@@ -1,11 +1,10 @@
 import './assets/base.css'
 import './assets/color.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
 import { FluentBundle } from '@fluent/bundle'
-
 import { createFluentVue } from 'fluent-vue'
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 
 import App from './App.vue'
 import router from './router'

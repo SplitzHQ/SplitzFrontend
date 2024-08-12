@@ -19,7 +19,7 @@ const tailwindColorObj = lightVars.reduce(
     }
     return acc
   },
-  {} as Record<string, string>
+  {} satisfies Record<string, string>
 )
 await fs.writeFile(
   './tailwind.config.colors.js',
