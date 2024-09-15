@@ -2,9 +2,21 @@
 import colors from './tailwind.config.colors'
 
 export default {
+  corePlugins: {
+    outlineWidth: false,
+    outlineStyle: false,
+    outlineColor: false,
+    outlineOffset: false
+  },
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    colors,
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      white: '#FFFFFF',
+      black: '#000000',
+      ...colors
+    },
     fontSize: {
       xs: [
         '0.75rem', // 12px
@@ -89,6 +101,7 @@ export default {
         }
       ]
     },
+
     extend: {
       fontFamily: {
         sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif']

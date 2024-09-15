@@ -4,10 +4,16 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  min-height: 100vh;
-  transition: color 0.3s, background-color 0.3s;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-base-bg-primary;
+  }
+
+  * {
+    @apply transition-colors;
+  }
 }

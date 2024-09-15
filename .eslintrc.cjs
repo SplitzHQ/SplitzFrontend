@@ -11,12 +11,15 @@ module.exports = {
     'plugin:vue/vue3-recommended',
     'eslint:recommended',
     '@vue/eslint-config-typescript/recommended',
-    '@vue/eslint-config-prettier/skip-formatting'
+    '@vue/eslint-config-prettier/skip-formatting',
+    'plugin:storybook/recommended',
+    'plugin:vuejs-accessibility/recommended'
   ],
   plugins: ['simple-import-sort'],
   rules: {
     'simple-import-sort/imports': 'error',
-    'simple-import-sort/exports': 'error'
+    'simple-import-sort/exports': 'error',
+    'vue/no-setup-props-destructure': 'off'
   },
   overrides: [
     {
@@ -25,6 +28,10 @@ module.exports = {
     }
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
+    parser: '@typescript-eslint/parser',
+    parserOptions: {
+      project: './tsconfig.json'
+    }
   }
 }
