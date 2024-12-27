@@ -19,7 +19,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
       size,
       disabled ? 'disabled' : color,
       iconOnly ? 'icon-only' : '',
-      'flex cursor-pointer items-center gap-1 rounded-full'
+      'flex cursor-pointer items-center justify-center gap-1 rounded-full'
     ]"
   >
     <PhCircleNotch v-if="loading" class="icon shrink-0 animate-spin" />
@@ -89,7 +89,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
 
   &.outline,
   &.ghost {
-    @apply bg-base-bg-primary text-base-text-primary;
+    @apply text-base-text-primary;
   }
 
   &.outline {
@@ -152,7 +152,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
 
   &.outline,
   &.ghost {
-    @apply bg-base-bg-primary text-base-text-error;
+    @apply text-base-text-error;
   }
 
   &.outline {
@@ -215,7 +215,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
 
   &.outline,
   &.ghost {
-    @apply bg-base-bg-primary text-base-text-brand;
+    @apply text-base-text-brand;
   }
 
   &.outline {
