@@ -6,9 +6,6 @@ import SButton from '@/components/SButton/SButtonBase.vue'
 export default {
   title: 'Components/Keyboard',
   component: Keyboard
-  // argTypes: {
-  //   onClick: { action: 'clicked' }
-  // }
 } satisfies Meta<typeof Keyboard>
 
 const Template: StoryFn<typeof Keyboard> = (args) => ({
@@ -20,4 +17,6 @@ const Template: StoryFn<typeof Keyboard> = (args) => ({
 })
 
 export const Default = Template.bind({})
-Default.args = {}
+Default.args = {
+  enableCalculator: true
+}

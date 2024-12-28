@@ -1,4 +1,5 @@
 import Big from 'big.js'
+import { computed, ref } from 'vue'
 
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
@@ -9,17 +10,17 @@ export type Operator = '+' | '-' | '×' | '÷'
 
 type CalculatorStack = PartialNumber | Operator
 
-export default class Calculator {
-  stack: CalculatorStack[] = []
+export default function useCalculator() {
+  const stack = ref<CalculatorStack[]>([])
 
-  input(input: CalculatorInput) {
-    if (this.stack.length === 0) {
-      this.stack.push([new Big(input), false, 0])
+  function input(input: CalculatorInput) {
+    if (stack.value.length === 0) {
+      stack.value.push([new Big(input), false, 0])
     } else {
-      const last = this.stack[this.stack.length - 1]
-      if (this.isOperator(last)) {
+      const last = stack.value[stack.value.length - 1]
+      if (isOperator(last)) {
         // if last is an operator, add a new number
-        this.stack.push([new Big(input), false, 0])
+        stack.value.push([new Big(input), false, 0])
       } else {
         // if last is a number, add the input to the number
         last[0] = last[0].times(10).plus(input)
@@ -31,38 +32,38 @@ export default class Calculator {
     }
   }
 
-  plus() {
-    if (this.stack.length === 0) return
-    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop()
-    this.stack.push('+')
+  function plus() {
+    if (stack.value.length === 0) return
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    stack.value.push('+')
   }
 
-  minus() {
-    if (this.stack.length === 0) return
-    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop()
-    this.stack.push('-')
+  function minus() {
+    if (stack.value.length === 0) return
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    stack.value.push('-')
   }
 
-  times() {
-    if (this.stack.length === 0) return
-    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop()
-    this.stack.push('×')
+  function times() {
+    if (stack.value.length === 0) return
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    stack.value.push('×')
   }
 
-  div() {
-    if (this.stack.length === 0) return
-    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop()
-    this.stack.push('÷')
+  function div() {
+    if (stack.value.length === 0) return
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    stack.value.push('÷')
   }
 
-  dot() {
-    if (this.stack.length === 0) {
-      this.stack.push([Big(0), true, 0])
+  function dot() {
+    if (stack.value.length === 0) {
+      stack.value.push([Big(0), true, 0])
     } else {
-      const last = this.stack[this.stack.length - 1]
+      const last = stack.value[stack.value.length - 1]
       if (typeof last === 'string') {
         // if last is an operator, add a 0 before the dot
-        this.stack.push([Big(0), true, 0])
+        stack.value.push([Big(0), true, 0])
       } else {
         if (last[1] === false) {
           // if last is not a decimal, add a dot
@@ -72,11 +73,11 @@ export default class Calculator {
     }
   }
 
-  backspace() {
-    if (this.stack.length !== 0) {
-      const last = this.stack[this.stack.length - 1]
-      if (this.isOperator(last)) {
-        this.stack.pop()
+  function backspace() {
+    if (stack.value.length !== 0) {
+      const last = stack.value[stack.value.length - 1]
+      if (isOperator(last)) {
+        stack.value.pop()
       } else {
         // if last is a number, remove the last digit
         last[0] = last[0].div(10).round(0, 0)
@@ -92,31 +93,31 @@ export default class Calculator {
         }
         if (last[0].eq(0) && !last[1]) {
           // if last is 0, remove it
-          this.stack.pop()
+          stack.value.pop()
         }
       }
     }
   }
 
-  get result() {
+  const result = computed(() => {
     let result = Big(0)
     let operator: Operator | null = null
     let partialNumber: Big | null = null
-    for (const item of this.stack) {
-      if (this.isOperator(item)) {
+    for (const item of stack.value) {
+      if (isOperator(item)) {
         operator = item
       } else {
         if (partialNumber === null) {
-          partialNumber = this.evaluatePartialNumber(item)
+          partialNumber = evaluatePartialNumber(item)
         } else {
           if (operator === '+') {
-            partialNumber = partialNumber.plus(this.evaluatePartialNumber(item))
+            partialNumber = partialNumber.plus(evaluatePartialNumber(item))
           } else if (operator === '-') {
-            partialNumber = partialNumber.minus(this.evaluatePartialNumber(item))
+            partialNumber = partialNumber.minus(evaluatePartialNumber(item))
           } else if (operator === '×') {
-            partialNumber = partialNumber.times(this.evaluatePartialNumber(item))
+            partialNumber = partialNumber.times(evaluatePartialNumber(item))
           } else if (operator === '÷') {
-            partialNumber = partialNumber.div(this.evaluatePartialNumber(item))
+            partialNumber = partialNumber.div(evaluatePartialNumber(item))
           }
         }
       }
@@ -125,14 +126,14 @@ export default class Calculator {
       result = partialNumber
     }
     return result.round(2, 1).toString()
-  }
+  })
 
-  get expression() {
+  const expression = computed(() => {
     let expression: string[] = []
     let lastOperator: Operator | null = null
-    for (const item of this.stack) {
-      if (!this.isOperator(item)) {
-        let num = this.evaluatePartialNumber(item).toFixed(item[2], 1)
+    for (const item of stack.value) {
+      if (!isOperator(item)) {
+        let num = evaluatePartialNumber(item).toFixed(item[2], 1)
         if (item[1] && item[2] === 0) {
           // if the number is a decimal with no decimal places, add a dot
           num += '.'
@@ -149,17 +150,30 @@ export default class Calculator {
       }
     }
     return expression
-  }
+  })
 
-  get isComplexExpression() {
-    return this.stack.length > 2
-  }
+  const isComplexExpression = computed(() => {
+    return stack.value.length > 2
+  })
 
-  private isOperator(input: CalculatorStack): input is Operator {
-    return input === '+' || input === '-' || input === '×' || input === '÷'
+  return {
+    input,
+    plus,
+    minus,
+    times,
+    div,
+    dot,
+    backspace,
+    result,
+    expression,
+    isComplexExpression
   }
+}
 
-  private evaluatePartialNumber(num: PartialNumber) {
-    return num[0].div(Big(10).pow(num[2]))
-  }
+function isOperator(input: CalculatorStack): input is Operator {
+  return input === '+' || input === '-' || input === '×' || input === '÷'
+}
+
+function evaluatePartialNumber(num: PartialNumber) {
+  return num[0].div(Big(10).pow(num[2]))
 }
