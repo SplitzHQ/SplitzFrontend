@@ -105,6 +105,9 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      },
+      borderRadius: {
+        '05xl': '0.625rem' // 10px
       }
     }
   },
