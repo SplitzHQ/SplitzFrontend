@@ -125,7 +125,7 @@ export default function useCalculator() {
     if (partialNumber !== null) {
       result = partialNumber
     }
-    return result.round(2, 1).toString()
+    return result.toNumber()
   })
 
   const expression = computed(() => {
