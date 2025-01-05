@@ -18,5 +18,6 @@ const Template: StoryFn<typeof Keyboard> = (args) => ({
 
 export const Default = Template.bind({})
 Default.args = {
-  enableCalculator: true
+  enableCalculator: true,
+  modelValue: 0
 }

@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from '@phosphor-icons/vue'
 import SButton from '@/components/SButton/SButtonBase.vue'
 import useCalculator, { type CalculatorInput, type Operator } from './useCalculator'
 
 interface KeyboardProps {
   enableCalculator?: boolean
+  varient: 'ghost' | 'primary'
 }
 
-const emit = defineEmits(['change'])
+const model = defineModel<number>()
 const { enableCalculator = true } = defineProps<KeyboardProps>()
 
 const calculator = useCalculator()
@@ -28,7 +29,7 @@ const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
   else if (value === '÷') calculator.div()
   else calculator.input(value)
 
-  emit('change', calculator.result.value)
+  model.value = calculator.result.value
 }
 </script>
 
@@ -36,7 +37,8 @@ const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
   <div
     :class="[
       enableCalculator ? 'enable-calculator' : 'disable-calculator',
-      'flex flex-col gap-2 border-t border-base-border-tertiary bg-base-bg-secondary p-4'
+      'flex flex-col gap-2 border-t',
+      varient === 'primary' ? 'border-base-border-tertiary bg-base-bg-secondary' : 'border-transparent'
     ]"
   >
     <div

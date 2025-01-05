@@ -124,7 +124,7 @@ export default class Calculator {
     if (partialNumber !== null) {
       result = partialNumber
     }
-    return result.round(2, 1).toString()
+    return result.toNumber()
   }
 
   get expression() {

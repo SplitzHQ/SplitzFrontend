@@ -9,11 +9,19 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+// @ts-expect-error - translation files
+import enMessages from './locales/en.ftl'
+// @ts-expect-error - translation files
+import zhcnMessages from './locales/zh-cn.ftl'
+
 const app = createApp(App)
 
 // Create bundles for locales that will be used
 const enBundle = new FluentBundle('en')
 const zhcnBundle = new FluentBundle('zh-cn')
+
+enBundle.addResource(enMessages)
+zhcnBundle.addResource(zhcnMessages)
 
 const fluent = createFluentVue({
   bundles: [enBundle, zhcnBundle]

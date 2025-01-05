@@ -5,8 +5,10 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    min-height: 100vh;
+  body,
+  #app,
+  .layout {
+    min-height: 100dvh;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
