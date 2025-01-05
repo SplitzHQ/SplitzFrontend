@@ -4,10 +4,13 @@ import Layout from '@/components/Layout/Layout.vue'
 import SButton from '@/components/SButton/SButton.vue'
 import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
 import { useFluent } from 'fluent-vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useElementBounding } from '@vueuse/core'
+import { useMotion } from '@vueuse/motion'
 
 const { $t } = useFluent()
 
+// format value as currency
 const value = ref(0)
 const formattedValue = computed(() => {
   return value.value.toLocaleString(undefined, {
@@ -17,6 +20,22 @@ const formattedValue = computed(() => {
     maximumFractionDigits: 2
   })
 })
+
+// format value layout animation
+const formattedValueDivRef = ref<HTMLDivElement | null>(null)
+const formattedValueDivBounding = useElementBounding(formattedValueDivRef)
+watch(formattedValue, async () => {
+  // watch for value change
+  const { x } = formattedValueDivBounding
+  const oldX = x.value
+  await nextTick()
+  const newX = x.value
+  // animate x position
+  useMotion(formattedValueDivRef, {
+    initial: { x: oldX - newX },
+    enter: { x: 0 }
+  })
+})
 </script>
 
 <template>
@@ -24,10 +43,12 @@ const formattedValue = computed(() => {
     <div v-bind="layoutAttrs" class="flex flex-col gap-4">
       <div class="flex grow flex-col items-center justify-center gap-6">
         <div
+          ref="formattedValueDivRef"
           :class="[
-            'text-[4.5rem] font-medium transition-none',
+            'flex h-[4.5rem] items-center font-medium transition-none',
             value === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
           ]"
+          :style="{ fontSize: `min(4.5rem, ${150 / formattedValue.length}vw)` }"
         >
           {{ formattedValue }}
         </div>
