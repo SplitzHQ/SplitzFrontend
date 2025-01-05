@@ -79,18 +79,20 @@ export default function useCalculator() {
       if (isOperator(last)) {
         stack.value.pop()
       } else {
-        // if last is a number, remove the last digit
-        last[0] = last[0].div(10).round(0, 0)
+        // last is a number
         if (last[1]) {
           // last is a decimal
           if (last[2] === 0) {
             // if last is a decimal with no decimal places, remove the dot
             last[1] = false
+            return
           } else {
             // if last is a decimal with decimal places, decrease the number of decimal places
             last[2]--
           }
         }
+        // remove the last digit
+        last[0] = last[0].div(10).round(0, 0)
         if (last[0].eq(0) && !last[1]) {
           // if last is 0, remove it
           stack.value.pop()
