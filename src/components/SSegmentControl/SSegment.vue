@@ -38,8 +38,10 @@ const emit = defineEmits<ButtonEvents>()
   .icon {
     @apply text-base-fg-brand;
 
-    &:hover {
-      @apply text-base-fg-brand_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply text-base-fg-brand_hover;
+      }
     }
 
     &:active {
@@ -55,8 +57,10 @@ const emit = defineEmits<ButtonEvents>()
 .ghost {
   @apply text-base-text-quaternary;
 
-  &:hover {
-    @apply bg-core-alpha-brand-10 text-base-text-brand_hover;
+  @media (hover: hover) {
+    &:hover {
+      @apply bg-core-alpha-brand-10 text-base-text-brand_hover;
+    }
   }
 
   &:active {
