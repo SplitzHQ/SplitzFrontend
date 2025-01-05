@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HeroProvider } from 'hero-motion'
+
 import SSegment from './SSegment.vue'
 
 interface SegmentControlProps {

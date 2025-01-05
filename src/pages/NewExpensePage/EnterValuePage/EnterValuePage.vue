@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
+import { useElementBounding } from '@vueuse/core'
+import { useMotion } from '@vueuse/motion'
+import { useFluent } from 'fluent-vue'
+import { computed, nextTick, ref, watch } from 'vue'
+
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
 import Layout from '@/components/Layout/Layout.vue'
 import SButton from '@/components/SButton/SButton.vue'
-import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
-import { useFluent } from 'fluent-vue'
-import { computed, nextTick, ref, watch } from 'vue'
-import { useElementBounding } from '@vueuse/core'
-import { useMotion } from '@vueuse/motion'
 
 const { $t } = useFluent()
 

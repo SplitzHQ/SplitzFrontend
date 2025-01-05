@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/vue3'
+
 import SSegmentControl from './SSegmentControl.vue'
 
 export default {

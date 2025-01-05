@@ -1,7 +1,9 @@
-import type { Meta, StoryFn } from '@storybook/vue3'
-import Keyboard from './Keyboard.vue'
 import { PhBackspace } from '@phosphor-icons/vue'
+import type { Meta, StoryFn } from '@storybook/vue3'
+
 import SButton from '@/components/SButton/SButtonBase.vue'
+
+import Keyboard from './Keyboard.vue'
 
 export default {
   title: 'Components/Keyboard',

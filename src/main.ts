@@ -1,18 +1,16 @@
-import './assets/base.css'
-import './assets/color.css'
-
 import { FluentBundle } from '@fluent/bundle'
 import { createFluentVue } from 'fluent-vue'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from './App.vue'
-import router from './router'
-
+import './assets/base.css'
+import './assets/color.css'
 // @ts-expect-error - translation files
 import enMessages from './locales/en.ftl'
 // @ts-expect-error - translation files
 import zhcnMessages from './locales/zh-cn.ftl'
+import router from './router'
 
 const app = createApp(App)
 

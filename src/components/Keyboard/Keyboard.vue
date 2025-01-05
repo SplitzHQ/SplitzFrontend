@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from '@phosphor-icons/vue'
+import { computed } from 'vue'
+
 import SButton from '@/components/SButton/SButtonBase.vue'
+
 import useCalculator, { type CalculatorInput, type Operator } from './useCalculator'
 
 interface KeyboardProps {
