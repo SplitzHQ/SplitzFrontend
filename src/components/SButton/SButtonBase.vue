@@ -38,8 +38,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.primary {
     @apply bg-base-bg-primary-reverse text-base-text-primary-reverse;
 
-    &:hover {
-      @apply bg-base-bg-primary-reverse_hover text-base-text-primary-reverse_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-primary-reverse_hover text-base-text-primary-reverse_hover;
+      }
     }
 
     &:active {
@@ -49,8 +51,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-primary-reverse;
 
-      &:hover {
-        @apply text-base-fg-primary-reverse_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-primary-reverse_hover;
+        }
       }
 
       &:active {
@@ -73,8 +77,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-primary;
 
-      &:hover {
-        @apply text-base-fg-primary_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-primary_hover;
+        }
       }
 
       &:active {
@@ -101,8 +107,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.primary {
     @apply bg-base-bg-error-reverse text-base-text-primary-reverse;
 
-    &:hover {
-      @apply bg-base-bg-error-reverse_hover text-base-text-primary-reverse_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-error-reverse_hover text-base-text-primary-reverse_hover;
+      }
     }
 
     &:active {
@@ -112,8 +120,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-primary-reverse;
 
-      &:hover {
-        @apply text-base-fg-primary-reverse_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-primary-reverse_hover;
+        }
       }
 
       &:active {
@@ -125,8 +135,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.secondary,
   &.outline,
   &.ghost {
-    &:hover {
-      @apply bg-base-bg-error_hover text-base-text-error_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-error_hover text-base-text-error_hover;
+      }
     }
 
     &:active {
@@ -136,8 +148,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-error;
 
-      &:hover {
-        @apply text-base-fg-error_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-error_hover;
+        }
       }
 
       &:active {
@@ -164,8 +178,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.primary {
     @apply bg-base-bg-brand-reverse text-base-text-primary-reverse;
 
-    &:hover {
-      @apply bg-base-bg-brand-reverse_hover text-base-text-primary-reverse_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-brand-reverse_hover text-base-text-primary-reverse_hover;
+      }
     }
 
     &:active {
@@ -175,8 +191,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-primary-reverse;
 
-      &:hover {
-        @apply text-base-fg-primary-reverse_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-primary-reverse_hover;
+        }
       }
 
       &:active {
@@ -188,8 +206,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.secondary,
   &.outline,
   &.ghost {
-    &:hover {
-      @apply bg-base-bg-brand_hover text-base-text-brand_hover;
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-brand_hover text-base-text-brand_hover;
+      }
     }
 
     &:active {
@@ -199,8 +219,10 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     .icon {
       @apply text-base-fg-brand;
 
-      &:hover {
-        @apply text-base-fg-brand_hover;
+      @media (hover: hover) {
+        &:hover {
+          @apply text-base-fg-brand_hover;
+        }
       }
 
       &:active {

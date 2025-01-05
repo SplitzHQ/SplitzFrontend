@@ -6,6 +6,7 @@ import useCalculator, { type CalculatorInput, type Operator } from './useCalcula
 
 interface KeyboardProps {
   enableCalculator?: boolean
+  varient: 'ghost' | 'primary'
 }
 
 const model = defineModel<number>()
@@ -36,7 +37,8 @@ const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
   <div
     :class="[
       enableCalculator ? 'enable-calculator' : 'disable-calculator',
-      'flex flex-col gap-2 border-t border-base-border-tertiary bg-base-bg-secondary p-4'
+      'flex flex-col gap-2 border-t',
+      varient === 'primary' ? 'border-base-border-tertiary bg-base-bg-secondary' : 'border-transparent'
     ]"
   >
     <div

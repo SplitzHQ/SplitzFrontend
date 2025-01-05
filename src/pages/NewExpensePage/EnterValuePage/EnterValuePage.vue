@@ -12,7 +12,9 @@ const value = ref(0)
 const formattedValue = computed(() => {
   return value.value.toLocaleString(undefined, {
     style: 'currency',
-    currency: 'USD'
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
   })
 })
 </script>
@@ -21,7 +23,14 @@ const formattedValue = computed(() => {
   <Layout v-slot="layoutAttrs">
     <div v-bind="layoutAttrs" class="flex flex-col gap-4">
       <div class="flex grow flex-col items-center justify-center gap-6">
-        <div class="text-[4.5rem] font-medium text-base-text-disabled">{{ formattedValue }}</div>
+        <div
+          :class="[
+            'text-[4.5rem] font-medium transition-none',
+            value === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
+          ]"
+        >
+          {{ formattedValue }}
+        </div>
         <div class="flex items-center gap-2">
           <SButton color="brand" variant="secondary" size="sm">
             <template #icon-left><PhCurrencyDollar /></template>
@@ -33,7 +42,7 @@ const formattedValue = computed(() => {
           </SButton>
         </div>
       </div>
-      <Keyboard v-model="value" :enable-calculator="true" />
+      <Keyboard varient="ghost" v-model="value" :enable-calculator="true" />
       <div class="grid grid-cols-2 items-center gap-3 py-3">
         <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
         <SButton color="brand" variant="primary" size="xxl">{{ $t('Next') }}</SButton>
