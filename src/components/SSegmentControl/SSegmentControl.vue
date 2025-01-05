@@ -21,6 +21,7 @@ const model = defineModel<number>({ required: true })
         :active="model === index"
       >
         <slot :item="item" />
-      </SSegment></div
-  ></HeroProvider>
+      </SSegment>
+    </div>
+  </HeroProvider>
 </template>
