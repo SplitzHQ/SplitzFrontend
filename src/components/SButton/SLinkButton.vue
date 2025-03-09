@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 
 import SButtonBase from './SButtonBase.vue'
 
-interface LinkButtonProps {
+export interface LinkButtonProps {
   color: 'neutral' | 'error' | 'brand'
   variant: 'primary' | 'secondary' | 'outline' | 'ghost'
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'

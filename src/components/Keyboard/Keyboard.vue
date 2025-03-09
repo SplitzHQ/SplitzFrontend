@@ -4,9 +4,9 @@ import { computed } from 'vue'
 
 import SButton from '@/components/SButton/SButtonBase.vue'
 
-import useCalculator, { type CalculatorInput, type Operator } from './useCalculator'
+import useCalculator, { type CalculatorInput, type Operator } from './UseCalculator'
 
-interface KeyboardProps {
+export interface KeyboardProps {
   enableCalculator?: boolean
   varient: 'ghost' | 'primary'
 }

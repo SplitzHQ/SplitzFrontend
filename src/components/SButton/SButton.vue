@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SButtonBase from './SButtonBase.vue'
 
-interface ButtonProps {
+export interface ButtonProps {
   color: 'neutral' | 'error' | 'brand'
   variant: 'primary' | 'secondary' | 'outline' | 'ghost'
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'

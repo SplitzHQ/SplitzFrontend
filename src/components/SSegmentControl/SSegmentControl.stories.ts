@@ -6,10 +6,6 @@ export default {
   title: 'Components/SegmentControl',
   component: SSegmentControl,
   argTypes: {
-    items: {
-      control: { type: 'array' },
-      description: 'Array of segment items'
-    },
     modelValue: {
       control: { type: 'number' },
       description: 'Index of the active segment'

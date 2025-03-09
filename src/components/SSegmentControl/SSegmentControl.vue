@@ -3,7 +3,7 @@ import { HeroProvider } from 'hero-motion'
 
 import SSegment from './SSegment.vue'
 
-interface SegmentControlProps {
+export interface SegmentControlProps {
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   items: string[]
 }
@@ -17,9 +17,9 @@ const model = defineModel<number>({ required: true })
       <SSegment
         v-for="(item, index) in items"
         :key="item"
-        @click="model = index"
         :size="size"
         :active="model === index"
+        @click="model = index"
       >
         <slot :item="item" />
       </SSegment>

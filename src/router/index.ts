@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createRouter, createWebHistory } from 'vue-router'
 
 import EnterValuePage from '@/pages/NewExpensePage/EnterValuePage/EnterValuePage.vue'

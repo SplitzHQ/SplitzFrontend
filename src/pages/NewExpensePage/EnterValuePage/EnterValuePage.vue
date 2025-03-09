@@ -64,7 +64,7 @@ watch(formattedValue, async () => {
           </SButton>
         </div>
       </div>
-      <Keyboard varient="ghost" v-model="value" :enable-calculator="true" />
+      <Keyboard v-model="value" varient="ghost" :enable-calculator="true" />
       <div class="grid grid-cols-2 items-center gap-3 py-3">
         <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
         <SButton color="brand" variant="primary" size="xxl">{{ $t('Next') }}</SButton>

@@ -5,6 +5,7 @@
   "singleQuote": true,
   "printWidth": 120,
   "trailingComma": "none",
+  "objectWrap": "preserve",
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
     "^@/",

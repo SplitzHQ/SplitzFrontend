@@ -3,7 +3,7 @@ interface Image {
   src: string
   alt: string
 }
-interface AvatarProps {
+export interface AvatarProps {
   images: Image[]
   size: 'xs' | 'sm' | 'lg'
 }
@@ -21,8 +21,8 @@ if (images.length > 4) {
     <div v-else class="flex flex-wrap justify-center gap-0.5">
       <img
         v-for="image in images.slice(0, 4)"
-        class="image-count-multiple"
         :key="image.src"
+        class="image-count-multiple"
         :src="image.src"
         :alt="image.alt"
       />

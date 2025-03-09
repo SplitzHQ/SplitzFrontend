@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import Big from 'big.js'
 import { computed, ref } from 'vue'
 
@@ -131,7 +132,7 @@ export default function useCalculator() {
   })
 
   const expression = computed(() => {
-    let expression: string[] = []
+    const expression: string[] = []
     let lastOperator: Operator | null = null
     for (const item of stack.value) {
       if (!isOperator(item)) {

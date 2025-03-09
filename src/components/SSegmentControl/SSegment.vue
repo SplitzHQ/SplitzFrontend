@@ -12,7 +12,7 @@ const emit = defineEmits<ButtonEvents>()
 </script>
 
 <template>
-  <button type="button" @click="emit('click')" class="relative">
+  <button type="button" class="relative" @click="emit('click')">
     <Hero v-if="active" class="absolute inset-0 rounded-full bg-core-alpha-brand-20" layout-id="segment-bg" />
     <div
       :class="[

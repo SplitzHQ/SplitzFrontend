@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { FluentBundle } from '@fluent/bundle'
 import { createFluentVue } from 'fluent-vue'
 import { createPinia } from 'pinia'

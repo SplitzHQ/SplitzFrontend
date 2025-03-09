@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 import Big from 'big.js'
 
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
@@ -128,7 +129,7 @@ export default class Calculator {
   }
 
   get expression() {
-    let expression: string[] = []
+    const expression: string[] = []
     let lastOperator: Operator | null = null
     for (const item of this.stack) {
       if (!this.isOperator(item)) {
