@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint'
 
 export default [
   ...tseslint.config({
-    extends: [tseslint.configs.recommendedTypeChecked],
+    extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     ignores: ['.storybook/**/*', 'scripts/**/*', '**/*.js', '**/*.stories.ts'],
     languageOptions: {
       parserOptions: {

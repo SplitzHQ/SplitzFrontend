@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
-// if secound boolean is true, the number is a decimal. The third number is the number of decimal places
+// if second boolean is true, the number is a decimal. The third number is the number of decimal places
 export type PartialNumber = [Big, boolean, number]
 
 export type Operator = '+' | '-' | '×' | '÷'
@@ -66,7 +66,7 @@ export default function useCalculator() {
         // if last is an operator, add a 0 before the dot
         stack.value.push([Big(0), true, 0])
       } else {
-        if (last[1] === false) {
+        if (!last[1]) {
           // if last is not a decimal, add a dot
           last[1] = true
         }
