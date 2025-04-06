@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createRouter, createWebHistory } from 'vue-router'
 
-import EnterValuePage from '@/pages/NewExpensePage/EnterValuePage/EnterValuePage.vue'
+import EnterAmountPage from '@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: EnterValuePage
+      component: EnterAmountPage
     }
   ]
 })

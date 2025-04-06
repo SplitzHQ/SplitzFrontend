@@ -48,7 +48,7 @@ const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
     >
       {{ expression }}
     </div>
-    <div class="grid-keyboard grid grow gap-2">
+    <div class="grid-keyboard grid grow gap-2 select-none">
       <SButton color="brand" variant="ghost" size="xxl" @click="input(1)">1</SButton>
       <SButton color="brand" variant="ghost" size="xxl" @click="input(2)">2</SButton>
       <SButton color="brand" variant="ghost" size="xxl" @click="input(3)">3</SButton>

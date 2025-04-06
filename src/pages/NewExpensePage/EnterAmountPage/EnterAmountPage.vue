@@ -8,13 +8,19 @@ import { computed, nextTick, ref, watch } from 'vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
 import Layout from '@/components/Layout/Layout.vue'
 import SButton from '@/components/SButton/SButton.vue'
+import { useTransactionStore } from '@/stores/transaction'
 
 const { $t } = useFluent()
+const transactionStore = useTransactionStore()
+const transaction = transactionStore.transaction
 
-// format value as currency
-const value = ref(0)
-const formattedValue = computed(() => {
-  return value.value.toLocaleString(undefined, {
+if (!transaction.amount) {
+  transaction.amount = 0
+}
+
+// format amount as currency
+const formattedAmount = computed(() => {
+  return transaction.amount!.toLocaleString(undefined, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
@@ -22,17 +28,17 @@ const formattedValue = computed(() => {
   })
 })
 
-// format value layout animation
-const formattedValueDivRef = ref<HTMLDivElement | null>(null)
-const formattedValueDivBounding = useElementBounding(formattedValueDivRef)
-watch(formattedValue, async () => {
-  // watch for value change
-  const { x } = formattedValueDivBounding
+// format amount layout animation
+const formattedAmountDivRef = ref<HTMLDivElement | null>(null)
+const formattedAmountDivBounding = useElementBounding(formattedAmountDivRef)
+watch(formattedAmount, async () => {
+  // watch for amount change
+  const { x } = formattedAmountDivBounding
   const oldX = x.value
   await nextTick()
   const newX = x.value
   // animate x position
-  useMotion(formattedValueDivRef, {
+  useMotion(formattedAmountDivRef, {
     initial: { x: oldX - newX },
     enter: { x: 0 }
   })
@@ -44,14 +50,14 @@ watch(formattedValue, async () => {
     <div v-bind="layoutAttrs" class="flex flex-col gap-4">
       <div class="flex grow flex-col items-center justify-center gap-6">
         <div
-          ref="formattedValueDivRef"
+          ref="formattedAmountDivRef"
           :class="[
             'flex h-[4.5rem] items-center font-medium transition-none',
-            value === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
+            transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
           ]"
-          :style="{ fontSize: `min(4.5rem, ${150 / formattedValue.length}vw)` }"
+          :style="{ fontSize: `min(4.5rem, ${150 / formattedAmount.length}vw)` }"
         >
-          {{ formattedValue }}
+          {{ formattedAmount }}
         </div>
         <div class="flex items-center gap-2">
           <SButton color="brand" variant="secondary" size="sm">
@@ -64,7 +70,7 @@ watch(formattedValue, async () => {
           </SButton>
         </div>
       </div>
-      <Keyboard v-model="value" varient="ghost" :enable-calculator="true" />
+      <Keyboard v-model="transaction.amount" varient="ghost" :enable-calculator="true" />
       <div class="grid grid-cols-2 items-center gap-3 py-3">
         <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
         <SButton color="brand" variant="primary" size="xxl">{{ $t('Next') }}</SButton>
