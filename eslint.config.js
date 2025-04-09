@@ -17,6 +17,7 @@ export default [
   ...vue(),
   ...tseslint.config({
     rules: {
+      'no-void': 'off',
       'import/no-default-export': 'off',
       'vue/singleline-html-element-content-newline': 'off',
       'unicorn/prefer-at': 'off'

@@ -66,8 +66,12 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.secondary,
   &.outline,
   &.ghost {
-    &:hover {
-      @apply bg-base-bg-neutral_hover text-base-text-primary_hover;
+    @apply text-base-text-primary;
+
+    @media (hover: hover) {
+      &:hover {
+        @apply bg-base-bg-neutral_hover text-base-text-primary_hover;
+      }
     }
 
     &:active {
@@ -90,12 +94,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.secondary {
-    @apply bg-base-bg-neutral text-base-text-primary;
-  }
-
-  &.outline,
-  &.ghost {
-    @apply text-base-text-primary;
+    @apply bg-base-bg-neutral;
   }
 
   &.outline {
@@ -135,6 +134,8 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.secondary,
   &.outline,
   &.ghost {
+    @apply text-base-text-error;
+
     @media (hover: hover) {
       &:hover {
         @apply bg-base-bg-error_hover text-base-text-error_hover;
@@ -161,12 +162,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.secondary {
-    @apply bg-base-bg-error text-base-text-error;
-  }
-
-  &.outline,
-  &.ghost {
-    @apply text-base-text-error;
+    @apply bg-base-bg-error;
   }
 
   &.outline {
@@ -206,6 +202,8 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   &.secondary,
   &.outline,
   &.ghost {
+    @apply text-base-text-brand;
+
     @media (hover: hover) {
       &:hover {
         @apply bg-base-bg-brand_hover text-base-text-brand_hover;
@@ -232,12 +230,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.secondary {
-    @apply bg-base-bg-brand text-base-text-brand;
-  }
-
-  &.outline,
-  &.ghost {
-    @apply text-base-text-brand;
+    @apply bg-base-bg-brand;
   }
 
   &.outline {
