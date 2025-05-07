@@ -45,7 +45,7 @@ export interface TransactionBalance {
      * @type {string}
      * @memberof TransactionBalance
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {number}

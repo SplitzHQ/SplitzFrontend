@@ -38,7 +38,7 @@ export interface TransactionBalanceDto {
      * @type {string}
      * @memberof TransactionBalanceDto
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {number}

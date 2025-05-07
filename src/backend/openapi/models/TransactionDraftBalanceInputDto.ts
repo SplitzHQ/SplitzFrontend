@@ -30,7 +30,7 @@ export interface TransactionDraftBalanceInputDto {
      * @type {string}
      * @memberof TransactionDraftBalanceInputDto
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {number}

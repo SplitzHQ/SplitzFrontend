@@ -24,13 +24,13 @@ export interface SplitzUserReducedDto {
      * @type {string}
      * @memberof SplitzUserReducedDto
      */
-    id: string | null;
+    id: string;
     /**
      * 
      * @type {string}
      * @memberof SplitzUserReducedDto
      */
-    userName?: string | null;
+    userName: string;
     /**
      * 
      * @type {string}
@@ -44,6 +44,7 @@ export interface SplitzUserReducedDto {
  */
 export function instanceOfSplitzUserReducedDto(value: object): value is SplitzUserReducedDto {
     if (!('id' in value) || value['id'] === undefined) return false;
+    if (!('userName' in value) || value['userName'] === undefined) return false;
     return true;
 }
 
@@ -58,7 +59,7 @@ export function SplitzUserReducedDtoFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'id': json['id'],
-        'userName': json['userName'] == null ? undefined : json['userName'],
+        'userName': json['userName'],
         'photo': json['photo'] == null ? undefined : json['photo'],
     };
 }

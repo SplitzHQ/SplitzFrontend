@@ -24,7 +24,7 @@ export interface TwoFactorResponse {
      * @type {string}
      * @memberof TwoFactorResponse
      */
-    sharedKey: string | null;
+    sharedKey: string;
     /**
      * 
      * @type {number}

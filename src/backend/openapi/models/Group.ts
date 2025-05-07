@@ -52,7 +52,7 @@ export interface Group {
      * @type {string}
      * @memberof Group
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}
@@ -64,27 +64,35 @@ export interface Group {
      * @type {Array<SplitzUser>}
      * @memberof Group
      */
-    members?: Array<SplitzUser> | null;
+    members?: Array<SplitzUser>;
     /**
      * 
      * @type {string}
      * @memberof Group
      */
-    membersIdHash: string | null;
+    membersIdHash: string;
     /**
      * 
      * @type {Array<Transaction>}
      * @memberof Group
      */
-    transactions?: Array<Transaction> | null;
+    transactions?: Array<Transaction>;
     /**
      * 
      * @type {Array<GroupBalance>}
      * @memberof Group
      */
-    balances?: Array<GroupBalance> | null;
+    balances?: Array<GroupBalance>;
     /**
-     * 
+     * The number of transactions of the group.
+     * This number is only for searching purposes and may not be accurate if transactions are deleted or modified.
+     * @type {number}
+     * @memberof Group
+     */
+    transactionCount: number;
+    /**
+     * The date of the last transaction of the group.
+     * This is only for searching purposes and may not be accurate if transactions are deleted or modified.
      * @type {Date}
      * @memberof Group
      */
@@ -97,6 +105,7 @@ export interface Group {
 export function instanceOfGroup(value: object): value is Group {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('membersIdHash' in value) || value['membersIdHash'] === undefined) return false;
+    if (!('transactionCount' in value) || value['transactionCount'] === undefined) return false;
     if (!('lastActivityTime' in value) || value['lastActivityTime'] === undefined) return false;
     return true;
 }
@@ -118,6 +127,7 @@ export function GroupFromJSONTyped(json: any, ignoreDiscriminator: boolean): Gro
         'membersIdHash': json['membersIdHash'],
         'transactions': json['transactions'] == null ? undefined : ((json['transactions'] as Array<any>).map(TransactionFromJSON)),
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(GroupBalanceFromJSON)),
+        'transactionCount': json['transactionCount'],
         'lastActivityTime': (new Date(json['lastActivityTime'])),
     };
 }
@@ -140,6 +150,7 @@ export function GroupToJSONTyped(value?: Group | null, ignoreDiscriminator: bool
         'membersIdHash': value['membersIdHash'],
         'transactions': value['transactions'] == null ? undefined : ((value['transactions'] as Array<any>).map(TransactionToJSON)),
         'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(GroupBalanceToJSON)),
+        'transactionCount': value['transactionCount'],
         'lastActivityTime': ((value['lastActivityTime']).toISOString()),
     };
 }

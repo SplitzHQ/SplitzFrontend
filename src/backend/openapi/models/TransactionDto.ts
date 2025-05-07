@@ -51,13 +51,13 @@ export interface TransactionDto {
      * @type {string}
      * @memberof TransactionDto
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}
      * @memberof TransactionDto
      */
-    icon: string | null;
+    icon: string;
     /**
      * 
      * @type {Date}
@@ -81,13 +81,13 @@ export interface TransactionDto {
      * @type {string}
      * @memberof TransactionDto
      */
-    currency: string | null;
+    currency: string;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof TransactionDto
      */
-    tags: Array<Tag> | null;
+    tags: Array<Tag>;
     /**
      * 
      * @type {string}
@@ -105,7 +105,7 @@ export interface TransactionDto {
      * @type {Array<TransactionBalanceDto>}
      * @memberof TransactionDto
      */
-    balances?: Array<TransactionBalanceDto> | null;
+    balances?: Array<TransactionBalanceDto>;
 }
 
 /**
@@ -141,7 +141,7 @@ export function TransactionDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'transactionTime': (new Date(json['transactionTime'])),
         'amount': json['amount'],
         'currency': json['currency'],
-        'tags': (json['tags'] == null ? null : (json['tags'] as Array<any>).map(TagFromJSON)),
+        'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'geoCoordinate': json['geoCoordinate'] == null ? undefined : json['geoCoordinate'],
         'photo': json['photo'] == null ? undefined : json['photo'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionBalanceDtoFromJSON)),
@@ -167,7 +167,7 @@ export function TransactionDtoToJSONTyped(value?: TransactionDto | null, ignoreD
         'transactionTime': ((value['transactionTime']).toISOString()),
         'amount': value['amount'],
         'currency': value['currency'],
-        'tags': (value['tags'] == null ? null : (value['tags'] as Array<any>).map(TagToJSON)),
+        'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         'geoCoordinate': value['geoCoordinate'],
         'photo': value['photo'],
         'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(TransactionBalanceDtoToJSON)),

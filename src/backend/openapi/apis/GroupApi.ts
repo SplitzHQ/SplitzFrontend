@@ -90,6 +90,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
         const response = await this.request({
             path: `/group/{groupId}/members`.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId']))),
             method: 'POST',
@@ -118,6 +122,10 @@ export class GroupApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
 
         const response = await this.request({
             path: `/group`,
@@ -153,6 +161,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
         const response = await this.request({
             path: `/group/{groupId}/join-link`.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId']))),
             method: 'POST',
@@ -185,6 +197,10 @@ export class GroupApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
 
         const response = await this.request({
             path: `/group/{groupId}`.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId']))),
@@ -219,6 +235,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
         const response = await this.request({
             path: `/group/join/{joinLinkId}`.replace(`{${"joinLinkId"}}`, encodeURIComponent(String(requestParameters['joinLinkId']))),
             method: 'GET',
@@ -252,6 +272,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
+
         const response = await this.request({
             path: `/group/{groupId}/transactions`.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId']))),
             method: 'GET',
@@ -277,6 +301,10 @@ export class GroupApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
 
         const response = await this.request({
             path: `/group`,
@@ -310,6 +338,10 @@ export class GroupApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
 
         const response = await this.request({
             path: `/group/join/{joinLinkId}`.replace(`{${"joinLinkId"}}`, encodeURIComponent(String(requestParameters['joinLinkId']))),
@@ -345,6 +377,10 @@ export class GroupApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+        }
 
         const response = await this.request({
             path: `/group/{groupId}`.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId']))),

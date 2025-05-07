@@ -1,7 +1,9 @@
+// sort-imports-ignore
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { FluentBundle } from '@fluent/bundle'
 import { createFluentVue } from 'fluent-vue'
 import { createPinia } from 'pinia'
+import { PiniaColada } from '@pinia/colada'
 import { createApp } from 'vue'
 
 import App from './App.vue'
@@ -27,6 +29,7 @@ const fluent = createFluentVue({
 })
 
 app.use(createPinia())
+app.use(PiniaColada, {})
 app.use(router)
 app.use(fluent)
 

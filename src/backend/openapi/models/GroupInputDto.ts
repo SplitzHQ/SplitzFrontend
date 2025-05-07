@@ -24,7 +24,7 @@ export interface GroupInputDto {
      * @type {string}
      * @memberof GroupInputDto
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}
@@ -36,7 +36,7 @@ export interface GroupInputDto {
      * @type {Array<string>}
      * @memberof GroupInputDto
      */
-    membersId: Array<string> | null;
+    membersId: Array<string>;
 }
 
 /**
@@ -60,7 +60,7 @@ export function GroupInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'name': json['name'],
         'photo': json['photo'] == null ? undefined : json['photo'],
-        'membersId': json['membersId'] == null ? null : json['membersId'],
+        'membersId': json['membersId'],
     };
 }
 

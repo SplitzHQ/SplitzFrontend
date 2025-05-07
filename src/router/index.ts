@@ -2,7 +2,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HomePage from '@/pages/HomePage/HomePage.vue'
-import EnterAmountPage from '@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +18,12 @@ const router = createRouter({
     {
       path: '/new-expense/enter-amount',
       name: 'newExpenseEnterAmount',
-      component: EnterAmountPage
+      component: () => import('@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue')
+    },
+    {
+      path: '/new-expense/select-people',
+      name: 'newExpenseSelectPeople',
+      component: () => import('@/pages/NewExpensePage/SelectPeoplePage/SelectPeoplePage.vue')
     }
   ]
 })

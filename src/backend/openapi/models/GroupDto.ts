@@ -45,7 +45,7 @@ export interface GroupDto {
      * @type {string}
      * @memberof GroupDto
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}
@@ -57,21 +57,29 @@ export interface GroupDto {
      * @type {Array<SplitzUserReducedDto>}
      * @memberof GroupDto
      */
-    members?: Array<SplitzUserReducedDto> | null;
+    members: Array<SplitzUserReducedDto>;
     /**
      * 
      * @type {string}
      * @memberof GroupDto
      */
-    membersIdHash: string | null;
+    membersIdHash: string;
     /**
      * 
      * @type {Array<GroupBalanceDto>}
      * @memberof GroupDto
      */
-    balances?: Array<GroupBalanceDto> | null;
+    balances: Array<GroupBalanceDto>;
     /**
-     * 
+     * The number of transactions between the user and their friend.
+     * This number is only for searching purposes and may not be accurate if transactions are deleted or modified.
+     * @type {number}
+     * @memberof GroupDto
+     */
+    transactionCount: number;
+    /**
+     * The date of the last transaction between the user and their friend.
+     * This is only for searching purposes and may not be accurate if transactions are deleted or modified.
      * @type {Date}
      * @memberof GroupDto
      */
@@ -84,7 +92,10 @@ export interface GroupDto {
 export function instanceOfGroupDto(value: object): value is GroupDto {
     if (!('groupId' in value) || value['groupId'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('members' in value) || value['members'] === undefined) return false;
     if (!('membersIdHash' in value) || value['membersIdHash'] === undefined) return false;
+    if (!('balances' in value) || value['balances'] === undefined) return false;
+    if (!('transactionCount' in value) || value['transactionCount'] === undefined) return false;
     if (!('lastActivityTime' in value) || value['lastActivityTime'] === undefined) return false;
     return true;
 }
@@ -102,9 +113,10 @@ export function GroupDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'groupId': json['groupId'],
         'name': json['name'],
         'photo': json['photo'] == null ? undefined : json['photo'],
-        'members': json['members'] == null ? undefined : ((json['members'] as Array<any>).map(SplitzUserReducedDtoFromJSON)),
+        'members': ((json['members'] as Array<any>).map(SplitzUserReducedDtoFromJSON)),
         'membersIdHash': json['membersIdHash'],
-        'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(GroupBalanceDtoFromJSON)),
+        'balances': ((json['balances'] as Array<any>).map(GroupBalanceDtoFromJSON)),
+        'transactionCount': json['transactionCount'],
         'lastActivityTime': (new Date(json['lastActivityTime'])),
     };
 }
@@ -123,9 +135,10 @@ export function GroupDtoToJSONTyped(value?: GroupDto | null, ignoreDiscriminator
         'groupId': value['groupId'],
         'name': value['name'],
         'photo': value['photo'],
-        'members': value['members'] == null ? undefined : ((value['members'] as Array<any>).map(SplitzUserReducedDtoToJSON)),
+        'members': ((value['members'] as Array<any>).map(SplitzUserReducedDtoToJSON)),
         'membersIdHash': value['membersIdHash'],
-        'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(GroupBalanceDtoToJSON)),
+        'balances': ((value['balances'] as Array<any>).map(GroupBalanceDtoToJSON)),
+        'transactionCount': value['transactionCount'],
         'lastActivityTime': ((value['lastActivityTime']).toISOString()),
     };
 }

@@ -19,3 +19,9 @@
     @apply transition-colors;
   }
 }
+
+@layer utilities {
+  .skeleton {
+    @apply animate-pulse rounded-md bg-base-bg-secondary;
+  }
+}

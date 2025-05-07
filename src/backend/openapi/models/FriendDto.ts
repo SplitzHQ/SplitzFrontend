@@ -34,7 +34,7 @@ export interface FriendDto {
      */
     friendUser: SplitzUserReducedDto;
     /**
-     * 
+     * A nickname about the friendship.
      * @type {string}
      * @memberof FriendDto
      */

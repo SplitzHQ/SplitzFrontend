@@ -58,13 +58,13 @@ export interface Transaction {
      * @type {string}
      * @memberof Transaction
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}
      * @memberof Transaction
      */
-    icon: string | null;
+    icon: string;
     /**
      * 
      * @type {Date}
@@ -88,13 +88,13 @@ export interface Transaction {
      * @type {string}
      * @memberof Transaction
      */
-    currency: string | null;
+    currency: string;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof Transaction
      */
-    tags: Array<Tag> | null;
+    tags: Array<Tag>;
     /**
      * 
      * @type {string}
@@ -118,7 +118,7 @@ export interface Transaction {
      * @type {Array<TransactionBalance>}
      * @memberof Transaction
      */
-    balances?: Array<TransactionBalance> | null;
+    balances?: Array<TransactionBalance>;
 }
 
 /**
@@ -155,7 +155,7 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'transactionTime': (new Date(json['transactionTime'])),
         'amount': json['amount'],
         'currency': json['currency'],
-        'tags': (json['tags'] == null ? null : (json['tags'] as Array<any>).map(TagFromJSON)),
+        'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'geoCoordinate': json['geoCoordinate'] == null ? undefined : json['geoCoordinate'],
         'photo': json['photo'] == null ? undefined : json['photo'],
         'group': GroupFromJSON(json['group']),
@@ -182,7 +182,7 @@ export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscrim
         'transactionTime': ((value['transactionTime']).toISOString()),
         'amount': value['amount'],
         'currency': value['currency'],
-        'tags': (value['tags'] == null ? null : (value['tags'] as Array<any>).map(TagToJSON)),
+        'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         'geoCoordinate': value['geoCoordinate'],
         'photo': value['photo'],
         'group': GroupToJSON(value['group']),

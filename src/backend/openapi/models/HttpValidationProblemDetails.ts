@@ -55,7 +55,7 @@ export interface HttpValidationProblemDetails {
      * @type {{ [key: string]: Array<string>; }}
      * @memberof HttpValidationProblemDetails
      */
-    errors?: { [key: string]: Array<string>; } | null;
+    errors?: { [key: string]: Array<string>; };
 }
 
 /**

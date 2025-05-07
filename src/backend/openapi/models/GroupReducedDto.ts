@@ -30,7 +30,7 @@ export interface GroupReducedDto {
      * @type {string}
      * @memberof GroupReducedDto
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}

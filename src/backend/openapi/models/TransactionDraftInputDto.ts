@@ -45,7 +45,7 @@ export interface TransactionDraftInputDto {
      * @type {string}
      * @memberof TransactionDraftInputDto
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {string}
@@ -93,7 +93,7 @@ export interface TransactionDraftInputDto {
      * @type {Array<Tag>}
      * @memberof TransactionDraftInputDto
      */
-    tags?: Array<Tag> | null;
+    tags?: Array<Tag>;
     /**
      * 
      * @type {string}
@@ -111,7 +111,7 @@ export interface TransactionDraftInputDto {
      * @type {Array<TransactionDraftBalanceInputDto>}
      * @memberof TransactionDraftInputDto
      */
-    balances?: Array<TransactionDraftBalanceInputDto> | null;
+    balances?: Array<TransactionDraftBalanceInputDto>;
 }
 
 /**

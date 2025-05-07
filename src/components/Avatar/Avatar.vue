@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import defaultUser from './default-user.svg'
+
 interface Image {
-  src: string
+  src: string | null | undefined
   alt: string
 }
 export interface AvatarProps {
@@ -17,13 +19,18 @@ if (images.length > 4) {
 
 <template>
   <div :class="['img-container', size, 'flex items-center justify-center bg-core-alpha-brand-10']">
-    <img v-if="images.length === 1" class="image-count-single" :src="images[0].src" :alt="images[0].alt" />
+    <img
+      v-if="images.length === 1"
+      class="image-count-single"
+      :src="images[0].src ?? defaultUser"
+      :alt="images[0].alt"
+    />
     <div v-else class="flex flex-wrap justify-center gap-0.5">
       <img
         v-for="image in images.slice(0, 4)"
-        :key="image.src"
+        :key="image.src ?? defaultUser"
         class="image-count-multiple"
-        :src="image.src"
+        :src="image.src ?? defaultUser"
         :alt="image.alt"
       />
     </div>

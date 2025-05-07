@@ -51,7 +51,7 @@ export interface GroupBalance {
      * @type {string}
      * @memberof GroupBalance
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {SplitzUser}
@@ -63,7 +63,7 @@ export interface GroupBalance {
      * @type {string}
      * @memberof GroupBalance
      */
-    friendUserId: string | null;
+    friendUserId: string;
     /**
      * 
      * @type {SplitzUser}
@@ -81,7 +81,7 @@ export interface GroupBalance {
      * @type {string}
      * @memberof GroupBalance
      */
-    currency: string | null;
+    currency: string;
 }
 
 /**

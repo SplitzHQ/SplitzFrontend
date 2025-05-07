@@ -24,13 +24,13 @@ export interface RegisterRequest {
      * @type {string}
      * @memberof RegisterRequest
      */
-    email: string | null;
+    email: string;
     /**
      * 
      * @type {string}
      * @memberof RegisterRequest
      */
-    password: string | null;
+    password: string;
 }
 
 /**

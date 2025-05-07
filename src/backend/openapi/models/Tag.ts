@@ -30,7 +30,7 @@ export interface Tag {
      * @type {string}
      * @memberof Tag
      */
-    name: string | null;
+    name: string;
     /**
      * 
      * @type {string}

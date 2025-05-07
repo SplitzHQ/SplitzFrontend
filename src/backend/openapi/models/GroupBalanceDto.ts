@@ -56,7 +56,7 @@ export interface GroupBalanceDto {
      * @type {string}
      * @memberof GroupBalanceDto
      */
-    currency: string | null;
+    currency: string;
 }
 
 /**

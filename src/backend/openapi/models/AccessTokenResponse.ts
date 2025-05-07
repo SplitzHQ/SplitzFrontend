@@ -24,13 +24,13 @@ export interface AccessTokenResponse {
      * @type {string}
      * @memberof AccessTokenResponse
      */
-    readonly tokenType?: string | null;
+    readonly tokenType?: string;
     /**
      * 
      * @type {string}
      * @memberof AccessTokenResponse
      */
-    accessToken: string | null;
+    accessToken: string;
     /**
      * 
      * @type {number}
@@ -42,7 +42,7 @@ export interface AccessTokenResponse {
      * @type {string}
      * @memberof AccessTokenResponse
      */
-    refreshToken: string | null;
+    refreshToken: string;
 }
 
 /**

@@ -39,7 +39,7 @@ export interface SplitzUser {
      * @type {string}
      * @memberof SplitzUser
      */
-    id?: string | null;
+    id?: string;
     /**
      * 
      * @type {string}
@@ -135,13 +135,13 @@ export interface SplitzUser {
      * @type {Array<Friend>}
      * @memberof SplitzUser
      */
-    friends?: Array<Friend> | null;
+    friends?: Array<Friend>;
     /**
      * 
      * @type {Array<Group>}
      * @memberof SplitzUser
      */
-    groups?: Array<Group> | null;
+    groups?: Array<Group>;
 }
 
 /**

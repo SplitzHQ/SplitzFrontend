@@ -9,6 +9,7 @@ import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMo
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
 import Layout from '@/components/Layout/Layout.vue'
 import SButton from '@/components/SButton/SButton.vue'
+import SLinkButton from '@/components/SButton/SLinkButton.vue'
 import { useTransactionStore } from '@/stores/transaction'
 
 const { $t } = useFluent()
@@ -80,7 +81,9 @@ watch(formattedAmount, async () => {
         <Keyboard v-model="transaction.amount" varient="ghost" :enable-calculator="true" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
           <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
-          <SButton color="brand" variant="primary" size="xxl">{{ $t('Next') }}</SButton>
+          <SLinkButton color="brand" variant="primary" size="xxl" href="/new-expense/select-people">
+            {{ $t('Next') }}
+          </SLinkButton>
         </div>
       </div>
     </template>

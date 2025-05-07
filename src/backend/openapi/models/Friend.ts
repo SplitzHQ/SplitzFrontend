@@ -32,7 +32,7 @@ export interface Friend {
      * @type {string}
      * @memberof Friend
      */
-    userId: string | null;
+    userId: string;
     /**
      * 
      * @type {SplitzUser}
@@ -44,7 +44,7 @@ export interface Friend {
      * @type {string}
      * @memberof Friend
      */
-    friendUserId: string | null;
+    friendUserId: string;
     /**
      * 
      * @type {SplitzUser}
@@ -52,7 +52,7 @@ export interface Friend {
      */
     friendUser?: SplitzUser;
     /**
-     * 
+     * A nickname about the friendship.
      * @type {string}
      * @memberof Friend
      */

@@ -24,7 +24,7 @@ export interface ForgotPasswordRequest {
      * @type {string}
      * @memberof ForgotPasswordRequest
      */
-    email: string | null;
+    email: string;
 }
 
 /**
