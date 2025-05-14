@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
 
 import { GroupApi } from '@/backend'
 import config from '@/backend/config'
 import Avatar from '@/components/Avatar/Avatar.vue'
+import { useTransactionStore } from '@/stores/transaction'
 
 const groupApi = new GroupApi(config)
-const { state } = useQuery({ key: ['getGroups'], query: () => groupApi.getGroups() })
+const { state: groups } = useQuery({ key: ['getGroups'], query: () => groupApi.getGroups() })
 const sortedGroups = computed(() => {
-  if (!state.value.data) return []
-  const groups = [...state.value.data]
-  return groups.sort((a, b) => b.transactionCount - a.transactionCount)
+  if (!groups.value.data) return []
+  const groupsValue = [...groups.value.data]
+  return groupsValue.sort((a, b) => b.transactionCount - a.transactionCount).slice(0, 10)
 })
+
+const transaction = useTransactionStore()
+const onGroupSelected = (groupId: string) => {
+  transaction.transaction.groupId = groupId
+}
 </script>
 
 <template>
-  <div v-if="state.status === 'pending'">
+  <div v-if="groups.status === 'pending'">
     <div class="flex items-center gap-3">
       <div class="flex flex-col items-center gap-1">
         <div class="w-16 h-16 skeleton" />
@@ -32,12 +39,18 @@ const sortedGroups = computed(() => {
       </div>
     </div>
   </div>
-  <div v-else-if="state.status === 'success'">
+  <div v-else-if="groups.status === 'success'">
     <div class="flex items-center gap-3">
-      <div v-for="group in sortedGroups" :key="group.groupId" class="flex flex-col items-center gap-1">
-        <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="xs" />
+      <RouterLink
+        v-for="group in sortedGroups"
+        :key="group.groupId"
+        to="/new-expense/select-split-method"
+        class="flex flex-col items-center gap-1"
+        @click="() => onGroupSelected(group.groupId)"
+      >
+        <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="lg" />
         <div class="text-center text-base-text-primary text-xs font-medium">{{ group.name }}</div>
-      </div>
+      </RouterLink>
     </div>
   </div>
 </template>

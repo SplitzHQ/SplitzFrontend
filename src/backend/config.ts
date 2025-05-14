@@ -9,12 +9,12 @@ const config = new Configuration({
   apiKey: async () => {
     let accessToken = localStorage.getItem('accessToken')
     const accessTokenExpiration = localStorage.getItem('accessTokenExpiration')
+    const backendApi = new SplitzBackendApi(new Configuration({ basePath: basePath }))
 
     if (accessTokenExpiration && parseInt(accessTokenExpiration) < Date.now()) {
       // access token expired, refresh it
       const refreshToken = localStorage.getItem('refreshToken')
       if (refreshToken) {
-        const backendApi = new SplitzBackendApi()
         const accessTokenResponse = await backendApi.accountRefreshPost({
           refreshRequest: {
             refreshToken: refreshToken
@@ -37,7 +37,6 @@ const config = new Configuration({
         // only run in dev mode
         // login with a test user
         // this is a temporary solution, should be removed in production
-        const backendApi = new SplitzBackendApi(new Configuration({ basePath: basePath }))
         const accessTokenResponse = await backendApi.accountLoginPost({
           loginRequest: {
             email: '1@a.com',

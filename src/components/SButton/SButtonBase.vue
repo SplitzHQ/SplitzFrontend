@@ -23,11 +23,11 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
     ]"
   >
     <PhCircleNotch v-if="loading" class="icon shrink-0 animate-spin" />
-    <div v-if="$slots['icon-left']" class="icon shrink-0">
+    <div v-if="$slots['icon-left']" class="icon shrink-0 relative">
       <slot name="icon-left" />
     </div>
     <slot />
-    <div v-if="$slots['icon-right']" class="icon shrink-0">
+    <div v-if="$slots['icon-right']" class="icon shrink-0 relative">
       <slot name="icon-right" />
     </div>
   </div>
@@ -312,6 +312,6 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
 }
 
 .icon {
-  @apply text-xl;
+  @apply h-5 w-5 text-xl;
 }
 </style>

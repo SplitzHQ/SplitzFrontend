@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Hero } from 'hero-motion'
+import { motion } from 'motion-v'
 
 interface SegmentProps {
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
@@ -13,7 +13,7 @@ const emit = defineEmits<ButtonEvents>()
 
 <template>
   <button type="button" class="relative" @click="emit('click')">
-    <Hero v-if="active" class="absolute inset-0 rounded-full bg-core-alpha-brand-20" layout-id="segment-bg" />
+    <motion.div v-if="active" class="absolute inset-0 rounded-full bg-core-alpha-brand-20" layout-id="segment-bg" />
     <div
       :class="[
         size,
