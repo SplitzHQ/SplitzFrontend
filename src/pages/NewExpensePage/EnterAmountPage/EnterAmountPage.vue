@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import NumberFlow, { type Format } from '@number-flow/vue'
 import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
-import { useElementBounding } from '@vueuse/core'
-import { useMotion } from '@vueuse/motion'
 import { useFluent } from 'fluent-vue'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed } from 'vue'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
@@ -21,29 +20,14 @@ if (!transaction.amount) {
 }
 
 // format amount as currency
+const formatOptions: Format = {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2
+}
 const formattedAmount = computed(() => {
-  return transaction.amount!.toLocaleString(undefined, {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  })
-})
-
-// format amount layout animation
-const formattedAmountDivRef = ref<HTMLDivElement | null>(null)
-const formattedAmountDivBounding = useElementBounding(formattedAmountDivRef)
-watch(formattedAmount, async () => {
-  // watch for amount change
-  const { x } = formattedAmountDivBounding
-  const oldX = x.value
-  await nextTick()
-  const newX = x.value
-  // animate x position
-  useMotion(formattedAmountDivRef, {
-    initial: { x: oldX - newX },
-    enter: { x: 0 }
-  })
+  return transaction.amount!.toLocaleString(undefined, formatOptions)
 })
 </script>
 
@@ -58,14 +42,13 @@ watch(formattedAmount, async () => {
       <div v-bind="layoutAttrs" class="flex flex-col gap-4">
         <div class="flex grow flex-col items-center justify-center gap-6">
           <div
-            ref="formattedAmountDivRef"
             :class="[
-              'flex h-[4.5rem] items-center font-medium transition-none',
+              'flex h-[4.5rem] items-center font-medium',
               transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
             ]"
             :style="{ fontSize: `min(4.5rem, ${150 / formattedAmount.length}vw)` }"
           >
-            {{ formattedAmount }}
+            <NumberFlow :value="transaction.amount!" :format="formatOptions" />
           </div>
           <div class="flex items-center gap-2">
             <SButton color="brand" variant="secondary" size="sm">

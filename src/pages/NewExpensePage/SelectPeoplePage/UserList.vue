@@ -2,11 +2,11 @@
 import { PhCheckCircle, PhCircle } from '@phosphor-icons/vue'
 
 import Avatar from '@/components/Avatar/Avatar.vue'
-import SIconButton from '@/components/SButton/SIconButton.vue'
+import SButtonBase from '@/components/SButton/SButtonBase.vue'
 
 import type { UserListItem } from './types'
 
-const { title, items } = defineProps<{
+const { title, items, selectedItemsId } = defineProps<{
   title: string
   items: UserListItem[]
   selectedItemsId: string[]
@@ -53,18 +53,27 @@ defineEmits<{
             </template>
             <div
               v-else-if="item.__typename === 'UserListItemFriend'"
-              class="text-base-text-primary text-base font-medium"
+              :class="[
+                'text-base-text-primary text-base font-medium',
+                selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : ''
+              ]"
             >
               {{ item.friendUser.userName }}
             </div>
           </div>
         </div>
-        <SIconButton color="brand" size="sm" variant="ghost">
-          <Transition name="fade">
-            <PhCheckCircle v-if="selectedItemsId.some((id) => item.id === id)" weight="fill" class="absolute inset-0" />
-            <PhCircle v-else class="absolute inset-0" />
-          </Transition>
-        </SIconButton>
+        <SButtonBase v-if="item.__typename === 'UserListItemFriend'" color="brand" size="sm" variant="ghost" icon-only>
+          <template #icon-left>
+            <Transition name="fade">
+              <PhCheckCircle
+                v-if="selectedItemsId.some((id) => item.id === id)"
+                weight="fill"
+                class="absolute inset-0"
+              />
+              <PhCircle v-else class="absolute inset-0" />
+            </Transition>
+          </template>
+        </SButtonBase>
       </button>
     </div>
   </div>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import { GroupApi } from '@/backend'
 import config from '@/backend/config'
 import Avatar from '@/components/Avatar/Avatar.vue'
 import { useTransactionStore } from '@/stores/transaction'
+
+const router = useRouter()
 
 const groupApi = new GroupApi(config)
 const { state: groups } = useQuery({ key: ['getGroups'], query: () => groupApi.getGroups() })
@@ -17,8 +19,9 @@ const sortedGroups = computed(() => {
 })
 
 const transaction = useTransactionStore()
-const onGroupSelected = (groupId: string) => {
+const onGroupSelected = async (groupId: string) => {
   transaction.transaction.groupId = groupId
+  await router.push({ name: 'newExpenseSelectSplitMethod' })
 }
 </script>
 
@@ -41,16 +44,15 @@ const onGroupSelected = (groupId: string) => {
   </div>
   <div v-else-if="groups.status === 'success'">
     <div class="flex items-center gap-3">
-      <RouterLink
+      <button
         v-for="group in sortedGroups"
         :key="group.groupId"
-        to="/new-expense/select-split-method"
         class="flex flex-col items-center gap-1"
         @click="() => onGroupSelected(group.groupId)"
       >
         <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="lg" />
         <div class="text-center text-base-text-primary text-xs font-medium">{{ group.name }}</div>
-      </RouterLink>
+      </button>
     </div>
   </div>
 </template>

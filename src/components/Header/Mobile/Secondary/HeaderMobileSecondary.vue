@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PhArrowLeft, PhX } from '@phosphor-icons/vue'
-import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 
 import SIconButton from '@/components/SButton/SIconButton.vue'

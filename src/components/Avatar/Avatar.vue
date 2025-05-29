@@ -7,7 +7,7 @@ interface Image {
 }
 export interface AvatarProps {
   images: Image[]
-  size: 'xs' | 'sm' | 'lg'
+  size: 'xxs' | 'xs' | 'sm' | 'lg'
 }
 
 const { images, size } = defineProps<AvatarProps>()
@@ -38,6 +38,18 @@ if (images.length > 4) {
 </template>
 
 <style lang="scss" scoped>
+.img-container.xxs {
+  @apply h-5 w-5 rounded-md;
+
+  .image-count-single {
+    @apply h-5 w-5 rounded-md;
+  }
+
+  .image-count-multiple {
+    @apply h-1 w-1 rounded-sm;
+  }
+}
+
 .img-container.xs {
   @apply h-10 w-10 rounded-05xl;
 

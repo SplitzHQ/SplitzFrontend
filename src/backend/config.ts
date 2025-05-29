@@ -12,22 +12,27 @@ const config = new Configuration({
     const backendApi = new SplitzBackendApi(new Configuration({ basePath: basePath }))
 
     if (accessTokenExpiration && parseInt(accessTokenExpiration) < Date.now()) {
+      accessToken = null
       // access token expired, refresh it
       const refreshToken = localStorage.getItem('refreshToken')
       if (refreshToken) {
-        const accessTokenResponse = await backendApi.accountRefreshPost({
-          refreshRequest: {
-            refreshToken: refreshToken
+        try {
+          const accessTokenResponse = await backendApi.accountRefreshPost({
+            refreshRequest: {
+              refreshToken: refreshToken
+            }
+          })
+          if (accessTokenResponse.accessToken && accessTokenResponse.refreshToken) {
+            localStorage.setItem('accessToken', accessTokenResponse.accessToken)
+            localStorage.setItem('refreshToken', accessTokenResponse.refreshToken)
+            localStorage.setItem(
+              'accessTokenExpiration',
+              new Date(Date.now() + 1000 * accessTokenResponse.expiresIn).getTime().toString()
+            )
+            accessToken = accessTokenResponse.accessToken
           }
-        })
-        if (accessTokenResponse.accessToken && accessTokenResponse.refreshToken) {
-          localStorage.setItem('accessToken', accessTokenResponse.accessToken)
-          localStorage.setItem('refreshToken', accessTokenResponse.refreshToken)
-          localStorage.setItem(
-            'accessTokenExpiration',
-            new Date(Date.now() + 1000 * accessTokenResponse.expiresIn).getTime().toString()
-          )
-          accessToken = accessTokenResponse.accessToken
+        } catch {
+          // do nothing, will return undefined accessToken
         }
       }
     }

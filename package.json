@@ -20,6 +20,7 @@
   "dependencies": {
     "@fluent/bundle": "^0.18.0",
     "@headlessui/vue": "^1.7.23",
+    "@number-flow/vue": "^0.4.7",
     "@phosphor-icons/vue": "^2.2.1",
     "@pinia/colada": "^0.15.3",
     "@vueuse/motion": "^2.2.6",
@@ -30,7 +31,8 @@
     "pinia": "^3.0.1",
     "swrv": "^1.1.0",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "xxhash-wasm": "^1.1.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
