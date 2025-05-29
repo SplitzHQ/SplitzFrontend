@@ -36,12 +36,30 @@ const accountApi = new AccountApi(config)
 const { state: groups } = useQuery({ key: ['getGroups'], query: () => groupApi.getGroups() })
 const { state: userInfo } = useQuery({ key: ['getUserInfo'], query: () => accountApi.getUserInfo() })
 
+// map groups with members and replace userName with remark if exists
+const mappedGroups = computed(() => {
+  if (!groups.value.data) return []
+  const groupsValue = structuredClone(groups.value.data)
+  // create a map for user friends
+  const friendsMap = new Map<string, string>()
+  userInfo.value.data?.friends?.forEach((friend) => {
+    friendsMap.set(friend.friendUser.id, friend.remark ?? friend.friendUser.userName)
+  })
+  // replace member userName with remark if exists
+  groupsValue.forEach((group) => {
+    group.members.forEach((member) => {
+      member.userName = friendsMap.get(member.id) ?? member.userName
+    })
+  })
+  return groupsValue
+})
 // sort groups and friends
 const sortedGroups = computed(() => {
   if (!groups.value.data) return []
-  let groupsValue = [...groups.value.data]
+  let groupsValue = [...mappedGroups.value]
   // todo: replace with flexsearch
   if (searchKeyword.value) groupsValue = groupsValue.filter((group) => group.name.includes(searchKeyword.value))
+  // sort groups by last activity time
   return groupsValue.sort((a, b) => b.lastActivityTime.getTime() - a.lastActivityTime.getTime())
 })
 const sortedGroupsGroupOnly = computed(() => {
@@ -91,10 +109,16 @@ const friendsInUserListItem = computed(() => {
 // selected items and selection handler
 const selectedItemsId = ref<string[]>([])
 const onItemSelected = (itemId: string) => {
-  const group = groups.value.data?.find((g) => g.groupId === itemId)
+  const group = mappedGroups.value.find((g) => g.groupId === itemId)
   if (group) {
     // If the item is a group, we set the groupId in the transaction store
     transaction.transaction.groupId = itemId
+    // update the members in the transaction store
+    transaction.members = group.members.map((member) => ({
+      id: member.id,
+      photo: member.photo,
+      userName: member.userName
+    }))
     // Navigate to the next step
     return router.push({ name: 'newExpenseSelectSplitMethod' })
   }
@@ -116,8 +140,9 @@ const selectedUsers = computed(() => {
     userInfo.value.data?.friends
       ?.filter((friend) => selectedItemsId.value.includes(friend.friendUser.id))
       .map((friend) => ({
+        id: friend.friendUser.id,
         photo: friend.friendUser.photo,
-        name: friend.remark ?? friend.friendUser.userName
+        userName: friend.remark ?? friend.friendUser.userName
       })) ?? []
   )
 })
@@ -129,27 +154,7 @@ const onSelectedUsersSubmitted = async () => {
   if (selectedItemsId.value.length === 0) return
   onSelectedUsersSubmittedLoading.value = true
   try {
-    // this is standard behavior for the package.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { h64: xxhash64 } = await xxhash()
-    const membersId = [...selectedItemsId.value, userInfo.value.data.id]
-    const membersIdHash = xxhash64(membersId.sort((a, b) => a.localeCompare(b)).join(','))
-      .toString(16)
-      .toLowerCase()
-    let group = groups.value.data?.find((g) => g.membersIdHash === membersIdHash)
-    if (!group) {
-      // If the group does not exist, create a new group
-      const newGroup = await groupApi.createGroup({
-        groupInputDto: {
-          name: [...selectedUsers.value.map((user) => user.name), userInfo.value.data.userName]
-            .sort((a, b) => a.localeCompare(b))
-            .join(', '),
-          membersId: selectedItemsId.value
-        }
-      })
-      group = newGroup
-    }
-    transaction.transaction.groupId = group.groupId
+    transaction.members = selectedUsers.value
     await router.push({ name: 'newExpenseSelectSplitMethod' })
   } finally {
     onSelectedUsersSubmittedLoading.value = false
@@ -165,20 +170,13 @@ const onSelectedUsersSubmitted = async () => {
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-4 relative">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-4 pb-16">
         <SearchBar v-model="searchKeyword" :selected-users="selectedUsers" />
-        <FrequentSelectionList />
+        <FrequentSelectionList @select="onItemSelected" />
         <UserList
           v-if="groupsInUserListItem.length > 0"
           :title="$t('Recent')"
           :items="groupsInUserListItem"
-          :selected-items-id="selectedItemsId"
-          @select="onItemSelected"
-        />
-        <UserList
-          v-if="groupsGroupOnlyInUserListItem.length > 0"
-          :title="$t('Groups')"
-          :items="groupsGroupOnlyInUserListItem"
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
@@ -189,7 +187,14 @@ const onSelectedUsersSubmitted = async () => {
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
-        <div class="absolute bottom-0 inset-x-3">
+        <UserList
+          v-if="groupsGroupOnlyInUserListItem.length > 0"
+          :title="$t('Groups')"
+          :items="groupsGroupOnlyInUserListItem"
+          :selected-items-id="selectedItemsId"
+          @select="onItemSelected"
+        />
+        <div class="fixed bottom-4 inset-x-3">
           <SButton
             variant="primary"
             color="brand"
