@@ -11,3 +11,5 @@ Friends = 朋友
 Groups = 群组
 Recent = 最近
 Select-split-method = 选择拆分方法
+Paid_By_Username = 付款人: { $username }
+You = 我

@@ -22,7 +22,7 @@ if (!transaction.amount) {
 // format amount as currency
 const formatOptions: Format = {
   style: 'currency',
-  currency: 'USD',
+  currency: transaction.currency ?? 'USD',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2
 }

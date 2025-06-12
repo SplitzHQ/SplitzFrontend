@@ -11,7 +11,7 @@ export interface KeyboardProps {
   varient: 'ghost' | 'primary'
 }
 
-const model = defineModel<number>()
+const model = defineModel<number | null>()
 const { enableCalculator = true } = defineProps<KeyboardProps>()
 
 const calculator = useCalculator()

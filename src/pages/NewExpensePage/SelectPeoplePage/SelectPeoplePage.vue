@@ -3,7 +3,6 @@ import { useQuery } from '@pinia/colada'
 import { useFluent } from 'fluent-vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import xxhash from 'xxhash-wasm'
 
 import { GroupApi, AccountApi } from '@/backend'
 import config from '@/backend/config'
@@ -119,6 +118,7 @@ const onItemSelected = (itemId: string) => {
       photo: member.photo,
       userName: member.userName
     }))
+    transaction.includedMembersId = transaction.members.map((user) => user.id)
     // Navigate to the next step
     return router.push({ name: 'newExpenseSelectSplitMethod' })
   }
@@ -155,6 +155,7 @@ const onSelectedUsersSubmitted = async () => {
   onSelectedUsersSubmittedLoading.value = true
   try {
     transaction.members = selectedUsers.value
+    transaction.includedMembersId = transaction.members.map((user) => user.id)
     await router.push({ name: 'newExpenseSelectSplitMethod' })
   } finally {
     onSelectedUsersSubmittedLoading.value = false
