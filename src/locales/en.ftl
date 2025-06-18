@@ -17,3 +17,13 @@ equally = Equally
 Total_Amount = Total Amount
 Included_People = Included ({ $count } people)
 Not_Included_People = Not Included ({ $count } people)
+percentage = Percentage
+shares = Shares
+adjustment = Adjustment
+custom = Custom
+countShare = 
+    { $count ->
+        [one] { $count } share
+        *[other] { $count } shares
+    }
+

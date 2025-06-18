@@ -7,6 +7,7 @@ import { useTransactionStore } from '@/stores/transaction'
 
 import PaidByButton from './PaidByButton.vue'
 import SplitMethodButton from './SplitMethodButton.vue'
+import UserItem from './UserItem.vue'
 
 // i18n
 const { $t } = useFluent()
@@ -48,11 +49,15 @@ const transaction = useTransactionStore()
               </div>
             </div>
           </div>
+          <UserItem v-for="memberId in transaction.includedMembersId" :key="memberId" :user-id="memberId" />
+        </div>
+        <div class="flex flex-col gap-1">
           <div class="flex justify-between items-center">
             <div class="text-base-text-tertiary text-sm font-medium">
               {{ $t('Not_Included_People', { count: transaction.excludedMembersId.length }) }}
             </div>
           </div>
+          <UserItem v-for="memberId in transaction.excludedMembersId" :key="memberId" :user-id="memberId" />
         </div>
       </div>
     </template>
