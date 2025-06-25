@@ -44,8 +44,8 @@ const config = new Configuration({
         // this is a temporary solution, should be removed in production
         const accessTokenResponse = await backendApi.accountLoginPost({
           loginRequest: {
-            email: '1@a.com',
-            password: '1@a.com1@a.com'
+            email: 'alice@example.com',
+            password: 'TestPassword123!'
           }
         })
         if (accessTokenResponse.accessToken && accessTokenResponse.refreshToken) {

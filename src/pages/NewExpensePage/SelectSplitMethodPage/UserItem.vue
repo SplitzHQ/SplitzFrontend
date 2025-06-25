@@ -52,10 +52,15 @@ const onPlusMinusButtonClick = () => {
           "
           class="text-base-text-primary text-sm font-normal"
         >
-          $ {{ transactionStore.finalSplitAmount[userId].toFixed(2) }}
+          {{
+            transactionStore.finalSplitAmount[userId].toLocaleString(undefined, {
+              style: 'currency',
+              currency: transactionStore.transaction.currency ?? 'USD'
+            })
+          }}
         </div>
       </div>
     </div>
-    <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" />
+    <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" is-focused />
   </div>
 </template>

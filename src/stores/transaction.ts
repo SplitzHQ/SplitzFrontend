@@ -6,7 +6,9 @@ import type { SplitMethod } from '@/types/split-method'
 
 export const useTransactionStore = defineStore('transaction', () => {
   const transaction = ref<TransactionDraftInputDto>({
-    userId: ''
+    userId: '',
+    amount: 0,
+    currency: 'USD'
   })
 
   const members = ref<SplitzUserReducedDto[]>([])
@@ -28,10 +30,10 @@ export const useTransactionStore = defineStore('transaction', () => {
   }
 
   const splitMethod = ref<SplitMethod>('equally')
-  const splitByPercentageDetails = ref<Record<string, number>>({})
-  const splitBySharesDetails = ref<Record<string, number>>({})
-  const splitByAdjustmentDetails = ref<Record<string, number>>({})
-  const splitByCustomDetails = ref<Record<string, number>>({})
+  const splitByPercentageDetails = ref<Record<string, number | undefined>>({})
+  const splitBySharesDetails = ref<Record<string, number | undefined>>({})
+  const splitByAdjustmentDetails = ref<Record<string, number | undefined>>({})
+  const splitByCustomDetails = ref<Record<string, number | undefined>>({})
   const finalSplitAmount = computed(() => {
     if (splitMethod.value === 'equally') {
       return includedMembersId.value.reduce<Record<string, number>>((acc, memberId) => {
@@ -40,10 +42,9 @@ export const useTransactionStore = defineStore('transaction', () => {
       }, {})
     } else if (splitMethod.value === 'percentage') {
       return includedMembersId.value.reduce<Record<string, number>>((acc, memberId) => {
+        const defaultPercentage = 100 / includedMembersId.value.length
         acc[memberId] =
-          ((splitByPercentageDetails.value[memberId] ?? 100 / includedMembersId.value.length) *
-            (transaction.value.amount ?? 0)) /
-          100
+          ((splitByPercentageDetails.value[memberId] ?? defaultPercentage) * (transaction.value.amount ?? 0)) / 100
         return acc
       }, {})
     } else if (splitMethod.value === 'shares') {

@@ -15,16 +15,10 @@ const { $t } = useFluent()
 const transactionStore = useTransactionStore()
 const transaction = transactionStore.transaction
 
-if (!transaction.amount) {
-  transaction.amount = 0
-}
-
 // format amount as currency
 const formatOptions: Format = {
   style: 'currency',
-  currency: transaction.currency ?? 'USD',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2
+  currency: transaction.currency ?? 'USD'
 }
 const formattedAmount = computed(() => {
   return transaction.amount!.toLocaleString(undefined, formatOptions)

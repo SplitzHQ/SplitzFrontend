@@ -30,7 +30,7 @@ const close = () => {
 </script>
 
 <template>
-  <div class="flex gap-2.5 p-4 items-center sticky top-0 bg-base-bg-primary z-sticky">
+  <header class="flex gap-2.5 p-4 items-center sticky top-0 bg-base-bg-primary z-sticky">
     <SIconButton v-if="enableBackButton" variant="ghost" color="neutral" size="lg" @click="goBack">
       <PhArrowLeft />
     </SIconButton>
@@ -40,5 +40,5 @@ const close = () => {
     <SIconButton v-if="enableCloseButton" variant="ghost" color="neutral" size="lg" @click="close">
       <PhX />
     </SIconButton>
-  </div>
+  </header>
 </template>

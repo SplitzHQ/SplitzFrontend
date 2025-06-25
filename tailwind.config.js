@@ -3,9 +3,9 @@ import colors from './tailwind.config.colors'
 
 export default {
   corePlugins: {
-    outlineWidth: false,
-    outlineColor: false,
-    outlineOffset: false
+    // outlineWidth: false,
+    // outlineColor: false,
+    // outlineOffset: false
   },
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
