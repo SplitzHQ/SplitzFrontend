@@ -55,7 +55,7 @@ const formattedAmount = computed(() => {
             </SButton>
           </div>
         </div>
-        <Keyboard v-model="transaction.amount" varient="ghost" :enable-calculator="true" />
+        <Keyboard v-model="transaction.amount" variant="ghost" :enable-calculator="true" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
           <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
           <SLinkButton color="brand" variant="primary" size="xxl" href="/new-expense/select-people">
