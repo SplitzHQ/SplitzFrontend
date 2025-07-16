@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core'
 import { useFluent } from 'fluent-vue'
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, ref, Teleport, useTemplateRef } from 'vue'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
@@ -40,6 +41,10 @@ onMounted(() => {
     headerHeight.value = headerElement.clientHeight
   }
 })
+
+// get keyboard's height to adjust the layout
+const keyboardContainer = useTemplateRef('keyboardContainer')
+const { height: keyboardHeight } = useElementSize(keyboardContainer)
 </script>
 
 <template>
@@ -87,11 +92,16 @@ onMounted(() => {
             <UserItem v-for="memberId in transaction.excludedMembersId" :key="memberId" :user-id="memberId" />
           </div>
         </div>
-        <Transition name="slide-fade">
-          <div v-if="focusedInputUserId" class="flex-shrink-0 -mt-4" @click.stop>
-            <Keyboard v-model="keyboardValue" class="pb-4 px-4" varient="primary" enable-calculator />
+        <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
+        <Teleport to="body">
+          <div ref="keyboardContainer" class="fixed z-fixed bottom-0 inset-x-0">
+            <Transition name="slide-fade">
+              <div v-if="focusedInputUserId" class="-mt-4" @click.stop>
+                <Keyboard v-model="keyboardValue" class="pb-4 px-4" variant="primary" enable-calculator />
+              </div>
+            </Transition>
           </div>
-        </Transition>
+        </Teleport>
       </div>
     </template>
   </Layout>
@@ -101,6 +111,7 @@ onMounted(() => {
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.3s ease;
+  transform-origin: bottom;
 }
 .slide-fade-enter-from,
 .slide-fade-leave-to {

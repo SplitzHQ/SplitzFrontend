@@ -23,18 +23,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
 </script>
 
 <template>
-  <button
-    type="button"
-    @click.stop="
-      () => {
-        if (transactionStore.splitMethod !== 'equally') setFocusedInputUserId(userId)
-      }
-    "
-  >
-    <div
-      v-if="transactionStore.splitMethod === 'equally'"
-      class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full flex justify-end items-center"
-    >
+  <button v-if="transactionStore.splitMethod === 'equally'" type="button" @click.stop="setFocusedInputUserId(userId)">
+    <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full flex justify-end items-center">
       <span class="text-center text-base-text-placeholder text-sm font-normal">
         {{
           transactionStore.finalSplitAmount[userId].toLocaleString(undefined, {
@@ -44,8 +34,14 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
         }}
       </span>
     </div>
+  </button>
+
+  <button
+    v-else-if="transactionStore.splitMethod === 'percentage'"
+    type="button"
+    @click.stop="setFocusedInputUserId(userId)"
+  >
     <div
-      v-else-if="transactionStore.splitMethod === 'percentage'"
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
@@ -74,23 +70,30 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
         }}
       </span>
     </div>
+  </button>
 
-    <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex justify-end items-center gap-1">
-      <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.decreaseSplitByShares(userId)">
-        <PhMinus />
-      </SIconButton>
+  <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex justify-end items-center gap-1">
+    <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.decreaseSplitByShares(userId)">
+      <PhMinus />
+    </SIconButton>
+    <button type="button" @click.stop="setFocusedInputUserId(userId)">
       <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full items-center">
         <span class="text-center text-base-text-primary text-sm font-normal">
           {{ $t('countShare', { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
         </span>
       </div>
-      <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.increaseSplitByShares(userId)">
-        <PhPlus />
-      </SIconButton>
-    </div>
+    </button>
+    <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.increaseSplitByShares(userId)">
+      <PhPlus />
+    </SIconButton>
+  </div>
 
+  <button
+    v-else-if="transactionStore.splitMethod === 'adjustment'"
+    type="button"
+    @click.stop="setFocusedInputUserId(userId)"
+  >
     <div
-      v-else-if="transactionStore.splitMethod === 'adjustment'"
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
@@ -119,9 +122,14 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
         }}
       </span>
     </div>
+  </button>
 
+  <button
+    v-else-if="transactionStore.splitMethod === 'custom'"
+    type="button"
+    @click.stop="setFocusedInputUserId(userId)"
+  >
     <div
-      v-else-if="transactionStore.splitMethod === 'custom'"
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',

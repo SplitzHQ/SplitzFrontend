@@ -23,6 +23,7 @@
     "@number-flow/vue": "^0.4.7",
     "@phosphor-icons/vue": "^2.2.1",
     "@pinia/colada": "^0.15.3",
+    "@vueuse/core": "^13.5.0",
     "big.js": "^6.2.2",
     "flexsearch": "^0.8.164",
     "fluent-vue": "^3.7.1",
