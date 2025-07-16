@@ -8,14 +8,16 @@ export interface ButtonProps {
   disabled?: boolean
   loading?: boolean
 }
-type ButtonEvents = (e: 'click') => void
+interface ButtonEvents {
+  click: [e: MouseEvent]
+}
 
 const { color, variant, size, disabled, loading } = defineProps<ButtonProps>()
 const emit = defineEmits<ButtonEvents>()
 
-function clickHandler() {
+function clickHandler(e: MouseEvent) {
   if (disabled) return
-  emit('click')
+  emit('click', e)
 }
 </script>
 
