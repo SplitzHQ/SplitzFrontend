@@ -17,7 +17,7 @@ import { useKeyboardControl } from './use-keyboard-control'
 const { $t } = useFluent()
 
 // transaction store
-const transaction = useTransactionStore()
+const transactionStore = useTransactionStore()
 const { keyboardValue, focusedInputUserId, setFocusedInputUserId } = useKeyboardControl()
 
 // Handle click outside to close the keyboard
@@ -65,7 +65,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
           <div class="flex flex-col gap-1">
             <div class="flex justify-between items-center">
               <div class="text-base-text-tertiary text-sm font-medium">
-                {{ $t('Included_People', { count: transaction.includedMembersId.length }) }}
+                {{ $t('Included_People', { count: transactionStore.includedMembersId.length }) }}
               </div>
               <div class="flex justify-start items-start gap-1">
                 <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
@@ -73,23 +73,31 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
                 </div>
                 <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
                   {{
-                    transaction.transaction.amount?.toLocaleString(undefined, {
+                    transactionStore.transaction.amount?.toLocaleString(undefined, {
                       style: 'currency',
-                      currency: transaction.transaction.currency ?? 'USD'
+                      currency: transactionStore.transaction.currency ?? 'USD'
                     })
                   }}
                 </div>
+                <div
+                  v-if="!transactionStore.isUserInputValid"
+                  class="justify-start text-sm font-medium leading-tight text-base-text-error"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {{ $t('Invalid_Input') }}
+                </div>
               </div>
             </div>
-            <UserItem v-for="memberId in transaction.includedMembersId" :key="memberId" :user-id="memberId" />
+            <UserItem v-for="memberId in transactionStore.includedMembersId" :key="memberId" :user-id="memberId" />
           </div>
           <div class="flex flex-col gap-1">
             <div class="flex justify-between items-center">
               <div class="text-base-text-tertiary text-sm font-medium">
-                {{ $t('Not_Included_People', { count: transaction.excludedMembersId.length }) }}
+                {{ $t('Not_Included_People', { count: transactionStore.excludedMembersId.length }) }}
               </div>
             </div>
-            <UserItem v-for="memberId in transaction.excludedMembersId" :key="memberId" :user-id="memberId" />
+            <UserItem v-for="memberId in transactionStore.excludedMembersId" :key="memberId" :user-id="memberId" />
           </div>
         </div>
         <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />

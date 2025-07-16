@@ -21,9 +21,9 @@ percentage = Percentage
 shares = Shares
 adjustment = Adjustment
 custom = Custom
-countShare = 
+countShare =
     { $count ->
         [one] { $count } share
-        *[other] { $count } shares
+       *[other] { $count } shares
     }
-
+Invalid_Input = Invalid Input
