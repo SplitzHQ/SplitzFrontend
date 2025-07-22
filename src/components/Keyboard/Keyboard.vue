@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from '@phosphor-icons/vue'
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 import SButton from '@/components/SButton/SButtonBase.vue'
 
@@ -15,6 +15,19 @@ const model = defineModel<number | null>()
 const { enableCalculator = true } = defineProps<KeyboardProps>()
 
 const calculator = useCalculator()
+
+onMounted(() => {
+  calculator.initialize(model.value ?? null)
+})
+
+// Watch for external changes to the model value
+watch(() => model.value, (newValue) => {
+  // Only reinitialize if the new value is different from the current calculator result
+  // to avoid infinite loops when the calculator updates the model
+  if (newValue !== calculator.result.value) {
+    calculator.initialize(newValue ?? null)
+  }
+})
 
 const expression = computed(() => {
   return calculator.expression.value.join(' ')

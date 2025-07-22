@@ -24,7 +24,15 @@ export default function useCalculator() {
         stack.value.push([new Big(input), false, 0])
       } else {
         // if last is a number, add the input to the number
-        last[0] = last[0].times(10).plus(input)
+        const isNegative = last[0].lt(0)
+        last[0] = last[0].times(10)
+        if (!isNegative) {
+          // if last is a positive number, add the input
+          last[0] = last[0].plus(input)
+        } else {
+          // if last is a negative number, subtract the input to maintain negative value
+          last[0] = last[0].minus(input)
+        }
         if (last[1]) {
           // if last is a decimal, increase the number of decimal places
           last[2]++
@@ -40,7 +48,11 @@ export default function useCalculator() {
   }
 
   function minus() {
-    if (stack.value.length === 0) return
+    if (stack.value.length === 0) {
+      // Start with negative zero to allow negative number input
+      stack.value.push([Big(0), false, 0], '-')
+      return
+    }
     if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
     stack.value.push('-')
   }
@@ -102,6 +114,29 @@ export default function useCalculator() {
     }
   }
 
+  function initialize(value: number | null) {
+    if (value === null || value === 0) {
+      stack.value = []
+      return
+    }
+
+    const bigValue = new Big(value)
+    const str = bigValue.toString()
+    const decimalIndex = str.indexOf('.')
+
+    if (decimalIndex === -1) {
+      // whole number
+      stack.value = [[bigValue, false, 0]]
+    } else {
+      // decimal number
+      const decimalPlaces = str.length - decimalIndex - 1
+      const multiplier = Big(10).pow(decimalPlaces)
+      // For negative decimals, we need to handle the conversion properly
+      const integerValue = bigValue.times(multiplier)
+      stack.value = [[integerValue, true, decimalPlaces]]
+    }
+  }
+
   const result = computed(() => {
     let result = Big(0)
     let operator: Operator | null = null
@@ -141,7 +176,16 @@ export default function useCalculator() {
           // if the number is a decimal with no decimal places, add a dot
           num += '.'
         }
-        expression.push(num)
+        // Handle negative numbers in expression display
+        if (num.startsWith('-') && expression.length === 0) {
+          // If it's the first number and negative, show it as is
+          expression.push(num)
+        } else if (num.startsWith('-')) {
+          // If it's a negative number but not the first, format it properly
+          expression.push(`(${num})`)
+        } else {
+          expression.push(num)
+        }
       } else {
         if (lastOperator !== null && (lastOperator === '+' || lastOperator === '-') && (item === '×' || item === '÷')) {
           // add parentheses if the last operator is + or - and the current operator is × or ÷
@@ -167,6 +211,7 @@ export default function useCalculator() {
     div,
     dot,
     backspace,
+    initialize,
     result,
     expression,
     isComplexExpression
