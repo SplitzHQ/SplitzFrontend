@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
+import { useAsyncState, useElementSize } from '@vueuse/core'
 import { useFluent } from 'fluent-vue'
 import { onMounted, onUnmounted, ref, Teleport, useTemplateRef } from 'vue'
 
@@ -46,6 +46,11 @@ onMounted(() => {
 // get keyboard's height to adjust the layout
 const keyboardContainer = useTemplateRef('keyboardContainer')
 const { height: keyboardHeight } = useElementSize(keyboardContainer)
+
+// async state for submit button
+// const { state } = useAsyncState(async () => {
+//   await transactionStore.saveTransaction()
+// })
 </script>
 
 <template>
@@ -103,7 +108,15 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             </div>
           </div>
           <div class="z-sticky sticky bottom-4">
-            <SButton color="brand" variant="primary" size="xxl" class="w-full">{{ $t('Next') }}</SButton>
+            <SButton
+              :disabled="!transactionStore.isUserInputValid"
+              color="brand"
+              variant="primary"
+              size="xxl"
+              class="w-full"
+            >
+              {{ $t('Next') }}
+            </SButton>
           </div>
         </div>
         <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
