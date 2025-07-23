@@ -1,7 +1,14 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-import type { SplitzUserReducedDto, TransactionDraftInputDto } from '@/backend'
+import {
+  TransactionApi,
+  type SplitzUserReducedDto,
+  type TransactionDraftInputDto,
+  type TransactionInputDto,
+  type TransactionBalanceInputDto,
+  type TransactionDto
+} from '@/backend'
 import type { SplitMethod } from '@/types/split-method'
 
 const ROUNDING_TOLERANCE = 0.01
@@ -20,6 +27,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     amount: 0,
     currency: 'USD'
   })
+  const transactionId = ref<string | undefined>(undefined)
 
   const members = ref<SplitzUserReducedDto[]>([])
   const paidBy = ref<string>()
@@ -117,12 +125,48 @@ export const useTransactionStore = defineStore('transaction', () => {
   })
   // check if the user input splitDetails is valid
   // for percentage, shares, adjustment, and custom splits
-  // also handle rounding issues
+  // also handle rounding issues and ensure final split amounts are positive and sum correctly
   const isUserInputValid = computed(() => {
     const totalAmount = transaction.value.amount ?? 0
 
+    // Check if transaction amount is positive
+    if (totalAmount <= 0) {
+      return false
+    }
+
+    // Check if there are included members
+    if (sortedIncludedMembersId.value.length === 0) {
+      return false
+    }
+
+    // Get the final split amounts to validate
+    const splitAmounts = finalSplitAmount.value
+    const memberIds = sortedIncludedMembersId.value
+
+    // Check if all split amounts are positive
+    const allAmountsPositive = memberIds.every((memberId) => {
+      const amount = splitAmounts[memberId] ?? 0
+      return amount > 0
+    })
+
+    if (!allAmountsPositive) {
+      return false
+    }
+
+    // Check if the sum of split amounts equals the transaction amount (within tolerance)
+    const totalSplitAmount = memberIds.reduce((sum, memberId) => {
+      return sum + (splitAmounts[memberId] ?? 0)
+    }, 0)
+
+    const sumIsCorrect = Math.abs(totalSplitAmount - totalAmount) < ROUNDING_TOLERANCE
+
+    if (!sumIsCorrect) {
+      return false
+    }
+
+    // Additional validation based on split method
     if (splitMethod.value === 'equally') {
-      return true // Always valid for equal splits
+      return true // Already validated above
     } else if (splitMethod.value === 'percentage') {
       const totalPercentage = sortedIncludedMembersId.value.reduce((sum, memberId) => {
         const defaultPercentage = 100 / sortedIncludedMembersId.value.length
@@ -145,14 +189,11 @@ export const useTransactionStore = defineStore('transaction', () => {
       const remainingAmount = totalAmount - totalAdjustment
       return remainingAmount >= ROUNDING_TOLERANCE // Allow for small amounts
     } else {
-      // custom split method
-      const totalCustomAmount = sortedIncludedMembersId.value.reduce((sum, memberId) => {
-        return sum + (splitByCustomDetails.value[memberId] ?? 0)
-      }, 0)
-      // Allow for small rounding errors (within ROUNDING_TOLERANCE)
-      return Math.abs(totalCustomAmount - totalAmount) < ROUNDING_TOLERANCE
+      // custom split method - already validated that amounts are positive and sum correctly
+      return true
     }
   })
+
   const decreaseSplitByShares = (memberId: string) => {
     if (!splitBySharesDetails.value[memberId]) {
       splitBySharesDetails.value[memberId] = 1
@@ -166,6 +207,81 @@ export const useTransactionStore = defineStore('transaction', () => {
       splitBySharesDetails.value[memberId] = 1
     }
     splitBySharesDetails.value[memberId] += 1
+  }
+
+  // Method to save or update transaction to the database
+  const saveTransaction = async (): Promise<TransactionDto> => {
+    // Validate that we have the required data
+    if (!transaction.value.amount || transaction.value.amount <= 0) {
+      throw new Error('Transaction amount must be greater than 0')
+    }
+    if (includedMembersId.value.length === 0) {
+      throw new Error('At least one member must be included in the transaction')
+    }
+    if (!paidBy.value) {
+      throw new Error('Paid by user must be specified')
+    }
+    if (!isUserInputValid.value) {
+      throw new Error('Split details are not valid')
+    }
+
+    // Require groupId if not already set in transaction
+    const groupId = transaction.value.groupId
+    if (!groupId) {
+      throw new Error('Group ID must be specified')
+    }
+
+    // Require name if not already set in transaction
+    if (!transaction.value.name) {
+      throw new Error('Transaction name must be specified')
+    }
+
+    // Create the API instance (you may want to inject configuration from elsewhere)
+    const api = new TransactionApi()
+
+    // Build the balance data from the final split amounts
+    const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => ({
+      userId,
+      balance: balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0),
+      transactionId: transactionId.value
+    }))
+
+    // prefill datetime
+    transaction.value.createTime = new Date()
+    transaction.value.transactionTime = new Date()
+
+    // Construct the TransactionInputDto using data from the transaction store
+    const transactionInput: TransactionInputDto = {
+      transactionId: transactionId.value,
+      groupId,
+      name: transaction.value.name,
+      icon: transaction.value.icon ?? 'default',
+      createTime: transaction.value.createTime ?? new Date(),
+      transactionTime: transaction.value.transactionTime ?? new Date(),
+      amount: transaction.value.amount,
+      currency: transaction.value.currency ?? 'USD',
+      tags: transaction.value.tags ?? [],
+      geoCoordinate: transaction.value.geoCoordinate,
+      photo: transaction.value.photo,
+      balances
+    }
+
+    // If transactionId exists, update the transaction, otherwise create a new one
+    if (transactionId.value) {
+      await api.updateTransaction({
+        transactionId: transactionId.value,
+        transactionInputDto: transactionInput
+      })
+      // For update, we need to get the updated transaction since updateTransaction returns void
+      return await api.getTransaction({ id: transactionId.value })
+    } else {
+      // Create new transaction
+      const result = await api.addTransaction({
+        transactionInputDto: transactionInput
+      })
+      transactionId.value = result.transactionId
+      return result
+    }
   }
 
   return {
@@ -184,6 +300,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     finalSplitAmount,
     isUserInputValid,
     decreaseSplitByShares,
-    increaseSplitByShares
+    increaseSplitByShares,
+    saveTransaction
   }
 })
