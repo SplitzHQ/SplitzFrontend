@@ -6,6 +6,7 @@ import { onMounted, onUnmounted, ref, Teleport, useTemplateRef } from 'vue'
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
 import Layout from '@/components/Layout/Layout.vue'
+import SButton from '@/components/SButton/SButton.vue'
 import { useTransactionStore } from '@/stores/transaction'
 
 import PaidByButton from './PaidByButton.vue'
@@ -56,48 +57,53 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
     </template>
     <template #default="layoutAttrs">
       <div class="flex flex-col grow" :style="{ height: `calc(100% - ${headerHeight}px)` }">
-        <div v-bind="layoutAttrs" class="flex flex-col gap-4 shrink grow min-h-0 overflow-y-auto">
-          <div class="flex gap-4 items-center">
-            <PaidByButton />
-            <div class="w-[1px] h-6 bg-base-border-secondary" />
-            <SplitMethodButton />
-          </div>
-          <div class="flex flex-col gap-1">
-            <div class="flex justify-between items-center">
-              <div class="text-base-text-tertiary text-sm font-medium">
-                {{ $t('Included_People', { count: transactionStore.includedMembersId.length }) }}
-              </div>
-              <div class="flex justify-start items-start gap-1">
-                <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
-                  {{ $t('Total_Amount') }}
-                </div>
-                <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
-                  {{
-                    transactionStore.transaction.amount?.toLocaleString(undefined, {
-                      style: 'currency',
-                      currency: transactionStore.transaction.currency ?? 'USD'
-                    })
-                  }}
-                </div>
-                <div
-                  v-if="!transactionStore.isUserInputValid"
-                  class="justify-start text-sm font-medium leading-tight text-base-text-error"
-                  role="alert"
-                  aria-live="polite"
-                >
-                  {{ $t('Invalid_Input') }}
-                </div>
-              </div>
+        <div v-bind="layoutAttrs" class="relative flex flex-col gap-4 grow overflow-y-auto">
+          <div class="flex flex-col gap-4 grow pb-4">
+            <div class="flex gap-4 items-center">
+              <PaidByButton />
+              <div class="w-[1px] h-6 bg-base-border-secondary" />
+              <SplitMethodButton />
             </div>
-            <UserItem v-for="memberId in transactionStore.includedMembersId" :key="memberId" :user-id="memberId" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <div class="flex justify-between items-center">
-              <div class="text-base-text-tertiary text-sm font-medium">
-                {{ $t('Not_Included_People', { count: transactionStore.excludedMembersId.length }) }}
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="text-base-text-tertiary text-sm font-medium">
+                  {{ $t('Included_People', { count: transactionStore.includedMembersId.length }) }}
+                </div>
+                <div class="flex justify-start items-start gap-1">
+                  <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
+                    {{ $t('Total_Amount') }}
+                  </div>
+                  <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
+                    {{
+                      transactionStore.transaction.amount?.toLocaleString(undefined, {
+                        style: 'currency',
+                        currency: transactionStore.transaction.currency ?? 'USD'
+                      })
+                    }}
+                  </div>
+                  <div
+                    v-if="!transactionStore.isUserInputValid"
+                    class="justify-start text-sm font-medium leading-tight text-base-text-error"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {{ $t('Invalid_Input') }}
+                  </div>
+                </div>
               </div>
+              <UserItem v-for="memberId in transactionStore.includedMembersId" :key="memberId" :user-id="memberId" />
             </div>
-            <UserItem v-for="memberId in transactionStore.excludedMembersId" :key="memberId" :user-id="memberId" />
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="text-base-text-tertiary text-sm font-medium">
+                  {{ $t('Not_Included_People', { count: transactionStore.excludedMembersId.length }) }}
+                </div>
+              </div>
+              <UserItem v-for="memberId in transactionStore.excludedMembersId" :key="memberId" :user-id="memberId" />
+            </div>
+          </div>
+          <div class="z-sticky sticky bottom-4">
+            <SButton color="brand" variant="primary" size="xxl" class="w-full">{{ $t('Next') }}</SButton>
           </div>
         </div>
         <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
