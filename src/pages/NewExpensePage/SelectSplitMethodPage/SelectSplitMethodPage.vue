@@ -6,7 +6,7 @@ import { onMounted, onUnmounted, ref, Teleport, useTemplateRef } from 'vue'
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'
 import Layout from '@/components/Layout/Layout.vue'
-import SButton from '@/components/SButton/SButton.vue'
+import SLinkButton from '@/components/SButton/SLinkButton.vue'
 import { useTransactionStore } from '@/stores/transaction'
 
 import PaidByButton from './PaidByButton.vue'
@@ -108,15 +108,16 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             </div>
           </div>
           <div class="z-sticky sticky bottom-4">
-            <SButton
+            <SLinkButton
               :disabled="!transactionStore.isUserInputValid"
               color="brand"
               variant="primary"
               size="xxl"
               class="w-full"
+              href="/new-expense/review-and-complete"
             >
-              {{ $t('Next') }}
-            </SButton>
+              {{ $t('Complete') }}
+            </SLinkButton>
           </div>
         </div>
         <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />

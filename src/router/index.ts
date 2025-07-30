@@ -29,6 +29,11 @@ const router = createRouter({
       path: '/new-expense/select-split-method',
       name: 'newExpenseSelectSplitMethod',
       component: () => import('@/pages/NewExpensePage/SelectSplitMethodPage/SelectSplitMethodPage.vue')
+    },
+    {
+      path: '/new-expense/review-and-complete',
+      name: 'newExpenseReviewAndComplete',
+      component: () => import('@/pages/NewExpensePage/ReviewAndCompletePage/ReviewAndCompletePage.vue')
     }
   ]
 })

@@ -105,6 +105,9 @@ export default {
       fontFamily: {
         sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif']
       },
+      backgroundImage: {
+        radial: 'radial-gradient(circle, var(--tw-gradient-stops))'
+      },
       borderRadius: {
         '05xl': '0.625rem' // 10px
       },
