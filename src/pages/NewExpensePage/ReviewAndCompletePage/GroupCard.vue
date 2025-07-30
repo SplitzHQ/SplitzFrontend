@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@pinia/colada'
+import { storeToRefs } from 'pinia'
 
 import { GroupApi } from '@/backend'
 import config from '@/backend/config'
@@ -7,7 +8,7 @@ import Avatar from '@/components/Avatar/Avatar.vue'
 import { useTransactionStore } from '@/stores/transaction'
 
 const transactionStore = useTransactionStore()
-const transaction = transactionStore.transaction
+const { transaction } = storeToRefs(transactionStore)
 
 const groupApi = new GroupApi(config)
 
@@ -17,13 +18,13 @@ function assertGroupId(groupId: string | null | undefined): asserts groupId is s
   }
 }
 
-assertGroupId(transaction.groupId)
+assertGroupId(transaction.value.groupId)
 
 const { data: group } = useQuery({
-  key: ['getGroup', transaction.groupId],
+  key: ['getGroup', transaction.value.groupId],
   query: () => {
-    assertGroupId(transaction.groupId)
-    return groupApi.getGroup({ groupId: transaction.groupId })
+    assertGroupId(transaction.value.groupId)
+    return groupApi.getGroup({ groupId: transaction.value.groupId })
   }
 })
 </script>

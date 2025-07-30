@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from '@phosphor-icons/vue'
 import { useFluent } from 'fluent-vue'
+import { storeToRefs } from 'pinia'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Layout from '@/components/Layout/Layout.vue'
@@ -13,7 +14,7 @@ import TransactionInfoCard from './TransactionInfoCard.vue'
 
 const { $t } = useFluent()
 const transactionStore = useTransactionStore()
-const transaction = transactionStore.transaction
+const { transaction } = storeToRefs(transactionStore)
 const bgUrl = `url("${BackgroundCheckCircle}")`
 </script>
 

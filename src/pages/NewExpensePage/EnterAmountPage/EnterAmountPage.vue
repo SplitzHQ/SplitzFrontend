@@ -2,6 +2,7 @@
 import NumberFlow, { type Format } from '@number-flow/vue'
 import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
 import { useFluent } from 'fluent-vue'
+import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
@@ -13,15 +14,18 @@ import { useTransactionStore } from '@/stores/transaction'
 
 const { $t } = useFluent()
 const transactionStore = useTransactionStore()
-const transaction = transactionStore.transaction
+const { transaction } = storeToRefs(transactionStore)
 
 // format amount as currency
-const formatOptions: Format = {
-  style: 'currency',
-  currency: transaction.currency ?? 'USD'
-}
+const formatOptions = computed(
+  (): Format => ({
+    style: 'currency',
+    currency: transaction.value.currency ?? 'USD'
+  })
+)
 const formattedAmount = computed(() => {
-  return transaction.amount!.toLocaleString(undefined, formatOptions)
+  const amount = transaction.value.amount
+  return amount != null ? amount.toLocaleString(undefined, formatOptions.value) : ''
 })
 </script>
 
