@@ -28,7 +28,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col">
         <div
-          class="bg-center bg-no-repeat bg-cover w-full aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10"
+          class="bg-center bg-no-repeat bg-cover w-full self-center max-w-lg aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10"
           :style="{ backgroundImage: bgUrl }"
         >
           <div class="text-base-text-brand text-base font-medium">{{ $t('Expense_added_to') }}</div>
@@ -42,30 +42,54 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               <SButton variant="secondary" size="xxl" color="brand">{{ $t('Add_Details') }}</SButton>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <div class="p-3 bg-util-color-clearblue-50 rounded-xl flex items-center gap-3">
+              <button
+                type="button"
+                :class="[
+                  'p-3 rounded-xl flex items-center gap-3',
+                  'bg-util-color-clearblue-50 hover:bg-util-color-clearblue-100 active:bg-util-color-clearblue-200'
+                ]"
+              >
                 <PhPencil class="text-util-color-clearblue-600 text-xl" />
-                <div class="flex-1 text-util-color-clearblue-700 text-sm font-medium">
+                <span class="text-util-color-clearblue-700 text-sm font-medium">
                   {{ $t('Give_It_a_Name') }}
-                </div>
-              </div>
-              <div class="p-3 bg-util-color-purple-50 rounded-xl flex items-center gap-3">
+                </span>
+              </button>
+              <button
+                type="button"
+                :class="[
+                  'p-3 rounded-xl flex items-center gap-3',
+                  'bg-util-color-purple-50 hover:bg-util-color-purple-100 active:bg-util-color-purple-200'
+                ]"
+              >
                 <PhForkKnife class="text-util-color-purple-600 text-xl" />
-                <div class="flex-1 text-util-color-purple-700 text-sm font-medium">
+                <span class="text-util-color-purple-700 text-sm font-medium">
                   {{ $t('Add_Category') }}
-                </div>
-              </div>
-              <div class="p-3 bg-util-color-leaf-50 rounded-xl flex items-center gap-3">
+                </span>
+              </button>
+              <button
+                type="button"
+                :class="[
+                  'p-3 rounded-xl flex items-center gap-3',
+                  'bg-util-color-leaf-50 hover:bg-util-color-leaf-100 active:bg-util-color-leaf-200'
+                ]"
+              >
                 <PhMapPin class="text-util-color-leaf-600 text-xl" />
-                <div class="flex-1 text-util-color-leaf-700 text-sm font-medium">
+                <span class="text-util-color-leaf-700 text-sm font-medium">
                   {{ $t('Add_Location') }}
-                </div>
-              </div>
-              <div class="p-3 bg-util-color-rosered-50 rounded-xl flex items-center gap-3">
+                </span>
+              </button>
+              <button
+                type="button"
+                :class="[
+                  'p-3 rounded-xl flex items-center gap-3',
+                  'bg-util-color-rosered-50 hover:bg-util-color-rosered-100 active:bg-util-color-rosered-200'
+                ]"
+              >
                 <PhImageSquare class="text-util-color-rosered-600 text-xl" />
-                <div class="flex-1 text-util-color-rosered-700 text-sm font-medium">
+                <span class="text-util-color-rosered-700 text-sm font-medium">
                   {{ $t('Upload_Receipt') }}
-                </div>
-              </div>
+                </span>
+              </button>
             </div>
           </div>
         </div>
