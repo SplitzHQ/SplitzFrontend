@@ -2,12 +2,14 @@
 import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from '@phosphor-icons/vue'
 import { useFluent } from 'fluent-vue'
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Layout from '@/components/Layout/Layout.vue'
 import SButton from '@/components/SButton/SButton.vue'
 import { useTransactionStore } from '@/stores/transaction'
 
+import AddExpenseDetailsSheet from './AddExpenseDetailsSheet.vue'
 import BackgroundCheckCircle from './BackgroundCheckCircle.svg'
 import GroupCard from './GroupCard.vue'
 import TransactionInfoCard from './TransactionInfoCard.vue'
@@ -15,6 +17,7 @@ import TransactionInfoCard from './TransactionInfoCard.vue'
 const { $t } = useFluent()
 const transactionStore = useTransactionStore()
 const { transaction } = storeToRefs(transactionStore)
+const showDetailsSheet = ref(false)
 const bgUrl = `url("${BackgroundCheckCircle}")`
 </script>
 
@@ -39,7 +42,9 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
               <SButton variant="primary" size="xxl" color="brand">{{ $t('Done') }}</SButton>
-              <SButton variant="secondary" size="xxl" color="brand">{{ $t('Add_Details') }}</SButton>
+              <SButton variant="secondary" size="xxl" color="brand" @click="showDetailsSheet = true">
+                {{ $t('Add_Details') }}
+              </SButton>
             </div>
             <div class="grid grid-cols-2 gap-2">
               <button
@@ -93,6 +98,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
             </div>
           </div>
         </div>
+        <AddExpenseDetailsSheet v-model="showDetailsSheet" />
       </div>
     </template>
   </Layout>

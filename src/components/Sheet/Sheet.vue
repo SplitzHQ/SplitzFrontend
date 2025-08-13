@@ -192,7 +192,7 @@ watch(isVisible, async (newValue) => {
                 v-if="showCloseButton"
                 aria-label="Close"
                 :class="[
-                  'absolute top-2 right-2 transition-colors rounded-full p-2',
+                  'absolute top-3 right-3 transition-colors rounded-full p-2',
                   'text-comp-button-close-fg-default hover:bg-comp-button-close-bg-hover active:bg-comp-button-close-bg-pressed'
                 ]"
                 @click="dismiss"
