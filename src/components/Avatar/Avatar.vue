@@ -22,8 +22,8 @@ if (images.length > 4) {
     <img
       v-if="images.length === 1"
       class="image-count-single"
-      :src="images[0].src ?? defaultUser"
-      :alt="images[0].alt"
+      :src="images[0]!.src ?? defaultUser"
+      :alt="images[0]!.alt"
     />
     <div v-else class="flex flex-wrap justify-center gap-0.5">
       <img

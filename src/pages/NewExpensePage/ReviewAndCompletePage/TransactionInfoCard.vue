@@ -49,7 +49,8 @@ const amountOwed = computed(() => {
           <div class="text-base-text-quaternary text-sm font-normal">
             {{
               $t('Paid_By_Username', {
-                username: transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName
+                username:
+                  transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? ''
               })
             }}
           </div>

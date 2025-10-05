@@ -18,7 +18,7 @@ export default function useCalculator() {
     if (stack.value.length === 0) {
       stack.value.push([new Big(input), false, 0])
     } else {
-      const last = stack.value[stack.value.length - 1]
+      const last = stack.value[stack.value.length - 1]!
       if (isOperator(last)) {
         // if last is an operator, add a new number
         stack.value.push([new Big(input), false, 0])
@@ -26,12 +26,12 @@ export default function useCalculator() {
         // if last is a number, add the input to the number
         const isNegative = last[0].lt(0)
         last[0] = last[0].times(10)
-        if (!isNegative) {
-          // if last is a positive number, add the input
-          last[0] = last[0].plus(input)
-        } else {
+        if (isNegative) {
           // if last is a negative number, subtract the input to maintain negative value
           last[0] = last[0].minus(input)
+        } else {
+          // if last is a positive number, add the input
+          last[0] = last[0].plus(input)
         }
         if (last[1]) {
           // if last is a decimal, increase the number of decimal places
@@ -43,7 +43,7 @@ export default function useCalculator() {
 
   function plus() {
     if (stack.value.length === 0) return
-    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop()
     stack.value.push('+')
   }
 
@@ -53,19 +53,19 @@ export default function useCalculator() {
       stack.value.push([Big(0), false, 0], '-')
       return
     }
-    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop()
     stack.value.push('-')
   }
 
   function times() {
     if (stack.value.length === 0) return
-    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop()
     stack.value.push('×')
   }
 
   function div() {
     if (stack.value.length === 0) return
-    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop()
+    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop()
     stack.value.push('÷')
   }
 
@@ -73,7 +73,7 @@ export default function useCalculator() {
     if (stack.value.length === 0) {
       stack.value.push([Big(0), true, 0])
     } else {
-      const last = stack.value[stack.value.length - 1]
+      const last = stack.value[stack.value.length - 1]!
       if (typeof last === 'string') {
         // if last is an operator, add a 0 before the dot
         stack.value.push([Big(0), true, 0])
@@ -88,7 +88,7 @@ export default function useCalculator() {
 
   function backspace() {
     if (stack.value.length !== 0) {
-      const last = stack.value[stack.value.length - 1]
+      const last = stack.value[stack.value.length - 1]!
       if (isOperator(last)) {
         stack.value.pop()
       } else {
@@ -148,14 +148,19 @@ export default function useCalculator() {
         if (partialNumber === null) {
           partialNumber = evaluatePartialNumber(item)
         } else {
-          if (operator === '+') {
-            partialNumber = partialNumber.plus(evaluatePartialNumber(item))
-          } else if (operator === '-') {
-            partialNumber = partialNumber.minus(evaluatePartialNumber(item))
-          } else if (operator === '×') {
-            partialNumber = partialNumber.times(evaluatePartialNumber(item))
-          } else if (operator === '÷') {
-            partialNumber = partialNumber.div(evaluatePartialNumber(item))
+          switch (operator) {
+            case '+':
+              partialNumber = partialNumber.plus(evaluatePartialNumber(item))
+              break
+            case '-':
+              partialNumber = partialNumber.minus(evaluatePartialNumber(item))
+              break
+            case '×':
+              partialNumber = partialNumber.times(evaluatePartialNumber(item))
+              break
+            case '÷':
+              partialNumber = partialNumber.div(evaluatePartialNumber(item))
+              break
           }
         }
       }
@@ -170,7 +175,15 @@ export default function useCalculator() {
     const expression: string[] = []
     let lastOperator: Operator | null = null
     for (const item of stack.value) {
-      if (!isOperator(item)) {
+      if (isOperator(item)) {
+        if (lastOperator !== null && (lastOperator === '+' || lastOperator === '-') && (item === '×' || item === '÷')) {
+          // add parentheses if the last operator is + or - and the current operator is × or ÷
+          expression.splice(0, 0, '(')
+          expression.push(')')
+        }
+        expression.push(item)
+        lastOperator = item
+      } else {
         let num = evaluatePartialNumber(item).toFixed(item[2], 1)
         if (item[1] && item[2] === 0) {
           // if the number is a decimal with no decimal places, add a dot
@@ -186,14 +199,6 @@ export default function useCalculator() {
         } else {
           expression.push(num)
         }
-      } else {
-        if (lastOperator !== null && (lastOperator === '+' || lastOperator === '-') && (item === '×' || item === '÷')) {
-          // add parentheses if the last operator is + or - and the current operator is × or ÷
-          expression.splice(0, 0, '(')
-          expression.push(')')
-        }
-        expression.push(item)
-        lastOperator = item
       }
     }
     return expression

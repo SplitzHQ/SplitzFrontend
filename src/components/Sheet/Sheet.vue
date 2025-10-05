@@ -84,7 +84,7 @@ function handleDragStart(event: TouchEvent | MouseEvent) {
   if (!props.dismissOnDrag) return
 
   isDragging.value = true
-  const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
+  const clientY = 'touches' in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY
   dragStartY.value = clientY
   dragCurrentY.value = clientY
 
@@ -100,7 +100,7 @@ function handleDragMove(event: TouchEvent | MouseEvent) {
   if (!isDragging.value) return
 
   event.preventDefault()
-  const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
+  const clientY = 'touches' in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY
   dragCurrentY.value = clientY
 }
 

@@ -53,7 +53,7 @@ const onPlusMinusButtonClick = () => {
           class="text-base-text-primary text-sm font-normal"
         >
           {{
-            transactionStore.finalSplitAmount[userId].toLocaleString(undefined, {
+            transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
               style: 'currency',
               currency: transactionStore.transaction.currency ?? 'USD'
             })

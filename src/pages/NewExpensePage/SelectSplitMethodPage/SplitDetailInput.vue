@@ -27,7 +27,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
     <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full flex justify-end items-center">
       <span class="text-center text-base-text-placeholder text-sm font-normal">
         {{
-          transactionStore.finalSplitAmount[userId].toLocaleString(undefined, {
+          transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
             style: 'currency',
             currency: transactionStore.transaction.currency ?? 'USD'
           })
