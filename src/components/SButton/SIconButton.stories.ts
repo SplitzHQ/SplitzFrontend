@@ -33,7 +33,7 @@ const Template: StoryFn<typeof SIconButton> = (args) => ({
   setup() {
     return { args }
   },
-  template: '<SIconButton v-bind="args"><PhAirplaneTakeoff /></SIconButton>'
+  template: '<SIconButton v-bind="args" aria-label="Airplane Takeoff"><PhAirplaneTakeoff /></SIconButton>'
 })
 
 export const Brand = Template.bind({})
@@ -42,8 +42,7 @@ Brand.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false,
-  ariaLabel: 'Airplane Takeoff'
+  loading: false
 }
 
 export const Neutral = Template.bind({})
@@ -52,8 +51,7 @@ Neutral.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false,
-  ariaLabel: 'Airplane Takeoff'
+  loading: false
 }
 
 export const Error = Template.bind({})
@@ -62,6 +60,5 @@ Error.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false,
-  ariaLabel: 'Airplane Takeoff'
+  loading: false
 }

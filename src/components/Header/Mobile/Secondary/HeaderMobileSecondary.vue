@@ -31,13 +31,13 @@ const close = () => {
 
 <template>
   <header class="flex gap-2.5 p-4 items-center sticky top-0 bg-base-bg-primary z-sticky">
-    <SIconButton v-if="enableBackButton" variant="ghost" color="neutral" size="lg" @click="goBack">
+    <SIconButton v-if="enableBackButton" aria-label="Go back" variant="ghost" color="neutral" size="lg" @click="goBack">
       <PhArrowLeft />
     </SIconButton>
     <div class="grow">
       <slot />
     </div>
-    <SIconButton v-if="enableCloseButton" variant="ghost" color="neutral" size="lg" @click="close">
+    <SIconButton v-if="enableCloseButton" aria-label="Close" variant="ghost" color="neutral" size="lg" @click="close">
       <PhX />
     </SIconButton>
   </header>

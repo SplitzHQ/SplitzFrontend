@@ -73,7 +73,13 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
   </button>
 
   <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex justify-end items-center gap-1">
-    <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.decreaseSplitByShares(userId)">
+    <SIconButton
+      aria-label="Decrease share"
+      color="brand"
+      size="sm"
+      variant="secondary"
+      @click="transactionStore.decreaseSplitByShares(userId)"
+    >
       <PhMinus />
     </SIconButton>
     <button type="button" @click.stop="setFocusedInputUserId(userId)">
@@ -83,7 +89,13 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
         </span>
       </div>
     </button>
-    <SIconButton color="brand" size="sm" variant="secondary" @click="transactionStore.increaseSplitByShares(userId)">
+    <SIconButton
+      aria-label="Increase share"
+      color="brand"
+      size="sm"
+      variant="secondary"
+      @click="transactionStore.increaseSplitByShares(userId)"
+    >
       <PhPlus />
     </SIconButton>
   </div>
