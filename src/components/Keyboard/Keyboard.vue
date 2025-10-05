@@ -36,13 +36,33 @@ const expression = computed(() => {
 })
 
 const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
-  if (value === 'backspace') calculator.backspace()
-  else if (value === '.') calculator.dot()
-  else if (value === '+') calculator.plus()
-  else if (value === '-') calculator.minus()
-  else if (value === '×') calculator.times()
-  else if (value === '÷') calculator.div()
-  else calculator.input(value)
+  switch (value) {
+  case 'backspace': {
+  calculator.backspace()
+  break;
+  }
+  case '.': {
+  calculator.dot()
+  break;
+  }
+  case '+': {
+  calculator.plus()
+  break;
+  }
+  case '-': {
+  calculator.minus()
+  break;
+  }
+  case '×': {
+  calculator.times()
+  break;
+  }
+  case '÷': {
+  calculator.div()
+  break;
+  }
+  default: calculator.input(value)
+  }
 
   model.value = calculator.result.value
 }
