@@ -1,15 +1,17 @@
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+import { fileURLToPath, URL } from 'node:url'
 import { ExternalFluentPlugin, SFCFluentPlugin } from 'unplugin-fluent-vue/vite'
+import { defineConfig } from 'vite'
+
+// import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    // incompatible with Storybook for now
+    // https://github.com/storybookjs/storybook/issues/32462
+    // vueDevTools(),
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: 'fluent', // default 'fluent' - name of the block in SFCs
