@@ -13,7 +13,7 @@ const { selectedUsers } = defineProps<{ selectedUsers: { photo: string | null | 
 </script>
 
 <template>
-  <div class="my-1.5 flex items-center gap-2 h-[1.375rem]">
+  <div class="my-1.5 flex items-center gap-2 h-5.5">
     <div class="text-base-text-quinary text-sm font-semibold">{{ $t('With') }}</div>
     <LayoutGroup>
       <AnimatePresence>

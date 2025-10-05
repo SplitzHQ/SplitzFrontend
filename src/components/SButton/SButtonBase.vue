@@ -34,6 +34,8 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
 </template>
 
 <style lang="scss" scoped>
+@reference '../../assets/base.css';
+
 .neutral {
   &.primary {
     @apply bg-base-bg-primary-reverse text-base-text-primary-reverse;
@@ -98,7 +100,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-primary;
+    @apply border-base-border-primary border;
   }
 }
 
@@ -166,7 +168,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-error;
+    @apply border-base-border-error border;
   }
 }
 
@@ -234,12 +236,12 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-brand;
+    @apply border-base-border-brand border;
   }
 }
 
 .disabled {
-  @apply cursor-default bg-base-bg-disabled text-base-text-disabled;
+  @apply bg-base-bg-disabled text-base-text-disabled cursor-default;
 
   &.outline {
     @apply border-base-border-disabled;

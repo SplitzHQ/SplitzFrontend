@@ -284,7 +284,7 @@ export function getMainCategory(subCategory: string | null | undefined): MainCat
     }
     subcategoryToMainCategory = localSubcategoryToMainCategory as Record<Subcategory, MainCategory>
   }
-  if (subCategory in subcategories) {
+  if (subcategories.includes(subCategory as Subcategory)) {
     return subcategoryToMainCategory[subCategory as Subcategory]
   }
   return 'other'

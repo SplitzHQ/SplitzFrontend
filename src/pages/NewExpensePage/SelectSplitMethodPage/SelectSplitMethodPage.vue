@@ -66,7 +66,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
           <div class="flex flex-col gap-4 grow pb-4">
             <div class="flex gap-4 items-center">
               <PaidByButton />
-              <div class="w-[1px] h-6 bg-base-border-secondary" />
+              <div class="w-px h-6 bg-base-border-secondary" />
               <SplitMethodButton />
             </div>
             <div class="flex flex-col gap-1">
@@ -120,7 +120,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             </SLinkButton>
           </div>
         </div>
-        <div class="flex-shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
+        <div class="shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
         <Teleport to="body">
           <div ref="keyboardContainer" class="fixed z-fixed bottom-0 inset-x-0">
             <Transition name="slide-fade">

@@ -41,7 +41,7 @@ const formattedAmount = computed(() => {
         <div class="flex grow flex-col items-center justify-center gap-6">
           <div
             :class="[
-              'flex h-[4.5rem] items-center font-medium',
+              'flex h-18 items-center font-medium',
               transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
             ]"
             :style="{ fontSize: `min(4.5rem, ${150 / formattedAmount.length}vw)` }"

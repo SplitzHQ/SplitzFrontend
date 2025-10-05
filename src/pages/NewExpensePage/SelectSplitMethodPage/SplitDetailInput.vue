@@ -45,7 +45,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline outline-1 outline-offset-[-1px] outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
       ]"
     >
       <span
@@ -97,7 +97,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline outline-1 outline-offset-[-1px] outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
       ]"
     >
       <span
@@ -133,7 +133,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       :class="[
         'px-2 py-1.5 rounded-full flex justify-end items-center',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline outline-1 outline-offset-[-1px] outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
       ]"
     >
       <span

@@ -33,6 +33,8 @@ const emit = defineEmits<ButtonEvents>()
 </template>
 
 <style lang="scss" scoped>
+@reference '../../assets/base.css';
+
 .secondary,
 .ghost {
   .icon {

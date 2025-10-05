@@ -161,7 +161,7 @@ watch(isVisible, async (newValue) => {
       <!-- Backdrop -->
       <div
         v-if="isVisible"
-        class="fixed inset-0 bg-util-alpha-black-10 backdrop-blur-sm z-modalBackdrop"
+        class="fixed inset-0 bg-util-alpha-black-10 backdrop-blur-xs z-modal-backdrop"
         @click="handleBackdropClick"
       >
         <div class="absolute inset-0 flex items-end justify-center z-modal">

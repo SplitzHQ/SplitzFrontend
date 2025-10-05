@@ -30,7 +30,7 @@ const amountOwed = computed(() => {
 
 <template>
   <div
-    class="p-3 bg-util-color-brand-50 rounded-2xl outline outline-1 -outline-offset-1 outline-base-border-primary flex flex-col justify-center gap-3"
+    class="p-3 bg-util-color-brand-50 rounded-2xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary flex flex-col justify-center gap-3"
   >
     <div class="flex items-center gap-3">
       <div class="bg-util-color-brand-100 rounded-05xl flex justify-center items-center p-2.5">

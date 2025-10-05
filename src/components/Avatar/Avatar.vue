@@ -38,6 +38,8 @@ if (images.length > 4) {
 </template>
 
 <style lang="scss" scoped>
+@reference '../../assets/base.css';
+
 .img-container.xxs {
   @apply h-5 w-5 rounded-md;
 
@@ -51,10 +53,10 @@ if (images.length > 4) {
 }
 
 .img-container.xs {
-  @apply h-10 w-10 rounded-05xl;
+  @apply rounded-05xl h-10 w-10;
 
   .image-count-single {
-    @apply h-10 w-10 rounded-05xl;
+    @apply rounded-05xl h-10 w-10;
   }
 
   .image-count-multiple {

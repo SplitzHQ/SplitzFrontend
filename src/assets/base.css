@@ -1,8 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap') layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@config '../../tailwind.config.js';
+
+@utility skeleton {
+  @apply bg-base-bg-secondary animate-pulse rounded-md;
+}
 
 @layer base {
   body,
@@ -18,11 +22,5 @@
 
   * {
     @apply transition-colors;
-  }
-}
-
-@layer utilities {
-  .skeleton {
-    @apply animate-pulse rounded-md bg-base-bg-secondary;
   }
 }

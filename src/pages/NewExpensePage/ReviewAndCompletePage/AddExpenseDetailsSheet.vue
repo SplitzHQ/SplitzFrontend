@@ -60,7 +60,7 @@ function saveDetails() {
             <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-3 text-[1.75rem] rounded-05xl']">
               <CategoryIcon :category="localCategory" />
             </div>
-            <div class="p-3 rounded-xl outline outline-1 -outline-offset-1 outline-base-border-primary grow">
+            <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary grow">
               <TextInput
                 v-model="localName"
                 :placeholder="$t('Whats_this_for')"
@@ -75,7 +75,7 @@ function saveDetails() {
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t('Add_Location') }}
           </label>
-          <div class="p-3 rounded-xl outline outline-1 -outline-offset-1 outline-base-border-primary">
+          <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <TextInput
               v-model="localLocation"
               :placeholder="$t('Add_Location')"
@@ -108,11 +108,11 @@ function saveDetails() {
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t('Add_Notes') }}
           </label>
-          <div class="p-3 rounded-xl outline outline-1 -outline-offset-1 outline-base-border-primary">
+          <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <textarea
               rows="3"
               :placeholder="$t('Add_Notes_Placeholder')"
-              class="placeholder:text-base-text-placeholder placeholder:font-normal text-base-text-primary font-normal text-base placeholder:text-base w-full bg-transparent focus-visible:outline-none"
+              class="placeholder:text-base-text-placeholder placeholder:font-normal text-base-text-primary font-normal text-base placeholder:text-base w-full bg-transparent focus-visible:outline-hidden"
             />
           </div>
         </div>
