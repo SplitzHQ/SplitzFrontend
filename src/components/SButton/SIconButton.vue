@@ -7,12 +7,13 @@ export interface ButtonProps {
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
   disabled?: boolean
   loading?: boolean
+  ariaLabel: string
 }
 interface ButtonEvents {
   click: [e: MouseEvent]
 }
 
-const { color, variant, size, disabled, loading } = defineProps<ButtonProps>()
+const { color, variant, size, disabled, loading, ariaLabel } = defineProps<ButtonProps>()
 const emit = defineEmits<ButtonEvents>()
 
 function clickHandler(e: MouseEvent) {
@@ -22,7 +23,7 @@ function clickHandler(e: MouseEvent) {
 </script>
 
 <template>
-  <button type="button" :disabled="disabled" @click="clickHandler">
+  <button type="button" :disabled="disabled" :aria-label="ariaLabel" @click="clickHandler">
     <SButtonBase :color="color" :variant="variant" :size="size" :disabled="disabled" :loading="loading" icon-only>
       <template #icon-left>
         <slot />

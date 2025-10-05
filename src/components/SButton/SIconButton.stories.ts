@@ -1,6 +1,6 @@
 import { PhAirplaneTakeoff } from '@phosphor-icons/vue'
-import { fn } from 'storybook/test'
 import type { Meta, StoryFn } from '@storybook/vue3-vite'
+import { fn } from 'storybook/test'
 
 import SIconButton from './SIconButton.vue'
 
@@ -42,7 +42,8 @@ Brand.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false
+  loading: false,
+  ariaLabel: 'Airplane Takeoff'
 }
 
 export const Neutral = Template.bind({})
@@ -51,7 +52,8 @@ Neutral.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false
+  loading: false,
+  ariaLabel: 'Airplane Takeoff'
 }
 
 export const Error = Template.bind({})
@@ -60,5 +62,6 @@ Error.args = {
   variant: 'primary',
   size: 'md',
   disabled: false,
-  loading: false
+  loading: false,
+  ariaLabel: 'Airplane Takeoff'
 }
