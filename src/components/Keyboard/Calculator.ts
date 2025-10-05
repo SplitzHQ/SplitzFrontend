@@ -110,14 +110,28 @@ export default class Calculator {
         if (partialNumber === null) {
           partialNumber = this.evaluatePartialNumber(item)
         } else {
-          if (operator === '+') {
-            partialNumber = partialNumber.plus(this.evaluatePartialNumber(item))
-          } else if (operator === '-') {
-            partialNumber = partialNumber.minus(this.evaluatePartialNumber(item))
-          } else if (operator === '×') {
-            partialNumber = partialNumber.times(this.evaluatePartialNumber(item))
-          } else if (operator === '÷') {
-            partialNumber = partialNumber.div(this.evaluatePartialNumber(item))
+          switch (operator) {
+            case '+': {
+              partialNumber = partialNumber.plus(this.evaluatePartialNumber(item))
+
+              break
+            }
+            case '-': {
+              partialNumber = partialNumber.minus(this.evaluatePartialNumber(item))
+
+              break
+            }
+            case '×': {
+              partialNumber = partialNumber.times(this.evaluatePartialNumber(item))
+
+              break
+            }
+            case '÷': {
+              partialNumber = partialNumber.div(this.evaluatePartialNumber(item))
+
+              break
+            }
+            // No default
           }
         }
       }
@@ -132,14 +146,7 @@ export default class Calculator {
     const expression: string[] = []
     let lastOperator: Operator | null = null
     for (const item of this.stack) {
-      if (!this.isOperator(item)) {
-        let num = this.evaluatePartialNumber(item).toFixed(item[2], 1)
-        if (item[1] && item[2] === 0) {
-          // if the number is a decimal with no decimal places, add a dot
-          num += '.'
-        }
-        expression.push(num)
-      } else {
+      if (this.isOperator(item)) {
         if (lastOperator !== null && (lastOperator === '+' || lastOperator === '-') && (item === '×' || item === '÷')) {
           // add parentheses if the last operator is + or - and the current operator is × or ÷
           expression.splice(0, 0, '(')
@@ -147,6 +154,13 @@ export default class Calculator {
         }
         expression.push(item)
         lastOperator = item
+      } else {
+        let num = this.evaluatePartialNumber(item).toFixed(item[2], 1)
+        if (item[1] && item[2] === 0) {
+          // if the number is a decimal with no decimal places, add a dot
+          num += '.'
+        }
+        expression.push(num)
       }
     }
     return expression

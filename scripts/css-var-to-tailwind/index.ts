@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
-const lightCss = await fs.readFile('./scripts/css-var-to-tailwind/light.txt', 'utf-8')
-const darkCss = await fs.readFile('./scripts/css-var-to-tailwind/dark.txt', 'utf-8')
+const lightCss = await fs.readFile('./scripts/css-var-to-tailwind/light.txt', 'utf8')
+const darkCss = await fs.readFile('./scripts/css-var-to-tailwind/dark.txt', 'utf8')
 
 await fs.writeFile('./src/assets/color.css', `:root {\n${lightCss}\n}\n.dark {\n${darkCss}\n}\n`, 'utf-8')
 

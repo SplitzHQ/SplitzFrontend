@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAsyncState, useElementSize } from '@vueuse/core'
+import { useElementSize } from '@vueuse/core'
 import { useFluent } from 'fluent-vue'
-import { onMounted, onUnmounted, ref, Teleport, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
 import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
 import Keyboard from '@/components/Keyboard/Keyboard.vue'

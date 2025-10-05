@@ -1,6 +1,6 @@
 import { PhAirplaneTakeoff } from '@phosphor-icons/vue'
-import { fn } from 'storybook/test'
 import type { Meta, StoryFn } from '@storybook/vue3-vite'
+import { fn } from 'storybook/test'
 
 import SButton from './SButton.vue'
 

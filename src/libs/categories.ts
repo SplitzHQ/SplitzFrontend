@@ -264,7 +264,7 @@ export const categorySubcategories: SubcategoryMap = {
 }
 
 // Add a reverse mapping from sub category to main category
-let subcategoryToMainCategory: Record<Subcategory, MainCategory> | undefined = undefined
+let subcategoryToMainCategory: Record<Subcategory, MainCategory> | undefined
 
 export function getMainCategory(subCategory: string | null | undefined): MainCategory {
   if (!subCategory) return 'other'

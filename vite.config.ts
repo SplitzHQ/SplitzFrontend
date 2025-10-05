@@ -22,13 +22,13 @@ export default defineConfig({
       locales: ['en', 'zh-cn'], // required - list of locales
       checkSyntax: true, // default true - whether to check syntax of the messages
 
-      baseDir: fileURLToPath(new URL('./src', import.meta.url)), // base directory for Vue files
-      ftlDir: fileURLToPath(new URL('./src/locales', import.meta.url)) // directory with ftl files
+      baseDir: fileURLToPath(new URL('src', import.meta.url)), // base directory for Vue files
+      ftlDir: fileURLToPath(new URL('src/locales', import.meta.url)) // directory with ftl files
     })
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('src', import.meta.url))
     }
   }
 })
