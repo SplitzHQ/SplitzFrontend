@@ -14,6 +14,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-pattern .gitignore",
     "format": "prettier --write src/",
     "css-var-to-tailwind": "bun scripts/css-var-to-tailwind/index.ts",
+    "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -64,7 +65,9 @@
     "eslint-plugin-storybook": "^9.1.10",
     "eslint-plugin-vue": "^10.5.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
+    "husky": "^9.1.7",
     "jsdom": "^27.0.0",
+    "lint-staged": "^16.2.3",
     "npm-run-all2": "^8.0.4",
     "playwright": "^1.55.1",
     "postcss": "^8.5.6",
