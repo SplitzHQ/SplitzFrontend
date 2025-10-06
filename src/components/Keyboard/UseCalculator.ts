@@ -161,6 +161,8 @@ export default function useCalculator() {
             case '÷':
               partialNumber = partialNumber.div(evaluatePartialNumber(item))
               break
+            case null:
+              break
           }
         }
       }

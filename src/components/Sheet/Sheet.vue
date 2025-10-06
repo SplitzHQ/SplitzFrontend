@@ -51,8 +51,7 @@ const detentHeight = computed(() => {
   switch (props.detent) {
     case 'medium':
       return '50vh'
-    case 'large':
-    default:
+    default: // all other cases, including 'large'
       return '90vh'
   }
 })

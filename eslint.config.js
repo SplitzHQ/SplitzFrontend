@@ -2,26 +2,29 @@ import { presetJavaScript, typescript, vue } from '@sxzz/eslint-config'
 import tseslint from 'typescript-eslint'
 
 export default [
-  ...tseslint.config(
-    {
-      // ignores openapi generated files
-      ignores: ['src/backend/**/*']
-    },
-    {
-      extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
-      ignores: ['.storybook/**/*', 'scripts/**/*', '**/*.js', '**/*.stories.ts'],
-      languageOptions: {
-        parserOptions: {
-          projectService: true,
-          tsconfigRootDir: import.meta.dirname
-        }
-      }
-    }
-  ),
+  {
+    ignores: [
+      'src/backend/**/*', // ignores openapi generated files
+      '.storybook/**/*',
+      'scripts/**/*',
+      '**/*.js',
+      '**/*.stories.ts'
+    ]
+  },
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
   ...presetJavaScript(),
   ...typescript(),
   ...vue(),
-  ...tseslint.config({
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
+      }
+    }
+  },
+  {
     rules: {
       'no-void': 'off',
       'import/no-default-export': 'off',
@@ -29,7 +32,14 @@ export default [
       'unicorn/prefer-at': 'off',
       'unicorn/no-useless-switch-case': 'off',
       'vue/html-indent': 'off',
-      'unicorn/no-array-sort': 'off'
+      'unicorn/no-array-sort': 'off',
+      '@typescript-eslint/switch-exhaustiveness-check': [
+        'error',
+        {
+          allowDefaultCaseForExhaustiveSwitch: false,
+          considerDefaultExhaustiveForUnions: true
+        }
+      ]
     }
-  })
+  }
 ]

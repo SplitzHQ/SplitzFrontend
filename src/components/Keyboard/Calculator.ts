@@ -123,6 +123,8 @@ export default class Calculator {
             case '÷':
               partialNumber = partialNumber.div(this.evaluatePartialNumber(item))
               break
+            case null:
+              break
           }
         }
       }

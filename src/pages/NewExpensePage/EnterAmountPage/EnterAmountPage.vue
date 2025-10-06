@@ -25,7 +25,7 @@ const formatOptions = computed(
 )
 const formattedAmount = computed(() => {
   const amount = transaction.value.amount
-  return amount != null ? amount.toLocaleString(undefined, formatOptions.value) : ''
+  return amount == null ? '' : amount.toLocaleString(undefined, formatOptions.value)
 })
 </script>
 
