@@ -1,9 +1,11 @@
 import vue from '@vitejs/plugin-vue'
+import process from 'node:process'
 import { fileURLToPath, URL } from 'node:url'
 import { ExternalFluentPlugin, SFCFluentPlugin } from 'unplugin-fluent-vue/vite'
 import { defineConfig } from 'vite'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
-// import vueDevTools from 'vite-plugin-vue-devtools'
+const isStorybookProcess = process.env.npm_lifecycle_event === 'storybook'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,7 +13,7 @@ export default defineConfig({
     vue(),
     // incompatible with Storybook for now
     // https://github.com/storybookjs/storybook/issues/32462
-    // vueDevTools(),
+    !isStorybookProcess && vueDevTools(),
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: 'fluent', // default 'fluent' - name of the block in SFCs
