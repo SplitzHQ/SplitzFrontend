@@ -41,7 +41,7 @@ const emit = defineEmits<{
       <button
         v-for="group in sortedGroups"
         :key="group.groupId"
-        class="flex flex-col items-center gap-1"
+        class="flex flex-col items-center gap-1 cursor-pointer"
         @click="() => emit('select', group.groupId)"
       >
         <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="lg" />

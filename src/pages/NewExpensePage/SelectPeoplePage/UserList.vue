@@ -26,7 +26,7 @@ defineEmits<{
       <button
         v-for="item in items"
         :key="item.id"
-        class="py-1 flex items-center gap-3 text-left"
+        class="py-1 flex items-center gap-3 text-left cursor-pointer"
         @click="() => $emit('select', item.id)"
       >
         <div class="flex-1 flex items-center gap-3">

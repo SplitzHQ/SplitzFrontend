@@ -157,3 +157,4 @@ categories = Categories
     .other_misc = Other misc
 Add_Notes_Placeholder = Anything else worth mentioning? (optional)
 Add_Notes = Add Notes
+Add_Category = Add Category

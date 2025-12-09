@@ -50,7 +50,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               <button
                 type="button"
                 :class="[
-                  'p-3 rounded-xl flex items-center gap-3',
+                  'p-3 rounded-xl flex items-center gap-3 cursor-pointer',
                   'bg-util-color-clearblue-50 hover:bg-util-color-clearblue-100 active:bg-util-color-clearblue-200'
                 ]"
               >
@@ -62,7 +62,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               <button
                 type="button"
                 :class="[
-                  'p-3 rounded-xl flex items-center gap-3',
+                  'p-3 rounded-xl flex items-center gap-3 cursor-pointer',
                   'bg-util-color-purple-50 hover:bg-util-color-purple-100 active:bg-util-color-purple-200'
                 ]"
               >
@@ -74,7 +74,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               <button
                 type="button"
                 :class="[
-                  'p-3 rounded-xl flex items-center gap-3',
+                  'p-3 rounded-xl flex items-center gap-3 cursor-pointer',
                   'bg-util-color-leaf-50 hover:bg-util-color-leaf-100 active:bg-util-color-leaf-200'
                 ]"
               >
@@ -86,7 +86,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               <button
                 type="button"
                 :class="[
-                  'p-3 rounded-xl flex items-center gap-3',
+                  'p-3 rounded-xl flex items-center gap-3 cursor-pointer',
                   'bg-util-color-rosered-50 hover:bg-util-color-rosered-100 active:bg-util-color-rosered-200'
                 ]"
               >
