@@ -56,7 +56,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`;
               >
                 <PhPencil class="text-util-color-clearblue-600 text-xl" />
                 <span class="text-util-color-clearblue-700 text-sm font-medium">
-                  {{ $t("new-expense-review-fields-name-label") }}
+                  {{ $t("new-expense-review-button-name") }}
                 </span>
               </button>
               <button
@@ -68,7 +68,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`;
               >
                 <PhForkKnife class="text-util-color-purple-600 text-xl" />
                 <span class="text-util-color-purple-700 text-sm font-medium">
-                  {{ $t("new-expense-review-fields-category") }}
+                  {{ $t("new-expense-review-button-category") }}
                 </span>
               </button>
               <button
@@ -80,7 +80,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`;
               >
                 <PhMapPin class="text-util-color-leaf-600 text-xl" />
                 <span class="text-util-color-leaf-700 text-sm font-medium">
-                  {{ $t("new-expense-review-fields-location") }}
+                  {{ $t("new-expense-review-button-location") }}
                 </span>
               </button>
               <button
@@ -92,7 +92,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`;
               >
                 <PhImageSquare class="text-util-color-rosered-600 text-xl" />
                 <span class="text-util-color-rosered-700 text-sm font-medium">
-                  {{ $t("new-expense-review-fields-receipt") }}
+                  {{ $t("new-expense-review-button-receipt") }}
                 </span>
               </button>
             </div>
