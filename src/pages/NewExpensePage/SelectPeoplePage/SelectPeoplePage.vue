@@ -167,7 +167,7 @@ const onSelectedUsersSubmitted = async () => {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        {{ $t('Select-People-Group') }}
+        {{ $t('new-expense-select-people-title') }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -176,21 +176,21 @@ const onSelectedUsersSubmitted = async () => {
         <FrequentSelectionList @select="onItemSelected" />
         <UserList
           v-if="groupsInUserListItem.length > 0"
-          :title="$t('Recent')"
+          :title="$t('new-expense-sections-recent')"
           :items="groupsInUserListItem"
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
         <UserList
           v-if="friendsInUserListItem.length > 0"
-          :title="$t('Friends')"
+          :title="$t('new-expense-sections-friends')"
           :items="friendsInUserListItem"
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
         <UserList
           v-if="groupsGroupOnlyInUserListItem.length > 0"
-          :title="$t('Groups')"
+          :title="$t('new-expense-sections-groups')"
           :items="groupsGroupOnlyInUserListItem"
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
@@ -205,7 +205,7 @@ const onSelectedUsersSubmitted = async () => {
             :loading="onSelectedUsersSubmittedLoading"
             @click="onSelectedUsersSubmitted"
           >
-            {{ $t('Next') }}
+            {{ $t('new-expense-actions-next') }}
           </SButton>
         </div>
       </div>

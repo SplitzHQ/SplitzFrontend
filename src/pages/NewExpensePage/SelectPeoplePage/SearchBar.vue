@@ -14,7 +14,7 @@ const { selectedUsers } = defineProps<{ selectedUsers: { photo: string | null | 
 
 <template>
   <div class="my-1.5 flex items-center gap-2 h-5.5">
-    <div class="text-base-text-quinary text-sm font-semibold">{{ $t('With') }}</div>
+    <div class="text-base-text-quinary text-sm font-semibold">{{ $t('new-expense-select-people-with') }}</div>
     <LayoutGroup>
       <AnimatePresence>
         <motion.div
@@ -30,7 +30,7 @@ const { selectedUsers } = defineProps<{ selectedUsers: { photo: string | null | 
           <UserTag :photo="user.photo" :name="user.userName" />
         </motion.div>
         <motion.div layout>
-          <TextInput v-model="model" :placeholder="$t('Search-by')" />
+          <TextInput v-model="model" :placeholder="$t('new-expense-select-people-search-placeholder')" />
         </motion.div>
       </AnimatePresence>
     </LayoutGroup>

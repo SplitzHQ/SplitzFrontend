@@ -41,7 +41,7 @@ const paidByUsername = computed(() => {
   if (!transactionStore.paidBy) return '...'
 
   if (transactionStore.paidBy === userInfo.value.data?.id) {
-    return $t('You')
+    return $t('new-expense-pronoun-you')
   }
 
   const friend = userInfo.value.data?.friends?.find((friend) => friend.friendUser.id === transactionStore.paidBy)
@@ -63,7 +63,7 @@ const setPaidBy = (memberId: string) => {
 
 <template>
   <SButton size="sm" variant="secondary" color="brand" @click="showSheet = true">
-    {{ $t('Paid_By_Username', { username: paidByUsername }) }}
+    {{ $t('new-expense-split-paid-by', { username: paidByUsername }) }}
     <template #icon-right>
       <PhCaretDown />
     </template>

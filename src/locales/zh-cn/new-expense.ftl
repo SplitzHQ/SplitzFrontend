@@ -1,0 +1,48 @@
+new-expense-title = 新费用
+new-expense-frequency-one-time = 单次
+
+new-expense-actions-skip = 跳过
+new-expense-actions-next = 下一步
+new-expense-actions-done = 完成
+
+new-expense-pronoun-you = 我
+
+new-expense-sections-recent = 最近
+new-expense-sections-groups = 群组
+new-expense-sections-friends = 朋友
+
+new-expense-select-people-title = 选择人 / 群组
+new-expense-select-people-with = 参与：
+new-expense-select-people-search-placeholder = 按名称，@用户名，Email 或手机号搜索
+
+new-expense-split-title = 选择拆分方法
+new-expense-split-paid-by = 付款人: { $username }
+new-expense-split-types-equally = 平均分摊
+new-expense-split-types-percentage = 百分比
+new-expense-split-types-shares = 份数
+new-expense-split-types-adjustment = 调整
+new-expense-split-types-custom = 自定义
+new-expense-split-summary-total-amount = 总金额
+new-expense-split-summary-included = 已包含（{ $count } 人）
+new-expense-split-summary-not-included = 未包含（{ $count } 人）
+new-expense-split-shares-count =
+    { $count ->
+        [one] { $count } 份
+       *[other] { $count } 份
+    }
+new-expense-split-validation-invalid-input = 输入无效
+new-expense-split-actions-complete = 完成
+
+new-expense-review-title = 审核并完成
+new-expense-review-expense-added-to = 已添加到
+new-expense-review-you-owe = 你需要支付
+new-expense-review-you-are-owed = 你将收到
+new-expense-review-actions-add-details = 添加详情
+new-expense-review-actions-done = 完成
+new-expense-review-fields-name-label = 取个名字
+new-expense-review-fields-name-placeholder = 这是用来做什么？
+new-expense-review-fields-category = 添加分类
+new-expense-review-fields-location = 添加地点
+new-expense-review-fields-receipt = 上传收据
+new-expense-review-fields-notes-label = 添加备注
+new-expense-review-fields-notes-placeholder = 还有什么要补充吗？（可选）

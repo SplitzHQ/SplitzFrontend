@@ -25,7 +25,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
-        {{ $t('Review_and_Complete') }}
+        {{ $t('new-expense-review-title') }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -34,16 +34,16 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
           class="bg-center bg-no-repeat bg-cover w-full self-center max-w-lg aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10"
           :style="{ backgroundImage: bgUrl }"
         >
-          <div class="text-base-text-brand text-base font-medium">{{ $t('Expense_added_to') }}</div>
+          <div class="text-base-text-brand text-base font-medium">{{ $t('new-expense-review-expense-added-to') }}</div>
           <GroupCard v-if="transaction.groupId" />
         </div>
         <div class="flex flex-col gap-10">
           <TransactionInfoCard />
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
-              <SButton variant="primary" size="xxl" color="brand">{{ $t('Done') }}</SButton>
+              <SButton variant="primary" size="xxl" color="brand">{{ $t('new-expense-review-actions-done') }}</SButton>
               <SButton variant="secondary" size="xxl" color="brand" @click="showDetailsSheet = true">
-                {{ $t('Add_Details') }}
+                {{ $t('new-expense-review-actions-add-details') }}
               </SButton>
             </div>
             <div class="grid grid-cols-2 gap-2">
@@ -56,7 +56,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               >
                 <PhPencil class="text-util-color-clearblue-600 text-xl" />
                 <span class="text-util-color-clearblue-700 text-sm font-medium">
-                  {{ $t('Give_It_a_Name') }}
+                  {{ $t('new-expense-review-fields-name-label') }}
                 </span>
               </button>
               <button
@@ -68,7 +68,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               >
                 <PhForkKnife class="text-util-color-purple-600 text-xl" />
                 <span class="text-util-color-purple-700 text-sm font-medium">
-                  {{ $t('Add_Category') }}
+                  {{ $t('new-expense-review-fields-category') }}
                 </span>
               </button>
               <button
@@ -80,7 +80,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               >
                 <PhMapPin class="text-util-color-leaf-600 text-xl" />
                 <span class="text-util-color-leaf-700 text-sm font-medium">
-                  {{ $t('Add_Location') }}
+                  {{ $t('new-expense-review-fields-location') }}
                 </span>
               </button>
               <button
@@ -92,7 +92,7 @@ const bgUrl = `url("${BackgroundCheckCircle}")`
               >
                 <PhImageSquare class="text-util-color-rosered-600 text-xl" />
                 <span class="text-util-color-rosered-700 text-sm font-medium">
-                  {{ $t('Upload_Receipt') }}
+                  {{ $t('new-expense-review-fields-receipt') }}
                 </span>
               </button>
             </div>

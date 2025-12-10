@@ -57,7 +57,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
   <Layout class="h-dvh">
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        {{ $t('Select-split-method') }}
+        {{ $t('new-expense-split-title') }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -72,11 +72,11 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             <div class="flex flex-col gap-1">
               <div class="flex justify-between items-center">
                 <div class="text-base-text-tertiary text-sm font-medium">
-                  {{ $t('Included_People', { count: transactionStore.includedMembersId.length }) }}
+                  {{ $t('new-expense-split-summary-included', { count: transactionStore.includedMembersId.length }) }}
                 </div>
                 <div class="flex justify-start items-start gap-1">
                   <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
-                    {{ $t('Total_Amount') }}
+                    {{ $t('new-expense-split-summary-total-amount') }}
                   </div>
                   <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
                     {{
@@ -92,7 +92,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
                     role="alert"
                     aria-live="polite"
                   >
-                    {{ $t('Invalid_Input') }}
+                    {{ $t('new-expense-split-validation-invalid-input') }}
                   </div>
                 </div>
               </div>
@@ -101,7 +101,9 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             <div class="flex flex-col gap-1">
               <div class="flex justify-between items-center">
                 <div class="text-base-text-tertiary text-sm font-medium">
-                  {{ $t('Not_Included_People', { count: transactionStore.excludedMembersId.length }) }}
+                  {{
+                    $t('new-expense-split-summary-not-included', { count: transactionStore.excludedMembersId.length })
+                  }}
                 </div>
               </div>
               <UserItem v-for="memberId in transactionStore.excludedMembersId" :key="memberId" :user-id="memberId" />
@@ -116,7 +118,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
               class="w-full"
               href="/new-expense/review-and-complete"
             >
-              {{ $t('Complete') }}
+              {{ $t('new-expense-split-actions-complete') }}
             </SLinkButton>
           </div>
         </div>

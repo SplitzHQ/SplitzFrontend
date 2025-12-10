@@ -32,7 +32,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     color="brand"
     @click="showSheet = true"
   >
-    {{ $t('equally') }}
+    {{ $t('new-expense-split-types-equally') }}
     <template #icon-left>
       <PhEquals />
     </template>
@@ -44,7 +44,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     color="brand"
     @click="showSheet = true"
   >
-    {{ $t('percentage') }}
+    {{ $t('new-expense-split-types-percentage') }}
     <template #icon-left>
       <PhPercent />
     </template>
@@ -56,7 +56,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     color="brand"
     @click="showSheet = true"
   >
-    {{ $t('shares') }}
+    {{ $t('new-expense-split-types-shares') }}
     <template #icon-left>
       <PhRowsPlusTop />
     </template>
@@ -68,7 +68,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     color="brand"
     @click="showSheet = true"
   >
-    {{ $t('adjustment') }}
+    {{ $t('new-expense-split-types-adjustment') }}
     <template #icon-left>
       <PhPlusMinus />
     </template>
@@ -80,7 +80,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     color="brand"
     @click="showSheet = true"
   >
-    {{ $t('custom') }}
+    {{ $t('new-expense-split-types-custom') }}
     <template #icon-left>
       <PhPencilSimple />
     </template>
@@ -90,23 +90,23 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     <div class="flex flex-col gap-4">
       <button class="flex items-center gap-2" @click="setSplitMethod('equally')">
         <PhEquals />
-        <span>{{ $t('equally') }}</span>
+        <span>{{ $t('new-expense-split-types-equally') }}</span>
       </button>
       <button class="flex items-center gap-2" @click="setSplitMethod('percentage')">
         <PhPercent />
-        <span>{{ $t('percentage') }}</span>
+        <span>{{ $t('new-expense-split-types-percentage') }}</span>
       </button>
       <button class="flex items-center gap-2" @click="setSplitMethod('shares')">
         <PhRowsPlusTop />
-        <span>{{ $t('shares') }}</span>
+        <span>{{ $t('new-expense-split-types-shares') }}</span>
       </button>
       <button class="flex items-center gap-2" @click="setSplitMethod('adjustment')">
         <PhPlusMinus />
-        <span>{{ $t('adjustment') }}</span>
+        <span>{{ $t('new-expense-split-types-adjustment') }}</span>
       </button>
       <button class="flex items-center gap-2" @click="setSplitMethod('custom')">
         <PhPencilSimple />
-        <span>{{ $t('custom') }}</span>
+        <span>{{ $t('new-expense-split-types-custom') }}</span>
       </button>
     </div>
   </Sheet>

@@ -48,7 +48,7 @@ const amountOwed = computed(() => {
         <div class="flex items-end gap-1">
           <div class="text-base-text-quaternary text-sm font-normal">
             {{
-              $t('Paid_By_Username', {
+              $t('new-expense-split-paid-by', {
                 username:
                   transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? ''
               })
@@ -58,7 +58,7 @@ const amountOwed = computed(() => {
       </div>
       <div class="flex flex-col justify-center items-end gap-1">
         <div class="text-base-text-quaternary text-sm font-normal">
-          {{ amountOwed > 0 ? $t('You_owe') : $t('You_are_owed') }}
+          {{ amountOwed > 0 ? $t('new-expense-review-you-owe') : $t('new-expense-review-you-are-owed') }}
         </div>
         <div class="flex items-end gap-1">
           <div v-if="amountOwed > 0" class="text-base-text-error text-sm font-medium">

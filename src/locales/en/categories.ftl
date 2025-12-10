@@ -1,42 +1,3 @@
-Skip = Skip
-Next = Next
-One-time = One-time
-New-Expense = New Expense
-Select-People-Group = Select People / Group
-With = With:
-Search-by = Search by name, @username, email, phone
-Recent = Recent
-Groups = Groups
-Friends = Friends
-Select-split-method = Select Split Method
-Paid_By_Username = Paid By: { $username }
-You = You
-equally = Equally
-Total_Amount = Total Amount
-Included_People = Included ({ $count } people)
-Not_Included_People = Not Included ({ $count } people)
-percentage = Percentage
-shares = Shares
-adjustment = Adjustment
-custom = Custom
-countShare =
-    { $count ->
-        [one] { $count } share
-       *[other] { $count } shares
-    }
-Invalid_Input = Invalid Input
-Complete = Complete
-Review_and_Complete = Review & Complete
-Expense_added_to = Expense added to
-You_owe = You owe
-You_are_owed = You are owed
-Done = Done
-Add_Details = Add Expense Details
-Give_It_a_Name = Give it a name
-Add_Location = Add Location
-Upload_Receipt = Upload Receipt
-Whats_this_for = What’s this for?
-# Category sub
 categories = Categories
     .dining_out = Dining out
     .groceries = Groceries
@@ -155,6 +116,3 @@ categories = Categories
     .other_debt = Other debt
     .uncategorized = Uncategorized
     .other_misc = Other misc
-Add_Notes_Placeholder = Anything else worth mentioning? (optional)
-Add_Notes = Add Notes
-Add_Category = Add Category

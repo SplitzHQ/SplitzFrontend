@@ -33,7 +33,7 @@ const formattedAmount = computed(() => {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        {{ $t('New-Expense') }}
+        {{ $t('new-expense-title') }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -55,15 +55,15 @@ const formattedAmount = computed(() => {
             </SButton>
             <SButton color="brand" variant="secondary" size="sm">
               <template #icon-left><PhArrowUpRight /></template>
-              {{ $t('One-time') }}
+              {{ $t('new-expense-frequency-one-time') }}
             </SButton>
           </div>
         </div>
         <Keyboard v-model="transaction.amount" variant="ghost" :enable-calculator="true" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
-          <SButton color="brand" variant="outline" size="xxl">{{ $t('Skip') }}</SButton>
+          <SButton color="brand" variant="outline" size="xxl">{{ $t('new-expense-actions-skip') }}</SButton>
           <SLinkButton color="brand" variant="primary" size="xxl" href="/new-expense/select-people">
-            {{ $t('Next') }}
+            {{ $t('new-expense-actions-next') }}
           </SLinkButton>
         </div>
       </div>

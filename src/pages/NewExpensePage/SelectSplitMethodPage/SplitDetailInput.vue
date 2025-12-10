@@ -85,7 +85,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
     <button type="button" @click.stop="setFocusedInputUserId(userId)">
       <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full items-center">
         <span class="text-center text-base-text-primary text-sm font-normal">
-          {{ $t('countShare', { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
+          {{ $t('new-expense-split-shares-count', { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
         </span>
       </div>
     </button>

@@ -1,25 +1,3 @@
-Next = 下一步
-Skip = 跳过
-One-time = 单次
-New-Expense = 新费用
-Select-People-Group = 选择人 / 群组
-With = 参与：
-Search-by = 按名称，@用户名，Email 或手机号搜索
-Friends = 朋友
-Groups = 群组
-Recent = 最近
-Select-split-method = 选择拆分方法
-Paid_By_Username = 付款人: { $username }
-You = 我
-Review_and_Complete = 审核并完成
-Expense_added_to = 已添加到
-Done = 完成
-Add_Details = 添加详情
-Give_It_a_Name = 取个名字
-Add_Category = 添加分类
-Upload_Receipt = 上传收据
-
-# 分类子类
 categories = 分类
     .dining_out = 外出就餐
     .groceries = 采购食材

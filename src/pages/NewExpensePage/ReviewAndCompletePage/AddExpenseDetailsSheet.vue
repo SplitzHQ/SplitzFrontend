@@ -49,12 +49,12 @@ function saveDetails() {
 <template>
   <Sheet v-model="model" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
-      <div class="text-base-text-primary text-lg font-medium">{{ $t('Add_Details') }}</div>
+      <div class="text-base-text-primary text-lg font-medium">{{ $t('new-expense-review-actions-add-details') }}</div>
       <div class="flex flex-col gap-4">
         <!-- Name -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('Give_It_a_Name') }}
+            {{ $t('new-expense-review-fields-name-label') }}
           </label>
           <div class="gap-2 flex items-center">
             <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-3 text-[1.75rem] rounded-05xl']">
@@ -63,7 +63,7 @@ function saveDetails() {
             <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary grow">
               <TextInput
                 v-model="localName"
-                :placeholder="$t('Whats_this_for')"
+                :placeholder="$t('new-expense-review-fields-name-placeholder')"
                 class="text-base placeholder:text-base"
               />
             </div>
@@ -73,12 +73,12 @@ function saveDetails() {
         <!-- Location -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('Add_Location') }}
+            {{ $t('new-expense-review-fields-location') }}
           </label>
           <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <TextInput
               v-model="localLocation"
-              :placeholder="$t('Add_Location')"
+              :placeholder="$t('new-expense-review-fields-location')"
               class="text-base placeholder:text-base"
             />
           </div>
@@ -88,7 +88,7 @@ function saveDetails() {
         <!-- Receipt -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('Upload_Receipt') }}
+            {{ $t('new-expense-review-fields-receipt') }}
           </label>
           <div class="flex flex-col gap-3">
             <input
@@ -106,12 +106,12 @@ function saveDetails() {
         <!-- Notes -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('Add_Notes') }}
+            {{ $t('new-expense-review-fields-notes-label') }}
           </label>
           <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <textarea
               rows="3"
-              :placeholder="$t('Add_Notes_Placeholder')"
+              :placeholder="$t('new-expense-review-fields-notes-placeholder')"
               class="placeholder:text-base-text-placeholder placeholder:font-normal text-base-text-primary font-normal text-base placeholder:text-base w-full bg-transparent focus-visible:outline-hidden"
             />
           </div>
@@ -119,7 +119,7 @@ function saveDetails() {
 
         <div class="flex gap-3">
           <SButton class="flex-1" variant="primary" size="lg" color="brand" @click="saveDetails">
-            {{ $t('Done') }}
+            {{ $t('new-expense-review-actions-done') }}
           </SButton>
         </div>
       </div>
