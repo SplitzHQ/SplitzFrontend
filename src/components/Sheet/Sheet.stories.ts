@@ -1,40 +1,40 @@
-import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import type { Meta, StoryObj } from "@storybook/vue3-vite";
+import { ref } from "vue";
 
-import Sheet from './Sheet.vue'
+import Sheet from "./Sheet.vue";
 
 const meta: Meta<typeof Sheet> = {
-  title: 'Components/Sheet',
+  title: "Components/Sheet",
   component: Sheet,
   argTypes: {
     detent: {
-      control: 'radio',
-      options: ['large', 'medium']
+      control: "radio",
+      options: ["large", "medium"]
     },
     showHandle: {
-      control: 'boolean'
+      control: "boolean"
     },
     showCloseButton: {
-      control: 'boolean'
+      control: "boolean"
     },
     dismissOnBackdrop: {
-      control: 'boolean'
+      control: "boolean"
     },
     dismissOnDrag: {
-      control: 'boolean'
+      control: "boolean"
     }
   }
-}
+};
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Large: Story = {
   render: (args) => ({
     components: { Sheet },
     setup() {
-      const isOpen = ref(false)
-      return { args, isOpen }
+      const isOpen = ref(false);
+      return { args, isOpen };
     },
     template: `
       <div class="p-4 text-base-text-primary">
@@ -71,20 +71,20 @@ export const Large: Story = {
     `
   }),
   args: {
-    detent: 'large',
+    detent: "large",
     showHandle: true,
     showCloseButton: false,
     dismissOnBackdrop: true,
     dismissOnDrag: true
   }
-}
+};
 
 export const Medium: Story = {
   render: (args) => ({
     components: { Sheet },
     setup() {
-      const isOpen = ref(false)
-      return { args, isOpen }
+      const isOpen = ref(false);
+      return { args, isOpen };
     },
     template: `
       <div class="p-4 text-base-text-primary">
@@ -114,20 +114,20 @@ export const Medium: Story = {
     `
   }),
   args: {
-    detent: 'medium',
+    detent: "medium",
     showHandle: true,
     showCloseButton: false,
     dismissOnBackdrop: true,
     dismissOnDrag: true
   }
-}
+};
 
 export const WithCloseButton: Story = {
   render: (args) => ({
     components: { Sheet },
     setup() {
-      const isOpen = ref(false)
-      return { args, isOpen }
+      const isOpen = ref(false);
+      return { args, isOpen };
     },
     template: `
       <div class="p-4 text-base-text-primary">
@@ -165,20 +165,20 @@ export const WithCloseButton: Story = {
     `
   }),
   args: {
-    detent: 'large',
+    detent: "large",
     showHandle: true,
     showCloseButton: true,
     dismissOnBackdrop: true,
     dismissOnDrag: true
   }
-}
+};
 
 export const NoHandle: Story = {
   render: (args) => ({
     components: { Sheet },
     setup() {
-      const isOpen = ref(false)
-      return { args, isOpen }
+      const isOpen = ref(false);
+      return { args, isOpen };
     },
     template: `
       <div class="p-4 text-base-text-primary">
@@ -212,20 +212,20 @@ export const NoHandle: Story = {
     `
   }),
   args: {
-    detent: 'medium',
+    detent: "medium",
     showHandle: false,
     showCloseButton: true,
     dismissOnBackdrop: true,
     dismissOnDrag: false
   }
-}
+};
 
 export const NonDismissible: Story = {
   render: (args) => ({
     components: { Sheet },
     setup() {
-      const isOpen = ref(false)
-      return { args, isOpen }
+      const isOpen = ref(false);
+      return { args, isOpen };
     },
     template: `
       <div class="p-4 text-base-text-primary">
@@ -261,10 +261,10 @@ export const NonDismissible: Story = {
     `
   }),
   args: {
-    detent: 'medium',
+    detent: "medium",
     showHandle: true,
     showCloseButton: true,
     dismissOnBackdrop: false,
     dismissOnDrag: false
   }
-}
+};

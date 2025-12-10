@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { PhCheckCircle } from '@phosphor-icons/vue'
-import { useElementSize } from '@vueuse/core'
-import { useTemplateRef } from 'vue'
+import { PhCheckCircle } from "@phosphor-icons/vue";
+import { useElementSize } from "@vueuse/core";
+import { useTemplateRef } from "vue";
 
-const rootRef = useTemplateRef('rootRef')
-const { width: rootWidth } = useElementSize(rootRef)
+const rootRef = useTemplateRef("rootRef");
+const { width: rootWidth } = useElementSize(rootRef);
 </script>
 
 <template>

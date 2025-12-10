@@ -1,1 +1,1 @@
-export type SplitMethod = 'equally' | 'percentage' | 'shares' | 'adjustment' | 'custom'
+export type SplitMethod = "equally" | "percentage" | "shares" | "adjustment" | "custom";

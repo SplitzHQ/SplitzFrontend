@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { PhMinusCircle, PhPlusCircle } from '@phosphor-icons/vue'
-import { computed } from 'vue'
+import { PhMinusCircle, PhPlusCircle } from "@phosphor-icons/vue";
+import { computed } from "vue";
 
-import Avatar from '@/components/Avatar/Avatar.vue'
-import { useTransactionStore } from '@/stores/transaction'
+import Avatar from "@/components/Avatar/Avatar.vue";
+import { useTransactionStore } from "@/stores/transaction";
 
-import SplitDetailInput from './SplitDetailInput.vue'
+import SplitDetailInput from "./SplitDetailInput.vue";
 
 const { userId } = defineProps<{
-  userId: string
-}>()
+  userId: string;
+}>();
 
 // transaction store
-const transactionStore = useTransactionStore()
+const transactionStore = useTransactionStore();
 
 const user = computed(() => {
-  return transactionStore.members.find((member) => member.id === userId)
-})
+  return transactionStore.members.find((member) => member.id === userId);
+});
 const isInIncludedMembers = computed(() => {
-  return transactionStore.includedMembersId.includes(userId)
-})
+  return transactionStore.includedMembersId.includes(userId);
+});
 
 const onPlusMinusButtonClick = () => {
   if (isInIncludedMembers.value) {
-    transactionStore.removeFromIncludedMembers(userId)
+    transactionStore.removeFromIncludedMembers(userId);
   } else {
-    transactionStore.addToIncludedMembers(userId)
+    transactionStore.addToIncludedMembers(userId);
   }
-}
+};
 </script>
 
 <template>
@@ -54,8 +54,8 @@ const onPlusMinusButtonClick = () => {
         >
           {{
             transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
-              style: 'currency',
-              currency: transactionStore.transaction.currency ?? 'USD'
+              style: "currency",
+              currency: transactionStore.transaction.currency ?? "USD"
             })
           }}
         </div>

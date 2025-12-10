@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { useQuery } from '@pinia/colada'
-import { storeToRefs } from 'pinia'
+import { useQuery } from "@pinia/colada";
+import { storeToRefs } from "pinia";
 
-import { GroupApi } from '@/backend'
-import config from '@/backend/config'
-import Avatar from '@/components/Avatar/Avatar.vue'
-import { useTransactionStore } from '@/stores/transaction'
+import { GroupApi } from "@/backend";
+import config from "@/backend/config";
+import Avatar from "@/components/Avatar/Avatar.vue";
+import { useTransactionStore } from "@/stores/transaction";
 
-const transactionStore = useTransactionStore()
-const { transaction } = storeToRefs(transactionStore)
+const transactionStore = useTransactionStore();
+const { transaction } = storeToRefs(transactionStore);
 
-const groupApi = new GroupApi(config)
+const groupApi = new GroupApi(config);
 
 function assertGroupId(groupId: string | null | undefined): asserts groupId is string {
   if (!groupId) {
-    throw new Error('Transaction groupId is not set')
+    throw new Error("Transaction groupId is not set");
   }
 }
 
-assertGroupId(transaction.value.groupId)
+assertGroupId(transaction.value.groupId);
 
 const { data: group } = useQuery({
-  key: ['getGroup', transaction.value.groupId],
+  key: ["getGroup", transaction.value.groupId],
   query: () => {
-    assertGroupId(transaction.value.groupId)
-    return groupApi.getGroup({ groupId: transaction.value.groupId })
+    assertGroupId(transaction.value.groupId);
+    return groupApi.getGroup({ groupId: transaction.value.groupId });
   }
-})
+});
 </script>
 
 <template>

@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { PhFiles } from '@phosphor-icons/vue'
-import { useQuery } from '@pinia/colada'
-import { useFluent } from 'fluent-vue'
-import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { PhFiles } from "@phosphor-icons/vue";
+import { useQuery } from "@pinia/colada";
+import { useFluent } from "fluent-vue";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
-import { AccountApi } from '@/backend'
-import config from '@/backend/config'
-import { useTransactionStore } from '@/stores/transaction'
+import { AccountApi } from "@/backend";
+import config from "@/backend/config";
+import { useTransactionStore } from "@/stores/transaction";
 
-const { $t } = useFluent()
-const transactionStore = useTransactionStore()
-const { transaction } = storeToRefs(transactionStore)
+const { $t } = useFluent();
+const transactionStore = useTransactionStore();
+const { transaction } = storeToRefs(transactionStore);
 
-const accountApi = new AccountApi(config)
-const { data: userInfo } = useQuery({ key: ['getUserInfo'], query: () => accountApi.getUserInfo() })
+const accountApi = new AccountApi(config);
+const { data: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
 
 const amountOwed = computed(() => {
   if (transactionStore.paidBy && userInfo.value?.id && transaction.value.amount) {
-    let owed = transactionStore.finalSplitAmount[userInfo.value.id] ?? 0
+    let owed = transactionStore.finalSplitAmount[userInfo.value.id] ?? 0;
     if (transactionStore.paidBy === userInfo.value.id) {
-      owed = owed - transaction.value.amount
+      owed = owed - transaction.value.amount;
     }
-    return owed
+    return owed;
   }
-  return 0
-})
+  return 0;
+});
 </script>
 
 <template>
@@ -40,17 +40,17 @@ const amountOwed = computed(() => {
         <div class="text-base-text-primary text-lg font-medium">
           {{
             transaction.amount?.toLocaleString(undefined, {
-              style: 'currency',
-              currency: transaction.currency ?? 'USD'
+              style: "currency",
+              currency: transaction.currency ?? "USD"
             })
           }}
         </div>
         <div class="flex items-end gap-1">
           <div class="text-base-text-quaternary text-sm font-normal">
             {{
-              $t('new-expense-split-paid-by', {
+              $t("new-expense-split-paid-by", {
                 username:
-                  transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? ''
+                  transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? ""
               })
             }}
           </div>
@@ -58,22 +58,22 @@ const amountOwed = computed(() => {
       </div>
       <div class="flex flex-col justify-center items-end gap-1">
         <div class="text-base-text-quaternary text-sm font-normal">
-          {{ amountOwed > 0 ? $t('new-expense-review-you-owe') : $t('new-expense-review-you-are-owed') }}
+          {{ amountOwed > 0 ? $t("new-expense-review-you-owe") : $t("new-expense-review-you-are-owed") }}
         </div>
         <div class="flex items-end gap-1">
           <div v-if="amountOwed > 0" class="text-base-text-error text-sm font-medium">
             {{
               amountOwed.toLocaleString(undefined, {
-                style: 'currency',
-                currency: transactionStore.transaction.currency ?? 'USD'
+                style: "currency",
+                currency: transactionStore.transaction.currency ?? "USD"
               })
             }}
           </div>
           <div v-else class="text-util-color-success-500 text-sm font-medium">
             {{
               (0 - amountOwed).toLocaleString(undefined, {
-                style: 'currency',
-                currency: transactionStore.transaction.currency ?? 'USD'
+                style: "currency",
+                currency: transactionStore.transaction.currency ?? "USD"
               })
             }}
           </div>

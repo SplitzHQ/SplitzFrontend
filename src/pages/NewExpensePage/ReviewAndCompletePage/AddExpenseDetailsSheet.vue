@@ -1,60 +1,60 @@
 <script setup lang="ts">
-import { useFluent } from 'fluent-vue'
-import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { useFluent } from "fluent-vue";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
 
-import CategoryIcon from '@/components/Category/CategoryIcon.vue'
-import { categoryColorMap } from '@/components/Category/category-color'
-import SButton from '@/components/SButton/SButton.vue'
-import Sheet from '@/components/Sheet/Sheet.vue'
-import TextInput from '@/components/TextInput/TextInput.vue'
-import { getCategory, getMainCategory } from '@/libs/categories'
-import { useTransactionStore } from '@/stores/transaction'
+import CategoryIcon from "@/components/Category/CategoryIcon.vue";
+import { categoryColorMap } from "@/components/Category/category-color";
+import SButton from "@/components/SButton/SButton.vue";
+import Sheet from "@/components/Sheet/Sheet.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
+import { getCategory, getMainCategory } from "@/libs/categories";
+import { useTransactionStore } from "@/stores/transaction";
 
 // v-model from parent controls visibility
-const model = defineModel<boolean>({ required: true })
+const model = defineModel<boolean>({ required: true });
 
-const { $t } = useFluent()
-const transactionStore = useTransactionStore()
-const { transaction } = storeToRefs(transactionStore)
+const { $t } = useFluent();
+const transactionStore = useTransactionStore();
+const { transaction } = storeToRefs(transactionStore);
 
-const localName = ref(transaction.value.name ?? '')
-const localLocation = ref(transaction.value.geoCoordinate ?? '')
-const localCategory = ref(getCategory(transaction.value.icon))
-const receiptPreview = ref<string | undefined>(transaction.value.photo as string | undefined)
+const localName = ref(transaction.value.name ?? "");
+const localLocation = ref(transaction.value.geoCoordinate ?? "");
+const localCategory = ref(getCategory(transaction.value.icon));
+const receiptPreview = ref<string | undefined>(transaction.value.photo as string | undefined);
 
 function handleFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.addEventListener('load', () => {
-    const result = reader.result as string
-    receiptPreview.value = result
-  })
-  reader.readAsDataURL(file)
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    const result = reader.result as string;
+    receiptPreview.value = result;
+  });
+  reader.readAsDataURL(file);
 }
 
 function saveDetails() {
-  transaction.value.name = localName.value.trim() || undefined
-  transaction.value.icon = localCategory.value
-  transaction.value.geoCoordinate = localLocation.value.trim() || undefined
+  transaction.value.name = localName.value.trim() || undefined;
+  transaction.value.icon = localCategory.value;
+  transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
   if (receiptPreview.value) {
-    transaction.value.photo = receiptPreview.value
+    transaction.value.photo = receiptPreview.value;
   }
-  model.value = false
+  model.value = false;
 }
 </script>
 
 <template>
   <Sheet v-model="model" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
-      <div class="text-base-text-primary text-lg font-medium">{{ $t('new-expense-review-actions-add-details') }}</div>
+      <div class="text-base-text-primary text-lg font-medium">{{ $t("new-expense-review-actions-add-details") }}</div>
       <div class="flex flex-col gap-4">
         <!-- Name -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('new-expense-review-fields-name-label') }}
+            {{ $t("new-expense-review-fields-name-label") }}
           </label>
           <div class="gap-2 flex items-center">
             <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-3 text-[1.75rem] rounded-05xl']">
@@ -73,7 +73,7 @@ function saveDetails() {
         <!-- Location -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('new-expense-review-fields-location') }}
+            {{ $t("new-expense-review-fields-location") }}
           </label>
           <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <TextInput
@@ -88,7 +88,7 @@ function saveDetails() {
         <!-- Receipt -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('new-expense-review-fields-receipt') }}
+            {{ $t("new-expense-review-fields-receipt") }}
           </label>
           <div class="flex flex-col gap-3">
             <input
@@ -106,7 +106,7 @@ function saveDetails() {
         <!-- Notes -->
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
-            {{ $t('new-expense-review-fields-notes-label') }}
+            {{ $t("new-expense-review-fields-notes-label") }}
           </label>
           <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <textarea
@@ -119,7 +119,7 @@ function saveDetails() {
 
         <div class="flex gap-3">
           <SButton class="flex-1" variant="primary" size="lg" color="brand" @click="saveDetails">
-            {{ $t('new-expense-review-actions-done') }}
+            {{ $t("new-expense-review-actions-done") }}
           </SButton>
         </div>
       </div>

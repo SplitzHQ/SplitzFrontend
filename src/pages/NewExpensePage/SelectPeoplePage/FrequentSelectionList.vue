@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { useQuery } from '@pinia/colada'
-import { computed } from 'vue'
+import { useQuery } from "@pinia/colada";
+import { computed } from "vue";
 
-import { GroupApi } from '@/backend'
-import config from '@/backend/config'
-import Avatar from '@/components/Avatar/Avatar.vue'
+import { GroupApi } from "@/backend";
+import config from "@/backend/config";
+import Avatar from "@/components/Avatar/Avatar.vue";
 
-const groupApi = new GroupApi(config)
-const { state: groups } = useQuery({ key: ['getGroups'], query: () => groupApi.getGroups() })
+const groupApi = new GroupApi(config);
+const { state: groups } = useQuery({ key: ["getGroups"], query: () => groupApi.getGroups() });
 const sortedGroups = computed(() => {
-  if (!groups.value.data) return []
-  const groupsValue = [...groups.value.data]
-  return groupsValue.sort((a, b) => b.transactionCount - a.transactionCount).slice(0, 10)
-})
+  if (!groups.value.data) return [];
+  const groupsValue = [...groups.value.data];
+  return groupsValue.sort((a, b) => b.transactionCount - a.transactionCount).slice(0, 10);
+});
 
 const emit = defineEmits<{
-  select: [id: string]
-}>()
+  select: [id: string];
+}>();
 </script>
 
 <template>

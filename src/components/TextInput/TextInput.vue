@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const model = defineModel<string>()
+const model = defineModel<string>();
 
 const { placeholder } = defineProps<{
-  placeholder: string
-}>()
+  placeholder: string;
+}>();
 </script>
 
 <template>

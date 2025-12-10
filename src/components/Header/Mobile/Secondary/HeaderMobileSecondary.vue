@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { PhArrowLeft, PhX } from '@phosphor-icons/vue'
-import { useRouter } from 'vue-router'
+import { PhArrowLeft, PhX } from "@phosphor-icons/vue";
+import { useRouter } from "vue-router";
 
-import SIconButton from '@/components/SButton/SIconButton.vue'
-import { useRouterHistoryStore } from '@/stores/routing-history'
+import SIconButton from "@/components/SButton/SIconButton.vue";
+import { useRouterHistoryStore } from "@/stores/routing-history";
 
 export interface HeaderMobileSecondaryProps {
-  enableBackButton?: boolean
-  enableCloseButton?: boolean
+  enableBackButton?: boolean;
+  enableCloseButton?: boolean;
 }
 
-const routerHistoryStore = useRouterHistoryStore()
-const router = useRouter()
+const routerHistoryStore = useRouterHistoryStore();
+const router = useRouter();
 
-const { enableBackButton, enableCloseButton } = defineProps<HeaderMobileSecondaryProps>()
+const { enableBackButton, enableCloseButton } = defineProps<HeaderMobileSecondaryProps>();
 
 const goBack = () => {
-  router.back()
-}
+  router.back();
+};
 
 const close = () => {
-  const previousRoute = routerHistoryStore.removeParentHistory()
+  const previousRoute = routerHistoryStore.removeParentHistory();
   if (previousRoute) {
-    void router.push(previousRoute)
+    void router.push(previousRoute);
   } else {
-    void router.push('/')
+    void router.push("/");
   }
-}
+};
 </script>
 
 <template>

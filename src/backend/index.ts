@@ -1,2 +1,2 @@
-export * from './openapi'
-export * from './config'
+export * from "./openapi";
+export * from "./config";

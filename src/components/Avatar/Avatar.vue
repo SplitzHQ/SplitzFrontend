@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import defaultUser from './default-user.svg'
+import defaultUser from "./default-user.svg";
 
 interface Image {
-  src: string | null | undefined
-  alt: string
+  src: string | null | undefined;
+  alt: string;
 }
 export interface AvatarProps {
-  images: Image[]
-  size: 'xxs' | 'xs' | 'sm' | 'lg'
+  images: Image[];
+  size: "xxs" | "xs" | "sm" | "lg";
 }
 
-const { images, size } = defineProps<AvatarProps>()
+const { images, size } = defineProps<AvatarProps>();
 
 if (images.length > 4) {
-  console.warn('Avatar component only supports up to 4 images')
+  console.warn("Avatar component only supports up to 4 images");
 }
 </script>
 

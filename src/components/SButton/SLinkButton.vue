@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { RouterLink } from "vue-router";
 
-import SButtonBase from './SButtonBase.vue'
+import SButtonBase from "./SButtonBase.vue";
 
 export interface LinkButtonProps {
-  color: 'neutral' | 'error' | 'brand'
-  variant: 'primary' | 'secondary' | 'outline' | 'ghost'
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
-  disabled?: boolean
-  href: string
+  color: "neutral" | "error" | "brand";
+  variant: "primary" | "secondary" | "outline" | "ghost";
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  disabled?: boolean;
+  href: string;
 }
 
-const { color, variant, size } = defineProps<LinkButtonProps>()
+const { color, variant, size } = defineProps<LinkButtonProps>();
 </script>
 
 <template>

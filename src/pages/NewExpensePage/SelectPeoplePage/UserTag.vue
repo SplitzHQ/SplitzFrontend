@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import Avatar from '@/components/Avatar/Avatar.vue'
+import Avatar from "@/components/Avatar/Avatar.vue";
 
-const { photo, name } = defineProps<{ photo: string | null | undefined; name: string }>()
+const { photo, name } = defineProps<{ photo: string | null | undefined; name: string }>();
 </script>
 
 <template>

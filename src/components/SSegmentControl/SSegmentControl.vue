@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import SSegment from './SSegment.vue'
+import SSegment from "./SSegment.vue";
 
 export interface SegmentControlProps {
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  items: string[]
+  size: "xs" | "sm" | "md" | "lg" | "xl";
+  items: string[];
 }
-const { size, items } = defineProps<SegmentControlProps>()
-const model = defineModel<number>({ required: true })
+const { size, items } = defineProps<SegmentControlProps>();
+const model = defineModel<number>({ required: true });
 </script>
 
 <template>

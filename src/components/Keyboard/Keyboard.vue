@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from '@phosphor-icons/vue'
-import { computed, onMounted, watch } from 'vue'
+import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from "@phosphor-icons/vue";
+import { computed, onMounted, watch } from "vue";
 
-import SButton from '@/components/SButton/SButtonBase.vue'
+import SButton from "@/components/SButton/SButtonBase.vue";
 
-import useCalculator, { type CalculatorInput, type Operator } from './UseCalculator'
+import useCalculator, { type CalculatorInput, type Operator } from "./UseCalculator";
 
 export interface KeyboardProps {
-  enableCalculator?: boolean
-  variant: 'ghost' | 'primary'
+  enableCalculator?: boolean;
+  variant: "ghost" | "primary";
 }
 
-const model = defineModel<number | null>()
-const { enableCalculator = true } = defineProps<KeyboardProps>()
+const model = defineModel<number | null>();
+const { enableCalculator = true } = defineProps<KeyboardProps>();
 
-const calculator = useCalculator()
+const calculator = useCalculator();
 
 onMounted(() => {
-  calculator.initialize(model.value ?? null)
-})
+  calculator.initialize(model.value ?? null);
+});
 
 // Watch for external changes to the model value
 watch(
@@ -27,43 +27,43 @@ watch(
     // Only reinitialize if the new value is different from the current calculator result
     // to avoid infinite loops when the calculator updates the model
     if (newValue !== calculator.result.value) {
-      calculator.initialize(newValue ?? null)
+      calculator.initialize(newValue ?? null);
     }
   }
-)
+);
 
 const expression = computed(() => {
-  return calculator.expression.value.join(' ')
+  return calculator.expression.value.join(" ");
   // if (!calculator.isComplexExpression.value) return calculator.expression.value.join(' ')
   // else return [...calculator.expression.value, '=', calculator.result.value].join(' ')
-})
+});
 
-const input = (value: CalculatorInput | Operator | '.' | 'backspace') => {
+const input = (value: CalculatorInput | Operator | "." | "backspace") => {
   switch (value) {
-    case 'backspace':
-      calculator.backspace()
-      break
-    case '.':
-      calculator.dot()
-      break
-    case '+':
-      calculator.plus()
-      break
-    case '-':
-      calculator.minus()
-      break
-    case '×':
-      calculator.times()
-      break
-    case '÷':
-      calculator.div()
-      break
+    case "backspace":
+      calculator.backspace();
+      break;
+    case ".":
+      calculator.dot();
+      break;
+    case "+":
+      calculator.plus();
+      break;
+    case "-":
+      calculator.minus();
+      break;
+    case "×":
+      calculator.times();
+      break;
+    case "÷":
+      calculator.div();
+      break;
     default:
-      calculator.input(value)
+      calculator.input(value);
   }
 
-  model.value = calculator.result.value
-}
+  model.value = calculator.result.value;
+};
 </script>
 
 <template>

@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import NumberFlow, { type Format } from '@number-flow/vue'
-import { PhArrowUpRight, PhCurrencyDollar } from '@phosphor-icons/vue'
-import { useFluent } from 'fluent-vue'
-import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import NumberFlow, { type Format } from "@number-flow/vue";
+import { PhArrowUpRight, PhCurrencyDollar } from "@phosphor-icons/vue";
+import { useFluent } from "fluent-vue";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
-import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
-import Keyboard from '@/components/Keyboard/Keyboard.vue'
-import Layout from '@/components/Layout/Layout.vue'
-import SButton from '@/components/SButton/SButton.vue'
-import SLinkButton from '@/components/SButton/SLinkButton.vue'
-import { useTransactionStore } from '@/stores/transaction'
+import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import Keyboard from "@/components/Keyboard/Keyboard.vue";
+import Layout from "@/components/Layout/Layout.vue";
+import SButton from "@/components/SButton/SButton.vue";
+import SLinkButton from "@/components/SButton/SLinkButton.vue";
+import { useTransactionStore } from "@/stores/transaction";
 
-const { $t } = useFluent()
-const transactionStore = useTransactionStore()
-const { transaction } = storeToRefs(transactionStore)
+const { $t } = useFluent();
+const transactionStore = useTransactionStore();
+const { transaction } = storeToRefs(transactionStore);
 
 // format amount as currency
 const formatOptions = computed(
   (): Format => ({
-    style: 'currency',
-    currency: transaction.value.currency ?? 'USD'
+    style: "currency",
+    currency: transaction.value.currency ?? "USD"
   })
-)
+);
 const formattedAmount = computed(() => {
-  const amount = transaction.value.amount
-  return amount == null ? '' : amount.toLocaleString(undefined, formatOptions.value)
-})
+  const amount = transaction.value.amount;
+  return amount == null ? "" : amount.toLocaleString(undefined, formatOptions.value);
+});
 </script>
 
 <template>
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        {{ $t('new-expense-title') }}
+        {{ $t("new-expense-title") }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -55,15 +55,15 @@ const formattedAmount = computed(() => {
             </SButton>
             <SButton color="brand" variant="secondary" size="sm">
               <template #icon-left><PhArrowUpRight /></template>
-              {{ $t('new-expense-frequency-one-time') }}
+              {{ $t("new-expense-frequency-one-time") }}
             </SButton>
           </div>
         </div>
         <Keyboard v-model="transaction.amount" variant="ghost" :enable-calculator="true" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
-          <SButton color="brand" variant="outline" size="xxl">{{ $t('new-expense-actions-skip') }}</SButton>
+          <SButton color="brand" variant="outline" size="xxl">{{ $t("new-expense-actions-skip") }}</SButton>
           <SLinkButton color="brand" variant="primary" size="xxl" href="/new-expense/select-people">
-            {{ $t('new-expense-actions-next') }}
+            {{ $t("new-expense-actions-next") }}
           </SLinkButton>
         </div>
       </div>

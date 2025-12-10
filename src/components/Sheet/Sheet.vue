@@ -1,157 +1,157 @@
 <script setup lang="ts">
-import { PhX } from '@phosphor-icons/vue'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { PhX } from "@phosphor-icons/vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 export interface SheetProps {
   /** Whether the sheet is visible */
-  modelValue: boolean
+  modelValue: boolean;
   /** Size of the sheet - 'large' shows ~90% of screen, 'medium' shows ~50% */
-  detent?: 'large' | 'medium'
+  detent?: "large" | "medium";
   /** Whether to show the drag handle at the top */
-  showHandle?: boolean
+  showHandle?: boolean;
   /** Whether to show the close button */
-  showCloseButton?: boolean
+  showCloseButton?: boolean;
   /** Whether the sheet can be dismissed by tapping the backdrop */
-  dismissOnBackdrop?: boolean
+  dismissOnBackdrop?: boolean;
   /** Whether the sheet can be dismissed by dragging down */
-  dismissOnDrag?: boolean
+  dismissOnDrag?: boolean;
 }
 
 interface SheetEvents {
-  'update:modelValue': [value: boolean]
-  dismiss: []
+  "update:modelValue": [value: boolean];
+  dismiss: [];
 }
 
 const props = withDefaults(defineProps<SheetProps>(), {
-  detent: 'large',
+  detent: "large",
   showHandle: true,
   showCloseButton: false,
   dismissOnBackdrop: true,
   dismissOnDrag: true
-})
+});
 
-const emit = defineEmits<SheetEvents>()
+const emit = defineEmits<SheetEvents>();
 
 // Refs
-const sheetRef = ref<HTMLElement>()
-const isDragging = ref(false)
-const dragStartY = ref(0)
-const dragCurrentY = ref(0)
-const sheetHeight = ref(0)
+const sheetRef = ref<HTMLElement>();
+const isDragging = ref(false);
+const dragStartY = ref(0);
+const dragCurrentY = ref(0);
+const sheetHeight = ref(0);
 
 // Computed
 const isVisible = computed({
   get: () => props.modelValue,
   set: (value: boolean) => {
-    emit('update:modelValue', value)
+    emit("update:modelValue", value);
   }
-})
+});
 
 const detentHeight = computed(() => {
   switch (props.detent) {
-    case 'medium':
-      return '50vh'
+    case "medium":
+      return "50vh";
     default: // all other cases, including 'large'
-      return '90vh'
+      return "90vh";
   }
-})
+});
 
 const dragOffset = computed(() => {
-  if (!isDragging.value) return 0
-  const offset = dragCurrentY.value - dragStartY.value
-  return Math.max(0, offset) // Only allow dragging down
-})
+  if (!isDragging.value) return 0;
+  const offset = dragCurrentY.value - dragStartY.value;
+  return Math.max(0, offset); // Only allow dragging down
+});
 
 const shouldDismiss = computed(() => {
-  return dragOffset.value > sheetHeight.value * 0.3 // Dismiss if dragged down more than 30%
-})
+  return dragOffset.value > sheetHeight.value * 0.3; // Dismiss if dragged down more than 30%
+});
 
 // Methods
 function dismiss() {
-  isVisible.value = false
-  emit('dismiss')
+  isVisible.value = false;
+  emit("dismiss");
 }
 
 function handleBackdropClick() {
   if (props.dismissOnBackdrop) {
-    dismiss()
+    dismiss();
   }
 }
 
 // Touch/Mouse drag handlers
 function handleDragStart(event: TouchEvent | MouseEvent) {
-  if (!props.dismissOnDrag) return
+  if (!props.dismissOnDrag) return;
 
-  isDragging.value = true
-  const clientY = 'touches' in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY
-  dragStartY.value = clientY
-  dragCurrentY.value = clientY
+  isDragging.value = true;
+  const clientY = "touches" in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY;
+  dragStartY.value = clientY;
+  dragCurrentY.value = clientY;
 
   if (sheetRef.value) {
-    sheetHeight.value = sheetRef.value.offsetHeight
+    sheetHeight.value = sheetRef.value.offsetHeight;
   }
 
   // Prevent text selection during drag
-  document.body.style.userSelect = 'none'
+  document.body.style.userSelect = "none";
 }
 
 function handleDragMove(event: TouchEvent | MouseEvent) {
-  if (!isDragging.value) return
+  if (!isDragging.value) return;
 
-  event.preventDefault()
-  const clientY = 'touches' in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY
-  dragCurrentY.value = clientY
+  event.preventDefault();
+  const clientY = "touches" in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY;
+  dragCurrentY.value = clientY;
 }
 
 function handleDragEnd() {
-  if (!isDragging.value) return
+  if (!isDragging.value) return;
 
   if (shouldDismiss.value) {
-    dismiss()
+    dismiss();
   }
 
   // Reset drag values
-  isDragging.value = false
-  document.body.style.userSelect = ''
-  dragStartY.value = 0
-  dragCurrentY.value = 0
+  isDragging.value = false;
+  document.body.style.userSelect = "";
+  dragStartY.value = 0;
+  dragCurrentY.value = 0;
 }
 
 // Keyboard handler
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && isVisible.value) {
-    dismiss()
+  if (event.key === "Escape" && isVisible.value) {
+    dismiss();
   }
 }
 
 // Lifecycle
 onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-  document.addEventListener('mousemove', handleDragMove)
-  document.addEventListener('mouseup', handleDragEnd)
-  document.addEventListener('touchmove', handleDragMove, { passive: false })
-  document.addEventListener('touchend', handleDragEnd)
-})
+  document.addEventListener("keydown", handleKeydown);
+  document.addEventListener("mousemove", handleDragMove);
+  document.addEventListener("mouseup", handleDragEnd);
+  document.addEventListener("touchmove", handleDragMove, { passive: false });
+  document.addEventListener("touchend", handleDragEnd);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-  document.removeEventListener('mousemove', handleDragMove)
-  document.removeEventListener('mouseup', handleDragEnd)
-  document.removeEventListener('touchmove', handleDragMove)
-  document.removeEventListener('touchend', handleDragEnd)
-})
+  document.removeEventListener("keydown", handleKeydown);
+  document.removeEventListener("mousemove", handleDragMove);
+  document.removeEventListener("mouseup", handleDragEnd);
+  document.removeEventListener("touchmove", handleDragMove);
+  document.removeEventListener("touchend", handleDragEnd);
+});
 
 // Watch for visibility changes to manage body scroll
 watch(isVisible, async (newValue) => {
   if (newValue) {
-    await nextTick()
+    await nextTick();
     // Prevent body scroll when sheet is open
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = "hidden";
   } else {
     // Restore body scroll
-    document.body.style.overflow = ''
+    document.body.style.overflow = "";
   }
-})
+});
 </script>
 
 <template>

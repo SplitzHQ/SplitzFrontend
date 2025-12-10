@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
-import { useFluent } from 'fluent-vue'
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { useElementSize } from "@vueuse/core";
+import { useFluent } from "fluent-vue";
+import { onMounted, onUnmounted, ref, useTemplateRef } from "vue";
 
-import HeaderMobileSecondary from '@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue'
-import Keyboard from '@/components/Keyboard/Keyboard.vue'
-import Layout from '@/components/Layout/Layout.vue'
-import SLinkButton from '@/components/SButton/SLinkButton.vue'
-import { useTransactionStore } from '@/stores/transaction'
+import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import Keyboard from "@/components/Keyboard/Keyboard.vue";
+import Layout from "@/components/Layout/Layout.vue";
+import SLinkButton from "@/components/SButton/SLinkButton.vue";
+import { useTransactionStore } from "@/stores/transaction";
 
-import PaidByButton from './PaidByButton.vue'
-import SplitMethodButton from './SplitMethodButton.vue'
-import UserItem from './UserItem.vue'
-import { useKeyboardControl } from './use-keyboard-control'
+import PaidByButton from "./PaidByButton.vue";
+import SplitMethodButton from "./SplitMethodButton.vue";
+import UserItem from "./UserItem.vue";
+import { useKeyboardControl } from "./use-keyboard-control";
 
 // i18n
-const { $t } = useFluent()
+const { $t } = useFluent();
 
 // transaction store
-const transactionStore = useTransactionStore()
-const { keyboardValue, focusedInputUserId, setFocusedInputUserId } = useKeyboardControl()
+const transactionStore = useTransactionStore();
+const { keyboardValue, focusedInputUserId, setFocusedInputUserId } = useKeyboardControl();
 
 // Handle click outside to close the keyboard
 const handleClickOutside = () => {
   if (focusedInputUserId.value) {
-    setFocusedInputUserId(null)
+    setFocusedInputUserId(null);
   }
-}
+};
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener("click", handleClickOutside);
+});
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener("click", handleClickOutside);
+});
 
 // get header's height to adjust the layout
-const headerHeight = ref(0)
+const headerHeight = ref(0);
 onMounted(() => {
-  const headerElement = document.querySelector('header')
+  const headerElement = document.querySelector("header");
   if (headerElement) {
-    headerHeight.value = headerElement.clientHeight
+    headerHeight.value = headerElement.clientHeight;
   }
-})
+});
 
 // get keyboard's height to adjust the layout
-const keyboardContainer = useTemplateRef('keyboardContainer')
-const { height: keyboardHeight } = useElementSize(keyboardContainer)
+const keyboardContainer = useTemplateRef("keyboardContainer");
+const { height: keyboardHeight } = useElementSize(keyboardContainer);
 
 // async state for submit button
 // const { state } = useAsyncState(async () => {
@@ -57,7 +57,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
   <Layout class="h-dvh">
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        {{ $t('new-expense-split-title') }}
+        {{ $t("new-expense-split-title") }}
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
@@ -72,17 +72,17 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
             <div class="flex flex-col gap-1">
               <div class="flex justify-between items-center">
                 <div class="text-base-text-tertiary text-sm font-medium">
-                  {{ $t('new-expense-split-summary-included', { count: transactionStore.includedMembersId.length }) }}
+                  {{ $t("new-expense-split-summary-included", { count: transactionStore.includedMembersId.length }) }}
                 </div>
                 <div class="flex justify-start items-start gap-1">
                   <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
-                    {{ $t('new-expense-split-summary-total-amount') }}
+                    {{ $t("new-expense-split-summary-total-amount") }}
                   </div>
                   <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
                     {{
                       transactionStore.transaction.amount?.toLocaleString(undefined, {
-                        style: 'currency',
-                        currency: transactionStore.transaction.currency ?? 'USD'
+                        style: "currency",
+                        currency: transactionStore.transaction.currency ?? "USD"
                       })
                     }}
                   </div>
@@ -92,7 +92,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
                     role="alert"
                     aria-live="polite"
                   >
-                    {{ $t('new-expense-split-validation-invalid-input') }}
+                    {{ $t("new-expense-split-validation-invalid-input") }}
                   </div>
                 </div>
               </div>
@@ -102,7 +102,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
               <div class="flex justify-between items-center">
                 <div class="text-base-text-tertiary text-sm font-medium">
                   {{
-                    $t('new-expense-split-summary-not-included', { count: transactionStore.excludedMembersId.length })
+                    $t("new-expense-split-summary-not-included", { count: transactionStore.excludedMembersId.length })
                   }}
                 </div>
               </div>
@@ -118,7 +118,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer)
               class="w-full"
               href="/new-expense/review-and-complete"
             >
-              {{ $t('new-expense-split-actions-complete') }}
+              {{ $t("new-expense-split-actions-complete") }}
             </SLinkButton>
           </div>
         </div>

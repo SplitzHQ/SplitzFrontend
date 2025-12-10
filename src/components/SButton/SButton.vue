@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import SButtonBase from './SButtonBase.vue'
+import SButtonBase from "./SButtonBase.vue";
 
 export interface ButtonProps {
-  color: 'neutral' | 'error' | 'brand'
-  variant: 'primary' | 'secondary' | 'outline' | 'ghost'
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
-  disabled?: boolean
-  loading?: boolean
+  color: "neutral" | "error" | "brand";
+  variant: "primary" | "secondary" | "outline" | "ghost";
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  disabled?: boolean;
+  loading?: boolean;
 }
 interface ButtonEvents {
-  click: [e: MouseEvent]
+  click: [e: MouseEvent];
 }
 
-const { color, variant, size, disabled, loading } = defineProps<ButtonProps>()
-const emit = defineEmits<ButtonEvents>()
+const { color, variant, size, disabled, loading } = defineProps<ButtonProps>();
+const emit = defineEmits<ButtonEvents>();
 
 function clickHandler(e: MouseEvent) {
-  if (disabled) return
-  emit('click', e)
+  if (disabled) return;
+  emit("click", e);
 }
 </script>
 

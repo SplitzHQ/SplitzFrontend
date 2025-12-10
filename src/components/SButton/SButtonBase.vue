@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { PhCircleNotch } from '@phosphor-icons/vue'
+import { PhCircleNotch } from "@phosphor-icons/vue";
 
 interface ButtonBaseProps {
-  color: 'neutral' | 'error' | 'brand'
-  variant: 'primary' | 'secondary' | 'outline' | 'ghost'
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
-  iconOnly?: boolean
-  disabled?: boolean
-  loading?: boolean
+  color: "neutral" | "error" | "brand";
+  variant: "primary" | "secondary" | "outline" | "ghost";
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  iconOnly?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
 }
-const { color, variant, size, disabled, loading, iconOnly } = defineProps<ButtonBaseProps>()
+const { color, variant, size, disabled, loading, iconOnly } = defineProps<ButtonBaseProps>();
 </script>
 
 <template>

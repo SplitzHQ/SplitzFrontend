@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { PhMinus, PhPlus } from '@phosphor-icons/vue'
-import { useFluent } from 'fluent-vue'
-import { computed } from 'vue'
+import { PhMinus, PhPlus } from "@phosphor-icons/vue";
+import { useFluent } from "fluent-vue";
+import { computed } from "vue";
 
-import SIconButton from '@/components/SButton/SIconButton.vue'
-import { useTransactionStore } from '@/stores/transaction'
+import SIconButton from "@/components/SButton/SIconButton.vue";
+import { useTransactionStore } from "@/stores/transaction";
 
-import { useKeyboardControl } from './use-keyboard-control'
+import { useKeyboardControl } from "./use-keyboard-control";
 
 const { userId } = defineProps<{
-  userId: string
-}>()
+  userId: string;
+}>();
 
 // i18n
-const { $t } = useFluent()
+const { $t } = useFluent();
 
 // transaction store
-const transactionStore = useTransactionStore()
+const transactionStore = useTransactionStore();
 
-const { focusedInputUserId, setFocusedInputUserId } = useKeyboardControl()
-const isFocused = computed(() => focusedInputUserId.value === userId)
+const { focusedInputUserId, setFocusedInputUserId } = useKeyboardControl();
+const isFocused = computed(() => focusedInputUserId.value === userId);
 </script>
 
 <template>
@@ -28,8 +28,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       <span class="text-center text-base-text-placeholder text-sm font-normal">
         {{
           transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
-            style: 'currency',
-            currency: transactionStore.transaction.currency ?? 'USD'
+            style: "currency",
+            currency: transactionStore.transaction.currency ?? "USD"
           })
         }}
       </span>
@@ -54,7 +54,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       >
         {{
           (1 / transactionStore.includedMembersId.length).toLocaleString(undefined, {
-            style: 'percent',
+            style: "percent",
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           })
@@ -63,7 +63,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       <span v-else class="text-center text-base-text-primary text-sm font-normal">
         {{
           (transactionStore.splitByPercentageDetails[userId] / 100).toLocaleString(undefined, {
-            style: 'percent',
+            style: "percent",
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           })
@@ -85,7 +85,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
     <button type="button" @click.stop="setFocusedInputUserId(userId)">
       <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full items-center">
         <span class="text-center text-base-text-primary text-sm font-normal">
-          {{ $t('new-expense-split-shares-count', { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
+          {{ $t("new-expense-split-shares-count", { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
         </span>
       </div>
     </button>
@@ -118,18 +118,18 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       >
         {{
           (0).toLocaleString(undefined, {
-            style: 'currency',
-            currency: transactionStore.transaction.currency ?? 'USD',
-            signDisplay: 'exceptZero'
+            style: "currency",
+            currency: transactionStore.transaction.currency ?? "USD",
+            signDisplay: "exceptZero"
           })
         }}
       </span>
       <span v-else class="text-center text-base-text-primary text-sm font-normal">
         {{
           transactionStore.splitByAdjustmentDetails[userId].toLocaleString(undefined, {
-            style: 'currency',
-            currency: transactionStore.transaction.currency ?? 'USD',
-            signDisplay: 'exceptZero'
+            style: "currency",
+            currency: transactionStore.transaction.currency ?? "USD",
+            signDisplay: "exceptZero"
           })
         }}
       </span>
@@ -154,16 +154,16 @@ const isFocused = computed(() => focusedInputUserId.value === userId)
       >
         {{
           (0).toLocaleString(undefined, {
-            style: 'currency',
-            currency: transactionStore.transaction.currency ?? 'USD'
+            style: "currency",
+            currency: transactionStore.transaction.currency ?? "USD"
           })
         }}
       </span>
       <span v-else class="text-center text-base-text-primary text-sm font-normal">
         {{
           transactionStore.splitByCustomDetails[userId].toLocaleString(undefined, {
-            style: 'currency',
-            currency: transactionStore.transaction.currency ?? 'USD'
+            style: "currency",
+            currency: transactionStore.transaction.currency ?? "USD"
           })
         }}
       </span>

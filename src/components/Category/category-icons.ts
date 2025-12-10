@@ -45,10 +45,10 @@ import {
   PhTooth,
   PhWifiHigh,
   PhWine
-} from '@phosphor-icons/vue'
-import type { Component } from 'vue'
+} from "@phosphor-icons/vue";
+import type { Component } from "vue";
 
-import type { Subcategory } from '@/libs/categories'
+import type { Subcategory } from "@/libs/categories";
 
 // Central mapping: every Subcategory must have an icon. Missing keys -> TS error.
 export const categoryIconMap: Record<Subcategory, Component> = {
@@ -206,6 +206,6 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   // other
   uncategorized: PhQuestion,
   other_misc: PhQuestion
-}
+};
 
-export type CategoryIconKey = keyof typeof categoryIconMap
+export type CategoryIconKey = keyof typeof categoryIconMap;

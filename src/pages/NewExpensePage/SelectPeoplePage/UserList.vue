@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { PhCheckCircle, PhCircle } from '@phosphor-icons/vue'
+import { PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 
-import Avatar from '@/components/Avatar/Avatar.vue'
-import SButtonBase from '@/components/SButton/SButtonBase.vue'
+import Avatar from "@/components/Avatar/Avatar.vue";
+import SButtonBase from "@/components/SButton/SButtonBase.vue";
 
-import type { UserListItem } from './types'
+import type { UserListItem } from "./types";
 
 const { title, items, selectedItemsId } = defineProps<{
-  title: string
-  items: UserListItem[]
-  selectedItemsId: string[]
-}>()
+  title: string;
+  items: UserListItem[];
+  selectedItemsId: string[];
+}>();
 
 defineEmits<{
-  select: [id: string]
-}>()
+  select: [id: string];
+}>();
 </script>
 
 <template>
@@ -48,7 +48,7 @@ defineEmits<{
                 </div>
               </div>
               <div class="text-base-text-quinary text-xs font-normal">
-                {{ item.members.map((member) => member.userName).join(', ') }}
+                {{ item.members.map((member) => member.userName).join(", ") }}
               </div>
             </template>
             <div

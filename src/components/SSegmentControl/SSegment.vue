@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { motion } from 'motion-v'
+import { motion } from "motion-v";
 
 interface SegmentProps {
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  active: boolean
+  size: "xs" | "sm" | "md" | "lg" | "xl";
+  active: boolean;
 }
-type ButtonEvents = (e: 'click') => void
+type ButtonEvents = (e: "click") => void;
 
-const { size, active } = defineProps<SegmentProps>()
-const emit = defineEmits<ButtonEvents>()
+const { size, active } = defineProps<SegmentProps>();
+const emit = defineEmits<ButtonEvents>();
 </script>
 
 <template>
