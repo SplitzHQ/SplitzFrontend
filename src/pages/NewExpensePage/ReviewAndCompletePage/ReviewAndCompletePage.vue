@@ -3,6 +3,7 @@ import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -15,10 +16,29 @@ import GroupCard from "./GroupCard.vue";
 import TransactionInfoCard from "./TransactionInfoCard.vue";
 
 const { $t } = useFluent();
+const router = useRouter();
 const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 const showDetailsSheet = ref(false);
+const isSubmitting = ref(false);
 const bgUrl = `url("${BackgroundCheckCircle}")`;
+
+async function handleComplete() {
+  if (isSubmitting.value) return;
+  
+  try {
+    isSubmitting.value = true;
+    await transactionStore.saveTransaction();
+    // Navigate to home page after successful submission
+    await router.push("/");
+  } catch (error) {
+    console.error("Failed to save transaction:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to save transaction, please try again";
+    alert(errorMessage);
+  } finally {
+    isSubmitting.value = false;
+  }
+}
 </script>
 
 <template>
@@ -41,7 +61,15 @@ const bgUrl = `url("${BackgroundCheckCircle}")`;
           <TransactionInfoCard />
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
-              <SButton variant="primary" size="xxl" color="brand">{{ $t("new-expense-review-actions-done") }}</SButton>
+              <SButton
+                variant="primary"
+                size="xxl"
+                color="brand"
+                :disabled="isSubmitting"
+                @click="handleComplete"
+              >
+                {{ $t("new-expense-review-actions-done") }}
+              </SButton>
               <SButton variant="secondary" size="xxl" color="brand" @click="showDetailsSheet = true">
                 {{ $t("new-expense-review-actions-add-details") }}
               </SButton>

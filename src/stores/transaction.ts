@@ -9,6 +9,7 @@ import {
   type TransactionBalanceInputDto,
   type TransactionDto
 } from "@/backend";
+import config from "@/backend/config";
 import type { SplitMethod } from "@/types/split-method";
 
 const ROUNDING_TOLERANCE = 0.01;
@@ -243,13 +244,15 @@ export const useTransactionStore = defineStore("transaction", () => {
       throw new Error("Group ID must be specified");
     }
 
-    // Require name if not already set in transaction
-    if (!transaction.value.name) {
-      throw new Error("Transaction name must be specified");
+    // Provide a default name if transaction name is missing
+    if (!transaction.value.name || transaction.value.name.trim() === "") {
+      const amount = transaction.value.amount ?? 0;
+      const currency = transaction.value.currency ?? "USD";
+      transaction.value.name = `Expense - ${currency} ${amount.toFixed(2)}`;
     }
 
-    // Create the API instance (you may want to inject configuration from elsewhere)
-    const api = new TransactionApi();
+    // Create the API instance with configuration
+    const api = new TransactionApi(config);
 
     // Build the balance data from the final split amounts
     const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => ({
