@@ -14,9 +14,13 @@ import enNewExpense from "./locales/en/new-expense.ftl";
 // @ts-expect-error - translation files
 import enCategories from "./locales/en/categories.ftl";
 // @ts-expect-error - translation files
+import enHome from "./locales/en/home.ftl";
+// @ts-expect-error - translation files
 import zhcnNewExpense from "./locales/zh-cn/new-expense.ftl";
 // @ts-expect-error - translation files
 import zhcnCategories from "./locales/zh-cn/categories.ftl";
+// @ts-expect-error - translation files
+import zhcnHome from "./locales/zh-cn/home.ftl";
 import router from "./router";
 
 const app = createApp(App);
@@ -25,8 +29,8 @@ const app = createApp(App);
 const enBundle = new FluentBundle("en");
 const zhcnBundle = new FluentBundle("zh-cn");
 
-[enNewExpense, enCategories].forEach((resource) => enBundle.addResource(resource));
-[zhcnNewExpense, zhcnCategories].forEach((resource) => zhcnBundle.addResource(resource));
+[enNewExpense, enCategories, enHome].forEach((resource) => enBundle.addResource(resource));
+[zhcnNewExpense, zhcnCategories, zhcnHome].forEach((resource) => zhcnBundle.addResource(resource));
 
 const fluent = createFluentVue({
   bundles: [enBundle, zhcnBundle]
