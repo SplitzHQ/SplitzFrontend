@@ -1,7 +1,22 @@
 import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
 import { Configuration } from "./openapi/runtime";
 
-const basePath = "http://localhost:5119";
+// Automatically select backend API address based on frontend access address
+// If frontend accesses via LAN IP, backend uses the same IP
+const getBasePath = () => {
+  const hostname = window.location.hostname;
+
+  // If frontend accesses via localhost or 127.0.0.1, backend also uses localhost
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return "http://localhost:5119";
+  }
+
+  // If frontend accesses via LAN IP (mobile devices), backend uses the same IP
+  // Example: frontend is http://192.168.1.100:5173, backend is http://192.168.1.100:5119
+  return `http://${hostname}:5119`;
+};
+
+const basePath = getBasePath();
 
 const config = new Configuration({
   basePath: basePath,
