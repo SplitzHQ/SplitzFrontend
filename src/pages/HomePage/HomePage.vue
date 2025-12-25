@@ -52,9 +52,7 @@ const createGroup = () => {
 <template>
   <Layout>
     <template #header>
-      <div
-        class="bg-base-bg-secondary_alt border-b border-base-border-quaternary flex flex-col gap-3 pb-4 pt-[63px] px-4"
-      >
+      <div class="bg-base-bg-secondary_alt border-b border-base-border-quaternary flex flex-col gap-3 pb-4 pt-4 px-4">
         <!-- Header -->
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-2.5">
