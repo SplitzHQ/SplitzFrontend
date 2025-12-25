@@ -19,6 +19,7 @@ import { useFluent } from "fluent-vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+import BackgroundCircle from "@/assets/BackgroundCircle.svg";
 import { AccountApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
@@ -36,6 +37,7 @@ const accountApi = new AccountApi(config);
 const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
 
 const searchKeyword = ref("");
+const bgUrl = `url("${BackgroundCircle}")`;
 
 const addExpense = () => {
   routerHistoryStore.clearParentHistory();
@@ -109,74 +111,47 @@ const createGroup = () => {
 
         <!-- Empty State Icon -->
         <div class="relative shrink-0 size-[120px]">
-          <!-- 4 Concentric Circles with increasing size, larger spacing, and decreasing opacity -->
-          <!-- Circle 1: 120px - darkest, radius ~32px to contain 64px icon -->
-          <div class="absolute left-1/2 size-[120px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-            <svg class="size-full" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="60" cy="60" r="32" stroke="#799689" stroke-width="1" opacity="1" />
-            </svg>
-          </div>
-          <!-- Circle 2: 200px - lighter, larger spacing -->
-          <div class="absolute left-1/2 size-[200px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-            <svg class="size-full" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="100" cy="100" r="60" stroke="#799689" stroke-width="1" opacity="0.6" />
-            </svg>
-          </div>
-          <!-- Circle 3: 280px - even lighter, larger spacing -->
-          <div class="absolute left-1/2 size-[280px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-            <svg class="size-full" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="140" cy="140" r="90" stroke="#799689" stroke-width="1" opacity="0.3" />
-            </svg>
-          </div>
-          <!-- Circle 4: 360px - outermost with fade-out effect, largest spacing -->
-          <div class="absolute left-1/2 size-[360px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-            <svg class="size-full" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <radialGradient id="outerFade" cx="50%" cy="50%">
-                  <stop offset="0%" stop-color="#799689" stop-opacity="0.2" />
-                  <stop offset="50%" stop-color="#799689" stop-opacity="0.1" />
-                  <stop offset="100%" stop-color="#799689" stop-opacity="0" />
-                </radialGradient>
-              </defs>
-              <circle cx="180" cy="180" r="120" stroke="url(#outerFade)" stroke-width="1" />
-            </svg>
-          </div>
+          <!-- Circle Background -->
+          <div
+            class="absolute left-1/2 size-[360px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 bg-center bg-no-repeat bg-cover"
+            :style="{ backgroundImage: bgUrl }"
+          />
 
           <!-- Center Dollar Icon -->
           <div
-            class="absolute left-1/2 size-16 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+            class="absolute left-1/2 size-16 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10"
           >
             <PhCurrencyCircleDollar class="text-util-color-brand-700 size-full" />
           </div>
 
           <!-- Category Icons around the circle -->
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[134.5px] top-0"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[134.5px] top-0 z-10"
           >
             <PhForkKnife class="text-util-color-brand-700 size-4" />
           </div>
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg -left-[94.5px] top-10"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg -left-[94.5px] top-10 z-10"
           >
             <PhAirplane class="text-util-color-brand-700 size-4" />
           </div>
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[40.5px] top-[98px]"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[40.5px] top-[98px] z-10"
           >
             <PhUsersThree class="text-util-color-brand-700 size-6" />
           </div>
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[49px] -top-6"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[49px] -top-6 z-10"
           >
             <PhHandCoins class="text-util-color-brand-700 size-6" />
           </div>
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[188.5px] top-[65px]"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[188.5px] top-[65px] z-10"
           >
             <PhCar class="text-util-color-brand-700 size-4" />
           </div>
           <div
-            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg left-[122.5px] top-[112px]"
+            class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg left-[122.5px] top-[112px] z-10"
           >
             <PhReceipt class="text-util-color-brand-700 size-6" />
           </div>

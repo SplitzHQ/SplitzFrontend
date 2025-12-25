@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/vue";
+import { PhCheckCircle, PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+import BackgroundCircle from "@/assets/BackgroundCircle.svg";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { useTransactionStore } from "@/stores/transaction";
 
 import AddExpenseDetailsSheet from "./AddExpenseDetailsSheet.vue";
-import BackgroundCheckCircle from "./BackgroundCheckCircle.svg";
 import GroupCard from "./GroupCard.vue";
 import TransactionInfoCard from "./TransactionInfoCard.vue";
 
@@ -21,11 +21,11 @@ const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 const showDetailsSheet = ref(false);
 const isSubmitting = ref(false);
-const bgUrl = `url("${BackgroundCheckCircle}")`;
+const bgUrl = `url("${BackgroundCircle}")`;
 
 async function handleComplete() {
   if (isSubmitting.value) return;
-  
+
   try {
     isSubmitting.value = true;
     await transactionStore.saveTransaction();
@@ -51,9 +51,13 @@ async function handleComplete() {
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col">
         <div
-          class="bg-center bg-no-repeat bg-cover w-full self-center max-w-lg aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10"
+          class="bg-center bg-no-repeat bg-cover w-full self-center max-w-lg aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10 relative"
           :style="{ backgroundImage: bgUrl }"
         >
+          <!-- Check Circle Icon -->
+          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+            <PhCheckCircle class="text-util-color-success-400" weight="fill" size="52" />
+          </div>
           <div class="text-base-text-brand text-base font-medium">{{ $t("new-expense-review-expense-added-to") }}</div>
           <GroupCard v-if="transaction.groupId" />
         </div>
@@ -61,13 +65,7 @@ async function handleComplete() {
           <TransactionInfoCard />
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
-              <SButton
-                variant="primary"
-                size="xxl"
-                color="brand"
-                :disabled="isSubmitting"
-                @click="handleComplete"
-              >
+              <SButton variant="primary" size="xxl" color="brand" :disabled="isSubmitting" @click="handleComplete">
                 {{ $t("new-expense-review-actions-done") }}
               </SButton>
               <SButton variant="secondary" size="xxl" color="brand" @click="showDetailsSheet = true">
