@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { PhCamera, PhCircleNotch, PhGpsFix, PhPlus, PhTrash } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { categoryColorMap } from "@/components/Category/category-color";
@@ -18,31 +19,98 @@ const { $t } = useFluent();
 const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 
+// Local editable copies of transaction details
 const localName = ref(transaction.value.name ?? "");
 const localLocation = ref(transaction.value.geoCoordinate ?? "");
 const localCategory = ref(getCategory(transaction.value.icon));
 const receiptPreview = ref<string | undefined>(transaction.value.photo as string | undefined);
 
-function handleFileChange(e: Event) {
-  const input = e.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    const result = reader.result as string;
-    receiptPreview.value = result;
-  });
-  reader.readAsDataURL(file);
-}
-
+// Save details back to transaction store
 function saveDetails() {
   transaction.value.name = localName.value.trim() || undefined;
   transaction.value.icon = localCategory.value;
   transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
-  if (receiptPreview.value) {
-    transaction.value.photo = receiptPreview.value;
-  }
+  // do not save receipt to transaction for now
+  // the photo should be uploaded separately when submitting the transaction
+  // transaction.value.photo = receiptPreview.value;
   model.value = false;
+}
+
+// location handling
+const locationLoading = ref(false);
+/**
+ * Get user's current location and convert to human-readable address
+ */
+function getLocation() {
+  if ("geolocation" in navigator) {
+    locationLoading.value = true;
+    setTimeout(() => {
+      locationLoading.value = false;
+    }, 10000); // timeout after 10 seconds
+
+    // use browser geolocation API to get coordinates
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        void (async () => {
+          const { latitude, longitude } = position.coords;
+          // use Nominatim API to reverse geocode coordinates to address
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${String(latitude)}&lon=${String(longitude)}`
+            );
+            const data = (await response.json()) as { display_name?: string } | null;
+            if (data?.display_name) {
+              localLocation.value = data.display_name;
+            } else {
+              localLocation.value = `${String(latitude)}, ${String(longitude)}`;
+            }
+          } catch (error) {
+            console.error("Error fetching location name:", error);
+            localLocation.value = `${String(latitude)}, ${String(longitude)}`;
+          } finally {
+            locationLoading.value = false;
+          }
+        })();
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        locationLoading.value = false;
+      }
+    );
+  }
+}
+
+// receipt handling
+const cameraInput = useTemplateRef("cameraInput");
+const galleryInput = useTemplateRef("galleryInput");
+
+function triggerCamera() {
+  // false alert
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  cameraInput.value?.click();
+}
+
+function triggerGallery() {
+  // false alert
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  galleryInput.value?.click();
+}
+
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files?.[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.addEventListener("load", (e) => {
+      receiptPreview.value = e.target?.result as string;
+    });
+    reader.readAsDataURL(file);
+  }
+  input.value = "";
+}
+
+function removeReceipt() {
+  receiptPreview.value = undefined;
 }
 </script>
 
@@ -57,14 +125,14 @@ function saveDetails() {
             {{ $t("new-expense-review-fields-name-label") }}
           </label>
           <div class="gap-2 flex items-center">
-            <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-3 text-[1.75rem] rounded-05xl']">
+            <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-2.5 icon-7 rounded-05xl']">
               <CategoryIcon :category="localCategory" />
             </div>
             <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary grow">
               <TextInput
                 v-model="localName"
                 :placeholder="$t('new-expense-review-fields-name-placeholder')"
-                class="text-base placeholder:text-base"
+                class="text-base w-full"
               />
             </div>
           </div>
@@ -75,14 +143,27 @@ function saveDetails() {
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t("new-expense-review-fields-location") }}
           </label>
-          <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
-            <TextInput
-              v-model="localLocation"
-              :placeholder="$t('new-expense-review-fields-location')"
-              class="text-base placeholder:text-base"
-            />
+          <div class="gap-2 flex items-stretch">
+            <button
+              class="p-3.5 rounded-xl outline -outline-offset-1 outline-base-border-primary flex justify-center items-center cursor-pointer"
+              @click="getLocation"
+            >
+              <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
+              <PhCircleNotch v-else class="icon-5 text-base-fg-primary animate-spin" />
+            </button>
+            <div
+              class="p-3 rounded-xl outline-solid outline-1 flex items-center gap-2 -outline-offset-1 outline-base-border-primary grow"
+            >
+              <TextInput
+                v-model="localLocation"
+                :placeholder="$t('new-expense-review-fields-location-placeholder')"
+                class="text-base w-full"
+              />
+            </div>
           </div>
-          <div class="text-base-text-quaternary text-[11px]">(Optional: enter an address or coordinates)</div>
+          <span class="text-xs text-base-text-quaternary">
+            {{ $t("new-expense-review-fields-location-disclaimer") }}
+          </span>
         </div>
 
         <!-- Receipt -->
@@ -90,16 +171,39 @@ function saveDetails() {
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t("new-expense-review-fields-receipt") }}
           </label>
-          <div class="flex flex-col gap-3">
-            <input
-              type="file"
-              accept="image/*"
-              class="text-xs text-base-text-secondary file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border file:border-base-border-secondary file:bg-base-bg-secondary file:text-base-text-secondary file:text-xs"
-              @change="handleFileChange"
-            />
-            <div v-if="receiptPreview" class="relative">
-              <img :src="receiptPreview" alt="Receipt preview" class="max-h-48 rounded-lg object-contain mx-auto" />
-            </div>
+          <input
+            ref="cameraInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            class="hidden"
+            @change="handleFileChange"
+          />
+          <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
+
+          <div v-if="receiptPreview" class="relative w-fit">
+            <img :src="receiptPreview" class="h-24 w-24 object-cover rounded-lg border border-base-border-primary" />
+            <button
+              type="button"
+              class="absolute -top-2 -right-2 bg-base-bg-primary rounded-full p-1 border border-base-border-secondary shadow-sm cursor-pointer"
+              @click="removeReceipt"
+            >
+              <PhTrash class="icon-4 text-base-fg-error" />
+            </button>
+          </div>
+          <div v-else class="flex gap-2">
+            <button
+              class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
+              @click="triggerCamera"
+            >
+              <PhCamera class="icon-8 text-base-fg-brand" />
+            </button>
+            <button
+              class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
+              @click="triggerGallery"
+            >
+              <PhPlus class="icon-8 text-base-fg-brand" />
+            </button>
           </div>
         </div>
 

@@ -174,7 +174,7 @@ watch(isVisible, async (newValue) => {
               transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
               opacity: isDragging && shouldDismiss ? 0.8 : undefined
             }"
-            @click.stop.prevent
+            @click.stop
             @touchstart="handleDragStart"
             @mousedown="handleDragStart"
           >
