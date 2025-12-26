@@ -53,10 +53,10 @@ if (images.length > 4) {
 }
 
 .img-container.xs {
-  @apply rounded-05xl h-10 w-10;
+  @apply h-10 w-10 rounded-05xl;
 
   .image-count-single {
-    @apply rounded-05xl h-10 w-10;
+    @apply h-10 w-10 rounded-05xl;
   }
 
   .image-count-multiple {

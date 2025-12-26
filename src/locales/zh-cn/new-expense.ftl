@@ -49,3 +49,4 @@ new-expense-review-fields-location = 地点
 new-expense-review-fields-receipt = 图片
 new-expense-review-fields-notes-label = 备注
 new-expense-review-fields-notes-placeholder = 还有什么需要补充的吗？
+new-expense-review-error-saving-transaction = 保存失败，请重试

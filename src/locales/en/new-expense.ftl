@@ -49,3 +49,4 @@ new-expense-review-fields-location = Location
 new-expense-review-fields-receipt = Image
 new-expense-review-fields-notes-label = Notes
 new-expense-review-fields-notes-placeholder = Anything else worth mentioning?
+new-expense-review-error-saving-transaction = Failed to save expense, please try again
