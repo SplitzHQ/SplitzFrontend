@@ -5,7 +5,20 @@
 @config "../../tailwind.config.js";
 
 @utility skeleton {
-  @apply bg-base-bg-secondary animate-pulse rounded-md;
+  @apply animate-pulse rounded-md bg-base-bg-secondary;
+}
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+}
+
+@utility scrollbar-styled {
+  scrollbar-width: thin;
+}
+
+@utility icon-* {
+  font-size: calc(var(--spacing) * --value(number));
+  font-size: --value([length]);
 }
 
 @layer base {
