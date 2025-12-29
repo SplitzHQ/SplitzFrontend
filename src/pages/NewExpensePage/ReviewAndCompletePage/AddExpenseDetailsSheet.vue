@@ -172,18 +172,22 @@ function removeReceipt() {
 
         <!-- Receipt -->
         <div class="flex flex-col gap-2">
+          <!-- The following inputs are triggered programmatically via refs, so they should not be related to a label -->
+          <!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t("new-expense-review-fields-receipt") }}
-            <input
-              ref="cameraInput"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              class="hidden"
-              @change="handleFileChange"
-            />
-            <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
           </label>
+          <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+          <input
+            ref="cameraInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            class="hidden"
+            @change="handleFileChange"
+          />
+          <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+          <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
 
           <div v-if="receiptPreview" class="relative w-fit">
             <img
