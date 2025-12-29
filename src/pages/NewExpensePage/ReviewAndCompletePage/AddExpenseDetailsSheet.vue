@@ -121,7 +121,7 @@ function removeReceipt() {
       <div class="flex flex-col gap-4">
         <!-- Name -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold">
+          <label class="text-base-text-secondary text-sm font-semibold" for="name">
             {{ $t("new-expense-review-fields-name-label") }}
           </label>
           <div class="gap-2 flex items-center">
@@ -130,6 +130,7 @@ function removeReceipt() {
             </div>
             <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary grow">
               <TextInput
+                id="name"
                 v-model="localName"
                 :placeholder="$t('new-expense-review-fields-name-placeholder')"
                 class="text-base w-full"
@@ -140,11 +141,13 @@ function removeReceipt() {
 
         <!-- Location -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold">
+          <label class="text-base-text-secondary text-sm font-semibold" for="location">
             {{ $t("new-expense-review-fields-location") }}
           </label>
           <div class="gap-2 flex items-stretch">
             <button
+              type="button"
+              aria-label="Get current location"
               class="p-3.5 rounded-xl outline -outline-offset-1 outline-base-border-primary flex justify-center items-center cursor-pointer"
               @click="getLocation"
             >
@@ -155,6 +158,7 @@ function removeReceipt() {
               class="p-3 rounded-xl outline-solid outline-1 flex items-center gap-2 -outline-offset-1 outline-base-border-primary grow"
             >
               <TextInput
+                id="location"
                 v-model="localLocation"
                 :placeholder="$t('new-expense-review-fields-location-placeholder')"
                 class="text-base w-full"
@@ -170,21 +174,26 @@ function removeReceipt() {
         <div class="flex flex-col gap-2">
           <label class="text-base-text-secondary text-sm font-semibold">
             {{ $t("new-expense-review-fields-receipt") }}
+            <input
+              ref="cameraInput"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              class="hidden"
+              @change="handleFileChange"
+            />
+            <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
           </label>
-          <input
-            ref="cameraInput"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            class="hidden"
-            @change="handleFileChange"
-          />
-          <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
 
           <div v-if="receiptPreview" class="relative w-fit">
-            <img :src="receiptPreview" class="h-24 w-24 object-cover rounded-lg border border-base-border-primary" />
+            <img
+              :src="receiptPreview"
+              alt="Receipt preview"
+              class="h-24 w-24 object-cover rounded-lg border border-base-border-primary"
+            />
             <button
               type="button"
+              aria-label="Remove receipt"
               class="absolute -top-2 -right-2 bg-base-bg-primary rounded-full p-1 border border-base-border-secondary shadow-sm cursor-pointer"
               @click="removeReceipt"
             >
@@ -193,12 +202,16 @@ function removeReceipt() {
           </div>
           <div v-else class="flex gap-2">
             <button
+              type="button"
+              aria-label="Select image from camera"
               class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
               @click="triggerCamera"
             >
               <PhCamera class="icon-8 text-base-fg-brand" />
             </button>
             <button
+              type="button"
+              aria-label="Select image from gallery"
               class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
               @click="triggerGallery"
             >
@@ -209,11 +222,12 @@ function removeReceipt() {
 
         <!-- Notes -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold">
+          <label class="text-base-text-secondary text-sm font-semibold" for="notes">
             {{ $t("new-expense-review-fields-notes-label") }}
           </label>
           <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
             <textarea
+              id="notes"
               rows="3"
               :placeholder="$t('new-expense-review-fields-notes-placeholder')"
               class="placeholder:text-base-text-placeholder placeholder:font-normal text-base-text-primary font-normal text-base placeholder:text-base w-full bg-transparent focus-visible:outline-hidden"
