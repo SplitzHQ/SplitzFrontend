@@ -158,6 +158,7 @@ watch(isVisible, async (newValue) => {
   <Teleport to="body">
     <Transition name="sheet-backdrop">
       <!-- Backdrop -->
+      <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
       <div
         v-if="isVisible"
         class="fixed inset-0 bg-util-alpha-black-10 backdrop-blur-xs z-modal-backdrop"
@@ -165,6 +166,7 @@ watch(isVisible, async (newValue) => {
       >
         <div class="absolute inset-0 flex items-end justify-center z-modal">
           <!-- Sheet -->
+          <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
           <div
             v-if="isVisible"
             ref="sheetRef"

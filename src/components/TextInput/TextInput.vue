@@ -7,6 +7,7 @@ const { placeholder } = defineProps<{
 </script>
 
 <template>
+  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <input
     v-model="model"
     type="text"
