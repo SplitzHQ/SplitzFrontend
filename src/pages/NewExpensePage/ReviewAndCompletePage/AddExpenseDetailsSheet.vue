@@ -12,6 +12,8 @@ import TextInput from "@/components/TextInput/TextInput.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { useTransactionStore } from "@/stores/transaction";
 
+import SelectCategorySheet from "./SelectCategorySheet.vue";
+
 // v-model from parent controls visibility
 const model = defineModel<boolean>({ required: true });
 
@@ -24,6 +26,7 @@ const localName = ref(transaction.value.name ?? "");
 const localLocation = ref(transaction.value.geoCoordinate ?? "");
 const localCategory = ref(getCategory(transaction.value.icon));
 const receiptPreview = ref<string | undefined>(transaction.value.photo as string | undefined);
+const showCategorySheet = ref(false);
 
 // Save details back to transaction store
 function saveDetails() {
@@ -117,23 +120,28 @@ function removeReceipt() {
 <template>
   <Sheet v-model="model" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
-      <div class="text-base-text-primary text-lg font-medium">{{ $t("new-expense-review-actions-add-details") }}</div>
+      <div class="text-lg font-medium text-base-text-primary">{{ $t("new-expense-review-actions-add-details") }}</div>
       <div class="flex flex-col gap-4">
         <!-- Name -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold" for="name">
+          <label class="text-sm font-semibold text-base-text-secondary" for="name">
             {{ $t("new-expense-review-fields-name-label") }}
           </label>
-          <div class="gap-2 flex items-center">
-            <div :class="[categoryColorMap[getMainCategory(localCategory)], 'p-2.5 icon-7 rounded-05xl']">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Open categories selection"
+              :class="[categoryColorMap[getMainCategory(localCategory)], 'rounded-05xl p-2.5 icon-7']"
+              @click="showCategorySheet = true"
+            >
               <CategoryIcon :category="localCategory" />
-            </div>
-            <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary grow">
+            </button>
+            <div class="grow rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
               <TextInput
                 id="name"
                 v-model="localName"
                 :placeholder="$t('new-expense-review-fields-name-placeholder')"
-                class="text-base w-full"
+                class="w-full text-base"
               />
             </div>
           </div>
@@ -141,27 +149,27 @@ function removeReceipt() {
 
         <!-- Location -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold" for="location">
+          <label class="text-sm font-semibold text-base-text-secondary" for="location">
             {{ $t("new-expense-review-fields-location") }}
           </label>
-          <div class="gap-2 flex items-stretch">
+          <div class="flex items-stretch gap-2">
             <button
               type="button"
               aria-label="Get current location"
-              class="p-3.5 rounded-xl outline -outline-offset-1 outline-base-border-primary flex justify-center items-center cursor-pointer"
+              class="flex cursor-pointer items-center justify-center rounded-xl p-3.5 outline -outline-offset-1 outline-base-border-primary"
               @click="getLocation"
             >
               <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
-              <PhCircleNotch v-else class="icon-5 text-base-fg-primary animate-spin" />
+              <PhCircleNotch v-else class="animate-spin icon-5 text-base-fg-primary" />
             </button>
             <div
-              class="p-3 rounded-xl outline-solid outline-1 flex items-center gap-2 -outline-offset-1 outline-base-border-primary grow"
+              class="flex grow items-center gap-2 rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid"
             >
               <TextInput
                 id="location"
                 v-model="localLocation"
                 :placeholder="$t('new-expense-review-fields-location-placeholder')"
-                class="text-base w-full"
+                class="w-full text-base"
               />
             </div>
           </div>
@@ -174,7 +182,7 @@ function removeReceipt() {
         <div class="flex flex-col gap-2">
           <!-- The following inputs are triggered programmatically via refs, so they should not be related to a label -->
           <!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
-          <label class="text-base-text-secondary text-sm font-semibold">
+          <label class="text-sm font-semibold text-base-text-secondary">
             {{ $t("new-expense-review-fields-receipt") }}
           </label>
           <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
@@ -193,12 +201,12 @@ function removeReceipt() {
             <img
               :src="receiptPreview"
               alt="Receipt preview"
-              class="h-24 w-24 object-cover rounded-lg border border-base-border-primary"
+              class="h-24 w-24 rounded-lg border border-base-border-primary object-cover"
             />
             <button
               type="button"
               aria-label="Remove receipt"
-              class="absolute -top-2 -right-2 bg-base-bg-primary rounded-full p-1 border border-base-border-secondary shadow-sm cursor-pointer"
+              class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
               @click="removeReceipt"
             >
               <PhTrash class="icon-4 text-base-fg-error" />
@@ -208,7 +216,7 @@ function removeReceipt() {
             <button
               type="button"
               aria-label="Select image from camera"
-              class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
+              class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
               @click="triggerCamera"
             >
               <PhCamera class="icon-8 text-base-fg-brand" />
@@ -216,7 +224,7 @@ function removeReceipt() {
             <button
               type="button"
               aria-label="Select image from gallery"
-              class="p-5 bg-core-color-brand-50 rounded-lg flex justify-start items-center gap-2 cursor-pointer"
+              class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
               @click="triggerGallery"
             >
               <PhPlus class="icon-8 text-base-fg-brand" />
@@ -226,15 +234,15 @@ function removeReceipt() {
 
         <!-- Notes -->
         <div class="flex flex-col gap-2">
-          <label class="text-base-text-secondary text-sm font-semibold" for="notes">
+          <label class="text-sm font-semibold text-base-text-secondary" for="notes">
             {{ $t("new-expense-review-fields-notes-label") }}
           </label>
-          <div class="p-3 rounded-xl outline-solid outline-1 -outline-offset-1 outline-base-border-primary">
+          <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
             <textarea
               id="notes"
               rows="3"
               :placeholder="$t('new-expense-review-fields-notes-placeholder')"
-              class="placeholder:text-base-text-placeholder placeholder:font-normal text-base-text-primary font-normal text-base placeholder:text-base w-full bg-transparent focus-visible:outline-hidden"
+              class="w-full bg-transparent text-base font-normal text-base-text-primary placeholder:text-base placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
             />
           </div>
         </div>
@@ -247,6 +255,8 @@ function removeReceipt() {
       </div>
     </div>
   </Sheet>
+
+  <SelectCategorySheet v-model="showCategorySheet" v-model:category="localCategory" />
 </template>
 
 <style scoped></style>

@@ -52,3 +52,6 @@ new-expense-review-fields-notes-label = 备注
 new-expense-review-fields-notes-placeholder = 还有什么需要补充的吗？
 new-expense-review-actions-done = 保存
 new-expense-review-error-saving-transaction = 保存失败，请重试
+
+new-expense-review-actions-select-category = 选择类别
+new-expense-review-category-search-placeholder = 搜索

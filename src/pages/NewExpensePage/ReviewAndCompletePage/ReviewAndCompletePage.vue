@@ -2,19 +2,21 @@
 import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { getCategory } from "@/libs/categories";
 import { useTransactionStore } from "@/stores/transaction";
 
 import AddExpenseDetailsSheet from "./AddExpenseDetailsSheet.vue";
 import BackgroundCheckCircle from "./BackgroundCheckCircle.svg";
 import ColoredButton from "./ColoredButton.vue";
 import GroupCard from "./GroupCard.vue";
+import SelectCategorySheet from "./SelectCategorySheet.vue";
 import TransactionInfoCard from "./TransactionInfoCard.vue";
 
 const { $t } = useFluent();
@@ -22,8 +24,16 @@ const router = useRouter();
 const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 const showDetailsSheet = ref(false);
+const showCategorySheet = ref(false);
 const isSubmitting = ref(false);
 const bgUrl = `url("${BackgroundCheckCircle}")`;
+
+const selectedCategory = computed({
+  get: () => getCategory(transaction.value.icon),
+  set: (next) => {
+    transaction.value.icon = next;
+  }
+});
 
 async function handleComplete() {
   if (isSubmitting.value) return;
@@ -52,10 +62,10 @@ async function handleComplete() {
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col">
         <div
-          class="bg-center bg-no-repeat bg-cover w-full self-center max-w-lg aspect-square flex flex-col gap-3 justify-end items-center -translate-y-10"
+          class="flex aspect-square w-full max-w-lg -translate-y-10 flex-col items-center justify-end gap-3 self-center bg-cover bg-center bg-no-repeat"
           :style="{ backgroundImage: bgUrl }"
         >
-          <div class="text-base-text-brand text-base font-medium">{{ $t("new-expense-review-expense-added-to") }}</div>
+          <div class="text-base font-medium text-base-text-brand">{{ $t("new-expense-review-expense-added-to") }}</div>
           <GroupCard v-if="transaction.groupId" />
         </div>
         <div class="flex flex-col gap-10">
@@ -83,7 +93,7 @@ async function handleComplete() {
               </ColoredButton>
               <ColoredButton
                 class="bg-util-color-purple-50 hover:bg-util-color-purple-100 active:bg-util-color-purple-200"
-                @click="showDetailsSheet = true"
+                @click="showCategorySheet = true"
               >
                 <template #icon>
                   <PhForkKnife class="text-util-color-purple-600" />
@@ -118,6 +128,7 @@ async function handleComplete() {
           </div>
         </div>
         <AddExpenseDetailsSheet v-model="showDetailsSheet" />
+        <SelectCategorySheet v-model="showCategorySheet" v-model:category="selectedCategory" />
       </div>
     </template>
   </Layout>
