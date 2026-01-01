@@ -33,6 +33,7 @@ export default [
       "vue/singleline-html-element-content-newline": "off",
       "unicorn/prefer-at": "off",
       "unicorn/no-useless-switch-case": "off",
+      "unicorn/filename-case": "off",
       "vue/html-indent": "off",
       "unicorn/no-array-sort": "off",
       "@typescript-eslint/switch-exhaustiveness-check": [

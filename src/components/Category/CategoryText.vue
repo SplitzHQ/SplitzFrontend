@@ -8,7 +8,7 @@ const props = defineProps<{ category: Subcategory }>();
 
 const { $t } = useFluent();
 
-const categoryName = computed(() => $t(`categories.${props.category}`));
+const categoryName = computed(() => $t(`categories-${props.category}`));
 </script>
 
 <template>
