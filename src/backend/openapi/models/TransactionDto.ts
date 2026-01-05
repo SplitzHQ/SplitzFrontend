@@ -66,10 +66,10 @@ export interface TransactionDto {
   transactionTime: Date;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof TransactionDto
    */
-  amount: number;
+  amount: string;
   /**
    *
    * @type {string}

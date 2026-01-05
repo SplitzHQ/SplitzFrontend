@@ -60,9 +60,11 @@ export class TransactionApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/transaction`;
+
     const response = await this.request(
       {
-        path: `/transaction`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -107,9 +109,12 @@ export class TransactionApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/transaction/{id}`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
     const response = await this.request(
       {
-        path: `/transaction/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"]))),
+        path: urlPath,
         method: "DELETE",
         headers: headerParameters,
         query: queryParameters
@@ -152,9 +157,12 @@ export class TransactionApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/transaction/{id}`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
     const response = await this.request(
       {
-        path: `/transaction/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"]))),
+        path: urlPath,
         method: "GET",
         headers: headerParameters,
         query: queryParameters
@@ -200,12 +208,12 @@ export class TransactionApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/transaction/{transactionId}`;
+    urlPath = urlPath.replace(`{${"transactionId"}}`, encodeURIComponent(String(requestParameters["transactionId"])));
+
     const response = await this.request(
       {
-        path: `/transaction/{transactionId}`.replace(
-          `{${"transactionId"}}`,
-          encodeURIComponent(String(requestParameters["transactionId"]))
-        ),
+        path: urlPath,
         method: "PUT",
         headers: headerParameters,
         query: queryParameters,

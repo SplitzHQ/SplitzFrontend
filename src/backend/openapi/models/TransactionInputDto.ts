@@ -66,10 +66,10 @@ export interface TransactionInputDto {
   transactionTime: Date;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof TransactionInputDto
    */
-  amount: number;
+  amount: string;
   /**
    *
    * @type {string}

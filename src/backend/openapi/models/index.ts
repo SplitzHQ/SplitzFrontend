@@ -2,10 +2,7 @@
 /* eslint-disable */
 export * from "./AccessTokenResponse";
 export * from "./ForgotPasswordRequest";
-export * from "./Friend";
 export * from "./FriendDto";
-export * from "./Group";
-export * from "./GroupBalance";
 export * from "./GroupBalanceDto";
 export * from "./GroupDto";
 export * from "./GroupInputDto";
@@ -19,13 +16,10 @@ export * from "./RefreshRequest";
 export * from "./RegisterRequest";
 export * from "./ResendConfirmationEmailRequest";
 export * from "./ResetPasswordRequest";
-export * from "./SplitzUser";
 export * from "./SplitzUserDto";
 export * from "./SplitzUserReducedDto";
 export * from "./SplitzUserUpdateViewModel";
 export * from "./Tag";
-export * from "./Transaction";
-export * from "./TransactionBalance";
 export * from "./TransactionBalanceDto";
 export * from "./TransactionBalanceInputDto";
 export * from "./TransactionDraftBalanceDto";

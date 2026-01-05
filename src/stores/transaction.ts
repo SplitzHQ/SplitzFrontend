@@ -23,7 +23,7 @@ const round = (value: number) => {
 };
 
 export const useTransactionStore = defineStore("transaction", () => {
-  const transaction = ref<TransactionDraftInputDto>({
+  const transaction = ref<Omit<TransactionDraftInputDto, "amount"> & { amount?: number }>({
     userId: "",
     amount: 0,
     currency: "USD"
@@ -255,11 +255,13 @@ export const useTransactionStore = defineStore("transaction", () => {
     const api = new TransactionApi(config);
 
     // Build the balance data from the final split amounts
-    const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => ({
-      userId,
-      balance: balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0),
-      transactionId: transactionId.value
-    }));
+    const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => {
+      return {
+        userId,
+        balance: (balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0)).toFixed(2),
+        transactionId: transactionId.value
+      };
+    });
 
     // prefill datetime
     transaction.value.createTime = new Date();
@@ -273,7 +275,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       icon: transaction.value.icon ?? "default",
       createTime: transaction.value.createTime ?? new Date(),
       transactionTime: transaction.value.transactionTime ?? new Date(),
-      amount: transaction.value.amount,
+      amount: transaction.value.amount.toFixed(2),
       currency: transaction.value.currency ?? "USD",
       tags: transaction.value.tags ?? [],
       geoCoordinate: transaction.value.geoCoordinate,
