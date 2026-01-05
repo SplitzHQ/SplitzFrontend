@@ -14,15 +14,20 @@
 import { mapValues } from "../runtime";
 import type { FriendDto } from "./FriendDto";
 import { FriendDtoFromJSON, FriendDtoFromJSONTyped, FriendDtoToJSON, FriendDtoToJSONTyped } from "./FriendDto";
-import type { Group } from "./Group";
-import { GroupFromJSON, GroupFromJSONTyped, GroupToJSON, GroupToJSONTyped } from "./Group";
-import type { GroupBalance } from "./GroupBalance";
+import type { GroupBalanceDto } from "./GroupBalanceDto";
 import {
-  GroupBalanceFromJSON,
-  GroupBalanceFromJSONTyped,
-  GroupBalanceToJSON,
-  GroupBalanceToJSONTyped
-} from "./GroupBalance";
+  GroupBalanceDtoFromJSON,
+  GroupBalanceDtoFromJSONTyped,
+  GroupBalanceDtoToJSON,
+  GroupBalanceDtoToJSONTyped
+} from "./GroupBalanceDto";
+import type { GroupReducedDto } from "./GroupReducedDto";
+import {
+  GroupReducedDtoFromJSON,
+  GroupReducedDtoFromJSONTyped,
+  GroupReducedDtoToJSON,
+  GroupReducedDtoToJSONTyped
+} from "./GroupReducedDto";
 
 /**
  *
@@ -56,16 +61,16 @@ export interface SplitzUserDto {
   friends?: Array<FriendDto>;
   /**
    *
-   * @type {Array<Group>}
+   * @type {Array<GroupReducedDto>}
    * @memberof SplitzUserDto
    */
-  groups?: Array<Group>;
+  groups?: Array<GroupReducedDto>;
   /**
    *
-   * @type {Array<GroupBalance>}
+   * @type {Array<GroupBalanceDto>}
    * @memberof SplitzUserDto
    */
-  balances?: Array<GroupBalance>;
+  balances?: Array<GroupBalanceDto>;
 }
 
 /**
@@ -90,8 +95,8 @@ export function SplitzUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
     userName: json["userName"],
     photo: json["photo"] == null ? undefined : json["photo"],
     friends: json["friends"] == null ? undefined : (json["friends"] as Array<any>).map(FriendDtoFromJSON),
-    groups: json["groups"] == null ? undefined : (json["groups"] as Array<any>).map(GroupFromJSON),
-    balances: json["balances"] == null ? undefined : (json["balances"] as Array<any>).map(GroupBalanceFromJSON)
+    groups: json["groups"] == null ? undefined : (json["groups"] as Array<any>).map(GroupReducedDtoFromJSON),
+    balances: json["balances"] == null ? undefined : (json["balances"] as Array<any>).map(GroupBalanceDtoFromJSON)
   };
 }
 
@@ -109,7 +114,7 @@ export function SplitzUserDtoToJSONTyped(value?: SplitzUserDto | null, ignoreDis
     userName: value["userName"],
     photo: value["photo"],
     friends: value["friends"] == null ? undefined : (value["friends"] as Array<any>).map(FriendDtoToJSON),
-    groups: value["groups"] == null ? undefined : (value["groups"] as Array<any>).map(GroupToJSON),
-    balances: value["balances"] == null ? undefined : (value["balances"] as Array<any>).map(GroupBalanceToJSON)
+    groups: value["groups"] == null ? undefined : (value["groups"] as Array<any>).map(GroupReducedDtoToJSON),
+    balances: value["balances"] == null ? undefined : (value["balances"] as Array<any>).map(GroupBalanceDtoToJSON)
   };
 }

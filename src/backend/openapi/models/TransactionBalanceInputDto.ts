@@ -33,10 +33,10 @@ export interface TransactionBalanceInputDto {
   userId: string;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof TransactionBalanceInputDto
    */
-  balance?: number;
+  balance?: string;
 }
 
 /**

@@ -46,10 +46,10 @@ export interface GroupBalanceDto {
   friendUser: SplitzUserReducedDto;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof GroupBalanceDto
    */
-  balance: number;
+  balance: string;
   /**
    *
    * @type {string}
