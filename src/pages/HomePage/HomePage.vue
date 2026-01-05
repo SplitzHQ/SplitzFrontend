@@ -40,14 +40,14 @@ const createGroup = () => {
 <template>
   <Layout>
     <template #header>
-      <div class="bg-base-bg-secondary_alt border-b border-base-border-quaternary flex flex-col gap-3 pb-4 pt-4 px-4">
+      <div class="flex flex-col gap-3 border-b border-base-border-quaternary bg-base-bg-secondary_alt px-4 pt-4 pb-4">
         <!-- Header -->
-        <div class="flex items-center justify-between w-full">
+        <div class="flex w-full items-center justify-between">
           <div class="flex items-center gap-2.5">
             <SIconButton variant="ghost" color="neutral" size="lg">
               <PhList class="text-util-color-brand-700" />
             </SIconButton>
-            <h1 class="text-util-color-brand-700 text-lg font-bold leading-7">Splitz</h1>
+            <h1 class="text-lg leading-7 font-bold text-util-color-brand-700">Splitz</h1>
           </div>
           <div class="flex items-start gap-2.5">
             <SIconButton variant="ghost" color="neutral" size="lg">
@@ -62,18 +62,18 @@ const createGroup = () => {
         </div>
 
         <!-- Search Bar -->
-        <div class="flex gap-2.5 items-start w-full">
+        <div class="flex w-full items-start gap-2.5">
           <div
-            class="bg-util-alpha-black-5 flex flex-1 gap-2 items-center min-h-0 min-w-0 overflow-clip p-2.5 rounded-full"
+            class="flex min-h-0 min-w-0 flex-1 items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 p-2.5"
           >
-            <PhMagnifyingGlass class="text-util-color-brand-700 shrink-0 size-5" />
+            <PhMagnifyingGlass class="size-5 shrink-0 text-util-color-brand-700" />
             <TextInput v-model="searchKeyword" :placeholder="$t('home-search-placeholder')" />
           </div>
           <button
             type="button"
-            class="bg-base-bg-neutral flex gap-0 items-center justify-center overflow-clip p-2.5 rounded-full shrink-0"
+            class="flex shrink-0 items-center justify-center gap-0 overflow-clip rounded-full bg-base-bg-neutral p-2.5"
           >
-            <PhSlidersHorizontal class="text-base-text-primary size-5" />
+            <PhSlidersHorizontal class="size-5 text-base-text-primary" />
           </button>
         </div>
       </div>
@@ -82,14 +82,14 @@ const createGroup = () => {
     <template #default="layoutAttrs">
       <div
         v-bind="layoutAttrs"
-        class="flex flex-1 flex-col gap-12 items-center overflow-x-clip overflow-y-auto px-4 py-16"
+        class="flex flex-1 flex-col items-center gap-12 overflow-x-clip overflow-y-auto px-4 py-16"
       >
         <!-- Floating Action Button -->
         <SIconButton
           variant="primary"
           color="brand"
           size="xxl"
-          class="fixed right-5 top-[575px] shadow-lg z-10"
+          class="fixed top-[575px] right-5 z-10 shadow-lg"
           @click="addExpense"
         >
           <PhPlus />
@@ -99,17 +99,17 @@ const createGroup = () => {
         <EmptyStateBackground />
 
         <!-- Empty State Text -->
-        <div class="flex flex-col gap-2 items-center leading-none px-8 py-0 text-center w-full">
-          <h2 class="flex flex-col font-medium justify-center text-xl text-base-text-primary w-full">
+        <div class="flex w-full flex-col items-center gap-2 px-8 py-0 text-center leading-none">
+          <h2 class="flex w-full flex-col justify-center text-xl font-medium text-base-text-primary">
             <p class="leading-7">{{ $t("home-empty-state-title") }}</p>
           </h2>
-          <p class="flex flex-col font-normal justify-center text-base text-base-text-tertiary w-full">
+          <p class="flex w-full flex-col justify-center text-base font-normal text-base-text-tertiary">
             <span class="leading-6">{{ $t("home-empty-state-description") }}</span>
           </p>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col gap-3 items-start px-3 py-0 w-full">
+        <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
           <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
             <template #icon-left>
               <PhPlus />

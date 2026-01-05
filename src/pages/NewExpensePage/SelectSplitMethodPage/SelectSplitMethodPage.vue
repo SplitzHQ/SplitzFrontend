@@ -61,24 +61,24 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
-      <div class="flex flex-col grow" :style="{ height: `calc(100% - ${headerHeight}px)` }">
-        <div v-bind="layoutAttrs" class="relative flex flex-col gap-4 grow overflow-y-auto">
-          <div class="flex flex-col gap-4 grow pb-4">
-            <div class="flex gap-4 items-center">
+      <div class="flex grow flex-col" :style="{ height: `calc(100% - ${headerHeight}px)` }">
+        <div v-bind="layoutAttrs" class="relative flex grow flex-col gap-4 overflow-y-auto">
+          <div class="flex grow flex-col gap-4 pb-4">
+            <div class="flex items-center gap-4">
               <PaidByButton />
-              <div class="w-px h-6 bg-base-border-secondary" />
+              <div class="h-6 w-px bg-base-border-secondary" />
               <SplitMethodButton />
             </div>
             <div class="flex flex-col gap-1">
-              <div class="flex justify-between items-center">
-                <div class="text-base-text-tertiary text-sm font-medium">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-medium text-base-text-tertiary">
                   {{ $t("new-expense-split-summary-included", { count: transactionStore.includedMembersId.length }) }}
                 </div>
-                <div class="flex justify-start items-start gap-1">
-                  <div class="justify-start text-base-text-quaternary text-sm font-medium leading-tight">
+                <div class="flex items-start justify-start gap-1">
+                  <div class="justify-start text-sm leading-tight font-medium text-base-text-quaternary">
                     {{ $t("new-expense-split-summary-total-amount") }}
                   </div>
-                  <div class="justify-start text-base-text-primary text-sm font-medium leading-tight">
+                  <div class="justify-start text-sm leading-tight font-medium text-base-text-primary">
                     {{
                       transactionStore.transaction.amount?.toLocaleString(undefined, {
                         style: "currency",
@@ -88,7 +88,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
                   </div>
                   <div
                     v-if="!transactionStore.isUserInputValid"
-                    class="justify-start text-sm font-medium leading-tight text-base-text-error"
+                    class="justify-start text-sm leading-tight font-medium text-base-text-error"
                     role="alert"
                     aria-live="polite"
                   >
@@ -99,8 +99,8 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
               <UserItem v-for="memberId in transactionStore.includedMembersId" :key="memberId" :user-id="memberId" />
             </div>
             <div class="flex flex-col gap-1">
-              <div class="flex justify-between items-center">
-                <div class="text-base-text-tertiary text-sm font-medium">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-medium text-base-text-tertiary">
                   {{
                     $t("new-expense-split-summary-not-included", { count: transactionStore.excludedMembersId.length })
                   }}
@@ -109,7 +109,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
               <UserItem v-for="memberId in transactionStore.excludedMembersId" :key="memberId" :user-id="memberId" />
             </div>
           </div>
-          <div class="z-sticky sticky bottom-4">
+          <div class="sticky bottom-4 z-sticky">
             <SLinkButton
               :disabled="!transactionStore.isUserInputValid"
               color="brand"
@@ -124,10 +124,10 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
         </div>
         <div class="shrink-0" :style="{ height: `${keyboardHeight ?? 0}px` }" />
         <Teleport to="body">
-          <div ref="keyboardContainer" class="fixed z-fixed bottom-0 inset-x-0">
+          <div ref="keyboardContainer" class="fixed inset-x-0 bottom-0 z-fixed">
             <Transition name="slide-fade">
               <div v-if="focusedInputUserId" class="-mt-4" @click.stop>
-                <Keyboard v-model="keyboardValue" class="pb-4 px-4" variant="primary" enable-calculator />
+                <Keyboard v-model="keyboardValue" class="px-4 pb-4" variant="primary" enable-calculator />
               </div>
             </Transition>
           </div>

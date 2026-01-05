@@ -23,16 +23,16 @@ const emit = defineEmits<{
   <div v-if="groups.status === 'pending'">
     <div class="flex items-center gap-3">
       <div class="flex flex-col items-center gap-1">
-        <div class="w-16 h-16 skeleton" />
-        <div class="w-16 h-3 py-0.5 skeleton" />
+        <div class="h-16 w-16 skeleton" />
+        <div class="h-3 w-16 skeleton py-0.5" />
       </div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-16 h-16 skeleton" />
-        <div class="w-16 h-3 py-0.5 skeleton" />
+        <div class="h-16 w-16 skeleton" />
+        <div class="h-3 w-16 skeleton py-0.5" />
       </div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-16 h-16 skeleton" />
-        <div class="w-16 h-3 py-0.5 skeleton" />
+        <div class="h-16 w-16 skeleton" />
+        <div class="h-3 w-16 skeleton py-0.5" />
       </div>
     </div>
   </div>
@@ -41,11 +41,11 @@ const emit = defineEmits<{
       <button
         v-for="group in sortedGroups"
         :key="group.groupId"
-        class="flex flex-col items-center gap-1 cursor-pointer"
+        class="flex cursor-pointer flex-col items-center gap-1"
         @click="() => emit('select', group.groupId)"
       >
         <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="lg" />
-        <div class="text-center text-base-text-primary text-xs font-medium">{{ group.name }}</div>
+        <div class="text-center text-xs font-medium text-base-text-primary">{{ group.name }}</div>
       </button>
     </div>
   </div>

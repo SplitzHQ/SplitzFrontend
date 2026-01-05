@@ -7,10 +7,10 @@ const emit = defineEmits<{
 <template>
   <button
     type="button"
-    :class="['p-1 rounded-xl flex items-center gap-3 cursor-pointer']"
+    :class="['flex cursor-pointer items-center gap-3 rounded-xl p-1']"
     @click="emit('click', $event)"
   >
-    <div class="p-1.5 bg-util-alpha-white-70/70 rounded-05xl icon-5">
+    <div class="rounded-05xl bg-util-alpha-white-70/70 p-1.5 icon-5">
       <slot name="icon" />
     </div>
     <span class="text-sm font-medium">

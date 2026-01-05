@@ -20,16 +20,16 @@ defineEmits<{
 <template>
   <div class="flex flex-col gap-1">
     <div class="flex items-center gap-2">
-      <div class="text-base-text-quaternary text-sm font-medium">{{ title }}</div>
+      <div class="text-sm font-medium text-base-text-quaternary">{{ title }}</div>
     </div>
     <div class="flex flex-col">
       <button
         v-for="item in items"
         :key="item.id"
-        class="py-1 flex items-center gap-3 text-left cursor-pointer"
+        class="flex cursor-pointer items-center gap-3 py-1 text-left"
         @click="() => $emit('select', item.id)"
       >
-        <div class="flex-1 flex items-center gap-3">
+        <div class="flex flex-1 items-center gap-3">
           <Avatar
             v-if="item.__typename === 'UserListItemGroup'"
             :images="item.members.map((member) => ({ src: member.photo, alt: member.userName }))"
@@ -40,21 +40,21 @@ defineEmits<{
             :images="[{ src: item.friendUser.photo, alt: item.friendUser.userName }]"
             size="xs"
           />
-          <div class="flex-1 flex flex-col justify-center gap-1">
+          <div class="flex flex-1 flex-col justify-center gap-1">
             <template v-if="item.__typename === 'UserListItemGroup'">
               <div class="flex items-center gap-2">
-                <div class="text-base-text-primary text-base font-medium">
+                <div class="text-base font-medium text-base-text-primary">
                   {{ item.name }}
                 </div>
               </div>
-              <div class="text-base-text-quinary text-xs font-normal">
+              <div class="text-xs font-normal text-base-text-quinary">
                 {{ item.members.map((member) => member.userName).join(", ") }}
               </div>
             </template>
             <div
               v-else-if="item.__typename === 'UserListItemFriend'"
               :class="[
-                'text-base-text-primary text-base font-medium',
+                'text-base font-medium text-base-text-primary',
                 selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : ''
               ]"
             >

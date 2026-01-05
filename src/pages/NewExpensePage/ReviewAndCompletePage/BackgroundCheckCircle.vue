@@ -11,20 +11,20 @@ const { width: rootWidth } = useElementSize(rootRef);
   <div
     ref="rootRef"
     :class="[
-      'aspect-square flex items-center justify-center border border-util-color-success-25 rounded-full',
+      'flex aspect-square items-center justify-center rounded-full border border-util-color-success-25',
       'bg-radial from-util-color-success-50 from-5% via-util-color-success-25 via-20% to-transparent to-40%'
     ]"
   >
     <div
-      class="flex items-center justify-center border border-util-color-success-50 rounded-full"
+      class="flex items-center justify-center rounded-full border border-util-color-success-50"
       :style="{ width: `${rootWidth * 0.8}px`, height: `${rootWidth * 0.8}px` }"
     >
       <div
-        class="flex items-center justify-center border border-util-color-success-100 rounded-full"
+        class="flex items-center justify-center rounded-full border border-util-color-success-100"
         :style="{ width: `${rootWidth * 0.6}px`, height: `${rootWidth * 0.6}px` }"
       >
         <div
-          class="flex items-center justify-center border border-util-color-success-200 rounded-full"
+          class="flex items-center justify-center rounded-full border border-util-color-success-200"
           :style="{ width: `${rootWidth * 0.4}px`, height: `${rootWidth * 0.4}px` }"
         >
           <PhCheckCircle
