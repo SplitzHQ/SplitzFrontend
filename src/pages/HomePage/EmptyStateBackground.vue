@@ -7,43 +7,43 @@ const bgUrl = `url("${BackgroundCircle}")`;
 </script>
 
 <template>
-  <div class="relative shrink-0 size-[120px]">
+  <div class="relative size-[120px] shrink-0">
     <!-- Circle Background -->
     <div
-      class="absolute left-1/2 size-[360px] top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 bg-center bg-no-repeat bg-cover"
+      class="absolute top-1/2 left-1/2 z-0 size-[360px] -translate-x-1/2 -translate-y-1/2 bg-cover bg-center bg-no-repeat"
       :style="{ backgroundImage: bgUrl }"
     />
 
     <!-- Category Icons with backdrop blur -->
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[134.5px] top-0 z-10"
+      class="absolute top-0 left-[134.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
     >
-      <PhForkKnife class="text-util-color-brand-700 size-4" />
+      <PhForkKnife class="size-4 text-util-color-brand-700" />
     </div>
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg -left-[94.5px] top-10 z-10"
+      class="absolute top-10 -left-[94.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
     >
-      <PhAirplane class="text-util-color-brand-700 size-4" />
+      <PhAirplane class="size-4 text-util-color-brand-700" />
     </div>
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[40.5px] top-[98px] z-10"
+      class="absolute top-[98px] -left-[40.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
     >
-      <PhUsersThree class="text-util-color-brand-700 size-6" />
+      <PhUsersThree class="size-6 text-util-color-brand-700" />
     </div>
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg -left-[49px] -top-6 z-10"
+      class="absolute -top-6 -left-[49px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
     >
-      <PhHandCoins class="text-util-color-brand-700 size-6" />
+      <PhHandCoins class="size-6 text-util-color-brand-700" />
     </div>
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-1.5 rounded-lg left-[188.5px] top-[65px] z-10"
+      class="absolute top-[65px] left-[188.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
     >
-      <PhCar class="text-util-color-brand-700 size-4" />
+      <PhCar class="size-4 text-util-color-brand-700" />
     </div>
     <div
-      class="absolute backdrop-blur-[2px] bg-core-alpha-brand-10 flex items-start p-2 rounded-lg left-[122.5px] top-[112px] z-10"
+      class="absolute top-[112px] left-[122.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
     >
-      <PhReceipt class="text-util-color-brand-700 size-6" />
+      <PhReceipt class="size-6 text-util-color-brand-700" />
     </div>
   </div>
 </template>

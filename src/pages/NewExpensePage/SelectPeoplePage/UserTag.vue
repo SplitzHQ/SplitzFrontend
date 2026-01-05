@@ -5,10 +5,10 @@ const { photo, name } = defineProps<{ photo: string | null | undefined; name: st
 </script>
 
 <template>
-  <div class="items-center gap-2 flex">
-    <div class="pr-1.5 bg-base-fg-brand-reverse rounded-md border border-base-border-brand flex gap-1">
+  <div class="flex items-center gap-2">
+    <div class="flex gap-1 rounded-md border border-base-border-brand bg-base-fg-brand-reverse pr-1.5">
       <Avatar :images="[{ src: photo, alt: name }]" size="xxs" />
-      <div class="text-center text-base-text-primary text-sm font-normal leading-tight">
+      <div class="text-center text-sm leading-tight font-normal text-base-text-primary">
         {{ name }}
       </div>
     </div>

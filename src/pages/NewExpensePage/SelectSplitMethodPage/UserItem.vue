@@ -31,17 +31,17 @@ const onPlusMinusButtonClick = () => {
 </script>
 
 <template>
-  <div v-if="user !== undefined" class="py-2 flex justify-between items-center gap-3">
+  <div v-if="user !== undefined" class="flex items-center justify-between gap-3 py-2">
     <div class="flex items-center gap-3">
       <div class="relative">
         <Avatar :images="[{ src: user.photo, alt: user.userName }]" size="sm" />
-        <button class="-right-1.5 -bottom-1.5 absolute bg-base-bg-primary rounded-full" @click="onPlusMinusButtonClick">
-          <PhMinusCircle v-if="isInIncludedMembers" class="text-base-fg-brand text-xl" />
-          <PhPlusCircle v-else class="text-base-fg-brand text-xl" />
+        <button class="absolute -right-1.5 -bottom-1.5 rounded-full bg-base-bg-primary" @click="onPlusMinusButtonClick">
+          <PhMinusCircle v-if="isInIncludedMembers" class="text-xl text-base-fg-brand" />
+          <PhPlusCircle v-else class="text-xl text-base-fg-brand" />
         </button>
       </div>
       <div class="flex flex-col gap-1">
-        <div class="text-base-text-primary text-base font-semibold">
+        <div class="text-base font-semibold text-base-text-primary">
           {{ user.userName }}
         </div>
         <div
@@ -50,7 +50,7 @@ const onPlusMinusButtonClick = () => {
             transactionStore.splitMethod !== 'custom' &&
             isInIncludedMembers
           "
-          class="text-base-text-primary text-sm font-normal"
+          class="text-sm font-normal text-base-text-primary"
         >
           {{
             transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
