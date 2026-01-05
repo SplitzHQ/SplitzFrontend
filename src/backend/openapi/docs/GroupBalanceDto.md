@@ -2,13 +2,12 @@
 
 ## Properties
 
-| Name         | Type                                            |
-| ------------ | ----------------------------------------------- |
-| `groupId`    | string                                          |
-| `user`       | [SplitzUserReducedDto](SplitzUserReducedDto.md) |
-| `friendUser` | [SplitzUserReducedDto](SplitzUserReducedDto.md) |
-| `balance`    | string                                          |
-| `currency`   | string                                          |
+| Name       | Type                                            |
+| ---------- | ----------------------------------------------- |
+| `groupId`  | string                                          |
+| `user`     | [SplitzUserReducedDto](SplitzUserReducedDto.md) |
+| `balance`  | string                                          |
+| `currency` | string                                          |
 
 ## Example
 
@@ -19,7 +18,6 @@ import type { GroupBalanceDto } from "";
 const example = {
   groupId: null,
   user: null,
-  friendUser: null,
   balance: null,
   currency: null
 } satisfies GroupBalanceDto;
