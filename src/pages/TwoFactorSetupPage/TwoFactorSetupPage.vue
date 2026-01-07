@@ -48,8 +48,8 @@ async function updateState(response: TwoFactorResponse) {
     recoveryCodes.value = response.recoveryCodes;
   }
 
-  if (response.sharedKey && userStore.userId) {
-    const email = "user@splitz.com"; // TODO: Get actual email
+  if (response.sharedKey && userStore.user?.email) {
+    const email = userStore.user.email;
     authenticatorUri.value = `otpauth://totp/Splitz:${email}?secret=${response.sharedKey}&issuer=Splitz`;
     await generateQRCode(authenticatorUri.value);
   }

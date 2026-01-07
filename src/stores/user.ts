@@ -2,10 +2,16 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 import config from "@/backend/config";
-import { SplitzBackendApi, AccountApi, type LoginRequest, type RegisterRequest } from "@/backend/openapi";
+import {
+  SplitzBackendApi,
+  AccountApi,
+  type LoginRequest,
+  type RegisterRequest,
+  type SplitzUserDto
+} from "@/backend/openapi";
 
 export const useUserStore = defineStore("user", () => {
-  const userId = ref<string | null>(null);
+  const user = ref<SplitzUserDto | null>(null);
   const isAuthenticated = ref(false);
   const api = new SplitzBackendApi(config);
   const accountApi = new AccountApi(config);
@@ -44,8 +50,8 @@ export const useUserStore = defineStore("user", () => {
 
   async function fetchUserInfo() {
     try {
-      const user = await accountApi.getUserInfo();
-      userId.value = user.id;
+      const userInfo = await accountApi.getUserInfo();
+      user.value = userInfo;
       isAuthenticated.value = true;
     } catch (error) {
       console.error("Failed to fetch user info", error);
@@ -56,9 +62,9 @@ export const useUserStore = defineStore("user", () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessTokenExpiration");
-    userId.value = null;
+    user.value = null;
     isAuthenticated.value = false;
   }
 
-  return { userId, isAuthenticated, login, register, logout, fetchUserInfo };
+  return { user, isAuthenticated, login, register, logout, fetchUserInfo };
 });

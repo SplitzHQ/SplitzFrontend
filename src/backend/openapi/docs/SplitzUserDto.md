@@ -6,6 +6,7 @@
 | ---------- | -------------------------------------------------- |
 | `id`       | string                                             |
 | `userName` | string                                             |
+| `email`    | string                                             |
 | `photo`    | string                                             |
 | `friends`  | [Array&lt;FriendDto&gt;](FriendDto.md)             |
 | `groups`   | [Array&lt;GroupReducedDto&gt;](GroupReducedDto.md) |
@@ -20,6 +21,7 @@ import type { SplitzUserDto } from "";
 const example = {
   id: null,
   userName: null,
+  email: null,
   photo: null,
   friends: null,
   groups: null,
