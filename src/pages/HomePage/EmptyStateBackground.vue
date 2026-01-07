@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhAirplane, PhCar, PhForkKnife, PhHandCoins, PhReceipt, PhUsersThree } from "@phosphor-icons/vue";
+import { PhAirplaneTilt, PhCar, PhForkKnife, PhHandCoins, PhReceipt, PhUsersThree } from "@phosphor-icons/vue";
 
 import BackgroundCircle from "./BackgroundCircle.svg";
 
@@ -7,43 +7,43 @@ const bgUrl = `url("${BackgroundCircle}")`;
 </script>
 
 <template>
-  <div class="relative size-[120px] shrink-0">
-    <!-- Circle Background -->
-    <div
-      class="absolute top-1/2 left-1/2 z-0 size-[360px] -translate-x-1/2 -translate-y-1/2 bg-cover bg-center bg-no-repeat"
-      :style="{ backgroundImage: bgUrl }"
-    />
-
+  <div class="relative size-90 shrink-0 bg-cover bg-center bg-no-repeat" :style="{ backgroundImage: bgUrl }">
     <!-- Category Icons with backdrop blur -->
     <div
-      class="absolute top-0 left-[134.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      :style="{ left: '19.7%', top: '26.6%' }"
     >
-      <PhForkKnife class="size-4 text-util-color-brand-700" />
+      <PhHandCoins weight="duotone" class="size-6 text-util-color-brand-500" />
     </div>
     <div
-      class="absolute top-10 -left-[94.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      :style="{ left: '70.6%', top: '33.3%' }"
     >
-      <PhAirplane class="size-4 text-util-color-brand-700" />
+      <PhForkKnife weight="duotone" class="size-4 text-util-color-brand-500" />
     </div>
     <div
-      class="absolute top-[98px] -left-[40.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      :style="{ left: '7.1%', top: '44.4%' }"
     >
-      <PhUsersThree class="size-6 text-util-color-brand-700" />
+      <PhAirplaneTilt weight="duotone" class="size-4 text-util-color-brand-500" />
     </div>
     <div
-      class="absolute -top-6 -left-[49px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      :style="{ left: '85.7%', top: '51.4%' }"
     >
-      <PhHandCoins class="size-6 text-util-color-brand-700" />
+      <PhCar weight="duotone" class="size-4 text-util-color-brand-500" />
     </div>
     <div
-      class="absolute top-[65px] left-[188.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-1.5 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      :style="{ left: '22.1%', top: '60.6%' }"
     >
-      <PhCar class="size-4 text-util-color-brand-700" />
+      <PhUsersThree weight="duotone" class="size-6 text-util-color-brand-500" />
     </div>
     <div
-      class="absolute top-[112px] left-[122.5px] z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      class="absolute z-10 flex items-start rounded-lg bg-core-alpha-brand-10 p-2 backdrop-blur-[2px]"
+      :style="{ left: '67.4%', top: '64.4%' }"
     >
-      <PhReceipt class="size-6 text-util-color-brand-700" />
+      <PhReceipt weight="duotone" class="size-6 text-util-color-brand-500" />
     </div>
   </div>
 </template>

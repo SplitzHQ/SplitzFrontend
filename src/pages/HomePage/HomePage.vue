@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { PhList, PhMagnifyingGlass, PhPlus, PhUsers, PhBell, PhSlidersHorizontal } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { AccountApi } from "@/backend";
-import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRouterHistoryStore } from "@/stores/routing-history";
+import { useUserStore } from "@/stores/user";
 
 import EmptyStateBackground from "./EmptyStateBackground.vue";
 
@@ -20,8 +18,7 @@ const { $t } = useFluent();
 const router = useRouter();
 const routerHistoryStore = useRouterHistoryStore();
 
-const accountApi = new AccountApi(config);
-const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
+const { user } = useUserStore();
 
 const searchKeyword = ref("");
 
@@ -33,7 +30,6 @@ const addExpense = () => {
 
 const createGroup = () => {
   // TODO: Implement create group navigation
-  console.log("Create group");
 };
 </script>
 
@@ -53,75 +49,63 @@ const createGroup = () => {
             <SIconButton variant="ghost" color="neutral" size="lg">
               <PhBell class="text-util-color-brand-700" />
             </SIconButton>
-            <Avatar
-              v-if="userInfo.data?.photo"
-              :images="[{ src: userInfo.data.photo, alt: userInfo.data.userName ?? 'User' }]"
-              size="xs"
-            />
+            <Avatar v-if="user?.photo" :images="[{ src: user.photo, alt: user.userName }]" size="xs" />
           </div>
         </div>
 
         <!-- Search Bar -->
         <div class="flex w-full items-start gap-2.5">
-          <div
-            class="flex min-h-0 min-w-0 flex-1 items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 p-2.5"
-          >
+          <div class="flex flex-1 items-center gap-2 rounded-full bg-util-alpha-black-5 p-2.5">
             <PhMagnifyingGlass class="size-5 shrink-0 text-util-color-brand-700" />
             <TextInput v-model="searchKeyword" :placeholder="$t('home-search-placeholder')" />
           </div>
-          <button
-            type="button"
-            class="flex shrink-0 items-center justify-center gap-0 overflow-clip rounded-full bg-base-bg-neutral p-2.5"
-          >
+          <SIconButton variant="secondary" color="neutral" size="lg">
             <PhSlidersHorizontal class="size-5 text-base-text-primary" />
-          </button>
+          </SIconButton>
         </div>
       </div>
     </template>
 
     <template #default="layoutAttrs">
-      <div
-        v-bind="layoutAttrs"
-        class="flex flex-1 flex-col items-center gap-12 overflow-x-clip overflow-y-auto px-4 py-16"
-      >
+      <div v-bind="layoutAttrs">
         <!-- Floating Action Button -->
         <SIconButton
           variant="primary"
           color="brand"
           size="xxl"
-          class="fixed top-[575px] right-5 z-10 shadow-lg"
+          class="fixed right-5 bottom-12 z-10"
           @click="addExpense"
         >
           <PhPlus />
         </SIconButton>
 
-        <!-- Empty State Icon -->
-        <EmptyStateBackground />
+        <EmptyStateBackground class="-mb-20" />
 
-        <!-- Empty State Text -->
-        <div class="flex w-full flex-col items-center gap-2 px-8 py-0 text-center leading-none">
-          <h2 class="flex w-full flex-col justify-center text-xl font-medium text-base-text-primary">
-            <p class="leading-7">{{ $t("home-empty-state-title") }}</p>
-          </h2>
-          <p class="flex w-full flex-col justify-center text-base font-normal text-base-text-tertiary">
-            <span class="leading-6">{{ $t("home-empty-state-description") }}</span>
-          </p>
-        </div>
+        <div class="flex flex-1 flex-col items-center gap-12">
+          <div class="flex flex-col items-center gap-2 px-8 py-0 text-center leading-none">
+            <h2 class="flex flex-col justify-center text-display-xs font-medium text-base-text-primary">
+              {{ $t("home-empty-state-title") }}
+            </h2>
+            <p class="flex flex-col justify-center text-base font-normal text-base-text-tertiary">
+              {{ $t("home-empty-state-description") }}
+            </p>
+          </div>
 
-        <!-- Action Buttons -->
-        <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
-          <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
-            <template #icon-left>
-              <PhPlus />
-            </template>
-            {{ $t("home-button-record-expense") }}
-          </SButton>
-          <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="createGroup">
-            <template #icon-left>
-              <PhUsers />
-            </template>
-            {{ $t("home-button-create-group") }}
-          </SButton>
+          <!-- Action Buttons -->
+          <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
+            <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
+              <template #icon-left>
+                <PhPlus />
+              </template>
+              {{ $t("home-button-record-expense") }}
+            </SButton>
+            <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="createGroup">
+              <template #icon-left>
+                <PhUsers />
+              </template>
+              {{ $t("home-button-create-group") }}
+            </SButton>
+          </div>
         </div>
       </div>
     </template>
