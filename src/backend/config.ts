@@ -1,27 +1,33 @@
 import router, { publicRoutes } from "@/router";
 
 import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
-import { Configuration } from "./openapi/runtime";
+import { Configuration, type Middleware } from "./openapi/runtime";
 
-// Automatically select backend API address based on frontend access address
-// If frontend accesses via LAN IP, backend uses the same IP
 const getBasePath = () => {
-  const hostname = window.location.hostname;
-
-  // If frontend accesses via localhost or 127.0.0.1, backend also uses localhost
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return "http://localhost:5119";
-  }
-
-  // If frontend accesses via LAN IP (mobile devices), backend uses the same IP
-  // Example: frontend is http://192.168.1.100:5173, backend is http://192.168.1.100:5119
-  return `http://${hostname}:5119`;
+  return "http://172.233.154.131:5119";
 };
 
 const basePath = getBasePath();
 
+const unauthorizedMiddleware: Middleware = {
+  post: async ({ response }) => {
+    if (response.status !== 401) {
+      return;
+    }
+
+    try {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("accessTokenExpiration");
+    } catch {
+      // ignore (e.g. tests / restricted storage)
+    }
+  }
+};
+
 const config = new Configuration({
   basePath: basePath,
+  middleware: [unauthorizedMiddleware],
 
   apiKey: async () => {
     let accessToken = localStorage.getItem("accessToken");
@@ -52,10 +58,6 @@ const config = new Configuration({
           // do nothing, will return undefined accessToken
         }
       }
-    }
-
-    if (!accessToken) {
-      if (publicRoutes.includes(router.currentRoute.value.name)) router.push({ name: "login" });
     }
 
     return "Bearer " + accessToken;

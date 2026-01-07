@@ -53,6 +53,14 @@ const router = createRouter({
   ]
 });
 
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem("accessToken");
+  if (!isAuthenticated && !publicRoutes.includes(to.name)) {
+    next({ name: "login" });
+  }
+  next();
+});
+
 export const publicRoutes: RouteRecordNameGeneric[] = ["login", "register"];
 
 export default router;
