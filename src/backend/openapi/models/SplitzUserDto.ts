@@ -52,6 +52,12 @@ export interface SplitzUserDto {
    * @type {string}
    * @memberof SplitzUserDto
    */
+  email: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SplitzUserDto
+   */
   photo?: string | null;
   /**
    *
@@ -79,6 +85,7 @@ export interface SplitzUserDto {
 export function instanceOfSplitzUserDto(value: object): value is SplitzUserDto {
   if (!("id" in value) || value["id"] === undefined) return false;
   if (!("userName" in value) || value["userName"] === undefined) return false;
+  if (!("email" in value) || value["email"] === undefined) return false;
   return true;
 }
 
@@ -93,6 +100,7 @@ export function SplitzUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
   return {
     id: json["id"],
     userName: json["userName"],
+    email: json["email"],
     photo: json["photo"] == null ? undefined : json["photo"],
     friends: json["friends"] == null ? undefined : (json["friends"] as Array<any>).map(FriendDtoFromJSON),
     groups: json["groups"] == null ? undefined : (json["groups"] as Array<any>).map(GroupReducedDtoFromJSON),
@@ -112,6 +120,7 @@ export function SplitzUserDtoToJSONTyped(value?: SplitzUserDto | null, ignoreDis
   return {
     id: value["id"],
     userName: value["userName"],
+    email: value["email"],
     photo: value["photo"],
     friends: value["friends"] == null ? undefined : (value["friends"] as Array<any>).map(FriendDtoToJSON),
     groups: value["groups"] == null ? undefined : (value["groups"] as Array<any>).map(GroupReducedDtoToJSON),
