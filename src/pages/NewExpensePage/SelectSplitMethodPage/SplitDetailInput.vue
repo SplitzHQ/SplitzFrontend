@@ -24,8 +24,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
 
 <template>
   <button v-if="transactionStore.splitMethod === 'equally'" type="button" @click.stop="setFocusedInputUserId(userId)">
-    <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full flex justify-end items-center">
-      <span class="text-center text-base-text-placeholder text-sm font-normal">
+    <div class="flex items-center justify-end rounded-full bg-util-alpha-black-5 px-2 py-1.5">
+      <span class="text-center text-sm font-normal text-base-text-placeholder">
         {{
           transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
             style: "currency",
@@ -43,14 +43,14 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
   >
     <div
       :class="[
-        'px-2 py-1.5 rounded-full flex justify-end items-center',
+        'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
       ]"
     >
       <span
         v-if="transactionStore.splitByPercentageDetails[userId] === undefined"
-        class="text-center text-base-text-placeholder text-sm font-normal"
+        class="text-center text-sm font-normal text-base-text-placeholder"
       >
         {{
           (1 / transactionStore.includedMembersId.length).toLocaleString(undefined, {
@@ -60,7 +60,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           })
         }}
       </span>
-      <span v-else class="text-center text-base-text-primary text-sm font-normal">
+      <span v-else class="text-center text-sm font-normal text-base-text-primary">
         {{
           (transactionStore.splitByPercentageDetails[userId] / 100).toLocaleString(undefined, {
             style: "percent",
@@ -72,7 +72,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     </div>
   </button>
 
-  <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex justify-end items-center gap-1">
+  <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex items-center justify-end gap-1">
     <SIconButton
       aria-label="Decrease share"
       color="brand"
@@ -83,8 +83,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
       <PhMinus />
     </SIconButton>
     <button type="button" @click.stop="setFocusedInputUserId(userId)">
-      <div class="px-2 py-1.5 bg-util-alpha-black-5 rounded-full items-center">
-        <span class="text-center text-base-text-primary text-sm font-normal">
+      <div class="items-center rounded-full bg-util-alpha-black-5 px-2 py-1.5">
+        <span class="text-center text-sm font-normal text-base-text-primary">
           {{ $t("new-expense-split-shares-count", { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
         </span>
       </div>
@@ -107,14 +107,14 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
   >
     <div
       :class="[
-        'px-2 py-1.5 rounded-full flex justify-end items-center',
+        'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
       ]"
     >
       <span
         v-if="transactionStore.splitByAdjustmentDetails[userId] === undefined"
-        class="text-center text-base-text-placeholder text-sm font-normal"
+        class="text-center text-sm font-normal text-base-text-placeholder"
       >
         {{
           (0).toLocaleString(undefined, {
@@ -124,7 +124,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           })
         }}
       </span>
-      <span v-else class="text-center text-base-text-primary text-sm font-normal">
+      <span v-else class="text-center text-sm font-normal text-base-text-primary">
         {{
           transactionStore.splitByAdjustmentDetails[userId].toLocaleString(undefined, {
             style: "currency",
@@ -143,14 +143,14 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
   >
     <div
       :class="[
-        'px-2 py-1.5 rounded-full flex justify-end items-center',
+        'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-solid outline-1 -outline-offset-1 outline-base-border-brand-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
       ]"
     >
       <span
         v-if="transactionStore.splitByCustomDetails[userId] === undefined"
-        class="text-center text-base-text-placeholder text-sm font-normal"
+        class="text-center text-sm font-normal text-base-text-placeholder"
       >
         {{
           (0).toLocaleString(undefined, {
@@ -159,7 +159,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           })
         }}
       </span>
-      <span v-else class="text-center text-base-text-primary text-sm font-normal">
+      <span v-else class="text-center text-sm font-normal text-base-text-primary">
         {{
           transactionStore.splitByCustomDetails[userId].toLocaleString(undefined, {
             style: "currency",

@@ -32,13 +32,13 @@ const { data: group } = useQuery({
 <template>
   <div
     v-if="group"
-    class="py-2 pl-2 pr-3 bg-util-color-brand-50 rounded-2xl backdrop-blur-[2px] flex flex-col items-start gap-2"
+    class="flex flex-col items-start gap-2 rounded-2xl bg-util-color-brand-50 py-2 pr-3 pl-2 backdrop-blur-[2px]"
   >
     <div class="flex items-center gap-3">
       <Avatar size="xs" :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" />
-      <div class="flex flex-col justify-center items-start">
+      <div class="flex flex-col items-start justify-center">
         <div class="flex items-center gap-2">
-          <div class="text-base-text-secondary text-base font-medium">
+          <div class="text-base font-medium text-base-text-secondary">
             {{ group.name }}
           </div>
         </div>

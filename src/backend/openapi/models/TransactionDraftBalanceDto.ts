@@ -40,10 +40,10 @@ export interface TransactionDraftBalanceDto {
   userId: string;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof TransactionDraftBalanceDto
    */
-  balance?: number;
+  balance?: string;
   /**
    *
    * @type {SplitzUserReducedDto}

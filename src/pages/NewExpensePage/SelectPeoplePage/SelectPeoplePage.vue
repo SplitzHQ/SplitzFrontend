@@ -195,7 +195,7 @@ const onSelectedUsersSubmitted = async () => {
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
-        <div class="fixed bottom-4 inset-x-3">
+        <div class="fixed inset-x-3 bottom-4">
           <SButton
             variant="primary"
             color="brand"

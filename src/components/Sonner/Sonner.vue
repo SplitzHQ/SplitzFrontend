@@ -20,7 +20,7 @@ const props = defineProps<ToasterProps>();
       <PhXCircle class="icon-4" />
     </template>
     <template #loading-icon>
-      <PhCircleNotch class="icon-4 animate-spin" />
+      <PhCircleNotch class="animate-spin icon-4" />
     </template>
     <template #close-icon>
       <PhX class="icon-3" />

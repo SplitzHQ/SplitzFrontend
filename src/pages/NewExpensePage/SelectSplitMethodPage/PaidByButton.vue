@@ -77,7 +77,7 @@ const setPaidBy = (memberId: string) => {
         @click="setPaidBy(member.id)"
       >
         <Avatar :images="[{ src: member.photo, alt: member.userName }]" size="sm" />
-        <div class="text-base-text-primary text-base font-semibold">{{ member.userName }}</div>
+        <div class="text-base font-semibold text-base-text-primary">{{ member.userName }}</div>
       </button>
     </div>
   </Sheet>

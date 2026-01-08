@@ -72,10 +72,10 @@ export interface TransactionDraftInputDto {
   transactionTime?: Date | null;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof TransactionDraftInputDto
    */
-  amount?: number | null;
+  amount?: string | null;
   /**
    *
    * @type {string}
@@ -165,8 +165,9 @@ export function TransactionDraftInputDtoToJSONTyped(
     groupId: value["groupId"],
     name: value["name"],
     icon: value["icon"],
-    createTime: value["createTime"] == null ? undefined : (value["createTime"] as any).toISOString(),
-    transactionTime: value["transactionTime"] == null ? undefined : (value["transactionTime"] as any).toISOString(),
+    createTime: value["createTime"] == null ? value["createTime"] : value["createTime"].toISOString(),
+    transactionTime:
+      value["transactionTime"] == null ? value["transactionTime"] : value["transactionTime"].toISOString(),
     amount: value["amount"],
     currency: value["currency"],
     tags: value["tags"] == null ? undefined : (value["tags"] as Array<any>).map(TagToJSON),

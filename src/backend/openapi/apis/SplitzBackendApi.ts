@@ -54,42 +54,42 @@ import {
 import * as runtime from "../runtime";
 
 export interface AccountForgotPasswordPostRequest {
-  forgotPasswordRequest?: ForgotPasswordRequest;
+  forgotPasswordRequest: ForgotPasswordRequest;
 }
 
 export interface AccountLoginPostRequest {
+  loginRequest: LoginRequest;
   useCookies?: boolean;
   useSessionCookies?: boolean;
-  loginRequest?: LoginRequest;
 }
 
 export interface AccountManage2faPostRequest {
-  twoFactorRequest?: TwoFactorRequest;
+  twoFactorRequest: TwoFactorRequest;
 }
 
 export interface AccountManageInfoPostRequest {
-  infoRequest?: InfoRequest;
+  infoRequest: InfoRequest;
 }
 
 export interface AccountRefreshPostRequest {
-  refreshRequest?: RefreshRequest;
+  refreshRequest: RefreshRequest;
 }
 
 export interface AccountRegisterPostRequest {
-  registerRequest?: RegisterRequest;
+  registerRequest: RegisterRequest;
 }
 
 export interface AccountResendConfirmationEmailPostRequest {
-  resendConfirmationEmailRequest?: ResendConfirmationEmailRequest;
+  resendConfirmationEmailRequest: ResendConfirmationEmailRequest;
 }
 
 export interface AccountResetPasswordPostRequest {
-  resetPasswordRequest?: ResetPasswordRequest;
+  resetPasswordRequest: ResetPasswordRequest;
 }
 
 export interface MapIdentityApiAccountConfirmEmailRequest {
-  userId?: string;
-  code?: string;
+  userId: string;
+  code: string;
   changedEmail?: string;
 }
 
@@ -103,15 +103,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountForgotPasswordPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["forgotPasswordRequest"] == null) {
+      throw new runtime.RequiredError(
+        "forgotPasswordRequest",
+        'Required parameter "forgotPasswordRequest" was null or undefined when calling accountForgotPasswordPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/forgotPassword`;
+
     const response = await this.request(
       {
-        path: `/account/forgotPassword`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -126,7 +135,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountForgotPasswordPost(
-    requestParameters: AccountForgotPasswordPostRequest = {},
+    requestParameters: AccountForgotPasswordPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.accountForgotPasswordPostRaw(requestParameters, initOverrides);
@@ -138,6 +147,13 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountLoginPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<AccessTokenResponse>> {
+    if (requestParameters["loginRequest"] == null) {
+      throw new runtime.RequiredError(
+        "loginRequest",
+        'Required parameter "loginRequest" was null or undefined when calling accountLoginPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     if (requestParameters["useCookies"] != null) {
@@ -152,9 +168,11 @@ export class SplitzBackendApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/login`;
+
     const response = await this.request(
       {
-        path: `/account/login`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -169,7 +187,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountLoginPost(
-    requestParameters: AccountLoginPostRequest = {},
+    requestParameters: AccountLoginPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<AccessTokenResponse> {
     const response = await this.accountLoginPostRaw(requestParameters, initOverrides);
@@ -182,15 +200,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountManage2faPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<TwoFactorResponse>> {
+    if (requestParameters["twoFactorRequest"] == null) {
+      throw new runtime.RequiredError(
+        "twoFactorRequest",
+        'Required parameter "twoFactorRequest" was null or undefined when calling accountManage2faPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/manage/2fa`;
+
     const response = await this.request(
       {
-        path: `/account/manage/2fa`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -205,7 +232,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountManage2faPost(
-    requestParameters: AccountManage2faPostRequest = {},
+    requestParameters: AccountManage2faPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<TwoFactorResponse> {
     const response = await this.accountManage2faPostRaw(requestParameters, initOverrides);
@@ -221,9 +248,11 @@ export class SplitzBackendApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    let urlPath = `/account/manage/info`;
+
     const response = await this.request(
       {
-        path: `/account/manage/info`,
+        path: urlPath,
         method: "GET",
         headers: headerParameters,
         query: queryParameters
@@ -247,15 +276,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountManageInfoPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<InfoResponse>> {
+    if (requestParameters["infoRequest"] == null) {
+      throw new runtime.RequiredError(
+        "infoRequest",
+        'Required parameter "infoRequest" was null or undefined when calling accountManageInfoPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/manage/info`;
+
     const response = await this.request(
       {
-        path: `/account/manage/info`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -270,7 +308,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountManageInfoPost(
-    requestParameters: AccountManageInfoPostRequest = {},
+    requestParameters: AccountManageInfoPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<InfoResponse> {
     const response = await this.accountManageInfoPostRaw(requestParameters, initOverrides);
@@ -283,15 +321,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountRefreshPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<AccessTokenResponse>> {
+    if (requestParameters["refreshRequest"] == null) {
+      throw new runtime.RequiredError(
+        "refreshRequest",
+        'Required parameter "refreshRequest" was null or undefined when calling accountRefreshPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/refresh`;
+
     const response = await this.request(
       {
-        path: `/account/refresh`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -306,7 +353,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountRefreshPost(
-    requestParameters: AccountRefreshPostRequest = {},
+    requestParameters: AccountRefreshPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<AccessTokenResponse> {
     const response = await this.accountRefreshPostRaw(requestParameters, initOverrides);
@@ -319,15 +366,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountRegisterPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["registerRequest"] == null) {
+      throw new runtime.RequiredError(
+        "registerRequest",
+        'Required parameter "registerRequest" was null or undefined when calling accountRegisterPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/register`;
+
     const response = await this.request(
       {
-        path: `/account/register`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -342,7 +398,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountRegisterPost(
-    requestParameters: AccountRegisterPostRequest = {},
+    requestParameters: AccountRegisterPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.accountRegisterPostRaw(requestParameters, initOverrides);
@@ -354,15 +410,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountResendConfirmationEmailPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["resendConfirmationEmailRequest"] == null) {
+      throw new runtime.RequiredError(
+        "resendConfirmationEmailRequest",
+        'Required parameter "resendConfirmationEmailRequest" was null or undefined when calling accountResendConfirmationEmailPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/resendConfirmationEmail`;
+
     const response = await this.request(
       {
-        path: `/account/resendConfirmationEmail`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -377,7 +442,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountResendConfirmationEmailPost(
-    requestParameters: AccountResendConfirmationEmailPostRequest = {},
+    requestParameters: AccountResendConfirmationEmailPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.accountResendConfirmationEmailPostRaw(requestParameters, initOverrides);
@@ -389,15 +454,24 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: AccountResetPasswordPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["resetPasswordRequest"] == null) {
+      throw new runtime.RequiredError(
+        "resetPasswordRequest",
+        'Required parameter "resetPasswordRequest" was null or undefined when calling accountResetPasswordPost().'
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
+    let urlPath = `/account/resetPassword`;
+
     const response = await this.request(
       {
-        path: `/account/resetPassword`,
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -412,7 +486,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async accountResetPasswordPost(
-    requestParameters: AccountResetPasswordPostRequest = {},
+    requestParameters: AccountResetPasswordPostRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.accountResetPasswordPostRaw(requestParameters, initOverrides);
@@ -424,6 +498,20 @@ export class SplitzBackendApi extends runtime.BaseAPI {
     requestParameters: MapIdentityApiAccountConfirmEmailRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["userId"] == null) {
+      throw new runtime.RequiredError(
+        "userId",
+        'Required parameter "userId" was null or undefined when calling mapIdentityApiAccountConfirmEmail().'
+      );
+    }
+
+    if (requestParameters["code"] == null) {
+      throw new runtime.RequiredError(
+        "code",
+        'Required parameter "code" was null or undefined when calling mapIdentityApiAccountConfirmEmail().'
+      );
+    }
+
     const queryParameters: any = {};
 
     if (requestParameters["userId"] != null) {
@@ -440,9 +528,11 @@ export class SplitzBackendApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    let urlPath = `/account/confirmEmail`;
+
     const response = await this.request(
       {
-        path: `/account/confirmEmail`,
+        path: urlPath,
         method: "GET",
         headers: headerParameters,
         query: queryParameters
@@ -456,7 +546,7 @@ export class SplitzBackendApi extends runtime.BaseAPI {
   /**
    */
   async mapIdentityApiAccountConfirmEmail(
-    requestParameters: MapIdentityApiAccountConfirmEmailRequest = {},
+    requestParameters: MapIdentityApiAccountConfirmEmailRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.mapIdentityApiAccountConfirmEmailRaw(requestParameters, initOverrides);

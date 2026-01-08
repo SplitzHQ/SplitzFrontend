@@ -65,9 +65,12 @@ export class AccountApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/account/friend/{id}`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
     const response = await this.request(
       {
-        path: `/account/friend/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"]))),
+        path: urlPath,
         method: "POST",
         headers: headerParameters,
         query: queryParameters,
@@ -103,9 +106,11 @@ export class AccountApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/account`;
+
     const response = await this.request(
       {
-        path: `/account`,
+        path: urlPath,
         method: "GET",
         headers: headerParameters,
         query: queryParameters
@@ -146,9 +151,12 @@ export class AccountApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/account/friend/{id}`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
     const response = await this.request(
       {
-        path: `/account/friend/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"]))),
+        path: urlPath,
         method: "DELETE",
         headers: headerParameters,
         query: queryParameters
@@ -195,9 +203,12 @@ export class AccountApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/account/friend/{id}`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
     const response = await this.request(
       {
-        path: `/account/friend/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"]))),
+        path: urlPath,
         method: "PATCH",
         headers: headerParameters,
         query: queryParameters
@@ -235,9 +246,11 @@ export class AccountApi extends runtime.BaseAPI {
       headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
     }
 
+    let urlPath = `/account`;
+
     const response = await this.request(
       {
-        path: `/account`,
+        path: urlPath,
         method: "PATCH",
         headers: headerParameters,
         query: queryParameters,

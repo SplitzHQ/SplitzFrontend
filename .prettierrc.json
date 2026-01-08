@@ -4,7 +4,7 @@
   "importOrderSeparation": true,
   "jsonRecursiveSort": true,
   "objectWrap": "preserve",
-  "plugins": ["prettier-plugin-tailwindcss", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-sort-json"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-sort-json", "prettier-plugin-tailwindcss"],
   "printWidth": 120,
   "semi": true,
   "singleQuote": false,

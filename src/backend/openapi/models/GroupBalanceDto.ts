@@ -40,16 +40,10 @@ export interface GroupBalanceDto {
   user: SplitzUserReducedDto;
   /**
    *
-   * @type {SplitzUserReducedDto}
+   * @type {string}
    * @memberof GroupBalanceDto
    */
-  friendUser: SplitzUserReducedDto;
-  /**
-   *
-   * @type {number}
-   * @memberof GroupBalanceDto
-   */
-  balance: number;
+  balance: string;
   /**
    *
    * @type {string}
@@ -64,7 +58,6 @@ export interface GroupBalanceDto {
 export function instanceOfGroupBalanceDto(value: object): value is GroupBalanceDto {
   if (!("groupId" in value) || value["groupId"] === undefined) return false;
   if (!("user" in value) || value["user"] === undefined) return false;
-  if (!("friendUser" in value) || value["friendUser"] === undefined) return false;
   if (!("balance" in value) || value["balance"] === undefined) return false;
   if (!("currency" in value) || value["currency"] === undefined) return false;
   return true;
@@ -81,7 +74,6 @@ export function GroupBalanceDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
   return {
     groupId: json["groupId"],
     user: SplitzUserReducedDtoFromJSON(json["user"]),
-    friendUser: SplitzUserReducedDtoFromJSON(json["friendUser"]),
     balance: json["balance"],
     currency: json["currency"]
   };
@@ -99,7 +91,6 @@ export function GroupBalanceDtoToJSONTyped(value?: GroupBalanceDto | null, ignor
   return {
     groupId: value["groupId"],
     user: SplitzUserReducedDtoToJSON(value["user"]),
-    friendUser: SplitzUserReducedDtoToJSON(value["friendUser"]),
     balance: value["balance"],
     currency: value["currency"]
   };

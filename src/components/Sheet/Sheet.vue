@@ -7,6 +7,8 @@ export interface SheetProps {
   modelValue: boolean;
   /** Size of the sheet - 'large' shows ~90% of screen, 'medium' shows ~50% */
   detent?: "large" | "medium";
+  /** How the detent value is applied: via max-height (default) or fixed height */
+  detentSizing?: "maxHeight" | "height";
   /** Whether to show the drag handle at the top */
   showHandle?: boolean;
   /** Whether to show the close button */
@@ -24,6 +26,7 @@ interface SheetEvents {
 
 const props = withDefaults(defineProps<SheetProps>(), {
   detent: "large",
+  detentSizing: "maxHeight",
   showHandle: true,
   showCloseButton: false,
   dismissOnBackdrop: true,
@@ -34,6 +37,7 @@ const emit = defineEmits<SheetEvents>();
 
 // Refs
 const sheetRef = ref<HTMLElement>();
+const sheetContentRef = ref<HTMLElement>();
 const isDragging = ref(false);
 const dragStartY = ref(0);
 const dragCurrentY = ref(0);
@@ -54,6 +58,10 @@ const detentHeight = computed(() => {
     default: // all other cases, including 'large'
       return "90vh";
   }
+});
+
+const detentStyle = computed(() => {
+  return props.detentSizing === "height" ? { height: detentHeight.value } : { maxHeight: detentHeight.value };
 });
 
 const dragOffset = computed(() => {
@@ -82,6 +90,11 @@ function handleBackdropClick() {
 function handleDragStart(event: TouchEvent | MouseEvent) {
   if (!props.dismissOnDrag) return;
 
+  // only start drag if internal scroll is near top (10px)
+  if (sheetContentRef.value && sheetContentRef.value.scrollTop > 10) {
+    return;
+  }
+
   isDragging.value = true;
   const clientY = "touches" in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY;
   dragStartY.value = clientY;
@@ -90,17 +103,18 @@ function handleDragStart(event: TouchEvent | MouseEvent) {
   if (sheetRef.value) {
     sheetHeight.value = sheetRef.value.offsetHeight;
   }
-
-  // Prevent text selection during drag
-  document.body.style.userSelect = "none";
 }
 
 function handleDragMove(event: TouchEvent | MouseEvent) {
   if (!isDragging.value) return;
 
-  event.preventDefault();
   const clientY = "touches" in event ? (event.touches.length > 0 ? event.touches[0]!.clientY : 0) : event.clientY;
   dragCurrentY.value = clientY;
+
+  // stop dragging if user scrolls up
+  if (dragCurrentY.value < dragStartY.value) {
+    handleDragEnd();
+  }
 }
 
 function handleDragEnd() {
@@ -112,7 +126,6 @@ function handleDragEnd() {
 
   // Reset drag values
   isDragging.value = false;
-  document.body.style.userSelect = "";
   dragStartY.value = 0;
   dragCurrentY.value = 0;
 }
@@ -158,32 +171,34 @@ watch(isVisible, async (newValue) => {
   <Teleport to="body">
     <Transition name="sheet-backdrop">
       <!-- Backdrop -->
+      <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
       <div
         v-if="isVisible"
-        class="fixed inset-0 bg-util-alpha-black-10 backdrop-blur-xs z-modal-backdrop"
+        class="fixed inset-0 z-modal-backdrop bg-util-alpha-black-10 backdrop-blur-xs"
         @click="handleBackdropClick"
       >
-        <div class="absolute inset-0 flex items-end justify-center z-modal">
+        <div class="absolute inset-0 z-modal flex items-end justify-center">
           <!-- Sheet -->
+          <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
           <div
             v-if="isVisible"
             ref="sheetRef"
-            class="relative w-full flex flex-col bg-base-bg-primary shadow-2xl rounded-t-3xl overflow-hidden sheet"
+            class="sheet relative flex w-full flex-col overflow-hidden rounded-t-3xl bg-base-bg-primary shadow-2xl"
             :style="{
-              maxHeight: detentHeight,
+              ...detentStyle,
               transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
               opacity: isDragging && shouldDismiss ? 0.8 : undefined
             }"
-            @click.stop.prevent
+            @click.stop
             @touchstart="handleDragStart"
             @mousedown="handleDragStart"
           >
             <!-- Header -->
             <div>
               <!-- Drag Handle -->
-              <div v-if="showHandle" class="absolute top-0 py-1 w-full flex justify-center bg-base-bg-primary">
+              <div v-if="showHandle" class="absolute top-0 flex w-full justify-center bg-base-bg-primary py-1">
                 <button
-                  class="w-10 h-1 bg-base-fg-secondary hover:bg-base-fg-secondary_hover rounded-full cursor-grab active:cursor-grabbing"
+                  class="h-1 w-10 cursor-grab rounded-full bg-base-fg-secondary hover:bg-base-fg-secondary_hover active:cursor-grabbing"
                 />
               </div>
               <!-- Close Button -->
@@ -191,7 +206,7 @@ watch(isVisible, async (newValue) => {
                 v-if="showCloseButton"
                 aria-label="Close"
                 :class="[
-                  'absolute top-3 right-3 transition-colors rounded-full p-2',
+                  'absolute top-3 right-3 rounded-full p-2 transition-colors',
                   'text-comp-button-close-fg-default hover:bg-comp-button-close-bg-hover active:bg-comp-button-close-bg-pressed'
                 ]"
                 @click="dismiss"
@@ -201,7 +216,7 @@ watch(isVisible, async (newValue) => {
             </div>
 
             <!-- Content -->
-            <div class="flex-1 overflow-y-auto px-4 pt-4 pb-12 sheet-content">
+            <div ref="sheetContentRef" class="sheet-content flex-1 overflow-y-auto px-4 pt-4 pb-12">
               <slot />
             </div>
           </div>
