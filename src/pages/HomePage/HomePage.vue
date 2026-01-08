@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { PhList, PhMagnifyingGlass, PhPlus, PhUsers, PhBell, PhSlidersHorizontal } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhCheckCircle, PhPlus, PhUsers } from "@phosphor-icons/vue";
+import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
+import { AccountApi, GroupApi } from "@/backend";
+import config from "@/backend/config";
+import type { GroupDto } from "@/backend/openapi/models";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import DebugButton from "@/components/DebugButton/DebugButton.vue";
-import FloatingActionButton from "@/components/FloatingActionButton/FloatingActionButton.vue";
 import HomeHeader from "@/components/Header/HomeHeader.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import PendingItems, { type PendingItem } from "@/components/PendingItems/PendingItems.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SIconButton from "@/components/SButton/SIconButton.vue";
 import { useRouterHistoryStore } from "@/stores/routing-history";
-import { useUserStore } from "@/stores/user";
 
 import EmptyStateBackground from "./EmptyStateBackground.vue";
 
@@ -19,7 +23,11 @@ const { $t } = useFluent();
 const router = useRouter();
 const routerHistoryStore = useRouterHistoryStore();
 
-const { user } = useUserStore();
+// Fetch data
+const accountApi = new AccountApi(config);
+const groupApi = new GroupApi(config);
+const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
+const { state: groups } = useQuery({ key: ["getGroups"], query: () => groupApi.getGroups() });
 
 const searchKeyword = ref("");
 
@@ -33,21 +41,19 @@ const groupsWithBalance = computed(() => {
     let lent = 0; // Amount user lent (positive number)
 
     group.balances.forEach((balance) => {
+      // balance.balance is a string, convert to number
+      const balanceAmount = Number.parseFloat(balance.balance) || 0;
+
       if (balance.user.id === userId) {
-        // User is the debtor
-        if (balance.balance > 0) {
-          owe += balance.balance;
-        } else {
-          lent += Math.abs(balance.balance);
-        }
-      } else if (balance.friendUser.id === userId) {
-        // User is the creditor
-        if (balance.balance > 0) {
-          lent += balance.balance;
-        } else {
-          owe += Math.abs(balance.balance);
+        // This balance entry is for the current user
+        if (balanceAmount > 0) {
+          owe += balanceAmount;
+        } else if (balanceAmount < 0) {
+          lent += Math.abs(balanceAmount);
         }
       }
+      // Note: GroupBalanceDto only has 'user' property, not 'friendUser'
+      // The balance represents the user's balance in this group
     });
 
     return {
@@ -123,8 +129,38 @@ const getGroupAvatarImages = (group: GroupDto) => {
   }));
 };
 
-// Pending items count (using placeholder data for now)
-const pendingItemsCount = ref(3);
+// Pending items (using placeholder data for now)
+const pendingItems = ref<PendingItem[]>([
+  {
+    id: "1",
+    type: "settle-up",
+    userName: "Sarah",
+    userPhoto: null,
+    amount: 827.29,
+    message: "Settled the balance with you for ",
+    actionButtonText: "View and Confirm",
+    currentIndex: 1,
+    totalCount: 3
+  },
+  {
+    id: "2",
+    type: "draft",
+    draftCount: 4,
+    draftMessage: "You have 4 draft expenses pending completion. Complete them now before you forget.",
+    actionButtonText: "Complete",
+    currentIndex: 2,
+    totalCount: 3
+  },
+  {
+    id: "3",
+    type: "placeholder",
+    placeholderText:
+      "Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien.",
+    actionButtonText: "Action",
+    currentIndex: 3,
+    totalCount: 3
+  }
+]);
 
 // Check if should show empty state
 const debugForceEmptyState = ref(false);
@@ -143,6 +179,8 @@ const addExpense = () => {
 
 const createGroup = () => {
   // TODO: Implement create group navigation
+  // eslint-disable-next-line no-console
+  console.log("Create group");
 };
 
 const navigateToGroup = (groupId: string) => {
@@ -150,9 +188,6 @@ const navigateToGroup = (groupId: string) => {
   // eslint-disable-next-line no-console
   console.log("Navigate to group", groupId);
 };
-
-// Track action buttons element for floating button visibility
-const actionButtonsRef = ref<HTMLElement | null>(null);
 
 // Track scroll container and preserve scroll position
 const scrollContainerRef = ref<HTMLElement | null>(null);
@@ -214,38 +249,114 @@ onBeforeUnmount(() => {
 <template>
   <Layout>
     <template #header>
-      <div class="flex flex-col gap-3 border-b border-base-border-quaternary bg-base-bg-secondary_alt px-4 pt-4 pb-4">
-        <!-- Header -->
-        <div class="flex w-full items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <SIconButton variant="ghost" color="neutral" size="lg">
-              <PhList class="text-util-color-brand-700" />
-            </SIconButton>
-            <h1 class="text-lg leading-7 font-bold text-util-color-brand-700">Splitz</h1>
-          </div>
-          <div class="flex items-start gap-2.5">
-            <SIconButton variant="ghost" color="neutral" size="lg">
-              <PhBell class="text-util-color-brand-700" />
-            </SIconButton>
-            <Avatar v-if="user?.photo" :images="[{ src: user.photo, alt: user.userName }]" size="xs" />
-          </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="flex w-full items-start gap-2.5">
-          <div class="flex flex-1 items-center gap-2 rounded-full bg-util-alpha-black-5 p-2.5">
-            <PhMagnifyingGlass class="size-5 shrink-0 text-util-color-brand-700" />
-            <TextInput v-model="searchKeyword" :placeholder="$t('home-search-placeholder')" />
-          </div>
-          <SIconButton variant="secondary" color="neutral" size="lg">
-            <PhSlidersHorizontal class="size-5 text-base-text-primary" />
-          </SIconButton>
-        </div>
-      </div>
+      <HomeHeader v-model:search-keyword="searchKeyword" />
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs">
+      <!-- Interface when there is data -->
+      <div
+        v-if="!isEmptyState"
+        ref="scrollContainerRef"
+        v-bind="layoutAttrs"
+        class="flex flex-1 flex-col items-start gap-4 overflow-x-clip overflow-y-auto px-4 py-4"
+      >
+        <!-- Pending Items Section -->
+        <PendingItems :items="pendingItems" @view="(id) => console.log('View pending item:', id)" />
+
+        <!-- All Groups Section -->
+        <div class="relative flex w-full shrink-0 flex-col items-start gap-1">
+          <!-- Section Header -->
+          <div class="relative flex w-full shrink-0 items-center justify-between px-1 py-0">
+            <p class="relative shrink-0 text-sm leading-5 font-semibold text-base-text-quaternary">All Groups</p>
+            <div class="relative flex shrink-0 items-center gap-1">
+              <PhArrowsDownUp class="size-4 text-base-text-quinary" />
+              <p class="relative shrink-0 text-sm leading-5 font-medium text-base-text-quinary">Lent</p>
+              <p class="relative shrink-0 text-sm leading-5 font-medium text-util-color-success-600">
+                {{ formatAmount(totalBalance.lent) }}
+              </p>
+              <p class="relative shrink-0 text-sm leading-5 font-medium text-base-text-quinary">Owe</p>
+              <p class="relative shrink-0 text-sm leading-5 font-medium text-base-text-error">
+                {{ formatAmount(totalBalance.owe) }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Group List -->
+          <div v-if="groups.status === 'pending'" class="flex w-full flex-col items-start gap-3 py-4">
+            <div v-for="i in 3" :key="i" class="flex w-full items-center gap-3">
+              <div class="h-16 w-16 skeleton rounded-2xl" />
+              <div class="flex flex-1 flex-col gap-1">
+                <div class="h-4 w-32 skeleton rounded" />
+                <div class="h-3 w-24 skeleton rounded" />
+              </div>
+            </div>
+          </div>
+
+          <div v-else-if="groups.status === 'success'" class="relative flex w-full shrink-0 flex-col items-start">
+            <button
+              v-for="group in filteredGroups"
+              :key="group.groupId"
+              type="button"
+              class="relative flex w-full shrink-0 items-center gap-3 rounded-lg px-0 py-2 transition-colors hover:bg-base-bg-active"
+              @click="() => navigateToGroup(group.groupId)"
+            >
+              <!-- Avatar -->
+              <Avatar :images="getGroupAvatarImages(group)" size="lg" />
+
+              <!-- Group Info -->
+              <div class="relative flex min-h-0 min-w-0 flex-1 shrink-0 flex-col items-start justify-center gap-1">
+                <p
+                  class="relative min-w-full shrink-0 overflow-hidden text-left text-base leading-6 font-semibold overflow-ellipsis whitespace-nowrap text-base-text-primary"
+                >
+                  {{ getGroupDisplayName(group) }}
+                </p>
+                <div class="relative flex shrink-0 items-end gap-1 text-sm leading-5 font-medium">
+                  <!-- All Settled -->
+                  <template v-if="group.isSettled">
+                    <p class="relative shrink-0 text-core-alpha-brand-80">All settled up</p>
+                    <PhCheckCircle class="size-4 shrink-0 text-core-alpha-brand-80" />
+                  </template>
+                  <!-- You Settled / Lent Only -->
+                  <template v-else-if="group.owe === 0 && group.lent > 0">
+                    <p class="relative shrink-0 text-base-text-quinary">You lent</p>
+                    <p class="relative shrink-0 text-util-color-success-600">{{ formatAmount(group.lent) }}</p>
+                  </template>
+                  <!-- Owe Only -->
+                  <template v-else-if="group.owe > 0 && group.lent === 0">
+                    <p class="relative shrink-0 text-base-text-quinary">You owe</p>
+                    <p class="relative shrink-0 text-base-text-error">{{ formatAmount(group.owe) }}</p>
+                  </template>
+                  <!-- Both Owe and Lent -->
+                  <template v-else>
+                    <p class="relative shrink-0 text-base-text-quinary">You owe</p>
+                    <p class="relative shrink-0 text-base-text-error">{{ formatAmount(group.owe) }}</p>
+                    <p class="relative shrink-0 text-base-text-quinary">, lent</p>
+                    <p class="relative shrink-0 text-util-color-success-600">{{ formatAmount(group.lent) }}</p>
+                  </template>
+                </div>
+              </div>
+            </button>
+
+            <!-- Empty State -->
+            <div
+              v-if="filteredGroups.length === 0"
+              class="flex w-full flex-col items-center justify-center gap-3 py-12"
+            >
+              <p class="text-center text-base text-base-text-tertiary">No groups found</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="relative flex w-full shrink-0 items-start gap-3 px-3 py-0">
+          <SButton variant="outline" color="brand" size="xxl" class="flex-1" @click="createGroup">
+            <template #icon-left>
+              <PhUsers />
+            </template>
+            Create Group
+          </SButton>
+        </div>
+
         <!-- Floating Action Button -->
         <SIconButton
           variant="primary"
@@ -256,34 +367,52 @@ onBeforeUnmount(() => {
         >
           <PhPlus />
         </SIconButton>
+      </div>
 
+      <!-- Empty state interface -->
+      <div
+        v-else
+        v-bind="layoutAttrs"
+        class="flex flex-1 flex-col items-center gap-12 overflow-x-clip overflow-y-auto px-4 py-16"
+      >
+        <!-- Floating Action Button (always visible in empty state) -->
+        <SIconButton
+          variant="primary"
+          color="brand"
+          size="xxl"
+          class="fixed right-5 bottom-12 z-10"
+          @click="addExpense"
+        >
+          <PhPlus />
+        </SIconButton>
+
+        <!-- Empty State Icon -->
         <EmptyStateBackground class="-mb-20" />
 
-        <div class="flex flex-1 flex-col items-center gap-12">
-          <div class="flex flex-col items-center gap-2 px-8 py-0 text-center leading-none">
-            <h2 class="flex flex-col justify-center text-display-xs font-medium text-base-text-primary">
-              {{ $t("home-empty-state-title") }}
-            </h2>
-            <p class="flex flex-col justify-center text-base font-normal text-base-text-tertiary">
-              {{ $t("home-empty-state-description") }}
-            </p>
-          </div>
+        <!-- Empty State Text -->
+        <div class="flex w-full flex-col items-center gap-2 px-8 py-0 text-center leading-none">
+          <h2 class="flex w-full flex-col justify-center text-display-xs font-medium text-base-text-primary">
+            {{ $t("home-empty-state-title") }}
+          </h2>
+          <p class="flex w-full flex-col justify-center text-base font-normal text-base-text-tertiary">
+            {{ $t("home-empty-state-description") }}
+          </p>
+        </div>
 
-          <!-- Action Buttons -->
-          <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
-            <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
-              <template #icon-left>
-                <PhPlus />
-              </template>
-              {{ $t("home-button-record-expense") }}
-            </SButton>
-            <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="createGroup">
-              <template #icon-left>
-                <PhUsers />
-              </template>
-              {{ $t("home-button-create-group") }}
-            </SButton>
-          </div>
+        <!-- Action Buttons -->
+        <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
+          <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
+            <template #icon-left>
+              <PhPlus />
+            </template>
+            {{ $t("home-button-record-expense") }}
+          </SButton>
+          <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="createGroup">
+            <template #icon-left>
+              <PhUsers />
+            </template>
+            {{ $t("home-button-create-group") }}
+          </SButton>
         </div>
       </div>
     </template>
