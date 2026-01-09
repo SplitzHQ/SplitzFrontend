@@ -1,0 +1,13 @@
+create-group-title = Create Group
+create-group-name-label = Group name
+create-group-name-placeholder = e.g. Trip to Tokyo
+create-group-submit = Create
+create-group-success = Group created
+create-group-error-user-not-ready = Loading your account… try again.
+create-group-error-submit-failed = Failed to create group.
+create-group-share-link-label = Share link
+create-group-share-link-hint = Send this link to others so they can join the group.
+create-group-copy-success = Link copied
+create-group-copy-failed = Failed to copy link.
+create-group-created-hint = You can invite others using the link above.
+create-group-done = Done

@@ -52,19 +52,7 @@ export interface GroupBalance {
    * @type {string}
    * @memberof GroupBalance
    */
-  friendUserId: string;
-  /**
-   *
-   * @type {SplitzUser}
-   * @memberof GroupBalance
-   */
-  friendUser?: SplitzUser;
-  /**
-   *
-   * @type {number}
-   * @memberof GroupBalance
-   */
-  balance: number;
+  balance: string;
   /**
    *
    * @type {string}
@@ -79,7 +67,6 @@ export interface GroupBalance {
 export function instanceOfGroupBalance(value: object): value is GroupBalance {
   if (!("groupId" in value) || value["groupId"] === undefined) return false;
   if (!("userId" in value) || value["userId"] === undefined) return false;
-  if (!("friendUserId" in value) || value["friendUserId"] === undefined) return false;
   if (!("balance" in value) || value["balance"] === undefined) return false;
   if (!("currency" in value) || value["currency"] === undefined) return false;
   return true;
@@ -98,8 +85,6 @@ export function GroupBalanceFromJSONTyped(json: any, ignoreDiscriminator: boolea
     group: json["group"] == null ? undefined : GroupFromJSON(json["group"]),
     userId: json["userId"],
     user: json["user"] == null ? undefined : SplitzUserFromJSON(json["user"]),
-    friendUserId: json["friendUserId"],
-    friendUser: json["friendUser"] == null ? undefined : SplitzUserFromJSON(json["friendUser"]),
     balance: json["balance"],
     currency: json["currency"]
   };
@@ -119,8 +104,6 @@ export function GroupBalanceToJSONTyped(value?: GroupBalance | null, ignoreDiscr
     group: GroupToJSON(value["group"]),
     userId: value["userId"],
     user: SplitzUserToJSON(value["user"]),
-    friendUserId: value["friendUserId"],
-    friendUser: SplitzUserToJSON(value["friendUser"]),
     balance: value["balance"],
     currency: value["currency"]
   };

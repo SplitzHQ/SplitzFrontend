@@ -12,6 +12,7 @@ docs/GroupApi.md
 docs/GroupBalanceDto.md
 docs/GroupDto.md
 docs/GroupInputDto.md
+docs/GroupJoinLinkDto.md
 docs/GroupReducedDto.md
 docs/HttpValidationProblemDetails.md
 docs/InfoRequest.md
@@ -46,6 +47,7 @@ models/FriendDto.ts
 models/GroupBalanceDto.ts
 models/GroupDto.ts
 models/GroupInputDto.ts
+models/GroupJoinLinkDto.ts
 models/GroupReducedDto.ts
 models/HttpValidationProblemDetails.ts
 models/InfoRequest.ts

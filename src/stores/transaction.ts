@@ -301,6 +301,23 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   };
 
+  const resetTransactionStore = () => {
+    transaction.value = {
+      userId: "",
+      amount: 0,
+      currency: "USD"
+    };
+    transactionId.value = undefined;
+    members.value = [];
+    paidBy.value = undefined;
+    includedMembersId.value = [];
+    splitMethod.value = "equally";
+    splitByPercentageDetails.value = {};
+    splitBySharesDetails.value = {};
+    splitByAdjustmentDetails.value = {};
+    splitByCustomDetails.value = {};
+  };
+
   return {
     transaction,
     members,
@@ -318,6 +335,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     isUserInputValid,
     decreaseSplitByShares,
     increaseSplitByShares,
-    saveTransaction
+    saveTransaction,
+    resetTransactionStore
   };
 });

@@ -11,12 +11,21 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import type { GroupDto, GroupInputDto, GroupReducedDto, ProblemDetails, TransactionDto } from "../models/index";
+import type {
+  GroupDto,
+  GroupInputDto,
+  GroupJoinLinkDto,
+  GroupReducedDto,
+  ProblemDetails,
+  TransactionDto
+} from "../models/index";
 import {
   GroupDtoFromJSON,
   GroupDtoToJSON,
   GroupInputDtoFromJSON,
   GroupInputDtoToJSON,
+  GroupJoinLinkDtoFromJSON,
+  GroupJoinLinkDtoToJSON,
   GroupReducedDtoFromJSON,
   GroupReducedDtoToJSON,
   ProblemDetailsFromJSON,
@@ -166,7 +175,7 @@ export class GroupApi extends runtime.BaseAPI {
   async createGroupJoinLinkRaw(
     requestParameters: CreateGroupJoinLinkRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<runtime.ApiResponse<GroupReducedDto>> {
+  ): Promise<runtime.ApiResponse<GroupJoinLinkDto>> {
     if (requestParameters["groupId"] == null) {
       throw new runtime.RequiredError(
         "groupId",
@@ -195,7 +204,7 @@ export class GroupApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.JSONApiResponse(response, (jsonValue) => GroupReducedDtoFromJSON(jsonValue));
+    return new runtime.JSONApiResponse(response, (jsonValue) => GroupJoinLinkDtoFromJSON(jsonValue));
   }
 
   /**
@@ -204,7 +213,7 @@ export class GroupApi extends runtime.BaseAPI {
   async createGroupJoinLink(
     requestParameters: CreateGroupJoinLinkRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<GroupReducedDto> {
+  ): Promise<GroupJoinLinkDto> {
     const response = await this.createGroupJoinLinkRaw(requestParameters, initOverrides);
     return await response.value();
   }

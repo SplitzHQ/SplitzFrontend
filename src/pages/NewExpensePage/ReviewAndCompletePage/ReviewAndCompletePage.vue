@@ -41,6 +41,8 @@ async function handleComplete() {
   try {
     isSubmitting.value = true;
     await transactionStore.saveTransaction();
+    // clean up transaction store after saving
+    transactionStore.resetTransactionStore();
     // Navigate to home page after successful submission
     await router.push("/");
   } catch (error) {
