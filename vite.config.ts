@@ -1,4 +1,5 @@
 import vue from "@vitejs/plugin-vue";
+import fs from "node:fs";
 import process from "node:process";
 import { fileURLToPath, URL } from "node:url";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
@@ -14,6 +15,16 @@ export default defineConfig({
     // incompatible with Storybook for now
     // https://github.com/storybookjs/storybook/issues/32462
     !isStorybookProcess && vueDevTools(),
+    {
+      name: "copy-redirects",
+      writeBundle() {
+        const src = fileURLToPath(new URL("_redirects", import.meta.url));
+        const dest = fileURLToPath(new URL("dist/_redirects", import.meta.url));
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dest);
+        }
+      }
+    },
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: "fluent", // default 'fluent' - name of the block in SFCs
