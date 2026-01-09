@@ -172,15 +172,13 @@ const isEmptyState = computed(() => {
 });
 
 const addExpense = () => {
-  routerHistoryStore.clearParentHistory();
-  routerHistoryStore.addParentHistory("/");
-  void router.push("/new-expense");
+  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  void router.push({ name: "newExpense" });
 };
 
 const createGroup = () => {
-  // TODO: Implement create group navigation
-  // eslint-disable-next-line no-console
-  console.log("Create group");
+  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  void router.push({ name: "createGroup" });
 };
 
 const navigateToGroup = (groupId: string) => {

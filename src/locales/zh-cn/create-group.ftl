@@ -1,0 +1,13 @@
+create-group-title = 创建组
+create-group-name-label = 组名
+create-group-name-placeholder = 例如：东京旅行
+create-group-submit = 创建
+create-group-success = 组已创建
+create-group-error-user-not-ready = 正在加载账户信息…请重试。
+create-group-error-submit-failed = 创建组失败。
+create-group-share-link-label = 分享链接
+create-group-share-link-hint = 将此链接发送给其他人，他们即可加入该组。
+create-group-copy-success = 链接已复制
+create-group-copy-failed = 复制链接失败。
+create-group-created-hint = 你可以使用上面的链接邀请其他人。
+create-group-done = 完成

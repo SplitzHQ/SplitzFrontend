@@ -16,6 +16,13 @@ import type { Friend } from "./Friend";
 import { FriendFromJSON, FriendFromJSONTyped, FriendToJSON, FriendToJSONTyped } from "./Friend";
 import type { Group } from "./Group";
 import { GroupFromJSON, GroupFromJSONTyped, GroupToJSON, GroupToJSONTyped } from "./Group";
+import type { GroupBalance } from "./GroupBalance";
+import {
+  GroupBalanceFromJSON,
+  GroupBalanceFromJSONTyped,
+  GroupBalanceToJSON,
+  GroupBalanceToJSONTyped
+} from "./GroupBalance";
 
 /**
  *
@@ -131,6 +138,12 @@ export interface SplitzUser {
    * @memberof SplitzUser
    */
   groups?: Array<Group>;
+  /**
+   *
+   * @type {Array<GroupBalance>}
+   * @memberof SplitzUser
+   */
+  balances?: Array<GroupBalance>;
 }
 
 /**
@@ -166,7 +179,8 @@ export function SplitzUserFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     accessFailedCount: json["accessFailedCount"] == null ? undefined : json["accessFailedCount"],
     photo: json["photo"] == null ? undefined : json["photo"],
     friends: json["friends"] == null ? undefined : (json["friends"] as Array<any>).map(FriendFromJSON),
-    groups: json["groups"] == null ? undefined : (json["groups"] as Array<any>).map(GroupFromJSON)
+    groups: json["groups"] == null ? undefined : (json["groups"] as Array<any>).map(GroupFromJSON),
+    balances: json["balances"] == null ? undefined : (json["balances"] as Array<any>).map(GroupBalanceFromJSON)
   };
 }
 
@@ -192,11 +206,12 @@ export function SplitzUserToJSONTyped(value?: SplitzUser | null, ignoreDiscrimin
     phoneNumber: value["phoneNumber"],
     phoneNumberConfirmed: value["phoneNumberConfirmed"],
     twoFactorEnabled: value["twoFactorEnabled"],
-    lockoutEnd: value["lockoutEnd"] == null ? undefined : (value["lockoutEnd"] as any).toISOString(),
+    lockoutEnd: value["lockoutEnd"] == null ? value["lockoutEnd"] : value["lockoutEnd"].toISOString(),
     lockoutEnabled: value["lockoutEnabled"],
     accessFailedCount: value["accessFailedCount"],
     photo: value["photo"],
     friends: value["friends"] == null ? undefined : (value["friends"] as Array<any>).map(FriendToJSON),
-    groups: value["groups"] == null ? undefined : (value["groups"] as Array<any>).map(GroupToJSON)
+    groups: value["groups"] == null ? undefined : (value["groups"] as Array<any>).map(GroupToJSON),
+    balances: value["balances"] == null ? undefined : (value["balances"] as Array<any>).map(GroupBalanceToJSON)
   };
 }

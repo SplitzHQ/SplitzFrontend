@@ -12,7 +12,18 @@ const router = createRouter({
       component: HomePage
     },
     {
+      path: "/group/create",
+      name: "createGroup",
+      component: () => import("@/pages/CreateGroupPage/CreateGroupPage.vue")
+    },
+    {
+      path: "/group/join/:joinLinkId",
+      name: "joinGroup",
+      component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue")
+    },
+    {
       path: "/new-expense",
+      name: "newExpense",
       redirect: "/new-expense/enter-amount"
     },
     {
