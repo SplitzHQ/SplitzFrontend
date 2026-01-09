@@ -68,10 +68,10 @@ export interface Transaction {
   transactionTime: Date;
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof Transaction
    */
-  amount: number;
+  amount: string;
   /**
    *
    * @type {string}

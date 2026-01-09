@@ -6,6 +6,7 @@ export * from "./FriendDto";
 export * from "./GroupBalanceDto";
 export * from "./GroupDto";
 export * from "./GroupInputDto";
+export * from "./GroupJoinLinkDto";
 export * from "./GroupReducedDto";
 export * from "./HttpValidationProblemDetails";
 export * from "./InfoRequest";

@@ -157,7 +157,7 @@ example().catch(console.error);
 
 ## createGroupJoinLink
 
-> GroupReducedDto createGroupJoinLink(groupId)
+> GroupJoinLinkDto createGroupJoinLink(groupId)
 
 create a join link for a group
 
@@ -203,7 +203,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**GroupReducedDto**](GroupReducedDto.md)
+[**GroupJoinLinkDto**](GroupJoinLinkDto.md)
 
 ### Authorization
 

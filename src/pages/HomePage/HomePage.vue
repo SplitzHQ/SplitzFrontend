@@ -23,13 +23,13 @@ const { user } = useUserStore();
 const searchKeyword = ref("");
 
 const addExpense = () => {
-  routerHistoryStore.clearParentHistory();
-  routerHistoryStore.addParentHistory("/");
-  void router.push("/new-expense");
+  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  void router.push({ name: "newExpense" });
 };
 
 const createGroup = () => {
-  // TODO: Implement create group navigation
+  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  void router.push({ name: "createGroup" });
 };
 </script>
 
