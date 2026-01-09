@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhCheckCircle, PhPlus, PhUsers } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhCaretDown, PhCaretUp, PhCheckCircle, PhPlus, PhUsers } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
@@ -12,9 +12,12 @@ import Avatar from "@/components/Avatar/Avatar.vue";
 import DebugButton from "@/components/DebugButton/DebugButton.vue";
 import HomeHeader from "@/components/Header/HomeHeader.vue";
 import Layout from "@/components/Layout/Layout.vue";
-import PendingItems, { type PendingItem } from "@/components/PendingItems/PendingItems.vue";
+import type { PendingItem } from "@/components/PendingItems/PendingItems.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import InteractCardStack from "@/components/SlidingCard/InteractCardStack.vue";
+import type { CardData } from "@/components/SlidingCard/types";
+import { convertPendingItemsToCardData } from "@/components/SlidingCard/utils";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 
 import EmptyStateBackground from "./EmptyStateBackground.vue";
@@ -162,6 +165,22 @@ const pendingItems = ref<PendingItem[]>([
   }
 ]);
 
+// Convert pending items to card data for sliding card component
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+const cardData = computed(() => convertPendingItemsToCardData(pendingItems.value));
+
+// Collapsible section state
+const isPendingItemsExpanded = ref(true);
+
+const togglePendingItems = () => {
+  isPendingItemsExpanded.value = !isPendingItemsExpanded.value;
+};
+
+const handleCardAction = (card: CardData) => {
+  // eslint-disable-next-line no-console
+  console.log("View pending item:", card.id);
+};
+
 // Check if should show empty state
 const debugForceEmptyState = ref(false);
 const isEmptyState = computed(() => {
@@ -259,7 +278,39 @@ onBeforeUnmount(() => {
         class="flex flex-1 flex-col items-start gap-4 overflow-x-clip overflow-y-auto px-4 py-4"
       >
         <!-- Pending Items Section -->
-        <PendingItems :items="pendingItems" @view="(id) => console.log('View pending item:', id)" />
+        <div class="relative flex w-full flex-col items-start gap-2">
+          <!-- Section Header -->
+          <div class="relative flex w-full shrink-0 items-start justify-between px-2 py-0">
+            <div class="relative flex shrink-0 items-start gap-1">
+              <p class="relative shrink-0 text-sm leading-5 font-semibold text-base-text-quaternary">Pending Items</p>
+              <div
+                v-if="!isPendingItemsExpanded && pendingItems.length > 0"
+                class="relative flex size-5 shrink-0 flex-col items-center justify-center rounded-lg bg-base-fg-brand p-2"
+              >
+                <p class="relative shrink-0 text-xs leading-4 font-semibold text-base-text-primary-reverse">
+                  {{ pendingItems.length }}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="relative flex shrink-0 cursor-pointer content-stretch items-center justify-center gap-1 overflow-clip p-0 shadow-xs"
+              @click="togglePendingItems"
+            >
+              <PhCaretDown v-if="isPendingItemsExpanded" class="size-5 text-base-text-quaternary" />
+              <PhCaretUp v-else class="size-5 text-base-text-quaternary" />
+            </button>
+          </div>
+
+          <!-- Sliding Cards Content -->
+          <div
+            v-if="isPendingItemsExpanded && cardData.length > 0"
+            class="relative w-full shrink-0"
+            style="min-height: 120px; padding-bottom: 12px"
+          >
+            <InteractCardStack :cards="cardData" @action="handleCardAction" />
+          </div>
+        </div>
 
         <!-- All Groups Section -->
         <div class="relative flex w-full shrink-0 flex-col items-start gap-1">

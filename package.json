@@ -29,6 +29,7 @@
     "caniuse-lite": "^1.0.30001760",
     "flexsearch": "^0.8.212",
     "fluent-vue": "^3.8.1",
+    "interactjs": "^1.10.27",
     "motion-v": "^1.7.4",
     "pinia": "^3.0.4",
     "qrcode": "^1.5.4",
