@@ -151,5 +151,8 @@ function nextCard() {
   width: 100%;
   min-height: 120px;
   height: auto;
+  /* Prevent page scroll when interacting with cards */
+  touch-action: pan-x pan-y;
+  -ms-touch-action: pan-x pan-y;
 }
 </style>

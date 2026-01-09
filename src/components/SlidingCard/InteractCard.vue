@@ -140,6 +140,8 @@ onMounted(() => {
       onstart: () => {
         // Disable animation/transition immediately when dragging starts
         isInteractAnimating.value = false;
+        // Prevent body scroll when dragging starts
+        document.body.style.overflow = "hidden";
       },
       onmove: (event: { dx: number; dy: number }) => {
         // Direct position update without transition
@@ -151,6 +153,8 @@ onMounted(() => {
         const { x, y } = interactPosition.value;
         // Re-enable animation for smooth transitions
         isInteractAnimating.value = true;
+        // Restore body scroll when dragging ends
+        document.body.style.overflow = "";
 
         // Check thresholds
         if (x > INTERACT_X_THRESHOLD) {
@@ -171,6 +175,8 @@ onBeforeUnmount(() => {
   if (interactElement.value) {
     interact(interactElement.value).unset();
   }
+  // Ensure body scroll is restored when component unmounts
+  document.body.style.overflow = "";
 });
 </script>
 
@@ -243,6 +249,9 @@ onBeforeUnmount(() => {
 .card.isCurrent {
   cursor: grab;
   z-index: 10;
+  /* Prevent page scroll when dragging */
+  touch-action: none;
+  -ms-touch-action: none;
 }
 
 .card.isCurrent:active {
