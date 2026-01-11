@@ -78,16 +78,19 @@ const createGroup = () => {
 };
 
 const userBalances = computed(() => {
-  const balances: { amount: number; currency: string }[] = [];
+  const balances = new Map<string, { amount: number; currency: string }>();
   for (const userBalance of userStore.user?.balances ?? []) {
-    const existing = balances.find((b) => b.currency === userBalance.currency);
+    const existing = balances.get(userBalance.currency);
     if (existing) {
       existing.amount += Number.parseFloat(userBalance.balance);
     } else {
-      balances.push({ amount: Number.parseFloat(userBalance.balance), currency: userBalance.currency });
+      balances.set(userBalance.currency, {
+        amount: Number.parseFloat(userBalance.balance),
+        currency: userBalance.currency
+      });
     }
   }
-  return balances;
+  return [...balances.values()];
 });
 </script>
 
