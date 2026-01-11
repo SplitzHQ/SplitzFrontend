@@ -66,6 +66,7 @@ const formatCurrency = (amount: number, currency: string) => {
 const hasGroups = computed(() => visibleGroups.value.length > 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
+const showErrorState = computed(() => groupsQuery.value.status === "error");
 
 const addExpense = () => {
   routerHistoryStore.addParentHistory(router.currentRoute.value.path);
@@ -220,6 +221,10 @@ const userBalances = computed(() => {
 
         <div v-else-if="showLoadingState" class="px-4 pt-6 text-base text-base-text-tertiary">
           {{ $t("home-loading") }}
+        </div>
+
+        <div v-else-if="showErrorState" class="px-4 pt-6 text-base text-base-text-error">
+          {{ $t("home-error-loading-groups") }}
         </div>
       </div>
     </template>

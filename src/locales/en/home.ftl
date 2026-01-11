@@ -6,6 +6,7 @@ home-you-owe = You owe
 home-all-settled-up = All settled up
 home-you-are-settled-up = You are settled up
 home-loading = Loading...
+home-error-loading-groups = Error loading groups. Please try again later.
 home-empty-state-title = No expenses yet
 home-empty-state-description = Get started by recording your first expense or create a new group to organize your expenses.
 home-button-record-expense = Record New Expense
