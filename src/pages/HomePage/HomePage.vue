@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  PhArrowsDownUp,
-  PhBell,
-  PhList,
-  PhMagnifyingGlass,
-  PhPlus,
-  PhSlidersHorizontal,
-  PhUsers
-} from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhBell, PhList, PhMagnifyingGlass, PhPlus, PhSlidersHorizontal } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -17,13 +9,12 @@ import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Layout from "@/components/Layout/Layout.vue";
-import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
-import EmptyStateBackground from "./EmptyStateBackground.vue";
+import HomeEmptyState from "./HomeEmptyState.vue";
 
 const { $t } = useFluent();
 const router = useRouter();
@@ -110,7 +101,7 @@ const userBalances = computed(() => {
             <SIconButton variant="ghost" color="neutral" size="lg">
               <PhList class="text-util-color-brand-700" />
             </SIconButton>
-            <h1 class="text-lg leading-7 font-bold text-util-color-brand-700">Splitz</h1>
+            <h1 class="text-lg font-bold text-util-color-brand-700">Splitz</h1>
           </div>
           <div class="flex items-start gap-2.5">
             <SIconButton variant="ghost" color="neutral" size="lg">
@@ -149,8 +140,8 @@ const userBalances = computed(() => {
         <div v-if="hasGroups" class="flex flex-col gap-1 pt-3 pb-4">
           <!-- Section Header -->
           <div class="flex items-center justify-between px-1">
-            <p class="text-sm leading-5 font-semibold text-base-text-quaternary">{{ $t("home-all-groups") }}</p>
-            <div v-if="userBalances.length > 0" class="flex items-center gap-1 text-sm leading-5 font-medium">
+            <p class="text-sm font-semibold text-base-text-quaternary">{{ $t("home-all-groups") }}</p>
+            <div v-if="userBalances.length > 0" class="flex items-center gap-1 text-sm font-medium">
               <PhArrowsDownUp class="icon-4 text-base-text-quinary" />
               <span class="text-base-text-quinary">{{ $t("home-total-balance") }}</span>
               <template v-for="userBalance in userBalances" :key="userBalance.currency">
@@ -175,9 +166,7 @@ const userBalances = computed(() => {
               type="button"
               class="flex w-full items-center gap-3 py-2 text-left"
             >
-              <div v-if="group.photo" class="h-16 w-16 overflow-hidden rounded-2xl bg-util-alpha-black-5">
-                <img :src="group.photo" :alt="group.name" class="h-full w-full object-cover" />
-              </div>
+              <Avatar v-if="group.photo" size="lg" :images="[{ src: group.photo, alt: group.name }]" />
               <Avatar
                 v-else
                 size="lg"
@@ -185,11 +174,11 @@ const userBalances = computed(() => {
               />
 
               <div class="min-w-0 flex-1">
-                <p class="truncate text-base leading-6 font-semibold text-base-text-primary">
+                <p class="truncate text-base font-semibold text-base-text-primary">
                   {{ group.name }}
                 </p>
 
-                <div class="mt-1 flex items-center gap-1 text-sm leading-5 font-medium">
+                <div class="mt-1 flex items-center gap-1 text-sm font-medium">
                   <template v-if="group.myBalancePositive.length > 0">
                     <span class="text-base-text-quinary">{{ $t("home-you-lent") }}</span>
                     <span
@@ -223,34 +212,7 @@ const userBalances = computed(() => {
         </div>
 
         <template v-else-if="showEmptyState">
-          <EmptyStateBackground class="-mb-20" />
-
-          <div class="flex flex-1 flex-col items-center gap-12">
-            <div class="flex flex-col items-center gap-2 px-8 py-0 text-center leading-none">
-              <h2 class="flex flex-col justify-center text-display-xs font-medium text-base-text-primary">
-                {{ $t("home-empty-state-title") }}
-              </h2>
-              <p class="flex flex-col justify-center text-base font-normal text-base-text-tertiary">
-                {{ $t("home-empty-state-description") }}
-              </p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
-              <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="addExpense">
-                <template #icon-left>
-                  <PhPlus />
-                </template>
-                {{ $t("home-button-record-expense") }}
-              </SButton>
-              <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="createGroup">
-                <template #icon-left>
-                  <PhUsers />
-                </template>
-                {{ $t("home-button-create-group") }}
-              </SButton>
-            </div>
-          </div>
+          <HomeEmptyState @add-expense="addExpense" @create-group="createGroup" />
         </template>
 
         <div v-else-if="showLoadingState" class="px-4 pt-6 text-base text-base-text-tertiary">
