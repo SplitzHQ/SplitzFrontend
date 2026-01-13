@@ -149,11 +149,11 @@ const userBalances = computed(() => {
               <PhArrowsDownUp class="icon-4 text-base-text-quinary" />
               <span class="text-base-text-quinary">{{ $t("home-total-balance") }}</span>
               <template v-for="userBalance in userBalances" :key="userBalance.currency">
-                <span v-if="userBalance.amount > 0" class="text-util-color-success-600">
+                <span v-if="userBalance.amount < 0" class="text-util-color-success-600">
                   {{ formatCurrency(userBalance.amount, userBalance.currency) }}
                 </span>
-                <span v-else-if="userBalance.amount < 0" class="text-base-text-error">
-                  {{ formatCurrency(userBalance.amount, userBalance.currency) }}
+                <span v-else-if="userBalance.amount > 0" class="text-base-text-error">
+                  {{ formatCurrency(-userBalance.amount, userBalance.currency) }}
                 </span>
                 <span v-else class="text-base-text-quinary">
                   {{ formatCurrency(0, userBalance.currency) }}
@@ -183,20 +183,20 @@ const userBalances = computed(() => {
                 </p>
 
                 <div class="mt-1 flex items-center gap-1 text-sm font-medium">
-                  <template v-if="group.myBalancePositive.length > 0">
+                  <template v-if="group.myBalanceNegative.length > 0">
                     <span class="text-base-text-quinary">{{ $t("home-you-lent") }}</span>
                     <span
-                      v-for="balance in group.myBalancePositive"
+                      v-for="balance in group.myBalanceNegative"
                       :key="balance.currency"
                       class="text-util-color-success-600"
                     >
                       {{ formatCurrency(Math.abs(balance.amount), balance.currency) }}
                     </span>
                   </template>
-                  <template v-if="group.myBalanceNegative.length > 0">
+                  <template v-if="group.myBalancePositive.length > 0">
                     <span class="text-base-text-quinary">{{ $t("home-you-owe") }}</span>
                     <span
-                      v-for="balance in group.myBalanceNegative"
+                      v-for="balance in group.myBalancePositive"
                       :key="balance.currency"
                       class="text-base-text-error"
                     >
