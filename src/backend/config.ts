@@ -29,7 +29,7 @@ const config = new Configuration({
   basePath: basePath,
   middleware: [unauthorizedMiddleware],
 
-  apiKey: async () => {
+  accessToken: async () => {
     let accessToken = localStorage.getItem("accessToken");
     const accessTokenExpiration = localStorage.getItem("accessTokenExpiration");
     const backendApi = new SplitzBackendApi(new Configuration({ basePath: basePath }));
@@ -60,7 +60,7 @@ const config = new Configuration({
       }
     }
 
-    return "Bearer " + accessToken;
+    return accessToken!;
   }
 });
 

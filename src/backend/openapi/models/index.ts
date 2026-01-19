@@ -31,3 +31,4 @@ export * from "./TransactionDto";
 export * from "./TransactionInputDto";
 export * from "./TwoFactorRequest";
 export * from "./TwoFactorResponse";
+export * from "./UploadImageResult";

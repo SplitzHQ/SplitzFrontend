@@ -52,5 +52,7 @@ new-expense-review-fields-notes-label = Notes
 new-expense-review-fields-notes-placeholder = Anything else worth mentioning?
 new-expense-review-actions-done = Save
 new-expense-review-error-saving-transaction = Failed to save expense, please try again
+new-expense-review-error-receipt-not-image = Please select an image file
+new-expense-review-error-receipt-too-large = Image must be smaller than { $maxMb }MB
 new-expense-review-actions-select-category = Select Category
 new-expense-review-category-search-placeholder = Search

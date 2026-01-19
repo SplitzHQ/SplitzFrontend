@@ -90,12 +90,6 @@ export interface TransactionInputDto {
   geoCoordinate?: string | null;
   /**
    *
-   * @type {string}
-   * @memberof TransactionInputDto
-   */
-  photo?: string | null;
-  /**
-   *
    * @type {Array<TransactionBalanceInputDto>}
    * @memberof TransactionInputDto
    */
@@ -136,7 +130,6 @@ export function TransactionInputDtoFromJSONTyped(json: any, ignoreDiscriminator:
     currency: json["currency"],
     tags: (json["tags"] as Array<any>).map(TagFromJSON),
     geoCoordinate: json["geoCoordinate"] == null ? undefined : json["geoCoordinate"],
-    photo: json["photo"] == null ? undefined : json["photo"],
     balances:
       json["balances"] == null ? undefined : (json["balances"] as Array<any>).map(TransactionBalanceInputDtoFromJSON)
   };
@@ -165,7 +158,6 @@ export function TransactionInputDtoToJSONTyped(
     currency: value["currency"],
     tags: (value["tags"] as Array<any>).map(TagToJSON),
     geoCoordinate: value["geoCoordinate"],
-    photo: value["photo"],
     balances:
       value["balances"] == null ? undefined : (value["balances"] as Array<any>).map(TransactionBalanceInputDtoToJSON)
   };

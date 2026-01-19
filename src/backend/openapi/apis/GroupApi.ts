@@ -17,7 +17,8 @@ import type {
   GroupJoinLinkDto,
   GroupReducedDto,
   ProblemDetails,
-  TransactionDto
+  TransactionDto,
+  UploadImageResult
 } from "../models/index";
 import {
   GroupDtoFromJSON,
@@ -31,7 +32,9 @@ import {
   ProblemDetailsFromJSON,
   ProblemDetailsToJSON,
   TransactionDtoFromJSON,
-  TransactionDtoToJSON
+  TransactionDtoToJSON,
+  UploadImageResultFromJSON,
+  UploadImageResultToJSON
 } from "../models/index";
 import * as runtime from "../runtime";
 
@@ -45,6 +48,10 @@ export interface CreateGroupRequest {
 }
 
 export interface CreateGroupJoinLinkRequest {
+  groupId: string;
+}
+
+export interface DeleteGroupRequest {
   groupId: string;
 }
 
@@ -67,6 +74,11 @@ export interface JoinGroupByLinkRequest {
 export interface UpdateGroupRequest {
   groupId: string;
   groupInputDto?: GroupInputDto;
+}
+
+export interface UploadGroupAvatarRequest {
+  groupId: string;
+  file?: Blob;
 }
 
 /**
@@ -93,8 +105,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/{groupId}/members`;
@@ -138,8 +155,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group`;
@@ -187,8 +209,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/{groupId}/join-link`;
@@ -219,6 +246,59 @@ export class GroupApi extends runtime.BaseAPI {
   }
 
   /**
+   * Delete a group.
+   */
+  async deleteGroupRaw(
+    requestParameters: DeleteGroupRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<void>> {
+    if (requestParameters["groupId"] == null) {
+      throw new runtime.RequiredError(
+        "groupId",
+        'Required parameter "groupId" was null or undefined when calling deleteGroup().'
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+
+    let urlPath = `/group/{groupId}`;
+    urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters["groupId"])));
+
+    const response = await this.request(
+      {
+        path: urlPath,
+        method: "DELETE",
+        headers: headerParameters,
+        query: queryParameters
+      },
+      initOverrides
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Delete a group.
+   */
+  async deleteGroup(
+    requestParameters: DeleteGroupRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<void> {
+    await this.deleteGroupRaw(requestParameters, initOverrides);
+  }
+
+  /**
    * Get the group info
    */
   async getGroupRaw(
@@ -236,8 +316,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/{groupId}`;
@@ -285,8 +370,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/join/{joinLinkId}`;
@@ -334,8 +424,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/{groupId}/transactions`;
@@ -375,8 +470,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group`;
@@ -420,8 +520,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/join/{joinLinkId}`;
@@ -471,8 +576,13 @@ export class GroupApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/group/{groupId}`;
@@ -500,6 +610,78 @@ export class GroupApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<GroupDto> {
     const response = await this.updateGroupRaw(requestParameters, initOverrides);
+    return await response.value();
+  }
+
+  /**
+   * Upload a group avatar image.
+   */
+  async uploadGroupAvatarRaw(
+    requestParameters: UploadGroupAvatarRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<UploadImageResult>> {
+    if (requestParameters["groupId"] == null) {
+      throw new runtime.RequiredError(
+        "groupId",
+        'Required parameter "groupId" was null or undefined when calling uploadGroupAvatar().'
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const consumes: runtime.Consume[] = [{ contentType: "multipart/form-data" }];
+    // @ts-ignore: canConsumeForm may be unused
+    const canConsumeForm = runtime.canConsumeForm(consumes);
+
+    let formParams: { append(param: string, value: any): any };
+    let useForm = false;
+    // use FormData to transmit files using content-type "multipart/form-data"
+    useForm = canConsumeForm;
+    if (useForm) {
+      formParams = new FormData();
+    } else {
+      formParams = new URLSearchParams();
+    }
+
+    if (requestParameters["file"] != null) {
+      formParams.append("file", requestParameters["file"] as any);
+    }
+
+    let urlPath = `/group/{groupId}/avatar`;
+    urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters["groupId"])));
+
+    const response = await this.request(
+      {
+        path: urlPath,
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: formParams
+      },
+      initOverrides
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) => UploadImageResultFromJSON(jsonValue));
+  }
+
+  /**
+   * Upload a group avatar image.
+   */
+  async uploadGroupAvatar(
+    requestParameters: UploadGroupAvatarRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<UploadImageResult> {
+    const response = await this.uploadGroupAvatarRaw(requestParameters, initOverrides);
     return await response.value();
   }
 }

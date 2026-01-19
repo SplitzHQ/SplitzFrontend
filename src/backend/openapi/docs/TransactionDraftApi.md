@@ -2,12 +2,13 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                      | HTTP request                              | Description           |
-| --------------------------------------------------------------------------- | ----------------------------------------- | --------------------- |
-| [**addTransactionDraft**](TransactionDraftApi.md#addtransactiondraft)       | **POST** /transactiondraft                | Add a transaction     |
-| [**deleteTransactionDraft**](TransactionDraftApi.md#deletetransactiondraft) | **DELETE** /transactiondraft/{id}         | Delete a transaction  |
-| [**getTransactionDraft**](TransactionDraftApi.md#gettransactiondraft)       | **GET** /transactiondraft/{id}            | Get transaction by id |
-| [**updateTransactionDraft**](TransactionDraftApi.md#updatetransactiondraft) | **PUT** /transactiondraft/{transactionId} | Update a transaction  |
+| Method                                                                                    | HTTP request                                   | Description                                     |
+| ----------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| [**addTransactionDraft**](TransactionDraftApi.md#addtransactiondraft)                     | **POST** /transactiondraft                     | Add a transaction                               |
+| [**deleteTransactionDraft**](TransactionDraftApi.md#deletetransactiondraft)               | **DELETE** /transactiondraft/{id}              | Delete a transaction                            |
+| [**getTransactionDraft**](TransactionDraftApi.md#gettransactiondraft)                     | **GET** /transactiondraft/{id}                 | Get transaction by id                           |
+| [**updateTransactionDraft**](TransactionDraftApi.md#updatetransactiondraft)               | **PUT** /transactiondraft/{transactionDraftId} | Update a transaction                            |
+| [**uploadTransactionDraftReceipt**](TransactionDraftApi.md#uploadtransactiondraftreceipt) | **POST** /transactiondraft/{id}/receipt        | Upload a receipt image for a transaction draft. |
 
 ## addTransactionDraft
 
@@ -27,8 +28,8 @@ import type { AddTransactionDraftRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionDraftApi(config);
 
@@ -96,8 +97,8 @@ import type { DeleteTransactionDraftRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionDraftApi(config);
 
@@ -141,10 +142,10 @@ example().catch(console.error);
 
 | Status code | Description  | Response headers |
 | ----------- | ------------ | ---------------- |
+| **204**     | No Content   | -                |
 | **400**     | Bad Request  | -                |
 | **401**     | Unauthorized | -                |
 | **404**     | Not Found    | -                |
-| **204**     | No Content   | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -166,8 +167,8 @@ import type { GetTransactionDraftRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionDraftApi(config);
 
@@ -219,7 +220,7 @@ example().catch(console.error);
 
 ## updateTransactionDraft
 
-> updateTransactionDraft(transactionId, transactionDraftId, transactionDraftInputDto)
+> updateTransactionDraft(transactionDraftId, transactionDraftInputDto)
 
 Update a transaction
 
@@ -235,15 +236,13 @@ import type { UpdateTransactionDraftRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionDraftApi(config);
 
   const body = {
-    // string
-    transactionId: transactionId_example,
-    // string |  (optional)
+    // string |
     transactionDraftId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
     // TransactionDraftInputDto |  (optional)
     transactionDraftInputDto: ...,
@@ -263,11 +262,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                         | Type                                                    | Description | Notes                                |
-| ---------------------------- | ------------------------------------------------------- | ----------- | ------------------------------------ |
-| **transactionId**            | `string`                                                |             | [Defaults to `undefined`]            |
-| **transactionDraftId**       | `string`                                                |             | [Optional] [Defaults to `undefined`] |
-| **transactionDraftInputDto** | [TransactionDraftInputDto](TransactionDraftInputDto.md) |             | [Optional]                           |
+| Name                         | Type                                                    | Description | Notes                     |
+| ---------------------------- | ------------------------------------------------------- | ----------- | ------------------------- |
+| **transactionDraftId**       | `string`                                                |             | [Defaults to `undefined`] |
+| **transactionDraftInputDto** | [TransactionDraftInputDto](TransactionDraftInputDto.md) |             | [Optional]                |
 
 ### Return type
 
@@ -286,9 +284,82 @@ example().catch(console.error);
 
 | Status code | Description  | Response headers |
 | ----------- | ------------ | ---------------- |
+| **204**     | No Content   | -                |
 | **400**     | Bad Request  | -                |
 | **401**     | Unauthorized | -                |
 | **404**     | Not Found    | -                |
-| **204**     | No Content   | -                |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+## uploadTransactionDraftReceipt
+
+> UploadImageResult uploadTransactionDraftReceipt(id, file)
+
+Upload a receipt image for a transaction draft.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  TransactionDraftApi,
+} from '';
+import type { UploadTransactionDraftReceiptRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new TransactionDraftApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // Blob (optional)
+    file: BINARY_DATA_HERE,
+  } satisfies UploadTransactionDraftReceiptRequest;
+
+  try {
+    const data = await api.uploadTransactionDraftReceipt(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+| Name     | Type     | Description | Notes                                |
+| -------- | -------- | ----------- | ------------------------------------ |
+| **id**   | `string` |             | [Defaults to `undefined`]            |
+| **file** | `Blob`   |             | [Optional] [Defaults to `undefined`] |
+
+### Return type
+
+[**UploadImageResult**](UploadImageResult.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: `multipart/form-data`
+- **Accept**: `application/json`
+
+### HTTP response details
+
+| Status code | Description  | Response headers |
+| ----------- | ------------ | ---------------- |
+| **401**     | Unauthorized | -                |
+| **404**     | Not Found    | -                |
+| **400**     | Bad Request  | -                |
+| **200**     | OK           | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)

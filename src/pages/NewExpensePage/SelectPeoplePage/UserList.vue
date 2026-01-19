@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
+import { PhCaretRight, PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
 import SButtonBase from "@/components/SButton/SButtonBase.vue";
@@ -62,7 +62,13 @@ defineEmits<{
             </div>
           </div>
         </div>
-        <SButtonBase v-if="item.__typename === 'UserListItemFriend'" color="brand" size="sm" variant="ghost" icon-only>
+        <SButtonBase
+          v-if="item.__typename === 'UserListItemFriend'"
+          :color="selectedItemsId.some((id) => item.id === id) ? 'brand' : 'neutral'"
+          size="sm"
+          variant="ghost"
+          icon-only
+        >
           <template #icon-left>
             <Transition name="fade">
               <PhCheckCircle
@@ -72,6 +78,17 @@ defineEmits<{
               />
               <PhCircle v-else class="absolute inset-0" />
             </Transition>
+          </template>
+        </SButtonBase>
+        <SButtonBase
+          v-else-if="item.__typename === 'UserListItemGroup'"
+          color="neutral"
+          size="sm"
+          variant="ghost"
+          icon-only
+        >
+          <template #icon-left>
+            <PhCaretRight />
           </template>
         </SButtonBase>
       </button>

@@ -29,6 +29,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     currency: "USD"
   });
   const transactionId = ref<string | undefined>(undefined);
+  const previewPhotoBase64 = ref<string | undefined>(undefined);
 
   const members = ref<SplitzUserReducedDto[]>([]);
   const paidBy = ref<string>();
@@ -279,7 +280,6 @@ export const useTransactionStore = defineStore("transaction", () => {
       currency: transaction.value.currency ?? "USD",
       tags: transaction.value.tags ?? [],
       geoCoordinate: transaction.value.geoCoordinate,
-      photo: transaction.value.photo,
       balances
     };
 
@@ -301,6 +301,23 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   };
 
+  const uploadTransactionReceipt = async (file: Blob): Promise<void> => {
+    if (!transactionId.value) {
+      await saveTransaction();
+    }
+
+    if (!transactionId.value) {
+      throw new Error("Transaction ID is required to upload receipt, cannot find transaction ID after saving.");
+    }
+    // Create the API instance with configuration
+    const api = new TransactionApi(config);
+
+    await api.uploadTransactionReceipt({
+      id: transactionId.value,
+      file
+    });
+  };
+
   const resetTransactionStore = () => {
     transaction.value = {
       userId: "",
@@ -320,6 +337,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   return {
     transaction,
+    previewPhotoBase64,
     members,
     paidBy,
     includedMembersId,
@@ -336,6 +354,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     decreaseSplitByShares,
     increaseSplitByShares,
     saveTransaction,
+    uploadTransactionReceipt,
     resetTransactionStore
   };
 });

@@ -98,7 +98,7 @@ async function copyJoinLink() {
         <div class="flex flex-col gap-2">
           <div class="text-sm font-semibold text-base-text-primary">{{ $t("create-group-name-label") }}</div>
           <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-            <TextInput v-model="groupName" :placeholder="$t('create-group-name-placeholder')" />
+            <TextInput v-model="groupName" class="w-full" :placeholder="$t('create-group-name-placeholder')" />
           </div>
         </div>
 

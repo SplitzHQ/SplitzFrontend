@@ -1,20 +1,24 @@
-# SplitzUserUpdateViewModel
+# UploadImageResult
 
 ## Properties
 
-| Name       | Type   |
-| ---------- | ------ |
-| `userName` | string |
+| Name          | Type   |
+| ------------- | ------ |
+| `url`         | string |
+| `objectKey`   | string |
+| `contentType` | string |
 
 ## Example
 
 ```typescript
-import type { SplitzUserUpdateViewModel } from "";
+import type { UploadImageResult } from "";
 
 // TODO: Update the object below with actual values
 const example = {
-  userName: null
-} satisfies SplitzUserUpdateViewModel;
+  url: null,
+  objectKey: null,
+  contentType: null
+} satisfies UploadImageResult;
 
 console.log(example);
 
@@ -23,7 +27,7 @@ const exampleJSON: string = JSON.stringify(example);
 console.log(exampleJSON);
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SplitzUserUpdateViewModel;
+const exampleParsed = JSON.parse(exampleJSON) as UploadImageResult;
 console.log(exampleParsed);
 ```
 

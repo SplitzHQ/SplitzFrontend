@@ -75,7 +75,7 @@ export interface TransactionDraftDto {
    * @type {string}
    * @memberof TransactionDraftDto
    */
-  amount?: string | null;
+  amount?: string;
   /**
    *
    * @type {string}

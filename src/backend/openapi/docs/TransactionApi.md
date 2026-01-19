@@ -2,12 +2,13 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                       | HTTP request                         | Description           |
-| ------------------------------------------------------------ | ------------------------------------ | --------------------- |
-| [**addTransaction**](TransactionApi.md#addtransaction)       | **POST** /transaction                | Add a transaction     |
-| [**deleteTransaction**](TransactionApi.md#deletetransaction) | **DELETE** /transaction/{id}         | Delete a transaction  |
-| [**getTransaction**](TransactionApi.md#gettransaction)       | **GET** /transaction/{id}            | Get transaction by id |
-| [**updateTransaction**](TransactionApi.md#updatetransaction) | **PUT** /transaction/{transactionId} | Update a transaction  |
+| Method                                                                     | HTTP request                         | Description                               |
+| -------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| [**addTransaction**](TransactionApi.md#addtransaction)                     | **POST** /transaction                | Add a transaction                         |
+| [**deleteTransaction**](TransactionApi.md#deletetransaction)               | **DELETE** /transaction/{id}         | Delete a transaction                      |
+| [**getTransaction**](TransactionApi.md#gettransaction)                     | **GET** /transaction/{id}            | Get transaction by id                     |
+| [**updateTransaction**](TransactionApi.md#updatetransaction)               | **PUT** /transaction/{transactionId} | Update a transaction                      |
+| [**uploadTransactionReceipt**](TransactionApi.md#uploadtransactionreceipt) | **POST** /transaction/{id}/receipt   | Upload a receipt image for a transaction. |
 
 ## addTransaction
 
@@ -27,8 +28,8 @@ import type { AddTransactionRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
@@ -96,8 +97,8 @@ import type { DeleteTransactionRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
@@ -141,10 +142,10 @@ example().catch(console.error);
 
 | Status code | Description  | Response headers |
 | ----------- | ------------ | ---------------- |
+| **204**     | No Content   | -                |
 | **400**     | Bad Request  | -                |
 | **401**     | Unauthorized | -                |
 | **404**     | Not Found    | -                |
-| **204**     | No Content   | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -166,8 +167,8 @@ import type { GetTransactionRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
@@ -235,8 +236,8 @@ import type { UpdateTransactionRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
@@ -283,9 +284,82 @@ example().catch(console.error);
 
 | Status code | Description  | Response headers |
 | ----------- | ------------ | ---------------- |
+| **204**     | No Content   | -                |
 | **400**     | Bad Request  | -                |
 | **401**     | Unauthorized | -                |
 | **404**     | Not Found    | -                |
-| **204**     | No Content   | -                |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+## uploadTransactionReceipt
+
+> UploadImageResult uploadTransactionReceipt(id, file)
+
+Upload a receipt image for a transaction.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  TransactionApi,
+} from '';
+import type { UploadTransactionReceiptRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new TransactionApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // Blob (optional)
+    file: BINARY_DATA_HERE,
+  } satisfies UploadTransactionReceiptRequest;
+
+  try {
+    const data = await api.uploadTransactionReceipt(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+| Name     | Type     | Description | Notes                                |
+| -------- | -------- | ----------- | ------------------------------------ |
+| **id**   | `string` |             | [Defaults to `undefined`]            |
+| **file** | `Blob`   |             | [Optional] [Defaults to `undefined`] |
+
+### Return type
+
+[**UploadImageResult**](UploadImageResult.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: `multipart/form-data`
+- **Accept**: `application/json`
+
+### HTTP response details
+
+| Status code | Description  | Response headers |
+| ----------- | ------------ | ---------------- |
+| **401**     | Unauthorized | -                |
+| **404**     | Not Found    | -                |
+| **400**     | Bad Request  | -                |
+| **200**     | OK           | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
