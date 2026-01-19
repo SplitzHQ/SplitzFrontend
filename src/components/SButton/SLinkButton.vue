@@ -10,12 +10,21 @@ export interface LinkButtonProps {
   disabled?: boolean;
   href: string;
 }
+interface ButtonEvents {
+  click: [e: MouseEvent];
+}
 
-const { color, variant, size } = defineProps<LinkButtonProps>();
+const { color, variant, size, disabled, href } = defineProps<LinkButtonProps>();
+const emit = defineEmits<ButtonEvents>();
+
+function clickHandler(e: MouseEvent) {
+  if (disabled) return;
+  emit("click", e);
+}
 </script>
 
 <template>
-  <RouterLink :to="href" :class="[disabled ? 'pointer-events-none' : '']">
+  <RouterLink :to="href" :class="[disabled ? 'pointer-events-none' : '']" @click="clickHandler">
     <SButtonBase :color="color" :variant="variant" :size="size" :disabled="disabled">
       <slot />
       <template #icon-left>

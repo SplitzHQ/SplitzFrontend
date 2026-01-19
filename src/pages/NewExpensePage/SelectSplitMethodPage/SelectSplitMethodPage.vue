@@ -117,6 +117,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
               size="xxl"
               class="w-full"
               href="/new-expense/review-and-complete"
+              @click="transactionStore.saveTransaction"
             >
               {{ $t("new-expense-split-actions-complete") }}
             </SLinkButton>

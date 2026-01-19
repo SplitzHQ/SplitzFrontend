@@ -3,6 +3,7 @@ import { PhCamera, PhCircleNotch, PhGpsFix, PhPlus, PhTrash } from "@phosphor-ic
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { ref, useTemplateRef } from "vue";
+import { toast } from "vue-sonner";
 
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { categoryColorMap } from "@/components/Category/category-color";
@@ -10,6 +11,7 @@ import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
+import reportError from "@/libs/report-error";
 import { useTransactionStore } from "@/stores/transaction";
 
 import SelectCategorySheet from "./SelectCategorySheet.vue";
@@ -19,24 +21,70 @@ const model = defineModel<boolean>({ required: true });
 
 const { $t } = useFluent();
 const transactionStore = useTransactionStore();
-const { transaction } = storeToRefs(transactionStore);
+const { transaction, previewPhotoBase64 } = storeToRefs(transactionStore);
 
 // Local editable copies of transaction details
 const localName = ref(transaction.value.name ?? "");
 const localLocation = ref(transaction.value.geoCoordinate ?? "");
 const localCategory = ref(getCategory(transaction.value.icon));
-const receiptPreview = ref<string | undefined>(transaction.value.photo as string | undefined);
+
+// Category selection sheet
 const showCategorySheet = ref(false);
 
+// receipt handling
+const receiptFile = ref<File | null>(null);
+const receiptPreview = ref<string | undefined>(previewPhotoBase64.value);
+const cameraInput = useTemplateRef("cameraInput");
+const galleryInput = useTemplateRef("galleryInput");
+
+function triggerCamera() {
+  // false alert
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  cameraInput.value?.click();
+}
+
+function triggerGallery() {
+  // false alert
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  galleryInput.value?.click();
+}
+
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  if (input.files?.[0]) {
+    const file = input.files[0];
+    receiptFile.value = file;
+    const reader = new FileReader();
+    reader.addEventListener("load", (e) => {
+      receiptPreview.value = e.target?.result as string;
+    });
+    reader.readAsDataURL(file);
+  }
+  input.value = "";
+}
+
+function removeReceipt() {
+  receiptPreview.value = undefined;
+  receiptFile.value = null;
+}
+
 // Save details back to transaction store
-function saveDetails() {
-  transaction.value.name = localName.value.trim() || undefined;
-  transaction.value.icon = localCategory.value;
-  transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
-  // do not save receipt to transaction for now
-  // the photo should be uploaded separately when submitting the transaction
-  // transaction.value.photo = receiptPreview.value;
-  model.value = false;
+const saveDetailsLoading = ref(false);
+async function saveDetails() {
+  try {
+    saveDetailsLoading.value = true;
+    transaction.value.name = localName.value.trim() || undefined;
+    transaction.value.icon = localCategory.value;
+    transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
+    await transactionStore.saveTransaction();
+    if (receiptFile.value) await transactionStore.uploadTransactionReceipt(receiptFile.value);
+    model.value = false;
+  } catch (error) {
+    toast.error($t("new-expense-review-error-saving-transaction"));
+    reportError("saveTransaction", error);
+  } finally {
+    saveDetailsLoading.value = false;
+  }
 }
 
 // location handling
@@ -68,7 +116,7 @@ function getLocation() {
               localLocation.value = `${String(latitude)}, ${String(longitude)}`;
             }
           } catch (error) {
-            console.error("Error fetching location name:", error);
+            reportError("fetchLocationName", error);
             localLocation.value = `${String(latitude)}, ${String(longitude)}`;
           } finally {
             locationLoading.value = false;
@@ -76,44 +124,11 @@ function getLocation() {
         })();
       },
       (error) => {
-        console.error("Error getting location:", error);
+        reportError("getCurrentPosition", error);
         locationLoading.value = false;
       }
     );
   }
-}
-
-// receipt handling
-const cameraInput = useTemplateRef("cameraInput");
-const galleryInput = useTemplateRef("galleryInput");
-
-function triggerCamera() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  cameraInput.value?.click();
-}
-
-function triggerGallery() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  galleryInput.value?.click();
-}
-
-function handleFileChange(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input.files?.[0]) {
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.addEventListener("load", (e) => {
-      receiptPreview.value = e.target?.result as string;
-    });
-    reader.readAsDataURL(file);
-  }
-  input.value = "";
-}
-
-function removeReceipt() {
-  receiptPreview.value = undefined;
 }
 </script>
 
@@ -131,7 +146,7 @@ function removeReceipt() {
             <button
               type="button"
               aria-label="Open categories selection"
-              :class="[categoryColorMap[getMainCategory(localCategory)], 'rounded-05xl p-2.5 icon-7']"
+              :class="[categoryColorMap[getMainCategory(localCategory)], 'rounded-05xl p-3 icon-6']"
               @click="showCategorySheet = true"
             >
               <CategoryIcon :category="localCategory" />
@@ -248,7 +263,14 @@ function removeReceipt() {
         </div>
 
         <div class="flex gap-3">
-          <SButton class="flex-1" variant="primary" size="lg" color="brand" @click="saveDetails">
+          <SButton
+            :loading="saveDetailsLoading"
+            class="flex-1"
+            variant="primary"
+            size="lg"
+            color="brand"
+            @click="saveDetails"
+          >
             {{ $t("new-expense-review-actions-done") }}
           </SButton>
         </div>
