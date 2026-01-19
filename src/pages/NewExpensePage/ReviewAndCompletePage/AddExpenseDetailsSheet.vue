@@ -53,6 +53,19 @@ function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
   if (input.files?.[0]) {
     const file = input.files[0];
+
+    const maxReceiptSizeBytes = 15 * 1024 * 1024;
+    if (!file.type.startsWith("image/")) {
+      toast.error($t("new-expense-review-error-receipt-not-image"));
+      input.value = "";
+      return;
+    }
+    if (file.size > maxReceiptSizeBytes) {
+      toast.error($t("new-expense-review-error-receipt-too-large", { maxMb: 15 }));
+      input.value = "";
+      return;
+    }
+
     receiptFile.value = file;
     const reader = new FileReader();
     reader.addEventListener("load", (e) => {
@@ -76,6 +89,7 @@ async function saveDetails() {
     transaction.value.name = localName.value.trim() || undefined;
     transaction.value.icon = localCategory.value;
     transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
+    previewPhotoBase64.value = receiptPreview.value;
     await transactionStore.saveTransaction();
     if (receiptFile.value) await transactionStore.uploadTransactionReceipt(receiptFile.value);
     model.value = false;
