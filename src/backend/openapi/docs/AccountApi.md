@@ -9,6 +9,7 @@ All URIs are relative to _http://localhost_
 | [**removeFriend**](AccountApi.md#removefriend)             | **DELETE** /account/friend/{id} | Remove a friend from the current user             |
 | [**updateFriendRemark**](AccountApi.md#updatefriendremark) | **PATCH** /account/friend/{id}  | Update the remark of a friend                     |
 | [**updateUserInfo**](AccountApi.md#updateuserinfo)         | **PATCH** /account              | Update the current user\&#39;s username and photo |
+| [**uploadUserAvatar**](AccountApi.md#uploaduseravatar)     | **POST** /account/avatar        | Upload the current user\&#39;s avatar image.      |
 
 ## addFriend
 
@@ -25,8 +26,8 @@ import type { AddFriendRequest } from "";
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY"
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN"
   });
   const api = new AccountApi(config);
 
@@ -94,8 +95,8 @@ import type { GetUserInfoRequest } from "";
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY"
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN"
   });
   const api = new AccountApi(config);
 
@@ -152,8 +153,8 @@ import type { RemoveFriendRequest } from "";
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY"
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN"
   });
   const api = new AccountApi(config);
 
@@ -218,8 +219,8 @@ import type { UpdateFriendRemarkRequest } from "";
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY"
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN"
   });
   const api = new AccountApi(config);
 
@@ -291,8 +292,8 @@ import type { UpdateUserInfoRequest } from '';
 async function example() {
   console.log("🚀 Testing  SDK...");
   const config = new Configuration({
-    // To configure API key authorization: Bearer
-    apiKey: "YOUR API KEY",
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
@@ -338,5 +339,71 @@ example().catch(console.error);
 | ----------- | ------------ | ---------------- |
 | **204**     | No Content   | -                |
 | **401**     | Unauthorized | -                |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+## uploadUserAvatar
+
+> UploadImageResult uploadUserAvatar(file)
+
+Upload the current user\&#39;s avatar image.
+
+### Example
+
+```ts
+import { Configuration, AccountApi } from "";
+import type { UploadUserAvatarRequest } from "";
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN"
+  });
+  const api = new AccountApi(config);
+
+  const body = {
+    // Blob (optional)
+    file: BINARY_DATA_HERE
+  } satisfies UploadUserAvatarRequest;
+
+  try {
+    const data = await api.uploadUserAvatar(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+| Name     | Type   | Description | Notes                                |
+| -------- | ------ | ----------- | ------------------------------------ |
+| **file** | `Blob` |             | [Optional] [Defaults to `undefined`] |
+
+### Return type
+
+[**UploadImageResult**](UploadImageResult.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: `multipart/form-data`
+- **Accept**: `application/json`
+
+### HTTP response details
+
+| Status code | Description  | Response headers |
+| ----------- | ------------ | ---------------- |
+| **401**     | Unauthorized | -                |
+| **400**     | Bad Request  | -                |
+| **200**     | OK           | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)

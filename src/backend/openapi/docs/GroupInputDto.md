@@ -5,7 +5,6 @@
 | Name        | Type                |
 | ----------- | ------------------- |
 | `name`      | string              |
-| `photo`     | string              |
 | `membersId` | Array&lt;string&gt; |
 
 ## Example
@@ -16,7 +15,6 @@ import type { GroupInputDto } from "";
 // TODO: Update the object below with actual values
 const example = {
   name: null,
-  photo: null,
   membersId: null
 } satisfies GroupInputDto;
 

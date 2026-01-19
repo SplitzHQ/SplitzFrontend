@@ -40,6 +40,7 @@ docs/TransactionDto.md
 docs/TransactionInputDto.md
 docs/TwoFactorRequest.md
 docs/TwoFactorResponse.md
+docs/UploadImageResult.md
 index.ts
 models/AccessTokenResponse.ts
 models/ForgotPasswordRequest.ts
@@ -72,5 +73,6 @@ models/TransactionDto.ts
 models/TransactionInputDto.ts
 models/TwoFactorRequest.ts
 models/TwoFactorResponse.ts
+models/UploadImageResult.ts
 models/index.ts
 runtime.ts

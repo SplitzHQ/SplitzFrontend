@@ -11,14 +11,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import type { ProblemDetails, SplitzUserDto, SplitzUserUpdateViewModel } from "../models/index";
+import type { ProblemDetails, SplitzUserDto, SplitzUserUpdateViewModel, UploadImageResult } from "../models/index";
 import {
   ProblemDetailsFromJSON,
   ProblemDetailsToJSON,
   SplitzUserDtoFromJSON,
   SplitzUserDtoToJSON,
   SplitzUserUpdateViewModelFromJSON,
-  SplitzUserUpdateViewModelToJSON
+  SplitzUserUpdateViewModelToJSON,
+  UploadImageResultFromJSON,
+  UploadImageResultToJSON
 } from "../models/index";
 import * as runtime from "../runtime";
 
@@ -38,6 +40,10 @@ export interface UpdateFriendRemarkRequest {
 
 export interface UpdateUserInfoRequest {
   splitzUserUpdateViewModel?: SplitzUserUpdateViewModel;
+}
+
+export interface UploadUserAvatarRequest {
+  file?: Blob;
 }
 
 /**
@@ -61,8 +67,13 @@ export class AccountApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/account/friend/{id}`;
@@ -102,8 +113,13 @@ export class AccountApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/account`;
@@ -147,8 +163,13 @@ export class AccountApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/account/friend/{id}`;
@@ -199,8 +220,13 @@ export class AccountApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/account/friend/{id}`;
@@ -242,8 +268,13 @@ export class AccountApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/account`;
@@ -270,5 +301,69 @@ export class AccountApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.updateUserInfoRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   * Upload the current user\'s avatar image.
+   */
+  async uploadUserAvatarRaw(
+    requestParameters: UploadUserAvatarRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<UploadImageResult>> {
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const consumes: runtime.Consume[] = [{ contentType: "multipart/form-data" }];
+    // @ts-ignore: canConsumeForm may be unused
+    const canConsumeForm = runtime.canConsumeForm(consumes);
+
+    let formParams: { append(param: string, value: any): any };
+    let useForm = false;
+    // use FormData to transmit files using content-type "multipart/form-data"
+    useForm = canConsumeForm;
+    if (useForm) {
+      formParams = new FormData();
+    } else {
+      formParams = new URLSearchParams();
+    }
+
+    if (requestParameters["file"] != null) {
+      formParams.append("file", requestParameters["file"] as any);
+    }
+
+    let urlPath = `/account/avatar`;
+
+    const response = await this.request(
+      {
+        path: urlPath,
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: formParams
+      },
+      initOverrides
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) => UploadImageResultFromJSON(jsonValue));
+  }
+
+  /**
+   * Upload the current user\'s avatar image.
+   */
+  async uploadUserAvatar(
+    requestParameters: UploadUserAvatarRequest = {},
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<UploadImageResult> {
+    const response = await this.uploadUserAvatarRaw(requestParameters, initOverrides);
+    return await response.value();
   }
 }

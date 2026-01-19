@@ -75,7 +75,7 @@ export interface TransactionDraftInputDto {
    * @type {string}
    * @memberof TransactionDraftInputDto
    */
-  amount?: string | null;
+  amount?: string;
   /**
    *
    * @type {string}
@@ -94,12 +94,6 @@ export interface TransactionDraftInputDto {
    * @memberof TransactionDraftInputDto
    */
   geoCoordinate?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof TransactionDraftInputDto
-   */
-  photo?: string | null;
   /**
    *
    * @type {Array<TransactionDraftBalanceInputDto>}
@@ -139,7 +133,6 @@ export function TransactionDraftInputDtoFromJSONTyped(
     currency: json["currency"] == null ? undefined : json["currency"],
     tags: json["tags"] == null ? undefined : (json["tags"] as Array<any>).map(TagFromJSON),
     geoCoordinate: json["geoCoordinate"] == null ? undefined : json["geoCoordinate"],
-    photo: json["photo"] == null ? undefined : json["photo"],
     balances:
       json["balances"] == null
         ? undefined
@@ -172,7 +165,6 @@ export function TransactionDraftInputDtoToJSONTyped(
     currency: value["currency"],
     tags: value["tags"] == null ? undefined : (value["tags"] as Array<any>).map(TagToJSON),
     geoCoordinate: value["geoCoordinate"],
-    photo: value["photo"],
     balances:
       value["balances"] == null
         ? undefined

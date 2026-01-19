@@ -25,12 +25,6 @@ export interface SplitzUserUpdateViewModel {
    * @memberof SplitzUserUpdateViewModel
    */
   userName?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof SplitzUserUpdateViewModel
-   */
-  photo?: string | null;
 }
 
 /**
@@ -52,8 +46,7 @@ export function SplitzUserUpdateViewModelFromJSONTyped(
     return json;
   }
   return {
-    userName: json["userName"] == null ? undefined : json["userName"],
-    photo: json["photo"] == null ? undefined : json["photo"]
+    userName: json["userName"] == null ? undefined : json["userName"]
   };
 }
 
@@ -70,7 +63,6 @@ export function SplitzUserUpdateViewModelToJSONTyped(
   }
 
   return {
-    userName: value["userName"],
-    photo: value["photo"]
+    userName: value["userName"]
   };
 }

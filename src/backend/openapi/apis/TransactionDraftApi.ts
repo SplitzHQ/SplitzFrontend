@@ -11,14 +11,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import type { ProblemDetails, TransactionDraftDto, TransactionDraftInputDto } from "../models/index";
+import type { ProblemDetails, TransactionDraftDto, TransactionDraftInputDto, UploadImageResult } from "../models/index";
 import {
   ProblemDetailsFromJSON,
   ProblemDetailsToJSON,
   TransactionDraftDtoFromJSON,
   TransactionDraftDtoToJSON,
   TransactionDraftInputDtoFromJSON,
-  TransactionDraftInputDtoToJSON
+  TransactionDraftInputDtoToJSON,
+  UploadImageResultFromJSON,
+  UploadImageResultToJSON
 } from "../models/index";
 import * as runtime from "../runtime";
 
@@ -35,9 +37,13 @@ export interface GetTransactionDraftRequest {
 }
 
 export interface UpdateTransactionDraftRequest {
-  transactionId: string;
-  transactionDraftId?: string;
+  transactionDraftId: string;
   transactionDraftInputDto?: TransactionDraftInputDto;
+}
+
+export interface UploadTransactionDraftReceiptRequest {
+  id: string;
+  file?: Blob;
 }
 
 /**
@@ -57,8 +63,13 @@ export class TransactionDraftApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/transactiondraft`;
@@ -106,8 +117,13 @@ export class TransactionDraftApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/transactiondraft/{id}`;
@@ -154,8 +170,13 @@ export class TransactionDraftApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
     let urlPath = `/transactiondraft/{id}`;
@@ -192,29 +213,33 @@ export class TransactionDraftApi extends runtime.BaseAPI {
     requestParameters: UpdateTransactionDraftRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<runtime.ApiResponse<void>> {
-    if (requestParameters["transactionId"] == null) {
+    if (requestParameters["transactionDraftId"] == null) {
       throw new runtime.RequiredError(
-        "transactionId",
-        'Required parameter "transactionId" was null or undefined when calling updateTransactionDraft().'
+        "transactionDraftId",
+        'Required parameter "transactionDraftId" was null or undefined when calling updateTransactionDraft().'
       );
     }
 
     const queryParameters: any = {};
 
-    if (requestParameters["transactionDraftId"] != null) {
-      queryParameters["transactionDraftId"] = requestParameters["transactionDraftId"];
-    }
-
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
 
-    if (this.configuration && this.configuration.apiKey) {
-      headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // Bearer authentication
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
     }
 
-    let urlPath = `/transactiondraft/{transactionId}`;
-    urlPath = urlPath.replace(`{${"transactionId"}}`, encodeURIComponent(String(requestParameters["transactionId"])));
+    let urlPath = `/transactiondraft/{transactionDraftId}`;
+    urlPath = urlPath.replace(
+      `{${"transactionDraftId"}}`,
+      encodeURIComponent(String(requestParameters["transactionDraftId"]))
+    );
 
     const response = await this.request(
       {
@@ -238,5 +263,77 @@ export class TransactionDraftApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<void> {
     await this.updateTransactionDraftRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   * Upload a receipt image for a transaction draft.
+   */
+  async uploadTransactionDraftReceiptRaw(
+    requestParameters: UploadTransactionDraftReceiptRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<UploadImageResult>> {
+    if (requestParameters["id"] == null) {
+      throw new runtime.RequiredError(
+        "id",
+        'Required parameter "id" was null or undefined when calling uploadTransactionDraftReceipt().'
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("Bearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const consumes: runtime.Consume[] = [{ contentType: "multipart/form-data" }];
+    // @ts-ignore: canConsumeForm may be unused
+    const canConsumeForm = runtime.canConsumeForm(consumes);
+
+    let formParams: { append(param: string, value: any): any };
+    let useForm = false;
+    // use FormData to transmit files using content-type "multipart/form-data"
+    useForm = canConsumeForm;
+    if (useForm) {
+      formParams = new FormData();
+    } else {
+      formParams = new URLSearchParams();
+    }
+
+    if (requestParameters["file"] != null) {
+      formParams.append("file", requestParameters["file"] as any);
+    }
+
+    let urlPath = `/transactiondraft/{id}/receipt`;
+    urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters["id"])));
+
+    const response = await this.request(
+      {
+        path: urlPath,
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: formParams
+      },
+      initOverrides
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) => UploadImageResultFromJSON(jsonValue));
+  }
+
+  /**
+   * Upload a receipt image for a transaction draft.
+   */
+  async uploadTransactionDraftReceipt(
+    requestParameters: UploadTransactionDraftReceiptRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<UploadImageResult> {
+    const response = await this.uploadTransactionDraftReceiptRaw(requestParameters, initOverrides);
+    return await response.value();
   }
 }

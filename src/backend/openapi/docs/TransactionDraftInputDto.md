@@ -15,7 +15,6 @@
 | `currency`           | string                                                                             |
 | `tags`               | [Array&lt;Tag&gt;](Tag.md)                                                         |
 | `geoCoordinate`      | string                                                                             |
-| `photo`              | string                                                                             |
 | `balances`           | [Array&lt;TransactionDraftBalanceInputDto&gt;](TransactionDraftBalanceInputDto.md) |
 
 ## Example
@@ -36,7 +35,6 @@ const example = {
   currency: null,
   tags: null,
   geoCoordinate: null,
-  photo: null,
   balances: null
 } satisfies TransactionDraftInputDto;
 
