@@ -69,12 +69,12 @@ const showLoadingState = computed(() => groupsQuery.value.status === "pending");
 const showErrorState = computed(() => groupsQuery.value.status === "error");
 
 const addExpense = () => {
-  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  routerHistoryStore.takeSnapshot();
   void router.push({ name: "newExpense" });
 };
 
 const createGroup = () => {
-  routerHistoryStore.addParentHistory(router.currentRoute.value.path);
+  routerHistoryStore.takeSnapshot();
   void router.push({ name: "createGroup" });
 };
 
@@ -169,6 +169,7 @@ const userBalances = computed(() => {
               :key="group.groupId"
               type="button"
               class="flex w-full items-center gap-3 py-2 text-left"
+              @click="router.push({ name: 'groupDetail', params: { groupId: group.groupId } })"
             >
               <Avatar v-if="group.photo" size="lg" :images="[{ src: group.photo, alt: group.name }]" />
               <Avatar

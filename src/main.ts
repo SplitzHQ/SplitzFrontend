@@ -20,6 +20,8 @@ import enCreateGroup from "./locales/en/create-group.ftl";
 // @ts-expect-error - translation files
 import enJoinGroup from "./locales/en/join-group.ftl";
 // @ts-expect-error - translation files
+import enGroupDetail from "./locales/en/group-detail.ftl";
+// @ts-expect-error - translation files
 import zhcnNewExpense from "./locales/zh-cn/new-expense.ftl";
 // @ts-expect-error - translation files
 import zhcnCategories from "./locales/zh-cn/categories.ftl";
@@ -29,6 +31,8 @@ import zhcnHome from "./locales/zh-cn/home.ftl";
 import zhcnCreateGroup from "./locales/zh-cn/create-group.ftl";
 // @ts-expect-error - translation files
 import zhcnJoinGroup from "./locales/zh-cn/join-group.ftl";
+// @ts-expect-error - translation files
+import zhcnGroupDetail from "./locales/zh-cn/group-detail.ftl";
 import router from "./router";
 
 const app = createApp(App);
@@ -37,8 +41,10 @@ const app = createApp(App);
 const enBundle = new FluentBundle("en");
 const zhcnBundle = new FluentBundle("zh-cn");
 
-[enNewExpense, enCategories, enHome, enCreateGroup, enJoinGroup].forEach((resource) => enBundle.addResource(resource));
-[zhcnNewExpense, zhcnCategories, zhcnHome, zhcnCreateGroup, zhcnJoinGroup].forEach((resource) =>
+[enNewExpense, enCategories, enHome, enCreateGroup, enJoinGroup, enGroupDetail].forEach((resource) =>
+  enBundle.addResource(resource)
+);
+[zhcnNewExpense, zhcnCategories, zhcnHome, zhcnCreateGroup, zhcnJoinGroup, zhcnGroupDetail].forEach((resource) =>
   zhcnBundle.addResource(resource)
 );
 
