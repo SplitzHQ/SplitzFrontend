@@ -1,7 +1,8 @@
-import vue from "@vitejs/plugin-vue";
 import fs from "node:fs";
 import process from "node:process";
 import { fileURLToPath, URL } from "node:url";
+
+import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";

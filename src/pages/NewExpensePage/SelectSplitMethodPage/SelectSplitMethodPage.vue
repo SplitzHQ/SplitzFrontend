@@ -11,8 +11,8 @@ import { useTransactionStore } from "@/stores/transaction";
 
 import PaidByButton from "./PaidByButton.vue";
 import SplitMethodButton from "./SplitMethodButton.vue";
-import UserItem from "./UserItem.vue";
 import { useKeyboardControl } from "./use-keyboard-control";
+import UserItem from "./UserItem.vue";
 
 // i18n
 const { $t } = useFluent();

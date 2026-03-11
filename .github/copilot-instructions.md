@@ -64,7 +64,7 @@ bun run css-var-to-tailwind
 Husky runs automatically on commit:
 
 1. `vue-tsc --build --force` - Type checks all files
-2. `lint-staged` - On staged files: `eslint --fix` + `prettier --write` for .ts/.vue files, `prettier --write` for other files
+2. `lint-staged` - On staged files: `eslint --fix` + `oxfmt` for .ts/.vue files, `oxfmt` for other files
 
 **Pre-commit check locally:**
 
@@ -142,7 +142,7 @@ bun run type-check && bun run lint && bun run format
 
 - **ESLint:** Flat config (9.x), strict TypeScript rules. Ignores: `src/backend/**/*` (generated), `.storybook/**/*`, `scripts/**/*`, `**/*.js`, `**/*.stories.ts`
 - **TypeScript:** Project references (app/node/vitest), strict mode, `@/` alias → `src/`
-- **Prettier:** No semicolons, single quotes, 2 spaces, 120 chars, import sorting (third-party → `@/` → relative)
+- **Oxfmt:** Semicolons, double quotes, 2 spaces, 120 chars, import sorting (builtin → external → `@/` → relative), Tailwind class sorting
 - **Tailwind:** CSS variables for colors, custom font sizes, z-index scale. Uses `@tailwindcss/postcss` (v4)
 - **Vite:** Vue 3 plugin, Fluent Vue i18n (SFC + .ftl files), `@` alias → `./src`
 - **Vitest:** Two projects: (1) unit tests (jsdom), (2) Storybook tests (browser/Chromium). Excludes `e2e/**`

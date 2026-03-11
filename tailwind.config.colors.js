@@ -289,8 +289,8 @@ export default {
   "comp-button-close-fg-default": "var(--comp-button-close-fg-default)",
   "comp-button-close-bg-hover": "var(--comp-button-close-bg-hover)",
   "comp-button-close-bg-pressed": "var(--comp-button-close-bg-pressed)",
-  "white": "var(--white)",
-  "black": "var(--black)",
+  white: "var(--white)",
+  black: "var(--black)",
   "core-color-brand-25": "var(--core-color-brand-25)",
   "core-color-brand-50": "var(--core-color-brand-50)",
   "core-color-brand-100": "var(--core-color-brand-100)",
@@ -627,4 +627,4 @@ export default {
   "core-alpha-yellow-90": "var(--core-alpha-yellow-90)",
   "core-alpha-yellow-95": "var(--core-alpha-yellow-95)",
   "core-alpha-yellow-100": "var(--core-alpha-yellow-100)"
-}
+};

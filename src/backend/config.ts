@@ -4,7 +4,7 @@ import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
 import { Configuration, type Middleware } from "./openapi/runtime";
 
 const getBasePath = () => {
-  return "https://splitzdev.netlify.app/api";
+  return "https://splitz.pro/api";
 };
 
 const basePath = getBasePath();

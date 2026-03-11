@@ -3,9 +3,9 @@ import { PhMagnifyingGlass } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { type ComponentPublicInstance, computed, ref, useTemplateRef, watch } from "vue";
 
+import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import CategoryText from "@/components/Category/CategoryText.vue";
-import { categoryColorMap } from "@/components/Category/category-color";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import {

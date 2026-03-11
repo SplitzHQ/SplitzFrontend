@@ -3,8 +3,8 @@ import { useFluent } from "fluent-vue";
 import { computed } from "vue";
 
 import type { TransactionDto } from "@/backend";
-import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { categoryColorMap } from "@/components/Category/category-color";
+import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { useUserStore } from "@/stores/user";
 

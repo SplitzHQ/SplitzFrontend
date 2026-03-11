@@ -13,8 +13,8 @@ import { useTransactionStore } from "@/stores/transaction";
 
 import FrequentSelectionList from "./FrequentSelectionList.vue";
 import SearchBar from "./SearchBar.vue";
-import UserList from "./UserList.vue";
 import type { UserListItem } from "./types";
+import UserList from "./UserList.vue";
 
 // transaction store
 const transaction = useTransactionStore();
