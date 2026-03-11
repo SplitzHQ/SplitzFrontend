@@ -11,8 +11,10 @@ import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMo
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
-import SLinkButton from "@/components/SButton/SLinkButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
+import { useRouterHistoryStore } from "@/stores/routing-history";
+
+const routerHistoryStore = useRouterHistoryStore();
 
 const { $t } = useFluent();
 
@@ -133,9 +135,16 @@ async function copyJoinLink() {
             {{ $t("create-group-submit") }}
           </SButton>
 
-          <SLinkButton v-else variant="primary" color="brand" size="xxl" class="w-full" href="/">
+          <SButton
+            v-else
+            variant="primary"
+            color="brand"
+            size="xxl"
+            class="w-full"
+            @click="() => routerHistoryStore.restoreSnapshot()"
+          >
             {{ $t("create-group-done") }}
-          </SLinkButton>
+          </SButton>
         </div>
       </div>
     </template>

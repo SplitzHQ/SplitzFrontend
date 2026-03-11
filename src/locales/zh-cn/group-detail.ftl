@@ -1,0 +1,14 @@
+group-detail-total-balance = 总余额
+group-detail-settle-up = 结算
+group-detail-owes-you = { $name }欠你
+group-detail-you-owe = 你欠{ $name }
+group-detail-tab-balances = 余额
+group-detail-tab-trend = 趋势
+group-detail-tab-history = 历史
+group-detail-tab-export = 导出
+group-detail-you-owe-label = 你欠
+group-detail-you-lent-label = 你借出
+group-detail-paid-by = { $name }支付了{ $amount }
+group-detail-you-paid = 你支付了{ $amount }
+group-detail-loading = 加载中...
+group-detail-error = 加载群组详情时出错。

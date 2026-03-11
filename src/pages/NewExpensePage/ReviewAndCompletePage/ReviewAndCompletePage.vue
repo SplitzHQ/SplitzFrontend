@@ -3,13 +3,13 @@ import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { getCategory } from "@/libs/categories";
+import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useTransactionStore } from "@/stores/transaction";
 
 import AddExpenseDetailsSheet from "./AddExpenseDetailsSheet.vue";
@@ -20,7 +20,8 @@ import SelectCategorySheet from "./SelectCategorySheet.vue";
 import TransactionInfoCard from "./TransactionInfoCard.vue";
 
 const { $t } = useFluent();
-const router = useRouter();
+const routerHistoryStore = useRouterHistoryStore();
+
 const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 const showDetailsSheet = ref(false);
@@ -44,7 +45,7 @@ async function handleComplete() {
     // clean up transaction store after saving
     transactionStore.resetTransactionStore();
     // Navigate to home page after successful submission
-    await router.push("/");
+    routerHistoryStore.restoreSnapshot();
   } catch (error) {
     console.error("Error saving transaction:", error);
     toast.error($t("new-expense-review-error-saving-transaction"));

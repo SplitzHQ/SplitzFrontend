@@ -20,12 +20,7 @@ const goBack = () => {
 };
 
 const close = () => {
-  const previousRoute = routerHistoryStore.removeParentHistory();
-  if (previousRoute) {
-    void router.push(previousRoute);
-  } else {
-    void router.push("/");
-  }
+  routerHistoryStore.restoreSnapshot();
 };
 </script>
 
@@ -40,5 +35,6 @@ const close = () => {
     <SIconButton v-if="enableCloseButton" variant="ghost" color="neutral" size="lg" @click="close">
       <PhX />
     </SIconButton>
+    <slot name="right" />
   </header>
 </template>

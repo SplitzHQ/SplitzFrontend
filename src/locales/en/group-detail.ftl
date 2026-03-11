@@ -1,0 +1,14 @@
+group-detail-total-balance = Total Balance
+group-detail-settle-up = Settle Up
+group-detail-owes-you = { $name } owes you
+group-detail-you-owe = You owe { $name }
+group-detail-tab-balances = Balances
+group-detail-tab-trend = Trend
+group-detail-tab-history = History
+group-detail-tab-export = Export
+group-detail-you-owe-label = You owe
+group-detail-you-lent-label = You lent
+group-detail-paid-by = { $name } paid { $amount }
+group-detail-you-paid = You paid { $amount }
+group-detail-loading = Loading...
+group-detail-error = Error loading group details.
