@@ -30,12 +30,12 @@ const groupApi = new GroupApi(config);
 
 const { state: groupQuery } = useQuery({
   key: () => ["getGroup", groupId.value],
-  query: () => groupApi.getGroup({ groupId: groupId.value })
+  query: () => groupApi.getGroup({ groupId: groupId.value }),
 });
 
 const { state: transactionsQuery } = useQuery({
   key: () => ["getGroupTransactions", groupId.value],
-  query: () => groupApi.getGroupTransactions({ groupId: groupId.value })
+  query: () => groupApi.getGroupTransactions({ groupId: groupId.value }),
 });
 
 const group = computed(() => groupQuery.value.data);
@@ -44,9 +44,9 @@ const transactions = computed(() => transactionsQuery.value.data ?? []);
 const avatarImages = computed(() => {
   if (!group.value) return [];
   if (group.value.photo) {
-    return [{ src: group.value.photo, alt: group.value.name }];
+    return [{ alt: group.value.name, src: group.value.photo }];
   }
-  return group.value.members.slice(0, 4).map((m) => ({ src: m.photo ?? null, alt: m.userName }));
+  return group.value.members.slice(0, 4).map((m) => ({ alt: m.userName, src: m.photo ?? null }));
 });
 
 const totalBalance = computed(() => {
@@ -68,11 +68,11 @@ const memberBalances = computed(() => {
   return group.value.balances
     .filter((b) => b.user.id !== userStore.user?.id && b.balance !== "0")
     .map((b) => ({
-      name: b.user.userName,
       // Other member's positive balance means they owe money (which the user is owed)
       // We negate it to match our convention: negative = they owe you, positive = you owe them
       amount: -Number.parseFloat(b.balance),
-      currency: b.currency
+      currency: b.currency,
+      name: b.user.userName,
     }));
 });
 
@@ -80,7 +80,7 @@ const tabs = computed(() => [
   $t("group-detail-tab-balances"),
   $t("group-detail-tab-trend"),
   $t("group-detail-tab-history"),
-  $t("group-detail-tab-export")
+  $t("group-detail-tab-export"),
 ]);
 
 const addExpense = () => {

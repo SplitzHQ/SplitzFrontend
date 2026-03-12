@@ -33,7 +33,7 @@ const selectedCategory = computed({
   get: () => getCategory(transaction.value.icon),
   set: (next) => {
     transaction.value.icon = next;
-  }
+  },
 });
 
 async function handleComplete() {

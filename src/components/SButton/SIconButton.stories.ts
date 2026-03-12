@@ -8,24 +8,24 @@ export default {
   title: "Components/IconButton",
   component: SIconButton,
   args: {
-    onClick: fn()
+    onClick: fn(),
   },
   argTypes: {
     color: {
       control: { type: "select" },
-      options: ["neutral", "error", "brand"]
+      options: ["neutral", "error", "brand"],
     },
     variant: {
       control: { type: "select" },
-      options: ["primary", "secondary", "outline", "ghost"]
+      options: ["primary", "secondary", "outline", "ghost"],
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl", "xxl"]
+      options: ["xs", "sm", "md", "lg", "xl", "xxl"],
     },
     disabled: { control: "boolean" },
-    loading: { control: "boolean" }
-  }
+    loading: { control: "boolean" },
+  },
 } satisfies Meta<typeof SIconButton>;
 
 const Template: StoryFn<typeof SIconButton> = (args) => ({
@@ -33,7 +33,7 @@ const Template: StoryFn<typeof SIconButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SIconButton v-bind="args" aria-label="Airplane Takeoff"><PhAirplaneTakeoff /></SIconButton>'
+  template: '<SIconButton v-bind="args" aria-label="Airplane Takeoff"><PhAirplaneTakeoff /></SIconButton>',
 });
 
 export const Brand = Template.bind({});
@@ -42,7 +42,7 @@ Brand.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };
 
 export const Neutral = Template.bind({});
@@ -51,7 +51,7 @@ Neutral.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };
 
 export const Error = Template.bind({});
@@ -60,5 +60,5 @@ Error.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };

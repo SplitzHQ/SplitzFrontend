@@ -21,11 +21,11 @@ async function handleLogin() {
     await userStore.login({
       email: email.value,
       password: password.value,
-      twoFactorCode: showTwoFactor.value ? twoFactorCode.value : undefined
+      twoFactorCode: showTwoFactor.value ? twoFactorCode.value : undefined,
     });
     toast.success("Logged in successfully");
     await router.push("/");
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     toast.error("Login failed. Please check your credentials.");
   } finally {

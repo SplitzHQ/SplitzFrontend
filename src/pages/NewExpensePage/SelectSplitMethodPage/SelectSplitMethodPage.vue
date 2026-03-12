@@ -11,8 +11,8 @@ import { useTransactionStore } from "@/stores/transaction";
 
 import PaidByButton from "./PaidByButton.vue";
 import SplitMethodButton from "./SplitMethodButton.vue";
-import UserItem from "./UserItem.vue";
 import { useKeyboardControl } from "./use-keyboard-control";
+import UserItem from "./UserItem.vue";
 
 // i18n
 const { $t } = useFluent();
@@ -82,7 +82,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
                     {{
                       transactionStore.transaction.amount?.toLocaleString(undefined, {
                         style: "currency",
-                        currency: transactionStore.transaction.currency ?? "USD"
+                        currency: transactionStore.transaction.currency ?? "USD",
                       })
                     }}
                   </div>

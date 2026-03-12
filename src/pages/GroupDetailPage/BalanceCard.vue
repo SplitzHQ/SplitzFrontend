@@ -16,7 +16,7 @@ const { $t } = useFluent();
 
 const formatCurrency = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(Math.abs(amount));
+    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(Math.abs(amount));
   } catch {
     return `${Math.abs(amount).toFixed(2)} ${currency}`;
   }

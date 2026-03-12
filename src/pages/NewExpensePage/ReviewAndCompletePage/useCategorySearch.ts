@@ -20,8 +20,8 @@ export function useCategorySearch(options: { limit?: number } = {}) {
 
   function buildSearchIndex() {
     const index = new FlexSearch.Index({
+      cache: true,
       tokenize: "forward",
-      cache: true
     });
 
     for (const sub of subcategories) {
@@ -62,10 +62,10 @@ export function useCategorySearch(options: { limit?: number } = {}) {
   });
 
   return {
-    searchQuery,
-    normalizedQuery,
-    matchedSubcategories,
     buildSearchIndex,
-    clearSearch
+    clearSearch,
+    matchedSubcategories,
+    normalizedQuery,
+    searchQuery,
   };
 }

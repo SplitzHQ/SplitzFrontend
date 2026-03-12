@@ -19,13 +19,13 @@ const { transaction } = storeToRefs(transactionStore);
 // format amount as currency
 const formatOptions = computed(
   (): Format => ({
+    currency: transaction.value.currency ?? "USD",
     style: "currency",
-    currency: transaction.value.currency ?? "USD"
   })
 );
 const formattedAmount = computed(() => {
   const amount = transaction.value.amount;
-  return amount == null ? "" : amount.toLocaleString(undefined, formatOptions.value);
+  return amount === null || amount === undefined ? "" : amount.toLocaleString(undefined, formatOptions.value);
 });
 </script>
 
@@ -42,7 +42,7 @@ const formattedAmount = computed(() => {
           <div
             :class="[
               'flex h-18 items-center font-medium',
-              transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
+              transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary',
             ]"
             :style="{ fontSize: `min(4.5rem, ${150 / formattedAmount.length}vw)` }"
           >

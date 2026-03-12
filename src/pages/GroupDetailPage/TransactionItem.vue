@@ -3,8 +3,8 @@ import { useFluent } from "fluent-vue";
 import { computed } from "vue";
 
 import type { TransactionDto } from "@/backend";
-import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { categoryColorMap } from "@/components/Category/category-color";
+import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { useUserStore } from "@/stores/user";
 
@@ -44,12 +44,12 @@ const payerDescription = computed(() => {
   if (payer.value.id === userStore.user?.id) {
     return $t("group-detail-you-paid", { amount });
   }
-  return $t("group-detail-paid-by", { name: payer.value.userName, amount });
+  return $t("group-detail-paid-by", { amount, name: payer.value.userName });
 });
 
 const formatCurrency = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(Math.abs(amount));
+    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(Math.abs(amount));
   } catch {
     return `${Math.abs(amount).toFixed(2)} ${currency}`;
   }

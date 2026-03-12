@@ -1,5 +1,5 @@
 /* eslint-disable no-lonely-if */
-import Big from "big.js";
+import { Big } from "big.js";
 
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -74,7 +74,7 @@ export default class Calculator {
   }
 
   backspace() {
-    if (this.stack.length !== 0) {
+    if (this.stack.length > 0) {
       const last = this.stack[this.stack.length - 1]!;
       if (this.isOperator(last)) {
         this.stack.pop();

@@ -24,11 +24,11 @@ async function handleRegister() {
   try {
     await userStore.register({
       email: email.value,
-      password: password.value
+      password: password.value,
     });
     toast.success("Registration successful. Please login.");
     await router.push("/login");
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     toast.error("Registration failed.");
   } finally {

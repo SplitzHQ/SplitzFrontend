@@ -12,7 +12,7 @@ const { width: rootWidth } = useElementSize(rootRef);
     ref="rootRef"
     :class="[
       'flex aspect-square items-center justify-center rounded-full border border-util-color-success-25',
-      'bg-radial from-util-color-success-50 from-5% via-util-color-success-25 via-20% to-transparent to-40%'
+      'bg-radial from-util-color-success-50 from-5% via-util-color-success-25 via-20% to-transparent to-40%',
     ]"
   >
     <div

@@ -41,7 +41,7 @@ const amountOwed = computed(() => {
           {{
             transaction.amount?.toLocaleString(undefined, {
               style: "currency",
-              currency: transaction.currency ?? "USD"
+              currency: transaction.currency ?? "USD",
             })
           }}
         </div>
@@ -50,7 +50,7 @@ const amountOwed = computed(() => {
             {{
               $t("new-expense-split-paid-by", {
                 username:
-                  transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? ""
+                  transactionStore.members.find((member) => member.id === transactionStore.paidBy)?.userName ?? "",
               })
             }}
           </div>
@@ -65,7 +65,7 @@ const amountOwed = computed(() => {
             {{
               amountOwed.toLocaleString(undefined, {
                 style: "currency",
-                currency: transactionStore.transaction.currency ?? "USD"
+                currency: transactionStore.transaction.currency ?? "USD",
               })
             }}
           </div>
@@ -73,7 +73,7 @@ const amountOwed = computed(() => {
             {{
               (0 - amountOwed).toLocaleString(undefined, {
                 style: "currency",
-                currency: transactionStore.transaction.currency ?? "USD"
+                currency: transactionStore.transaction.currency ?? "USD",
               })
             }}
           </div>

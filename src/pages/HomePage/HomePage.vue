@@ -37,13 +37,13 @@ const groupWithExtraInfo = computed(() => {
       .filter((b) => b.user.id === userStore.user?.id)
       .map((b) => ({
         ...b,
-        amount: Number.parseFloat(b.balance)
+        amount: Number.parseFloat(b.balance),
       }));
     const myBalanceNegative = myBalances.filter((b) => b.amount < 0);
     const myBalancePositive = myBalances.filter((b) => b.amount > 0);
     const myBalanceSettled = myBalances.every((b) => b.amount === 0);
     const groupSettled = group.balances.every((b) => b.balance === "0");
-    return { ...group, myBalances, myBalanceNegative, myBalancePositive, myBalanceSettled, groupSettled };
+    return { ...group, groupSettled, myBalanceNegative, myBalancePositive, myBalanceSettled, myBalances };
   });
 });
 
@@ -57,7 +57,7 @@ const visibleGroups = computed(() => {
 
 const formatCurrency = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(amount);
   } catch {
     return `${amount.toFixed(2)} ${currency}`;
   }
@@ -87,7 +87,7 @@ const userBalances = computed(() => {
     } else {
       balances.set(userBalance.currency, {
         amount: Number.parseFloat(userBalance.balance),
-        currency: userBalance.currency
+        currency: userBalance.currency,
       });
     }
   }

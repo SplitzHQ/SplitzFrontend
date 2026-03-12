@@ -27,10 +27,10 @@ interface SheetEvents {
 const props = withDefaults(defineProps<SheetProps>(), {
   detent: "large",
   detentSizing: "maxHeight",
-  showHandle: true,
-  showCloseButton: false,
   dismissOnBackdrop: true,
-  dismissOnDrag: true
+  dismissOnDrag: true,
+  showCloseButton: false,
+  showHandle: true,
 });
 
 const emit = defineEmits<SheetEvents>();
@@ -48,7 +48,7 @@ const isVisible = computed({
   get: () => props.modelValue,
   set: (value: boolean) => {
     emit("update:modelValue", value);
-  }
+  },
 });
 
 const detentHeight = computed(() => {
@@ -187,7 +187,7 @@ watch(isVisible, async (newValue) => {
             :style="{
               ...detentStyle,
               transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
-              opacity: isDragging && shouldDismiss ? 0.8 : undefined
+              opacity: isDragging && shouldDismiss ? 0.8 : undefined,
             }"
             @click.stop
             @touchstart="handleDragStart"
@@ -207,7 +207,7 @@ watch(isVisible, async (newValue) => {
                 aria-label="Close"
                 :class="[
                   'absolute top-3 right-3 rounded-full p-2 transition-colors',
-                  'text-comp-button-close-fg-default hover:bg-comp-button-close-bg-hover active:bg-comp-button-close-bg-pressed'
+                  'text-comp-button-close-fg-default hover:bg-comp-button-close-bg-hover active:bg-comp-button-close-bg-pressed',
                 ]"
                 @click="dismiss"
               >

@@ -29,7 +29,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
         {{
           transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
             style: "currency",
-            currency: transactionStore.transaction.currency ?? "USD"
+            currency: transactionStore.transaction.currency ?? "USD",
           })
         }}
       </span>
@@ -45,7 +45,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >
       <span
@@ -56,7 +56,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           (1 / transactionStore.includedMembersId.length).toLocaleString(undefined, {
             style: "percent",
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2,
           })
         }}
       </span>
@@ -65,7 +65,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           (transactionStore.splitByPercentageDetails[userId] / 100).toLocaleString(undefined, {
             style: "percent",
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2,
           })
         }}
       </span>
@@ -109,7 +109,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >
       <span
@@ -120,7 +120,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           (0).toLocaleString(undefined, {
             style: "currency",
             currency: transactionStore.transaction.currency ?? "USD",
-            signDisplay: "exceptZero"
+            signDisplay: "exceptZero",
           })
         }}
       </span>
@@ -129,7 +129,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
           transactionStore.splitByAdjustmentDetails[userId].toLocaleString(undefined, {
             style: "currency",
             currency: transactionStore.transaction.currency ?? "USD",
-            signDisplay: "exceptZero"
+            signDisplay: "exceptZero",
           })
         }}
       </span>
@@ -145,7 +145,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
         isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : ''
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >
       <span
@@ -155,7 +155,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
         {{
           (0).toLocaleString(undefined, {
             style: "currency",
-            currency: transactionStore.transaction.currency ?? "USD"
+            currency: transactionStore.transaction.currency ?? "USD",
           })
         }}
       </span>
@@ -163,7 +163,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
         {{
           transactionStore.splitByCustomDetails[userId].toLocaleString(undefined, {
             style: "currency",
-            currency: transactionStore.transaction.currency ?? "USD"
+            currency: transactionStore.transaction.currency ?? "USD",
           })
         }}
       </span>

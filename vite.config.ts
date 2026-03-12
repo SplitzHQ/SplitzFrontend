@@ -1,7 +1,9 @@
-import vue from "@vitejs/plugin-vue";
+// oxlint-disable sort-keys
 import fs from "node:fs";
 import process from "node:process";
 import { fileURLToPath, URL } from "node:url";
+
+import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
@@ -23,12 +25,12 @@ export default defineConfig({
         if (fs.existsSync(src)) {
           fs.copyFileSync(src, dest);
         }
-      }
+      },
     },
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: "fluent", // default 'fluent' - name of the block in SFCs
-      checkSyntax: true // default true - whether to check syntax of the messages
+      checkSyntax: true, // default true - whether to check syntax of the messages
     }),
     // define messages in external ftl files
     ExternalFluentPlugin({
@@ -36,16 +38,16 @@ export default defineConfig({
       checkSyntax: true, // default true - whether to check syntax of the messages
 
       baseDir: fileURLToPath(new URL("src", import.meta.url)), // base directory for Vue files
-      ftlDir: fileURLToPath(new URL("src/locales", import.meta.url)) // directory with ftl files
-    })
+      ftlDir: fileURLToPath(new URL("src/locales", import.meta.url)), // directory with ftl files
+    }),
   ],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("src", import.meta.url))
-    }
+      "@": fileURLToPath(new URL("src", import.meta.url)),
+    },
   },
   server: {
     host: "0.0.0.0", // Allow access from local network
-    port: 5173
-  }
+    port: 5173,
+  },
 });

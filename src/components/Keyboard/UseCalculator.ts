@@ -1,5 +1,5 @@
 /* eslint-disable no-lonely-if */
-import Big from "big.js";
+import { Big } from "big.js";
 import { computed, ref } from "vue";
 
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -87,7 +87,7 @@ export default function useCalculator() {
   }
 
   function backspace() {
-    if (stack.value.length !== 0) {
+    if (stack.value.length > 0) {
       const last = stack.value[stack.value.length - 1]!;
       if (isOperator(last)) {
         stack.value.pop();
@@ -211,17 +211,17 @@ export default function useCalculator() {
   });
 
   return {
-    input,
-    plus,
-    minus,
-    times,
+    backspace,
     div,
     dot,
-    backspace,
-    initialize,
-    result,
     expression,
-    isComplexExpression
+    initialize,
+    input,
+    isComplexExpression,
+    minus,
+    plus,
+    result,
+    times,
   };
 }
 

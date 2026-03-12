@@ -5,8 +5,8 @@ import { storeToRefs } from "pinia";
 import { ref, useTemplateRef } from "vue";
 import { toast } from "vue-sonner";
 
-import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import { categoryColorMap } from "@/components/Category/category-color";
+import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
@@ -38,14 +38,10 @@ const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
 function triggerCamera() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   cameraInput.value?.click();
 }
 
 function triggerGallery() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   galleryInput.value?.click();
 }
 

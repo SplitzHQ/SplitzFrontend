@@ -3,9 +3,9 @@ import { PhMagnifyingGlass } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { type ComponentPublicInstance, computed, ref, useTemplateRef, watch } from "vue";
 
+import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import CategoryText from "@/components/Category/CategoryText.vue";
-import { categoryColorMap } from "@/components/Category/category-color";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import {
@@ -13,7 +13,7 @@ import {
   getMainCategory,
   mainCategories,
   type MainCategory,
-  type Subcategory
+  type Subcategory,
 } from "@/libs/categories";
 
 import { useCategorySearch } from "./useCategorySearch";
@@ -30,7 +30,7 @@ const visibleSections = computed(() => {
   return mainCategories
     .map((main) => {
       const items = categorySubcategories[main].filter((sub) => (matched ? matched.has(sub) : true));
-      return { main, items };
+      return { items, main };
     })
     .filter((section) => section.items.length > 0);
 });
@@ -47,7 +47,7 @@ function scrollToSection(main: MainCategory) {
   if (!el) return;
   const headerHeight = stickyHeader.value?.offsetHeight ?? 0;
   const offsetTop = el.offsetTop - headerHeight;
-  stickyHeader.value?.parentElement?.scrollTo({ top: offsetTop, behavior: "smooth" });
+  stickyHeader.value?.parentElement?.scrollTo({ behavior: "smooth", top: offsetTop });
 }
 
 function selectCategory(next: Subcategory) {
@@ -124,7 +124,7 @@ watch(
             <div
               :class="[
                 categoryColorMap[section.main],
-                'flex aspect-square w-full items-center justify-center rounded-2xl p-4 icon-9'
+                'flex aspect-square w-full items-center justify-center rounded-2xl p-4 icon-9',
               ]"
             >
               <CategoryIcon :category="sub" />

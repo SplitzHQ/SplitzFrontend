@@ -7,7 +7,7 @@ import Keyboard from "./Keyboard.vue";
 
 export default {
   title: "Components/Keyboard",
-  component: Keyboard
+  component: Keyboard,
 } satisfies Meta<typeof Keyboard>;
 
 const Template: StoryFn<typeof Keyboard> = (args) => ({
@@ -15,11 +15,11 @@ const Template: StoryFn<typeof Keyboard> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<Keyboard v-bind="args" />'
+  template: '<Keyboard v-bind="args" />',
 });
 
 export const Default = Template.bind({});
 Default.args = {
   enableCalculator: true,
-  modelValue: 0
+  modelValue: 0,
 };

@@ -7,7 +7,7 @@ import {
   type TransactionDraftInputDto,
   type TransactionInputDto,
   type TransactionBalanceInputDto,
-  type TransactionDto
+  type TransactionDto,
 } from "@/backend";
 import config from "@/backend/config";
 import type { SplitMethod } from "@/types/split-method";
@@ -24,9 +24,9 @@ const round = (value: number) => {
 
 export const useTransactionStore = defineStore("transaction", () => {
   const transaction = ref<Omit<TransactionDraftInputDto, "amount"> & { amount?: number }>({
-    userId: "",
     amount: 0,
-    currency: "USD"
+    currency: "USD",
+    userId: "",
   });
   const transactionId = ref<string | undefined>(undefined);
   const previewPhotoBase64 = ref<string | undefined>(undefined);
@@ -258,9 +258,9 @@ export const useTransactionStore = defineStore("transaction", () => {
     // Build the balance data from the final split amounts
     const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => {
       return {
-        userId,
         balance: (balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0)).toFixed(2),
-        transactionId: transactionId.value
+        transactionId: transactionId.value,
+        userId,
       };
     });
 
@@ -270,31 +270,31 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     // Construct the TransactionInputDto using data from the transaction store
     const transactionInput: TransactionInputDto = {
-      transactionId: transactionId.value,
-      groupId,
-      name: transaction.value.name,
-      icon: transaction.value.icon ?? "default",
-      createTime: transaction.value.createTime ?? new Date(),
-      transactionTime: transaction.value.transactionTime ?? new Date(),
       amount: transaction.value.amount.toFixed(2),
+      balances,
+      createTime: transaction.value.createTime ?? new Date(),
       currency: transaction.value.currency ?? "USD",
-      tags: transaction.value.tags ?? [],
       geoCoordinate: transaction.value.geoCoordinate,
-      balances
+      groupId,
+      icon: transaction.value.icon ?? "default",
+      name: transaction.value.name,
+      tags: transaction.value.tags ?? [],
+      transactionId: transactionId.value,
+      transactionTime: transaction.value.transactionTime ?? new Date(),
     };
 
     // If transactionId exists, update the transaction, otherwise create a new one
     if (transactionId.value) {
       await api.updateTransaction({
         transactionId: transactionId.value,
-        transactionInputDto: transactionInput
+        transactionInputDto: transactionInput,
       });
       // For update, we need to get the updated transaction since updateTransaction returns void
       return await api.getTransaction({ id: transactionId.value });
     } else {
       // Create new transaction
       const result = await api.addTransaction({
-        transactionInputDto: transactionInput
+        transactionInputDto: transactionInput,
       });
       transactionId.value = result.transactionId;
       return result;
@@ -313,16 +313,16 @@ export const useTransactionStore = defineStore("transaction", () => {
     const api = new TransactionApi(config);
 
     await api.uploadTransactionReceipt({
+      file,
       id: transactionId.value,
-      file
     });
   };
 
   const resetTransactionStore = () => {
     transaction.value = {
-      userId: "",
       amount: 0,
-      currency: "USD"
+      currency: "USD",
+      userId: "",
     };
     transactionId.value = undefined;
     members.value = [];
@@ -336,25 +336,25 @@ export const useTransactionStore = defineStore("transaction", () => {
   };
 
   return {
-    transaction,
-    previewPhotoBase64,
+    addToIncludedMembers,
+    decreaseSplitByShares,
+    excludedMembersId,
+    finalSplitAmount,
+    includedMembersId,
+    increaseSplitByShares,
+    isUserInputValid,
     members,
     paidBy,
-    includedMembersId,
-    excludedMembersId,
-    addToIncludedMembers,
+    previewPhotoBase64,
     removeFromIncludedMembers,
-    splitMethod,
-    splitByPercentageDetails,
-    splitBySharesDetails,
+    resetTransactionStore,
+    saveTransaction,
     splitByAdjustmentDetails,
     splitByCustomDetails,
-    finalSplitAmount,
-    isUserInputValid,
-    decreaseSplitByShares,
-    increaseSplitByShares,
-    saveTransaction,
+    splitByPercentageDetails,
+    splitBySharesDetails,
+    splitMethod,
+    transaction,
     uploadTransactionReceipt,
-    resetTransactionStore
   };
 });
