@@ -38,14 +38,10 @@ const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
 function triggerCamera() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   cameraInput.value?.click();
 }
 
 function triggerGallery() {
-  // false alert
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   galleryInput.value?.click();
 }
 

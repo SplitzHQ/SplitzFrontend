@@ -1,3 +1,4 @@
+// oxlint-disable sort-keys
 import fs from "node:fs";
 import process from "node:process";
 import { fileURLToPath, URL } from "node:url";

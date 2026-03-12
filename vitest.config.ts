@@ -31,15 +31,15 @@ export default mergeConfig(
             })
           ],
           test: {
-            name: "storybook",
             // Enable browser mode
             browser: {
               enabled: true,
-              // Make sure to install Playwright
-              provider: playwright(),
               headless: true,
-              instances: [{ browser: "chromium" }]
+              instances: [{ browser: "chromium" }],
+              // Make sure to install Playwright
+              provider: playwright()
             },
+            name: "storybook",
             setupFiles: ["./.storybook/vitest.setup.ts"]
           }
         }

@@ -25,7 +25,7 @@ async function handleLogin() {
     });
     toast.success("Logged in successfully");
     await router.push("/");
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     toast.error("Login failed. Please check your credentials.");
   } finally {

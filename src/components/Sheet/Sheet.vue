@@ -27,10 +27,10 @@ interface SheetEvents {
 const props = withDefaults(defineProps<SheetProps>(), {
   detent: "large",
   detentSizing: "maxHeight",
-  showHandle: true,
-  showCloseButton: false,
   dismissOnBackdrop: true,
-  dismissOnDrag: true
+  dismissOnDrag: true,
+  showCloseButton: false,
+  showHandle: true
 });
 
 const emit = defineEmits<SheetEvents>();

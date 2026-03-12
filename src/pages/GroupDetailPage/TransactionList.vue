@@ -34,7 +34,7 @@ const groupedTransactions = computed<TransactionGroup[]>(() => {
 
   return [...groups.entries()].map(([key, txs]) => {
     const date = new Date(txs[0]!.transactionTime);
-    const label = date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    const label = date.toLocaleDateString(undefined, { day: "numeric", month: "short" });
     return { date: key, label, transactions: txs };
   });
 });

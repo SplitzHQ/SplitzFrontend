@@ -249,25 +249,25 @@ export type SubcategoryMap = Record<MainCategory, readonly Subcategory[]>;
 
 // Mapping all subcategories for easy lookup
 export const categorySubcategories: SubcategoryMap = {
-  food: foodSubcategories,
-  transport: transportSubcategories,
-  entertainment: entertainmentSubcategories,
-  home: homeSubcategories,
   bills: billsSubcategories,
-  travel: travelSubcategories,
-  shopping: shoppingSubcategories,
-  health: healthSubcategories,
-  personal_care: personalCareSubcategories,
-  education: educationSubcategories,
-  gifts_donations: giftsDonationsSubcategories,
-  kids: kidsSubcategories,
-  pets: petsSubcategories,
-  sports_fitness: sportsFitnessSubcategories,
-  insurance: insuranceSubcategories,
-  taxes: taxesSubcategories,
-  fees_charges: feesChargesSubcategories,
   debt: debtSubcategories,
-  other: otherSubcategories
+  education: educationSubcategories,
+  entertainment: entertainmentSubcategories,
+  fees_charges: feesChargesSubcategories,
+  food: foodSubcategories,
+  gifts_donations: giftsDonationsSubcategories,
+  health: healthSubcategories,
+  home: homeSubcategories,
+  insurance: insuranceSubcategories,
+  kids: kidsSubcategories,
+  other: otherSubcategories,
+  personal_care: personalCareSubcategories,
+  pets: petsSubcategories,
+  shopping: shoppingSubcategories,
+  sports_fitness: sportsFitnessSubcategories,
+  taxes: taxesSubcategories,
+  transport: transportSubcategories,
+  travel: travelSubcategories
 };
 
 // Add a reverse mapping from sub category to main category

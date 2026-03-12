@@ -70,5 +70,5 @@ export const useUserStore = defineStore("user", () => {
     void fetchUserInfo();
   }
 
-  return { user, isAuthenticated, login, register, logout, fetchUserInfo };
+  return { fetchUserInfo, isAuthenticated, login, logout, register, user };
 });

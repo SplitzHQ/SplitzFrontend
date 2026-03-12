@@ -30,7 +30,7 @@ const visibleSections = computed(() => {
   return mainCategories
     .map((main) => {
       const items = categorySubcategories[main].filter((sub) => (matched ? matched.has(sub) : true));
-      return { main, items };
+      return { items, main };
     })
     .filter((section) => section.items.length > 0);
 });
@@ -47,7 +47,7 @@ function scrollToSection(main: MainCategory) {
   if (!el) return;
   const headerHeight = stickyHeader.value?.offsetHeight ?? 0;
   const offsetTop = el.offsetTop - headerHeight;
-  stickyHeader.value?.parentElement?.scrollTo({ top: offsetTop, behavior: "smooth" });
+  stickyHeader.value?.parentElement?.scrollTo({ behavior: "smooth", top: offsetTop });
 }
 
 function selectCategory(next: Subcategory) {

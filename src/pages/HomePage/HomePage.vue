@@ -43,7 +43,7 @@ const groupWithExtraInfo = computed(() => {
     const myBalancePositive = myBalances.filter((b) => b.amount > 0);
     const myBalanceSettled = myBalances.every((b) => b.amount === 0);
     const groupSettled = group.balances.every((b) => b.balance === "0");
-    return { ...group, myBalances, myBalanceNegative, myBalancePositive, myBalanceSettled, groupSettled };
+    return { ...group, groupSettled, myBalanceNegative, myBalancePositive, myBalanceSettled, myBalances };
   });
 });
 
@@ -57,7 +57,7 @@ const visibleGroups = computed(() => {
 
 const formatCurrency = (amount: number, currency: string) => {
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(amount);
   } catch {
     return `${amount.toFixed(2)} ${currency}`;
   }

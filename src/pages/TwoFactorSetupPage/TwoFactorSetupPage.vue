@@ -91,7 +91,6 @@ async function enableTwoFactor() {
 }
 
 async function disableTwoFactor() {
-  // eslint-disable-next-line no-alert
   if (!confirm("Are you sure you want to disable 2FA?")) return;
 
   try {

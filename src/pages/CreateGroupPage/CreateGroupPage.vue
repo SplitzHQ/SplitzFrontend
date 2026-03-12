@@ -55,8 +55,8 @@ async function submit() {
   try {
     const group = await groupApi.createGroup({
       groupInputDto: {
-        name,
-        membersId: [userInfo.value.data.id]
+        membersId: [userInfo.value.data.id],
+        name
       }
     });
 

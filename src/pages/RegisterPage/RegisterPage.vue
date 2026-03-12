@@ -28,7 +28,7 @@ async function handleRegister() {
     });
     toast.success("Registration successful. Please login.");
     await router.push("/login");
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     toast.error("Registration failed.");
   } finally {

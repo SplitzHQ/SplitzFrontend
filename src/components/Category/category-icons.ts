@@ -1,3 +1,4 @@
+// oxlint-disable sort-keys
 // Import needed Phosphor icons (tree-shaken by bundler)
 import {
   PhAirplane,

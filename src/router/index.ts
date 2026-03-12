@@ -7,64 +7,64 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
+      component: HomePage,
       name: "home",
-      component: HomePage
+      path: "/"
     },
     {
-      path: "/group/create",
+      component: () => import("@/pages/CreateGroupPage/CreateGroupPage.vue"),
       name: "createGroup",
-      component: () => import("@/pages/CreateGroupPage/CreateGroupPage.vue")
+      path: "/group/create"
     },
     {
-      path: "/group/:groupId",
+      component: () => import("@/pages/GroupDetailPage/GroupDetailPage.vue"),
       name: "groupDetail",
-      component: () => import("@/pages/GroupDetailPage/GroupDetailPage.vue")
+      path: "/group/:groupId"
     },
     {
-      path: "/group/join/:joinLinkId",
+      component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue"),
       name: "joinGroup",
-      component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue")
+      path: "/group/join/:joinLinkId"
     },
     {
-      path: "/new-expense",
       name: "newExpense",
+      path: "/new-expense",
       redirect: "/new-expense/enter-amount"
     },
     {
-      path: "/new-expense/enter-amount",
+      component: () => import("@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue"),
       name: "newExpenseEnterAmount",
-      component: () => import("@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue")
+      path: "/new-expense/enter-amount"
     },
     {
-      path: "/new-expense/select-people",
+      component: () => import("@/pages/NewExpensePage/SelectPeoplePage/SelectPeoplePage.vue"),
       name: "newExpenseSelectPeople",
-      component: () => import("@/pages/NewExpensePage/SelectPeoplePage/SelectPeoplePage.vue")
+      path: "/new-expense/select-people"
     },
     {
-      path: "/new-expense/select-split-method",
+      component: () => import("@/pages/NewExpensePage/SelectSplitMethodPage/SelectSplitMethodPage.vue"),
       name: "newExpenseSelectSplitMethod",
-      component: () => import("@/pages/NewExpensePage/SelectSplitMethodPage/SelectSplitMethodPage.vue")
+      path: "/new-expense/select-split-method"
     },
     {
-      path: "/new-expense/review-and-complete",
+      component: () => import("@/pages/NewExpensePage/ReviewAndCompletePage/ReviewAndCompletePage.vue"),
       name: "newExpenseReviewAndComplete",
-      component: () => import("@/pages/NewExpensePage/ReviewAndCompletePage/ReviewAndCompletePage.vue")
+      path: "/new-expense/review-and-complete"
     },
     {
-      path: "/login",
+      component: () => import("@/pages/LoginPage/LoginPage.vue"),
       name: "login",
-      component: () => import("@/pages/LoginPage/LoginPage.vue")
+      path: "/login"
     },
     {
-      path: "/register",
+      component: () => import("@/pages/RegisterPage/RegisterPage.vue"),
       name: "register",
-      component: () => import("@/pages/RegisterPage/RegisterPage.vue")
+      path: "/register"
     },
     {
-      path: "/2fa-setup",
+      component: () => import("@/pages/TwoFactorSetupPage/TwoFactorSetupPage.vue"),
       name: "2faSetup",
-      component: () => import("@/pages/TwoFactorSetupPage/TwoFactorSetupPage.vue")
+      path: "/2fa-setup"
     }
   ]
 });
