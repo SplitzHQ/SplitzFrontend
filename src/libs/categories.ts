@@ -20,7 +20,7 @@ export const mainCategories = [
   "taxes",
   "fees_charges",
   "debt",
-  "other"
+  "other",
 ] as const;
 
 // Subcategories per main category
@@ -32,7 +32,7 @@ export const foodSubcategories = [
   "cafe",
   "takeout_delivery",
   "meal_kit",
-  "other_food"
+  "other_food",
 ] as const;
 
 export const transportSubcategories = [
@@ -44,7 +44,7 @@ export const transportSubcategories = [
   "vehicle_purchase",
   "tolls",
   "bike_share",
-  "other_transport"
+  "other_transport",
 ] as const;
 
 export const entertainmentSubcategories = [
@@ -56,7 +56,7 @@ export const entertainmentSubcategories = [
   "nightlife",
   "hobbies",
   "books_media",
-  "other_entertainment"
+  "other_entertainment",
 ] as const;
 
 export const homeSubcategories = [
@@ -67,7 +67,7 @@ export const homeSubcategories = [
   "home_improvement",
   "home_security",
   "hoa",
-  "other_home"
+  "other_home",
 ] as const;
 
 export const billsSubcategories = [
@@ -78,7 +78,7 @@ export const billsSubcategories = [
   "mobile_phone",
   "trash_recycling",
   "tv_streaming",
-  "other_bills"
+  "other_bills",
 ] as const;
 
 export const travelSubcategories = [
@@ -89,7 +89,7 @@ export const travelSubcategories = [
   "activities_tours",
   "travel_insurance",
   "visa_fees",
-  "other_travel"
+  "other_travel",
 ] as const;
 
 export const shoppingSubcategories = [
@@ -98,7 +98,7 @@ export const shoppingSubcategories = [
   "household_goods",
   "appliances",
   "office_supplies",
-  "other_shopping"
+  "other_shopping",
 ] as const;
 
 export const healthSubcategories = [
@@ -108,7 +108,7 @@ export const healthSubcategories = [
   "hospital",
   "vision",
   "mental_health",
-  "other_health"
+  "other_health",
 ] as const;
 
 export const personalCareSubcategories = [
@@ -117,7 +117,7 @@ export const personalCareSubcategories = [
   "cosmetics",
   "grooming",
   "laundry_dry_cleaning",
-  "other_personal_care"
+  "other_personal_care",
 ] as const;
 
 export const educationSubcategories = [
@@ -126,7 +126,7 @@ export const educationSubcategories = [
   "books",
   "supplies",
   "student_fees",
-  "other_education"
+  "other_education",
 ] as const;
 
 export const giftsDonationsSubcategories = ["gifts", "charity", "celebrations", "other_gifts_donations"] as const;
@@ -137,7 +137,7 @@ export const kidsSubcategories = [
   "toys",
   "clothing_kids",
   "activities_lessons",
-  "other_kids"
+  "other_kids",
 ] as const;
 
 export const petsSubcategories = [
@@ -146,7 +146,7 @@ export const petsSubcategories = [
   "grooming_pets",
   "boarding",
   "pet_supplies",
-  "other_pets"
+  "other_pets",
 ] as const;
 
 export const sportsFitnessSubcategories = [
@@ -154,7 +154,7 @@ export const sportsFitnessSubcategories = [
   "sports_equipment",
   "fitness_classes",
   "outdoor_activities",
-  "other_sports_fitness"
+  "other_sports_fitness",
 ] as const;
 
 export const insuranceSubcategories = [
@@ -163,7 +163,7 @@ export const insuranceSubcategories = [
   "home_insurance",
   "life_insurance",
   "travel_insurance_premium",
-  "other_insurance"
+  "other_insurance",
 ] as const;
 
 export const taxesSubcategories = ["income_tax", "property_tax", "sales_tax", "other_taxes"] as const;
@@ -174,7 +174,7 @@ export const feesChargesSubcategories = [
   "service_fees",
   "atm_fees",
   "platform_fees",
-  "other_fees_charges"
+  "other_fees_charges",
 ] as const;
 
 export const debtSubcategories = ["loan_payment", "credit_card_payment", "other_debt"] as const;
@@ -200,7 +200,7 @@ export const subcategories = [
   ...taxesSubcategories,
   ...feesChargesSubcategories,
   ...debtSubcategories,
-  ...otherSubcategories
+  ...otherSubcategories,
 ] as const;
 
 // Type helpers
@@ -267,7 +267,7 @@ export const categorySubcategories: SubcategoryMap = {
   sports_fitness: sportsFitnessSubcategories,
   taxes: taxesSubcategories,
   transport: transportSubcategories,
-  travel: travelSubcategories
+  travel: travelSubcategories,
 };
 
 // Add a reverse mapping from sub category to main category

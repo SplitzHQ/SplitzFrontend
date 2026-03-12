@@ -25,7 +25,7 @@ const { data: group } = useQuery({
   query: () => {
     assertGroupId(transaction.value.groupId);
     return groupApi.getGroup({ groupId: transaction.value.groupId });
-  }
+  },
 });
 </script>
 

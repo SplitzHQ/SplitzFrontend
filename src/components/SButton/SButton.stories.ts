@@ -8,24 +8,24 @@ export default {
   title: "Components/Button",
   component: SButton,
   args: {
-    onClick: fn()
+    onClick: fn(),
   },
   argTypes: {
     color: {
       control: { type: "select" },
-      options: ["neutral", "error", "brand"]
+      options: ["neutral", "error", "brand"],
     },
     variant: {
       control: { type: "select" },
-      options: ["primary", "secondary", "outline", "ghost"]
+      options: ["primary", "secondary", "outline", "ghost"],
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl", "xxl"]
+      options: ["xs", "sm", "md", "lg", "xl", "xxl"],
     },
     disabled: { control: "boolean" },
-    loading: { control: "boolean" }
-  }
+    loading: { control: "boolean" },
+  },
 } satisfies Meta<typeof SButton>;
 
 const Template: StoryFn<typeof SButton> = (args) => ({
@@ -33,7 +33,7 @@ const Template: StoryFn<typeof SButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SButton v-bind="args">click me</SButton>'
+  template: '<SButton v-bind="args">click me</SButton>',
 });
 
 export const Brand = Template.bind({});
@@ -42,7 +42,7 @@ Brand.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };
 
 export const Neutral = Template.bind({});
@@ -51,7 +51,7 @@ Neutral.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };
 
 export const Error = Template.bind({});
@@ -60,7 +60,7 @@ Error.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };
 
 const TemplateWithIcon: StoryFn<typeof SButton> = (args) => ({
@@ -68,7 +68,7 @@ const TemplateWithIcon: StoryFn<typeof SButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SButton v-bind="args"><template #icon-left><PhAirplaneTakeoff /></template>take off</SButton>'
+  template: '<SButton v-bind="args"><template #icon-left><PhAirplaneTakeoff /></template>take off</SButton>',
 });
 
 export const WithIcon = TemplateWithIcon.bind({});
@@ -77,5 +77,5 @@ WithIcon.args = {
   variant: "primary",
   size: "md",
   disabled: false,
-  loading: false
+  loading: false,
 };

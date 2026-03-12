@@ -63,6 +63,6 @@ export const useKeyboardControl = () => {
   return {
     focusedInputUserId,
     keyboardValue,
-    setFocusedInputUserId
+    setFocusedInputUserId,
   };
 };

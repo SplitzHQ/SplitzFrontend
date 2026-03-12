@@ -71,7 +71,7 @@ const input = (value: CalculatorInput | Operator | "." | "backspace") => {
     :class="[
       enableCalculator ? 'enable-calculator' : 'disable-calculator',
       'flex flex-col gap-2 border-t',
-      variant === 'primary' ? 'border-base-border-tertiary bg-base-bg-secondary' : 'border-transparent'
+      variant === 'primary' ? 'border-base-border-tertiary bg-base-bg-secondary' : 'border-transparent',
     ]"
   >
     <div

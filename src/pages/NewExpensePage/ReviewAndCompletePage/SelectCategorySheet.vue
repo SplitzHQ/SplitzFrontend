@@ -13,7 +13,7 @@ import {
   getMainCategory,
   mainCategories,
   type MainCategory,
-  type Subcategory
+  type Subcategory,
 } from "@/libs/categories";
 
 import { useCategorySearch } from "./useCategorySearch";
@@ -124,7 +124,7 @@ watch(
             <div
               :class="[
                 categoryColorMap[section.main],
-                'flex aspect-square w-full items-center justify-center rounded-2xl p-4 icon-9'
+                'flex aspect-square w-full items-center justify-center rounded-2xl p-4 icon-9',
               ]"
             >
               <CategoryIcon :category="sub" />

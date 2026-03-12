@@ -10,7 +10,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["src/backend/**/*", ".storybook/**/*", "scripts/**/*", "**/*.js", "**/*.stories.ts"]
+    ignores: ["src/backend/**/*", ".storybook/**/*", "scripts/**/*", "**/*.js", "**/*.stories.ts"],
   },
   ...pluginVue.configs["flat/base"],
   ...pluginVueA11y.configs["flat/recommended"],
@@ -18,9 +18,9 @@ export default tseslint.config(
     files: ["**/*.vue"],
     languageOptions: {
       parserOptions: {
-        parser: tseslint.parser
-      }
-    }
+        parser: tseslint.parser,
+      },
+    },
   },
   {
     plugins: {
@@ -29,7 +29,7 @@ export default tseslint.config(
       "@eslint-community/eslint-comments": pluginEslintComments,
       antfu: pluginAntfu,
       regexp: pluginRegexp,
-      "de-morgan": pluginDeMorgan
+      "de-morgan": pluginDeMorgan,
     },
     rules: {
       "sxzz/prefer-string-function": "warn",
@@ -37,8 +37,8 @@ export default tseslint.config(
       "@eslint-community/eslint-comments/disable-enable-pair": [
         "error",
         {
-          allowWholeFile: true
-        }
+          allowWholeFile: true,
+        },
       ],
       "@eslint-community/eslint-comments/no-aggregating-enable": "error",
       "@eslint-community/eslint-comments/no-duplicate-disable": "error",
@@ -106,26 +106,26 @@ export default tseslint.config(
       "regexp/strict": "error",
       "regexp/use-ignore-case": "error",
       "de-morgan/no-negated-conjunction": "error",
-      "de-morgan/no-negated-disjunction": "error"
-    }
+      "de-morgan/no-negated-disjunction": "error",
+    },
   },
   {
     rules: {
       "vuejs-accessibility/form-control-has-label": [
         "error",
         {
-          controlComponents: ["TextInput"]
-        }
+          controlComponents: ["TextInput"],
+        },
       ],
       "vuejs-accessibility/label-has-for": [
         "error",
         {
           controlComponents: ["TextInput"],
           required: {
-            some: ["nesting", "id"]
-          }
-        }
-      ]
-    }
+            some: ["nesting", "id"],
+          },
+        },
+      ],
+    },
   }
 );

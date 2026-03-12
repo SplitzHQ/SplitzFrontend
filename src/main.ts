@@ -49,7 +49,7 @@ const zhcnBundle = new FluentBundle("zh-cn");
 );
 
 const fluent = createFluentVue({
-  bundles: [enBundle, zhcnBundle]
+  bundles: [enBundle, zhcnBundle],
 });
 
 app.use(createPinia());

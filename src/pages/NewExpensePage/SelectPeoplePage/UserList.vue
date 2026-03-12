@@ -55,7 +55,7 @@ defineEmits<{
               v-else-if="item.__typename === 'UserListItemFriend'"
               :class="[
                 'text-base font-medium text-base-text-primary',
-                selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : ''
+                selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : '',
               ]"
             >
               {{ item.friendUser.userName }}

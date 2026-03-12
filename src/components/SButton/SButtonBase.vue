@@ -19,7 +19,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
       size,
       disabled ? 'disabled' : color,
       iconOnly ? 'icon-only' : '',
-      'flex cursor-pointer items-center justify-center gap-1 rounded-full'
+      'flex cursor-pointer items-center justify-center gap-1 rounded-full',
     ]"
   >
     <PhCircleNotch v-if="loading" class="icon shrink-0 animate-spin" />

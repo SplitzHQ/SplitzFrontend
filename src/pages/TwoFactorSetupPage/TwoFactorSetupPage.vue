@@ -73,8 +73,8 @@ async function enableTwoFactor() {
     const response = await api.accountManage2faPost({
       twoFactorRequest: {
         enable: true,
-        twoFactorCode: verificationCode.value
-      }
+        twoFactorCode: verificationCode.value,
+      },
     });
 
     if (response.isTwoFactorEnabled) {
@@ -96,8 +96,8 @@ async function disableTwoFactor() {
   try {
     const response = await api.accountManage2faPost({
       twoFactorRequest: {
-        enable: false
-      }
+        enable: false,
+      },
     });
     await updateState(response);
     toast.success("2FA disabled successfully");
@@ -117,8 +117,8 @@ async function generateRecoveryCodes() {
   try {
     const response = await api.accountManage2faPost({
       twoFactorRequest: {
-        resetRecoveryCodes: true
-      }
+        resetRecoveryCodes: true,
+      },
     });
     await updateState(response);
     toast.success("Recovery codes generated");

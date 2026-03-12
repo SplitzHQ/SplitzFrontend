@@ -22,5 +22,5 @@ export const categoryColorMap: Record<MainCategory, string> = {
   sports_fitness: "bg-util-color-forest-50 text-util-color-forest-500",
   taxes: "bg-util-color-warning-50 text-util-color-warning-500",
   transport: "bg-util-color-waterblue-50 text-util-color-waterblue-500",
-  travel: "bg-util-color-clearblue-50 text-util-color-clearblue-500"
+  travel: "bg-util-color-clearblue-50 text-util-color-clearblue-500",
 };

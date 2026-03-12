@@ -82,7 +82,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
                     {{
                       transactionStore.transaction.amount?.toLocaleString(undefined, {
                         style: "currency",
-                        currency: transactionStore.transaction.currency ?? "USD"
+                        currency: transactionStore.transaction.currency ?? "USD",
                       })
                     }}
                   </div>

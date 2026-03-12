@@ -7,7 +7,7 @@ import {
   AccountApi,
   type LoginRequest,
   type RegisterRequest,
-  type SplitzUserDto
+  type SplitzUserDto,
 } from "@/backend/openapi";
 
 export const useUserStore = defineStore("user", () => {

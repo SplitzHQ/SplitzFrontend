@@ -19,16 +19,16 @@ export default mergeConfig(
           test: {
             environment: "jsdom",
             exclude: [...configDefaults.exclude, "e2e/**"],
-            root: fileURLToPath(new URL("./", import.meta.url))
-          }
+            root: fileURLToPath(new URL("./", import.meta.url)),
+          },
         },
         {
           extends: true,
           plugins: [
             storybookTest({
               // The location of your Storybook config, main.js|ts
-              configDir: path.join(dirname, ".storybook")
-            })
+              configDir: path.join(dirname, ".storybook"),
+            }),
           ],
           test: {
             // Enable browser mode
@@ -37,13 +37,13 @@ export default mergeConfig(
               headless: true,
               instances: [{ browser: "chromium" }],
               // Make sure to install Playwright
-              provider: playwright()
+              provider: playwright(),
             },
             name: "storybook",
-            setupFiles: ["./.storybook/vitest.setup.ts"]
-          }
-        }
-      ]
-    }
+            setupFiles: ["./.storybook/vitest.setup.ts"],
+          },
+        },
+      ],
+    },
   })
 );

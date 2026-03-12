@@ -8,13 +8,13 @@ export default {
   argTypes: {
     modelValue: {
       control: { type: "number" },
-      description: "Index of the active segment"
+      description: "Index of the active segment",
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl"]
-    }
-  }
+      options: ["xs", "sm", "md", "lg", "xl"],
+    },
+  },
 } satisfies Meta<typeof SSegmentControl>;
 
 const Template: StoryFn<typeof SSegmentControl> = (args) => ({
@@ -22,12 +22,12 @@ const Template: StoryFn<typeof SSegmentControl> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SSegmentControl v-bind="args"><template #default="{ item }">{{ item }}</template></SSegmentControl>'
+  template: '<SSegmentControl v-bind="args"><template #default="{ item }">{{ item }}</template></SSegmentControl>',
 });
 
 export const Default = Template.bind({});
 Default.args = {
   items: ["Segment 1", "Segment 2", "Segment 3"],
   size: "md",
-  modelValue: 0
+  modelValue: 0,
 };

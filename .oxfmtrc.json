@@ -4,7 +4,7 @@
   "semi": true,
   "singleQuote": false,
   "tabWidth": 2,
-  "trailingComma": "none",
+  "trailingComma": "es5",
   "objectWrap": "preserve",
   "sortImports": {
     "groups": ["builtin", "external", "internal", ["parent", "sibling", "index"]],

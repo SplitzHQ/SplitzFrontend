@@ -19,6 +19,6 @@ export const useRouterHistoryStore = defineStore("routing-history", () => {
 
   return {
     restoreSnapshot,
-    takeSnapshot
+    takeSnapshot,
   };
 });

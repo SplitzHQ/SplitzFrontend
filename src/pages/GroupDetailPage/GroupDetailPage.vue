@@ -30,12 +30,12 @@ const groupApi = new GroupApi(config);
 
 const { state: groupQuery } = useQuery({
   key: () => ["getGroup", groupId.value],
-  query: () => groupApi.getGroup({ groupId: groupId.value })
+  query: () => groupApi.getGroup({ groupId: groupId.value }),
 });
 
 const { state: transactionsQuery } = useQuery({
   key: () => ["getGroupTransactions", groupId.value],
-  query: () => groupApi.getGroupTransactions({ groupId: groupId.value })
+  query: () => groupApi.getGroupTransactions({ groupId: groupId.value }),
 });
 
 const group = computed(() => groupQuery.value.data);
@@ -72,7 +72,7 @@ const memberBalances = computed(() => {
       // We negate it to match our convention: negative = they owe you, positive = you owe them
       amount: -Number.parseFloat(b.balance),
       currency: b.currency,
-      name: b.user.userName
+      name: b.user.userName,
     }));
 });
 
@@ -80,7 +80,7 @@ const tabs = computed(() => [
   $t("group-detail-tab-balances"),
   $t("group-detail-tab-trend"),
   $t("group-detail-tab-history"),
-  $t("group-detail-tab-export")
+  $t("group-detail-tab-export"),
 ]);
 
 const addExpense = () => {

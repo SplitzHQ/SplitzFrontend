@@ -9,21 +9,21 @@ const meta: Meta<typeof Sheet> = {
   argTypes: {
     detent: {
       control: "radio",
-      options: ["large", "medium"]
+      options: ["large", "medium"],
     },
     showHandle: {
-      control: "boolean"
+      control: "boolean",
     },
     showCloseButton: {
-      control: "boolean"
+      control: "boolean",
     },
     dismissOnBackdrop: {
-      control: "boolean"
+      control: "boolean",
     },
     dismissOnDrag: {
-      control: "boolean"
-    }
-  }
+      control: "boolean",
+    },
+  },
 };
 
 export default meta;
@@ -68,15 +68,15 @@ export const Large: Story = {
           </div>
         </Sheet>
       </div>
-    `
+    `,
   }),
   args: {
     detent: "large",
     showHandle: true,
     showCloseButton: false,
     dismissOnBackdrop: true,
-    dismissOnDrag: true
-  }
+    dismissOnDrag: true,
+  },
 };
 
 export const Medium: Story = {
@@ -111,15 +111,15 @@ export const Medium: Story = {
           </div>
         </Sheet>
       </div>
-    `
+    `,
   }),
   args: {
     detent: "medium",
     showHandle: true,
     showCloseButton: false,
     dismissOnBackdrop: true,
-    dismissOnDrag: true
-  }
+    dismissOnDrag: true,
+  },
 };
 
 export const WithCloseButton: Story = {
@@ -162,15 +162,15 @@ export const WithCloseButton: Story = {
           </div>
         </Sheet>
       </div>
-    `
+    `,
   }),
   args: {
     detent: "large",
     showHandle: true,
     showCloseButton: true,
     dismissOnBackdrop: true,
-    dismissOnDrag: true
-  }
+    dismissOnDrag: true,
+  },
 };
 
 export const NoHandle: Story = {
@@ -209,15 +209,15 @@ export const NoHandle: Story = {
           </div>
         </Sheet>
       </div>
-    `
+    `,
   }),
   args: {
     detent: "medium",
     showHandle: false,
     showCloseButton: true,
     dismissOnBackdrop: true,
-    dismissOnDrag: false
-  }
+    dismissOnDrag: false,
+  },
 };
 
 export const NonDismissible: Story = {
@@ -258,13 +258,13 @@ export const NonDismissible: Story = {
           </div>
         </Sheet>
       </div>
-    `
+    `,
   }),
   args: {
     detent: "medium",
     showHandle: true,
     showCloseButton: true,
     dismissOnBackdrop: false,
-    dismissOnDrag: false
-  }
+    dismissOnDrag: false,
+  },
 };

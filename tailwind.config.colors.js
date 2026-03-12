@@ -626,5 +626,5 @@ export default {
   "core-alpha-yellow-80": "var(--core-alpha-yellow-80)",
   "core-alpha-yellow-90": "var(--core-alpha-yellow-90)",
   "core-alpha-yellow-95": "var(--core-alpha-yellow-95)",
-  "core-alpha-yellow-100": "var(--core-alpha-yellow-100)"
+  "core-alpha-yellow-100": "var(--core-alpha-yellow-100)",
 };

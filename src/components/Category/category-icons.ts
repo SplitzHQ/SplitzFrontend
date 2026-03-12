@@ -45,7 +45,7 @@ import {
   PhGasPump,
   PhTooth,
   PhWifiHigh,
-  PhWine
+  PhWine,
 } from "@phosphor-icons/vue";
 import type { Component } from "vue";
 
@@ -206,7 +206,7 @@ export const categoryIconMap: Record<Subcategory, Component> = {
 
   // other
   uncategorized: PhQuestion,
-  other_misc: PhQuestion
+  other_misc: PhQuestion,
 };
 
 export type CategoryIconKey = keyof typeof categoryIconMap;

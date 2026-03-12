@@ -8,13 +8,13 @@ const config: StorybookConfig = {
     "@storybook/addon-themes",
     "@storybook/addon-docs",
     "@storybook/addon-a11y",
-    "@storybook/addon-vitest"
+    "@storybook/addon-vitest",
   ],
   framework: {
     name: "@storybook/vue3-vite",
     options: {
-      docgen: "vue-component-meta"
-    }
-  }
+      docgen: "vue-component-meta",
+    },
+  },
 };
 export default config;

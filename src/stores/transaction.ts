@@ -7,7 +7,7 @@ import {
   type TransactionDraftInputDto,
   type TransactionInputDto,
   type TransactionBalanceInputDto,
-  type TransactionDto
+  type TransactionDto,
 } from "@/backend";
 import config from "@/backend/config";
 import type { SplitMethod } from "@/types/split-method";
@@ -26,7 +26,7 @@ export const useTransactionStore = defineStore("transaction", () => {
   const transaction = ref<Omit<TransactionDraftInputDto, "amount"> & { amount?: number }>({
     amount: 0,
     currency: "USD",
-    userId: ""
+    userId: "",
   });
   const transactionId = ref<string | undefined>(undefined);
   const previewPhotoBase64 = ref<string | undefined>(undefined);
@@ -260,7 +260,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       return {
         balance: (balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0)).toFixed(2),
         transactionId: transactionId.value,
-        userId
+        userId,
       };
     });
 
@@ -280,21 +280,21 @@ export const useTransactionStore = defineStore("transaction", () => {
       name: transaction.value.name,
       tags: transaction.value.tags ?? [],
       transactionId: transactionId.value,
-      transactionTime: transaction.value.transactionTime ?? new Date()
+      transactionTime: transaction.value.transactionTime ?? new Date(),
     };
 
     // If transactionId exists, update the transaction, otherwise create a new one
     if (transactionId.value) {
       await api.updateTransaction({
         transactionId: transactionId.value,
-        transactionInputDto: transactionInput
+        transactionInputDto: transactionInput,
       });
       // For update, we need to get the updated transaction since updateTransaction returns void
       return await api.getTransaction({ id: transactionId.value });
     } else {
       // Create new transaction
       const result = await api.addTransaction({
-        transactionInputDto: transactionInput
+        transactionInputDto: transactionInput,
       });
       transactionId.value = result.transactionId;
       return result;
@@ -314,7 +314,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     await api.uploadTransactionReceipt({
       file,
-      id: transactionId.value
+      id: transactionId.value,
     });
   };
 
@@ -322,7 +322,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     transaction.value = {
       amount: 0,
       currency: "USD",
-      userId: ""
+      userId: "",
     };
     transactionId.value = undefined;
     members.value = [];
@@ -355,6 +355,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     splitBySharesDetails,
     splitMethod,
     transaction,
-    uploadTransactionReceipt
+    uploadTransactionReceipt,
   };
 });

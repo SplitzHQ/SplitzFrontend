@@ -37,7 +37,7 @@ const groupWithExtraInfo = computed(() => {
       .filter((b) => b.user.id === userStore.user?.id)
       .map((b) => ({
         ...b,
-        amount: Number.parseFloat(b.balance)
+        amount: Number.parseFloat(b.balance),
       }));
     const myBalanceNegative = myBalances.filter((b) => b.amount < 0);
     const myBalancePositive = myBalances.filter((b) => b.amount > 0);
@@ -87,7 +87,7 @@ const userBalances = computed(() => {
     } else {
       balances.set(userBalance.currency, {
         amount: Number.parseFloat(userBalance.balance),
-        currency: userBalance.currency
+        currency: userBalance.currency,
       });
     }
   }

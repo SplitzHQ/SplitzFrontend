@@ -21,7 +21,7 @@ async function handleLogin() {
     await userStore.login({
       email: email.value,
       password: password.value,
-      twoFactorCode: showTwoFactor.value ? twoFactorCode.value : undefined
+      twoFactorCode: showTwoFactor.value ? twoFactorCode.value : undefined,
     });
     toast.success("Logged in successfully");
     await router.push("/");

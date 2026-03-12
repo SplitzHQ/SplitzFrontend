@@ -20,7 +20,7 @@ const { transaction } = storeToRefs(transactionStore);
 const formatOptions = computed(
   (): Format => ({
     currency: transaction.value.currency ?? "USD",
-    style: "currency"
+    style: "currency",
   })
 );
 const formattedAmount = computed(() => {
@@ -42,7 +42,7 @@ const formattedAmount = computed(() => {
           <div
             :class="[
               'flex h-18 items-center font-medium',
-              transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary'
+              transaction.amount === 0 ? 'text-base-text-disabled' : 'text-base-text-primary',
             ]"
             :style="{ fontSize: `min(4.5rem, ${150 / formattedAmount.length}vw)` }"
           >

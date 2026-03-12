@@ -9,64 +9,64 @@ const router = createRouter({
     {
       component: HomePage,
       name: "home",
-      path: "/"
+      path: "/",
     },
     {
       component: () => import("@/pages/CreateGroupPage/CreateGroupPage.vue"),
       name: "createGroup",
-      path: "/group/create"
+      path: "/group/create",
     },
     {
       component: () => import("@/pages/GroupDetailPage/GroupDetailPage.vue"),
       name: "groupDetail",
-      path: "/group/:groupId"
+      path: "/group/:groupId",
     },
     {
       component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue"),
       name: "joinGroup",
-      path: "/group/join/:joinLinkId"
+      path: "/group/join/:joinLinkId",
     },
     {
       name: "newExpense",
       path: "/new-expense",
-      redirect: "/new-expense/enter-amount"
+      redirect: "/new-expense/enter-amount",
     },
     {
       component: () => import("@/pages/NewExpensePage/EnterAmountPage/EnterAmountPage.vue"),
       name: "newExpenseEnterAmount",
-      path: "/new-expense/enter-amount"
+      path: "/new-expense/enter-amount",
     },
     {
       component: () => import("@/pages/NewExpensePage/SelectPeoplePage/SelectPeoplePage.vue"),
       name: "newExpenseSelectPeople",
-      path: "/new-expense/select-people"
+      path: "/new-expense/select-people",
     },
     {
       component: () => import("@/pages/NewExpensePage/SelectSplitMethodPage/SelectSplitMethodPage.vue"),
       name: "newExpenseSelectSplitMethod",
-      path: "/new-expense/select-split-method"
+      path: "/new-expense/select-split-method",
     },
     {
       component: () => import("@/pages/NewExpensePage/ReviewAndCompletePage/ReviewAndCompletePage.vue"),
       name: "newExpenseReviewAndComplete",
-      path: "/new-expense/review-and-complete"
+      path: "/new-expense/review-and-complete",
     },
     {
       component: () => import("@/pages/LoginPage/LoginPage.vue"),
       name: "login",
-      path: "/login"
+      path: "/login",
     },
     {
       component: () => import("@/pages/RegisterPage/RegisterPage.vue"),
       name: "register",
-      path: "/register"
+      path: "/register",
     },
     {
       component: () => import("@/pages/TwoFactorSetupPage/TwoFactorSetupPage.vue"),
       name: "2faSetup",
-      path: "/2fa-setup"
-    }
-  ]
+      path: "/2fa-setup",
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {

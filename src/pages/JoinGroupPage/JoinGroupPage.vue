@@ -21,7 +21,7 @@ const groupApi = new GroupApi(config);
 
 const { state: groupInfo } = useQuery({
   key: ["getGroupInfoByLink", joinLinkId.value],
-  query: () => groupApi.getGroupInfoByLink({ joinLinkId: joinLinkId.value })
+  query: () => groupApi.getGroupInfoByLink({ joinLinkId: joinLinkId.value }),
 });
 
 const joining = ref(false);

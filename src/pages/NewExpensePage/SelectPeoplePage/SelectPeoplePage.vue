@@ -84,7 +84,7 @@ const groupsInUserListItem = computed(() => {
   const result: UserListItem[] = sortedGroups.value.map((group) => ({
     __typename: "UserListItemGroup",
     id: group.groupId,
-    ...group
+    ...group,
   }));
   return result;
 });
@@ -92,7 +92,7 @@ const groupsGroupOnlyInUserListItem = computed(() => {
   const result: UserListItem[] = sortedGroupsGroupOnly.value.map((group) => ({
     __typename: "UserListItemGroup",
     id: group.groupId,
-    ...group
+    ...group,
   }));
   return result;
 });
@@ -100,7 +100,7 @@ const friendsInUserListItem = computed(() => {
   const result: UserListItem[] = sortedFriends.value.map((friend) => ({
     __typename: "UserListItemFriend",
     id: friend.friendUser.id,
-    ...friend
+    ...friend,
   }));
   return result;
 });
@@ -116,7 +116,7 @@ const onItemSelected = (itemId: string) => {
     transaction.members = group.members.map((member) => ({
       id: member.id,
       photo: member.photo,
-      userName: member.userName
+      userName: member.userName,
     }));
     transaction.includedMembersId = transaction.members.map((user) => user.id);
     // Navigate to the next step
@@ -142,7 +142,7 @@ const selectedUsers = computed(() => {
       .map((friend) => ({
         id: friend.friendUser.id,
         photo: friend.friendUser.photo,
-        userName: friend.remark ?? friend.friendUser.userName
+        userName: friend.remark ?? friend.friendUser.userName,
       })) ?? []
   );
 });

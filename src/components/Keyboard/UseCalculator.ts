@@ -221,7 +221,7 @@ export default function useCalculator() {
     minus,
     plus,
     result,
-    times
+    times,
   };
 }
 

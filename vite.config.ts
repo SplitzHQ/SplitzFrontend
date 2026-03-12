@@ -25,12 +25,12 @@ export default defineConfig({
         if (fs.existsSync(src)) {
           fs.copyFileSync(src, dest);
         }
-      }
+      },
     },
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: "fluent", // default 'fluent' - name of the block in SFCs
-      checkSyntax: true // default true - whether to check syntax of the messages
+      checkSyntax: true, // default true - whether to check syntax of the messages
     }),
     // define messages in external ftl files
     ExternalFluentPlugin({
@@ -38,16 +38,16 @@ export default defineConfig({
       checkSyntax: true, // default true - whether to check syntax of the messages
 
       baseDir: fileURLToPath(new URL("src", import.meta.url)), // base directory for Vue files
-      ftlDir: fileURLToPath(new URL("src/locales", import.meta.url)) // directory with ftl files
-    })
+      ftlDir: fileURLToPath(new URL("src/locales", import.meta.url)), // directory with ftl files
+    }),
   ],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("src", import.meta.url))
-    }
+      "@": fileURLToPath(new URL("src", import.meta.url)),
+    },
   },
   server: {
     host: "0.0.0.0", // Allow access from local network
-    port: 5173
-  }
+    port: 5173,
+  },
 });

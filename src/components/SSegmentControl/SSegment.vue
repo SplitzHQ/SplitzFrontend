@@ -18,7 +18,7 @@ const emit = defineEmits<ButtonEvents>();
       :class="[
         size,
         active ? 'secondary' : 'ghost',
-        'relative z-10 flex cursor-pointer items-center gap-1.5 rounded-full'
+        'relative z-10 flex cursor-pointer items-center gap-1.5 rounded-full',
       ]"
     >
       <div v-if="$slots['icon-left']" class="icon shrink-0">
