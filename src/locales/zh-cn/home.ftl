@@ -1,3 +1,4 @@
+home-profile = 个人资料
 home-search-placeholder = 搜索
 home-all-groups = 全部组
 home-total-balance = 总余额

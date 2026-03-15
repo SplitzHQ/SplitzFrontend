@@ -111,7 +111,7 @@ const userBalances = computed(() => {
             <SIconButton variant="ghost" color="neutral" size="lg">
               <PhBell class="text-util-color-brand-700" />
             </SIconButton>
-            <button type="button" @click="router.push({ name: 'profile' })">
+            <button type="button" :aria-label="$t('home-profile')" @click="router.push({ name: 'profile' })">
               <Avatar
                 :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]"
                 size="xs"

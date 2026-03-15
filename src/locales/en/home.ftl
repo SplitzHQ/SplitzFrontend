@@ -1,3 +1,4 @@
+home-profile = Profile
 home-search-placeholder = Search
 home-all-groups = All Groups
 home-total-balance = Total Balance

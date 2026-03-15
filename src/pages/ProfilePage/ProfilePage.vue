@@ -60,10 +60,18 @@ function triggerAvatarUpload() {
   fileInputRef.value?.click();
 }
 
+const MAX_AVATAR_SIZE = 10 * 1024 * 1024; // 10 MB
+
 async function handleAvatarFile(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
+
+  if (file.size > MAX_AVATAR_SIZE) {
+    toast.error($t("profile-avatar-too-large"));
+    input.value = "";
+    return;
+  }
 
   uploadingAvatar.value = true;
   try {
@@ -83,17 +91,6 @@ const friends = computed(() => userStore.user?.friends ?? []);
 
 // Add friend sheet
 const showAddFriend = ref(false);
-
-async function handleAddFriend(friendId: string, remark: string | undefined) {
-  try {
-    await accountApi.addFriend({ body: remark || undefined, id: friendId });
-    await userStore.fetchUserInfo();
-    showAddFriend.value = false;
-    toast.success($t("profile-add-friend-success"));
-  } catch {
-    toast.error($t("profile-add-friend-error"));
-  }
-}
 
 // Remove friend
 async function removeFriend(friendId: string) {
@@ -117,20 +114,6 @@ function startEditNickname(friendId: string, userName: string, currentRemark: st
   editingFriendName.value = userName;
   editingFriendRemark.value = currentRemark ?? "";
   showEditNickname.value = true;
-}
-
-async function handleSaveNickname(remark: string) {
-  try {
-    await accountApi.updateFriendRemark({
-      id: editingFriendId.value,
-      remark,
-    });
-    await userStore.fetchUserInfo();
-    showEditNickname.value = false;
-    toast.success($t("profile-edit-nickname-success"));
-  } catch {
-    toast.error($t("profile-edit-nickname-error"));
-  }
 }
 
 // Logout
@@ -173,7 +156,13 @@ function logout() {
             <div class="text-sm font-semibold text-base-text-primary">{{ $t("profile-username-label") }}</div>
             <div v-if="!isEditingUsername" class="flex items-center justify-between">
               <p class="text-base text-base-text-primary">{{ userStore.user?.userName }}</p>
-              <SIconButton variant="ghost" color="neutral" size="md" @click="startEditingUsername">
+              <SIconButton
+                variant="ghost"
+                color="neutral"
+                size="md"
+                :aria-label="$t('profile-edit-username')"
+                @click="startEditingUsername"
+              >
                 <PhPencilSimple />
               </SIconButton>
             </div>
@@ -251,7 +240,7 @@ function logout() {
   </Layout>
 
   <!-- Add Friend Sheet -->
-  <AddFriendSheet v-model="showAddFriend" @submit="handleAddFriend" />
+  <AddFriendSheet v-model="showAddFriend" />
 
   <!-- Hidden file input for avatar upload -->
   <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
@@ -260,8 +249,8 @@ function logout() {
   <!-- Edit Nickname Sheet -->
   <EditNicknameSheet
     v-model="showEditNickname"
+    :friend-id="editingFriendId"
     :friend-name="editingFriendName"
     :current-remark="editingFriendRemark"
-    @save="handleSaveNickname"
   />
 </template>

@@ -78,6 +78,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem("accessToken");
   if (!isAuthenticated && !publicRoutes.includes(to.name)) {
     next({ name: "login" });
+    return;
   }
   next();
 });

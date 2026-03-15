@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { useFluent } from "fluent-vue";
 import { ref, watch } from "vue";
+import { toast } from "vue-sonner";
 
+import { AccountApi } from "@/backend";
+import config from "@/backend/config";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
+import { useUserStore } from "@/stores/user";
 
 const model = defineModel<boolean>({ required: true });
 
 const props = defineProps<{
+  friendId: string;
   friendName: string;
   currentRemark: string;
 }>();
 
-const emit = defineEmits<{
-  save: [remark: string];
-}>();
-
 const { $t } = useFluent();
+const accountApi = new AccountApi(config);
+const userStore = useUserStore();
 
 const remark = ref("");
 const loading = ref(false);
@@ -34,7 +37,15 @@ watch(
 async function save() {
   loading.value = true;
   try {
-    emit("save", remark.value.trim());
+    await accountApi.updateFriendRemark({
+      id: props.friendId,
+      remark: remark.value.trim(),
+    });
+    await userStore.fetchUserInfo();
+    model.value = false;
+    toast.success($t("profile-edit-nickname-success"));
+  } catch {
+    toast.error($t("profile-edit-nickname-error"));
   } finally {
     loading.value = false;
   }
