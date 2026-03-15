@@ -66,6 +66,11 @@ const router = createRouter({
       name: "2faSetup",
       path: "/2fa-setup",
     },
+    {
+      component: () => import("@/pages/ProfilePage/ProfilePage.vue"),
+      name: "profile",
+      path: "/profile",
+    },
   ],
 });
 
@@ -73,6 +78,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem("accessToken");
   if (!isAuthenticated && !publicRoutes.includes(to.name)) {
     next({ name: "login" });
+    return;
   }
   next();
 });
