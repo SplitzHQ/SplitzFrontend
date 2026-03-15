@@ -66,6 +66,11 @@ const router = createRouter({
       name: "2faSetup",
       path: "/2fa-setup",
     },
+    {
+      component: () => import("@/pages/ProfilePage/ProfilePage.vue"),
+      name: "profile",
+      path: "/profile",
+    },
   ],
 });
 
