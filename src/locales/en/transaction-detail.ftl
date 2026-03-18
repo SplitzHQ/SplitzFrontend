@@ -1,0 +1,17 @@
+transaction-detail-loading = Loading…
+transaction-detail-error = Error loading transaction details.
+transaction-detail-paid-by = { $name } paid { $amount }
+transaction-detail-you-paid = You paid { $amount }
+transaction-detail-split-breakdown = Split Breakdown
+transaction-detail-lent = lent
+transaction-detail-borrowed = borrowed
+transaction-detail-receipt = Receipt
+transaction-detail-location = Location
+transaction-detail-tags = Tags
+transaction-detail-edit = Edit
+transaction-detail-delete = Delete
+transaction-detail-delete-confirm-title = Delete Transaction
+transaction-detail-delete-confirm-message = Are you sure you want to delete this transaction? This action cannot be undone.
+transaction-detail-delete-confirm-yes = Delete
+transaction-detail-delete-confirm-cancel = Cancel
+transaction-detail-delete-error = Failed to delete transaction, please try again.

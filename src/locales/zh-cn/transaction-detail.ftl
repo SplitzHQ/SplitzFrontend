@@ -1,0 +1,17 @@
+transaction-detail-loading = 加载中…
+transaction-detail-error = 加载交易详情时出错。
+transaction-detail-paid-by = { $name }支付了{ $amount }
+transaction-detail-you-paid = 你支付了{ $amount }
+transaction-detail-split-breakdown = 分账明细
+transaction-detail-lent = 借出
+transaction-detail-borrowed = 借入
+transaction-detail-receipt = 收据
+transaction-detail-location = 地点
+transaction-detail-tags = 标签
+transaction-detail-edit = 编辑
+transaction-detail-delete = 删除
+transaction-detail-delete-confirm-title = 删除交易
+transaction-detail-delete-confirm-message = 确定要删除此交易吗？此操作无法撤消。
+transaction-detail-delete-confirm-yes = 删除
+transaction-detail-delete-confirm-cancel = 取消
+transaction-detail-delete-error = 删除交易失败，请重试。
