@@ -16,13 +16,13 @@ const app = createApp(App);
 
 // Create bundles for locales that will be used
 const enBundle = new FluentBundle("en");
-for (const ftl of Object.values(import.meta.glob("./locales/en/*.ftl", { eager: true }))) {
-  enBundle.addResource((ftl as { default: FluentResource }).default);
+for (const ftl of Object.values(import.meta.glob("./locales/en/*.ftl", { eager: true, import: "default" }))) {
+  enBundle.addResource(ftl as FluentResource);
 }
 
 const zhcnBundle = new FluentBundle("zh-cn");
-for (const ftl of Object.values(import.meta.glob("./locales/zh-cn/*.ftl", { eager: true }))) {
-  zhcnBundle.addResource((ftl as { default: FluentResource }).default);
+for (const ftl of Object.values(import.meta.glob("./locales/zh-cn/*.ftl", { eager: true, import: "default" }))) {
+  zhcnBundle.addResource(ftl as FluentResource);
 }
 
 const fluent = createFluentVue({
