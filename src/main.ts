@@ -1,56 +1,29 @@
 // sort-imports-ignore
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { FluentBundle } from "@fluent/bundle";
+import { FluentBundle, type FluentResource } from "@fluent/bundle";
 import { PiniaColada } from "@pinia/colada";
 import { createFluentVue } from "fluent-vue";
 import { createPinia } from "pinia";
+
+import "./assets/base.css";
+import "./assets/color.css";
 import { createApp } from "vue";
 
 import App from "./App.vue";
-import "./assets/base.css";
-import "./assets/color.css";
-// @ts-expect-error - translation files
-import enCategories from "./locales/en/categories.ftl";
-// @ts-expect-error - translation files
-import enCreateGroup from "./locales/en/create-group.ftl";
-// @ts-expect-error - translation files
-import enGroupDetail from "./locales/en/group-detail.ftl";
-// @ts-expect-error - translation files
-import enHome from "./locales/en/home.ftl";
-// @ts-expect-error - translation files
-import enJoinGroup from "./locales/en/join-group.ftl";
-// @ts-expect-error - translation files
-import enNewExpense from "./locales/en/new-expense.ftl";
-// @ts-expect-error - translation files
-import enProfile from "./locales/en/profile.ftl";
-// @ts-expect-error - translation files
-import zhcnCategories from "./locales/zh-cn/categories.ftl";
-// @ts-expect-error - translation files
-import zhcnCreateGroup from "./locales/zh-cn/create-group.ftl";
-// @ts-expect-error - translation files
-import zhcnGroupDetail from "./locales/zh-cn/group-detail.ftl";
-// @ts-expect-error - translation files
-import zhcnHome from "./locales/zh-cn/home.ftl";
-// @ts-expect-error - translation files
-import zhcnJoinGroup from "./locales/zh-cn/join-group.ftl";
-// @ts-expect-error - translation files
-import zhcnNewExpense from "./locales/zh-cn/new-expense.ftl";
-// @ts-expect-error - translation files
-import zhcnProfile from "./locales/zh-cn/profile.ftl";
 import router from "./router";
 
 const app = createApp(App);
 
 // Create bundles for locales that will be used
 const enBundle = new FluentBundle("en");
-const zhcnBundle = new FluentBundle("zh-cn");
+for (const ftl of Object.values(import.meta.glob("./locales/en/*.ftl", { eager: true }))) {
+  enBundle.addResource((ftl as { default: FluentResource }).default);
+}
 
-[enNewExpense, enCategories, enHome, enCreateGroup, enJoinGroup, enGroupDetail, enProfile].forEach((resource) =>
-  enBundle.addResource(resource)
-);
-[zhcnNewExpense, zhcnCategories, zhcnHome, zhcnCreateGroup, zhcnJoinGroup, zhcnGroupDetail, zhcnProfile].forEach(
-  (resource) => zhcnBundle.addResource(resource)
-);
+const zhcnBundle = new FluentBundle("zh-cn");
+for (const ftl of Object.values(import.meta.glob("./locales/zh-cn/*.ftl", { eager: true }))) {
+  zhcnBundle.addResource((ftl as { default: FluentResource }).default);
+}
 
 const fluent = createFluentVue({
   bundles: [enBundle, zhcnBundle],
