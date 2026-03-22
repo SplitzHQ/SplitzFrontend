@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useFluent } from "fluent-vue";
 import { computed } from "vue";
+import { RouterLink } from "vue-router";
 
 import type { TransactionDto } from "@/backend";
 import { categoryColorMap } from "@/components/Category/category-color";
@@ -57,7 +58,13 @@ const formatCurrency = (amount: number, currency: string) => {
 </script>
 
 <template>
-  <div class="flex items-center gap-3 rounded-2xl py-2">
+  <RouterLink
+    :to="{
+      name: 'transactionDetail',
+      params: { groupId: transaction.groupId, transactionId: transaction.transactionId },
+    }"
+    class="flex items-center gap-3 rounded-2xl py-2 transition-colors active:bg-base-bg-secondary"
+  >
     <div class="flex size-12 shrink-0 items-center justify-center rounded-05xl" :class="colorClass">
       <CategoryIcon :category="subcategory" class="icon-7" />
     </div>
@@ -73,5 +80,5 @@ const formatCurrency = (amount: number, currency: string) => {
         {{ formatCurrency(myBalance, transaction.currency) }}
       </p>
     </div>
-  </div>
+  </RouterLink>
 </template>
