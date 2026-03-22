@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhMapPin, PhPencil, PhTrash } from "@phosphor-icons/vue";
+import { PhMapPin, PhPencil, PhTrash, PhX } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -13,6 +13,7 @@ import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SIconButton from "@/components/SButton/SIconButton.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { useUserStore } from "@/stores/user";
 
@@ -45,6 +46,15 @@ const group = computed(() => groupQuery.value.data);
 
 const showDeleteSheet = ref(false);
 const isDeleting = ref(false);
+
+// group avatar images
+const avatarImages = computed(() => {
+  if (!group.value) return [];
+  if (group.value.photo) {
+    return [{ alt: group.value.name, src: group.value.photo }];
+  }
+  return group.value.members.slice(0, 4).map((m) => ({ alt: m.userName, src: m.photo ?? null }));
+});
 
 // Category
 const subcategory = computed(() => getCategory(transaction.value?.icon));
@@ -115,9 +125,16 @@ async function handleDelete() {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
-        <div v-if="group" class="flex items-center justify-center">
+        <div v-if="group" class="flex items-center justify-center gap-2">
+          <Avatar :images="avatarImages" size="xs" />
           <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
         </div>
+        <!-- Add an invisible close button to make sure the header layout remains consistent -->
+        <template #right>
+          <SIconButton variant="ghost" color="neutral" size="lg" class="pointer-events-none">
+            <PhX class="text-transparent" />
+          </SIconButton>
+        </template>
       </HeaderMobileSecondary>
     </template>
 
