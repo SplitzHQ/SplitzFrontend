@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
 import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
 const isStorybookProcess = process.env.npm_lifecycle_event === "storybook";
@@ -27,6 +28,77 @@ export default defineConfig({
         }
       },
     },
+    VitePWA({
+      registerType: "prompt",
+      includeAssets: ["favicon.svg", "apple-touch-icon-180x180.png"],
+      manifest: {
+        name: "SplitZ",
+        short_name: "SplitZ",
+        description: "Split expenses with friends and groups",
+        theme_color: "#647C72",
+        background_color: "#fafbfa",
+        display: "standalone",
+        icons: [
+          {
+            src: "pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
+          },
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          {
+            src: "maskable-icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "google-fonts-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "gstatic-fonts-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+      devOptions: {
+        enabled: true,
+      },
+    }),
     // define messages in SFCs
     SFCFluentPlugin({
       blockType: "fluent", // default 'fluent' - name of the block in SFCs
