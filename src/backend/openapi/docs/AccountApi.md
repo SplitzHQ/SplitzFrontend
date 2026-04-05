@@ -1,15 +1,17 @@
 # AccountApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                     | HTTP request                    | Description                                       |
-| ---------------------------------------------------------- | ------------------------------- | ------------------------------------------------- |
-| [**addFriend**](AccountApi.md#addfriend)                   | **POST** /account/friend/{id}   | Add a friend to the current user                  |
-| [**getUserInfo**](AccountApi.md#getuserinfo)               | **GET** /account                | Get the current user\&#39;s information           |
-| [**removeFriend**](AccountApi.md#removefriend)             | **DELETE** /account/friend/{id} | Remove a friend from the current user             |
-| [**updateFriendRemark**](AccountApi.md#updatefriendremark) | **PATCH** /account/friend/{id}  | Update the remark of a friend                     |
-| [**updateUserInfo**](AccountApi.md#updateuserinfo)         | **PATCH** /account              | Update the current user\&#39;s username and photo |
-| [**uploadUserAvatar**](AccountApi.md#uploaduseravatar)     | **POST** /account/avatar        | Upload the current user\&#39;s avatar image.      |
+| Method | HTTP request | Description |
+|------------- | ------------- | -------------|
+| [**addFriend**](AccountApi.md#addfriend) | **POST** /account/friend/{id} | Add a friend to the current user |
+| [**getUserInfo**](AccountApi.md#getuserinfo) | **GET** /account | Get the current user\&#39;s information |
+| [**removeFriend**](AccountApi.md#removefriend) | **DELETE** /account/friend/{id} | Remove a friend from the current user |
+| [**updateFriendRemark**](AccountApi.md#updatefriendremark) | **PATCH** /account/friend/{id} | Update the remark of a friend |
+| [**updateUserInfo**](AccountApi.md#updateuserinfo) | **PATCH** /account | Update the current user\&#39;s username and photo |
+| [**uploadUserAvatar**](AccountApi.md#uploaduseravatar) | **POST** /account/avatar | Upload the current user\&#39;s avatar image. |
+
+
 
 ## addFriend
 
@@ -20,14 +22,17 @@ Add a friend to the current user
 ### Example
 
 ```ts
-import { Configuration, AccountApi } from "";
-import type { AddFriendRequest } from "";
+import {
+  Configuration,
+  AccountApi,
+} from '';
+import type { AddFriendRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
@@ -35,7 +40,7 @@ async function example() {
     // string | friend\'s id
     id: id_example,
     // string | friend\'s remark (optional)
-    body: body_example
+    body: body_example,
   } satisfies AddFriendRequest;
 
   try {
@@ -52,10 +57,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name     | Type     | Description          | Notes                     |
-| -------- | -------- | -------------------- | ------------------------- |
-| **id**   | `string` | friend\&#39;s id     | [Defaults to `undefined`] |
-| **body** | `string` | friend\&#39;s remark | [Optional]                |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` | friend\&#39;s id | [Defaults to `undefined`] |
+| **body** | `string` | friend\&#39;s remark | [Optional] |
 
 ### Return type
 
@@ -70,15 +76,16 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getUserInfo
 
@@ -89,14 +96,17 @@ Get the current user\&#39;s information
 ### Example
 
 ```ts
-import { Configuration, AccountApi } from "";
-import type { GetUserInfoRequest } from "";
+import {
+  Configuration,
+  AccountApi,
+} from '';
+import type { GetUserInfoRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
@@ -129,14 +139,15 @@ This endpoint does not need any parameter.
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **200**     | OK           | -                |
-| **401**     | Unauthorized | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **401** | Unauthorized |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## removeFriend
 
@@ -147,20 +158,23 @@ Remove a friend from the current user
 ### Example
 
 ```ts
-import { Configuration, AccountApi } from "";
-import type { RemoveFriendRequest } from "";
+import {
+  Configuration,
+  AccountApi,
+} from '';
+import type { RemoveFriendRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
   const body = {
     // string | friend\'s id
-    id: id_example
+    id: id_example,
   } satisfies RemoveFriendRequest;
 
   try {
@@ -177,8 +191,9 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name   | Type     | Description      | Notes                     |
-| ------ | -------- | ---------------- | ------------------------- |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
 | **id** | `string` | friend\&#39;s id | [Defaults to `undefined`] |
 
 ### Return type
@@ -194,15 +209,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## updateFriendRemark
 
@@ -213,14 +229,17 @@ Update the remark of a friend
 ### Example
 
 ```ts
-import { Configuration, AccountApi } from "";
-import type { UpdateFriendRemarkRequest } from "";
+import {
+  Configuration,
+  AccountApi,
+} from '';
+import type { UpdateFriendRemarkRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
@@ -228,7 +247,7 @@ async function example() {
     // string | friend\'s id
     id: id_example,
     // string | friend\'s new remark (optional)
-    remark: remark_example
+    remark: remark_example,
   } satisfies UpdateFriendRemarkRequest;
 
   try {
@@ -245,9 +264,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name       | Type     | Description              | Notes                                |
-| ---------- | -------- | ------------------------ | ------------------------------------ |
-| **id**     | `string` | friend\&#39;s id         | [Defaults to `undefined`]            |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` | friend\&#39;s id | [Defaults to `undefined`] |
 | **remark** | `string` | friend\&#39;s new remark | [Optional] [Defaults to `undefined`] |
 
 ### Return type
@@ -263,16 +283,17 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **400**     | Bad Request  | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## updateUserInfo
 
@@ -291,7 +312,7 @@ import type { UpdateUserInfoRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -316,9 +337,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                          | Type                                                      | Description | Notes      |
-| ----------------------------- | --------------------------------------------------------- | ----------- | ---------- |
-| **splitzUserUpdateViewModel** | [SplitzUserUpdateViewModel](SplitzUserUpdateViewModel.md) | user info   | [Optional] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **splitzUserUpdateViewModel** | [SplitzUserUpdateViewModel](SplitzUserUpdateViewModel.md) | user info | [Optional] |
 
 ### Return type
 
@@ -333,14 +355,15 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **401**     | Unauthorized | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## uploadUserAvatar
 
@@ -351,20 +374,23 @@ Upload the current user\&#39;s avatar image.
 ### Example
 
 ```ts
-import { Configuration, AccountApi } from "";
-import type { UploadUserAvatarRequest } from "";
+import {
+  Configuration,
+  AccountApi,
+} from '';
+import type { UploadUserAvatarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new AccountApi(config);
 
   const body = {
     // Blob (optional)
-    file: BINARY_DATA_HERE
+    file: BINARY_DATA_HERE,
   } satisfies UploadUserAvatarRequest;
 
   try {
@@ -381,9 +407,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name     | Type   | Description | Notes                                |
-| -------- | ------ | ----------- | ------------------------------------ |
-| **file** | `Blob` |             | [Optional] [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **file** | `Blob` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -398,12 +425,13 @@ example().catch(console.error);
 - **Content-Type**: `multipart/form-data`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **400**     | Bad Request  | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **400** | Bad Request |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+

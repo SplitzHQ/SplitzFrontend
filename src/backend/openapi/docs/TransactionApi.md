@@ -1,14 +1,16 @@
 # TransactionApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                                     | HTTP request                         | Description                               |
-| -------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| [**addTransaction**](TransactionApi.md#addtransaction)                     | **POST** /transaction                | Add a transaction                         |
-| [**deleteTransaction**](TransactionApi.md#deletetransaction)               | **DELETE** /transaction/{id}         | Delete a transaction                      |
-| [**getTransaction**](TransactionApi.md#gettransaction)                     | **GET** /transaction/{id}            | Get transaction by id                     |
-| [**updateTransaction**](TransactionApi.md#updatetransaction)               | **PUT** /transaction/{transactionId} | Update a transaction                      |
-| [**uploadTransactionReceipt**](TransactionApi.md#uploadtransactionreceipt) | **POST** /transaction/{id}/receipt   | Upload a receipt image for a transaction. |
+| Method | HTTP request | Description |
+|------------- | ------------- | -------------|
+| [**addTransaction**](TransactionApi.md#addtransaction) | **POST** /transaction | Add a transaction |
+| [**deleteTransaction**](TransactionApi.md#deletetransaction) | **DELETE** /transaction/{id} | Delete a transaction |
+| [**getTransaction**](TransactionApi.md#gettransaction) | **GET** /transaction/{id} | Get transaction by id |
+| [**updateTransaction**](TransactionApi.md#updatetransaction) | **PUT** /transaction/{transactionId} | Update a transaction |
+| [**uploadTransactionReceipt**](TransactionApi.md#uploadtransactionreceipt) | **POST** /transaction/{id}/receipt | Upload a receipt image for a transaction. |
+
+
 
 ## addTransaction
 
@@ -27,7 +29,7 @@ import type { AddTransactionRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -52,9 +54,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                    | Type                                          | Description | Notes      |
-| ----------------------- | --------------------------------------------- | ----------- | ---------- |
-| **transactionInputDto** | [TransactionInputDto](TransactionInputDto.md) |             | [Optional] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **transactionInputDto** | [TransactionInputDto](TransactionInputDto.md) |  | [Optional] |
 
 ### Return type
 
@@ -69,15 +72,16 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **400**     | Bad Request  | -                |
-| **401**     | Unauthorized | -                |
-| **201**     | Created      | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **201** | Created |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## deleteTransaction
 
@@ -96,14 +100,14 @@ import type { DeleteTransactionRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
   const body = {
-    // string |
+    // string | 
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies DeleteTransactionRequest;
 
@@ -121,9 +125,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name   | Type     | Description | Notes                     |
-| ------ | -------- | ----------- | ------------------------- |
-| **id** | `string` |             | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -138,16 +143,17 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **400**     | Bad Request  | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getTransaction
 
@@ -166,14 +172,14 @@ import type { GetTransactionRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
   const body = {
-    // string |
+    // string | 
     id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies GetTransactionRequest;
 
@@ -191,9 +197,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name   | Type     | Description | Notes                     |
-| ------ | -------- | ----------- | ------------------------- |
-| **id** | `string` |             | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -208,15 +215,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## updateTransaction
 
@@ -235,14 +243,14 @@ import type { UpdateTransactionRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new TransactionApi(config);
 
   const body = {
-    // string |
+    // string | 
     transactionId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
     // TransactionInputDto |  (optional)
     transactionInputDto: ...,
@@ -262,10 +270,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                    | Type                                          | Description | Notes                     |
-| ----------------------- | --------------------------------------------- | ----------- | ------------------------- |
-| **transactionId**       | `string`                                      |             | [Defaults to `undefined`] |
-| **transactionInputDto** | [TransactionInputDto](TransactionInputDto.md) |             | [Optional]                |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **transactionId** | `string` |  | [Defaults to `undefined`] |
+| **transactionInputDto** | [TransactionInputDto](TransactionInputDto.md) |  | [Optional] |
 
 ### Return type
 
@@ -280,16 +289,17 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **400**     | Bad Request  | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## uploadTransactionReceipt
 
@@ -308,7 +318,7 @@ import type { UploadTransactionReceiptRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -335,10 +345,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name     | Type     | Description | Notes                                |
-| -------- | -------- | ----------- | ------------------------------------ |
-| **id**   | `string` |             | [Defaults to `undefined`]            |
-| **file** | `Blob`   |             | [Optional] [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+| **file** | `Blob` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -353,13 +364,14 @@ example().catch(console.error);
 - **Content-Type**: `multipart/form-data`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **400**     | Bad Request  | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **400** | Bad Request |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+

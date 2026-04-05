@@ -1,34 +1,38 @@
+
 # Tag
+
 
 ## Properties
 
-| Name    | Type   |
-| ------- | ------ |
-| `tagId` | string |
-| `name`  | string |
-| `icon`  | string |
+Name | Type
+------------ | -------------
+`tagId` | string
+`name` | string
+`icon` | string
 
 ## Example
 
 ```typescript
-import type { Tag } from "";
+import type { Tag } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  tagId: null,
-  name: null,
-  icon: null
-} satisfies Tag;
+  "tagId": null,
+  "name": null,
+  "icon": null,
+} satisfies Tag
 
-console.log(example);
+console.log(example)
 
 // Convert the instance to a JSON string
-const exampleJSON: string = JSON.stringify(example);
-console.log(exampleJSON);
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as Tag;
-console.log(exampleParsed);
+const exampleParsed = JSON.parse(exampleJSON) as Tag
+console.log(exampleParsed)
 ```
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
