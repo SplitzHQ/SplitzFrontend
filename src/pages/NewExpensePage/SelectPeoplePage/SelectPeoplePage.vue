@@ -4,12 +4,13 @@ import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { GroupApi, AccountApi } from "@/backend";
+import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { useTransactionStore } from "@/stores/transaction";
+import { useUserStore } from "@/stores/user";
 
 import FrequentSelectionList from "./FrequentSelectionList.vue";
 import SearchBar from "./SearchBar.vue";
@@ -30,10 +31,9 @@ const searchKeyword = ref<string>("");
 
 // fetch groups and user info
 const groupApi = new GroupApi(config);
-const accountApi = new AccountApi(config);
+const userStore = useUserStore();
 
 const { state: groups } = useQuery({ key: ["getGroups"], query: () => groupApi.getGroups() });
-const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
 
 // map groups with members and replace userName with remark if exists
 const mappedGroups = computed(() => {
@@ -41,7 +41,7 @@ const mappedGroups = computed(() => {
   const groupsValue = structuredClone(groups.value.data);
   // create a map for user friends
   const friendsMap = new Map<string, string>();
-  userInfo.value.data?.friends?.forEach((friend) => {
+  userStore.user?.friends?.forEach((friend) => {
     friendsMap.set(friend.friendUser.id, friend.remark ?? friend.friendUser.userName);
   });
   // replace member userName with remark if exists
@@ -65,8 +65,8 @@ const sortedGroupsGroupOnly = computed(() => {
   return sortedGroups.value.filter((group) => group.members.length > 2);
 });
 const sortedFriends = computed(() => {
-  if (!userInfo.value.data?.friends) return [];
-  let friendsValue = [...userInfo.value.data.friends];
+  if (!userStore.user?.friends) return [];
+  let friendsValue = [...userStore.user.friends];
   if (searchKeyword.value)
     friendsValue = friendsValue.filter(
       (friend) =>
@@ -123,7 +123,7 @@ const onItemSelected = (itemId: string) => {
     return router.push({ name: "newExpenseSelectSplitMethod" });
   }
 
-  const friend = userInfo.value.data?.friends?.find((f) => f.friendUser.id === itemId);
+  const friend = userStore.user?.friends?.find((f) => f.friendUser.id === itemId);
   if (friend) {
     // if the item is a friend, we just add / remove the friend to the selected items
     if (selectedItemsId.value.includes(itemId)) {
@@ -137,7 +137,7 @@ const onItemSelected = (itemId: string) => {
 // mapping selected users for the search bar
 const selectedUsers = computed(() => {
   return (
-    userInfo.value.data?.friends
+    userStore.user?.friends
       ?.filter((friend) => selectedItemsId.value.includes(friend.friendUser.id))
       .map((friend) => ({
         id: friend.friendUser.id,
@@ -150,7 +150,7 @@ const selectedUsers = computed(() => {
 // onSelectedUsersSubmitted function to handle the submission of selected users
 const onSelectedUsersSubmittedLoading = ref(false);
 const onSelectedUsersSubmitted = async () => {
-  if (!userInfo.value.data) return;
+  if (!userStore.user) return;
   if (selectedItemsId.value.length === 0) return;
   onSelectedUsersSubmittedLoading.value = true;
   try {

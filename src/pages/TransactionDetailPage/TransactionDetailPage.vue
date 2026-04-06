@@ -104,6 +104,8 @@ async function handleDelete() {
     isDeleting.value = true;
     await transactionApi.deleteTransaction({ id: transactionId.value });
     queryCache.invalidateQueries({ key: ["getGroupTransactions", groupId.value] });
+    queryCache.invalidateQueries({ key: ["getGroup", groupId.value] });
+    queryCache.invalidateQueries({ key: ["getGroups"] });
     void router.replace({ name: "groupDetail", params: { groupId: groupId.value } });
   } catch (error) {
     console.error("Error deleting transaction:", error);

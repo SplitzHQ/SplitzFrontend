@@ -1,3 +1,4 @@
+import { useQueryCache } from "@pinia/colada";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -23,6 +24,8 @@ const round = (value: number) => {
 };
 
 export const useTransactionStore = defineStore("transaction", () => {
+  const queryCache = useQueryCache();
+
   const transaction = ref<Omit<TransactionDraftInputDto, "amount"> & { amount?: number }>({
     amount: 0,
     currency: "USD",
@@ -284,6 +287,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       transactionTime: transaction.value.transactionTime ?? new Date(),
     };
 
+    let result: TransactionDto;
     // If transactionId exists, update the transaction, otherwise create a new one
     if (transactionId.value) {
       await api.updateTransaction({
@@ -291,15 +295,23 @@ export const useTransactionStore = defineStore("transaction", () => {
         transactionInputDto: transactionInput,
       });
       // For update, we need to get the updated transaction since updateTransaction returns void
-      return await api.getTransaction({ id: transactionId.value });
+      result = await api.getTransaction({ id: transactionId.value });
     } else {
       // Create new transaction
-      const result = await api.addTransaction({
+      result = await api.addTransaction({
         transactionInputDto: transactionInput,
       });
       transactionId.value = result.transactionId;
-      return result;
     }
+
+    // Invalidate relevant queries to ensure UI updates with the latest data
+    if (groupId) {
+      await queryCache.invalidateQueries({ key: ["getGroupTransactions", groupId] });
+      await queryCache.invalidateQueries({ key: ["getGroup", groupId] });
+    }
+    await queryCache.invalidateQueries({ key: ["getGroups"] });
+
+    return result;
   };
 
   const uploadTransactionReceipt = async (file: Blob): Promise<void> => {
