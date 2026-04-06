@@ -15,6 +15,7 @@ import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
+import { formatCurrency } from "@/libs/format-currency";
 import { useUserStore } from "@/stores/user";
 
 import DeleteConfirmSheet from "./DeleteConfirmSheet.vue";
@@ -61,20 +62,12 @@ const subcategory = computed(() => getCategory(transaction.value?.icon));
 const mainCategory = computed(() => getMainCategory(transaction.value?.icon));
 const colorClass = computed(() => categoryColorMap[mainCategory.value]);
 
-// Payer: the person with the most negative balance
+// Payer: the person with the most positive balance (creditor)
 const payer = computed(() => {
   const balances = transaction.value?.balances ?? [];
-  const sorted = [...balances].sort((a, b) => Number(a.balance) - Number(b.balance));
+  const sorted = [...balances].sort((a, b) => Number(b.balance) - Number(a.balance));
   return sorted[0]?.user ?? null;
 });
-
-const formatCurrency = (amount: number, currency: string) => {
-  try {
-    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(Math.abs(amount));
-  } catch {
-    return `${Math.abs(amount).toFixed(2)} ${currency}`;
-  }
-};
 
 const payerDescription = computed(() => {
   if (!payer.value || !transaction.value) return "";
@@ -196,11 +189,11 @@ async function handleDelete() {
                 </div>
                 <div class="flex shrink-0 flex-col items-end">
                   <p class="text-xs text-base-text-quaternary">
-                    {{ Number(entry.balance) < 0 ? $t("transaction-detail-lent") : $t("transaction-detail-borrowed") }}
+                    {{ Number(entry.balance) > 0 ? $t("transaction-detail-lent") : $t("transaction-detail-borrowed") }}
                   </p>
                   <p
                     class="text-sm font-medium"
-                    :class="Number(entry.balance) < 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
+                    :class="Number(entry.balance) > 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
                   >
                     {{ formatCurrency(Number(entry.balance), transaction.currency) }}
                   </p>

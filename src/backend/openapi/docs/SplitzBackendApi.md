@@ -1,23 +1,27 @@
 # SplitzBackendApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                                                           | HTTP request                              | Description |
-| ------------------------------------------------------------------------------------------------ | ----------------------------------------- | ----------- |
-| [**accountForgotPasswordPost**](SplitzBackendApi.md#accountforgotpasswordpost)                   | **POST** /account/forgotPassword          |             |
-| [**accountLoginPost**](SplitzBackendApi.md#accountloginpost)                                     | **POST** /account/login                   |             |
-| [**accountManage2faPost**](SplitzBackendApi.md#accountmanage2fapost)                             | **POST** /account/manage/2fa              |             |
-| [**accountManageInfoGet**](SplitzBackendApi.md#accountmanageinfoget)                             | **GET** /account/manage/info              |             |
-| [**accountManageInfoPost**](SplitzBackendApi.md#accountmanageinfopost)                           | **POST** /account/manage/info             |             |
-| [**accountRefreshPost**](SplitzBackendApi.md#accountrefreshpost)                                 | **POST** /account/refresh                 |             |
-| [**accountRegisterPost**](SplitzBackendApi.md#accountregisterpost)                               | **POST** /account/register                |             |
-| [**accountResendConfirmationEmailPost**](SplitzBackendApi.md#accountresendconfirmationemailpost) | **POST** /account/resendConfirmationEmail |             |
-| [**accountResetPasswordPost**](SplitzBackendApi.md#accountresetpasswordpost)                     | **POST** /account/resetPassword           |             |
-| [**mapIdentityApiAccountConfirmEmail**](SplitzBackendApi.md#mapidentityapiaccountconfirmemail)   | **GET** /account/confirmEmail             |             |
+| Method | HTTP request | Description |
+|------------- | ------------- | -------------|
+| [**accountForgotPasswordPost**](SplitzBackendApi.md#accountforgotpasswordpost) | **POST** /account/forgotPassword |  |
+| [**accountLoginPost**](SplitzBackendApi.md#accountloginpost) | **POST** /account/login |  |
+| [**accountManage2faPost**](SplitzBackendApi.md#accountmanage2fapost) | **POST** /account/manage/2fa |  |
+| [**accountManageInfoGet**](SplitzBackendApi.md#accountmanageinfoget) | **GET** /account/manage/info |  |
+| [**accountManageInfoPost**](SplitzBackendApi.md#accountmanageinfopost) | **POST** /account/manage/info |  |
+| [**accountRefreshPost**](SplitzBackendApi.md#accountrefreshpost) | **POST** /account/refresh |  |
+| [**accountRegisterPost**](SplitzBackendApi.md#accountregisterpost) | **POST** /account/register |  |
+| [**accountResendConfirmationEmailPost**](SplitzBackendApi.md#accountresendconfirmationemailpost) | **POST** /account/resendConfirmationEmail |  |
+| [**accountResetPasswordPost**](SplitzBackendApi.md#accountresetpasswordpost) | **POST** /account/resetPassword |  |
+| [**mapIdentityApiAccountConfirmEmail**](SplitzBackendApi.md#mapidentityapiaccountconfirmemail) | **GET** /account/confirmEmail |  |
+
+
 
 ## accountForgotPasswordPost
 
 > accountForgotPasswordPost(forgotPasswordRequest)
+
+
 
 ### Example
 
@@ -51,9 +55,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                      | Type                                              | Description | Notes |
-| ------------------------- | ------------------------------------------------- | ----------- | ----- |
-| **forgotPasswordRequest** | [ForgotPasswordRequest](ForgotPasswordRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **forgotPasswordRequest** | [ForgotPasswordRequest](ForgotPasswordRequest.md) |  | |
 
 ### Return type
 
@@ -68,18 +73,21 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountLoginPost
 
 > AccessTokenResponse accountLoginPost(loginRequest, useCookies, useSessionCookies)
+
+
 
 ### Example
 
@@ -117,11 +125,12 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                  | Type                            | Description | Notes                                |
-| --------------------- | ------------------------------- | ----------- | ------------------------------------ |
-| **loginRequest**      | [LoginRequest](LoginRequest.md) |             |                                      |
-| **useCookies**        | `boolean`                       |             | [Optional] [Defaults to `undefined`] |
-| **useSessionCookies** | `boolean`                       |             | [Optional] [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **loginRequest** | [LoginRequest](LoginRequest.md) |  | |
+| **useCookies** | `boolean` |  | [Optional] [Defaults to `undefined`] |
+| **useSessionCookies** | `boolean` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -136,17 +145,20 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountManage2faPost
 
 > TwoFactorResponse accountManage2faPost(twoFactorRequest)
+
+
 
 ### Example
 
@@ -180,9 +192,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                 | Type                                    | Description | Notes |
-| -------------------- | --------------------------------------- | ----------- | ----- |
-| **twoFactorRequest** | [TwoFactorRequest](TwoFactorRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **twoFactorRequest** | [TwoFactorRequest](TwoFactorRequest.md) |  | |
 
 ### Return type
 
@@ -197,25 +210,31 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/json`, `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
-| **404**     | Not Found   | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountManageInfoGet
 
 > InfoResponse accountManageInfoGet()
 
+
+
 ### Example
 
 ```ts
-import { Configuration, SplitzBackendApi } from "";
-import type { AccountManageInfoGetRequest } from "";
+import {
+  Configuration,
+  SplitzBackendApi,
+} from '';
+import type { AccountManageInfoGetRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -250,19 +269,22 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: `application/json`, `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
-| **404**     | Not Found   | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountManageInfoPost
 
 > InfoResponse accountManageInfoPost(infoRequest)
+
+
 
 ### Example
 
@@ -296,9 +318,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name            | Type                          | Description | Notes |
-| --------------- | ----------------------------- | ----------- | ----- |
-| **infoRequest** | [InfoRequest](InfoRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **infoRequest** | [InfoRequest](InfoRequest.md) |  | |
 
 ### Return type
 
@@ -313,19 +336,22 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/json`, `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
-| **404**     | Not Found   | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountRefreshPost
 
 > AccessTokenResponse accountRefreshPost(refreshRequest)
+
+
 
 ### Example
 
@@ -359,9 +385,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name               | Type                                | Description | Notes |
-| ------------------ | ----------------------------------- | ----------- | ----- |
-| **refreshRequest** | [RefreshRequest](RefreshRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **refreshRequest** | [RefreshRequest](RefreshRequest.md) |  | |
 
 ### Return type
 
@@ -376,17 +403,20 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountRegisterPost
 
 > accountRegisterPost(registerRequest)
+
+
 
 ### Example
 
@@ -420,9 +450,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                | Type                                  | Description | Notes |
-| ------------------- | ------------------------------------- | ----------- | ----- |
-| **registerRequest** | [RegisterRequest](RegisterRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **registerRequest** | [RegisterRequest](RegisterRequest.md) |  | |
 
 ### Return type
 
@@ -437,18 +468,21 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountResendConfirmationEmailPost
 
 > accountResendConfirmationEmailPost(resendConfirmationEmailRequest)
+
+
 
 ### Example
 
@@ -482,9 +516,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                               | Type                                                                | Description | Notes |
-| ---------------------------------- | ------------------------------------------------------------------- | ----------- | ----- |
-| **resendConfirmationEmailRequest** | [ResendConfirmationEmailRequest](ResendConfirmationEmailRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **resendConfirmationEmailRequest** | [ResendConfirmationEmailRequest](ResendConfirmationEmailRequest.md) |  | |
 
 ### Return type
 
@@ -499,17 +534,20 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: Not defined
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## accountResetPasswordPost
 
 > accountResetPasswordPost(resetPasswordRequest)
+
+
 
 ### Example
 
@@ -543,9 +581,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name                     | Type                                            | Description | Notes |
-| ------------------------ | ----------------------------------------------- | ----------- | ----- |
-| **resetPasswordRequest** | [ResetPasswordRequest](ResetPasswordRequest.md) |             |       |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **resetPasswordRequest** | [ResetPasswordRequest](ResetPasswordRequest.md) |  | |
 
 ### Return type
 
@@ -560,24 +599,30 @@ No authorization required
 - **Content-Type**: `application/json`
 - **Accept**: `application/problem+json`
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
-| **400**     | Bad Request | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## mapIdentityApiAccountConfirmEmail
 
 > mapIdentityApiAccountConfirmEmail(userId, code, changedEmail)
 
+
+
 ### Example
 
 ```ts
-import { Configuration, SplitzBackendApi } from "";
-import type { MapIdentityApiAccountConfirmEmailRequest } from "";
+import {
+  Configuration,
+  SplitzBackendApi,
+} from '';
+import type { MapIdentityApiAccountConfirmEmailRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -589,7 +634,7 @@ async function example() {
     // string
     code: code_example,
     // string (optional)
-    changedEmail: changedEmail_example
+    changedEmail: changedEmail_example,
   } satisfies MapIdentityApiAccountConfirmEmailRequest;
 
   try {
@@ -606,11 +651,12 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name             | Type     | Description | Notes                                |
-| ---------------- | -------- | ----------- | ------------------------------------ |
-| **userId**       | `string` |             | [Defaults to `undefined`]            |
-| **code**         | `string` |             | [Defaults to `undefined`]            |
-| **changedEmail** | `string` |             | [Optional] [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **userId** | `string` |  | [Defaults to `undefined`] |
+| **code** | `string` |  | [Defaults to `undefined`] |
+| **changedEmail** | `string` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -625,10 +671,11 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: Not defined
 
-### HTTP response details
 
+### HTTP response details
 | Status code | Description | Response headers |
-| ----------- | ----------- | ---------------- |
-| **200**     | OK          | -                |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+

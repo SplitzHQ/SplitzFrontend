@@ -1,32 +1,36 @@
+
 # GroupJoinLinkDto
+
 
 ## Properties
 
-| Name              | Type   |
-| ----------------- | ------ |
-| `groupJoinLinkId` | string |
-| `groupId`         | string |
+Name | Type
+------------ | -------------
+`groupJoinLinkId` | string
+`groupId` | string
 
 ## Example
 
 ```typescript
-import type { GroupJoinLinkDto } from "";
+import type { GroupJoinLinkDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  groupJoinLinkId: null,
-  groupId: null
-} satisfies GroupJoinLinkDto;
+  "groupJoinLinkId": null,
+  "groupId": null,
+} satisfies GroupJoinLinkDto
 
-console.log(example);
+console.log(example)
 
 // Convert the instance to a JSON string
-const exampleJSON: string = JSON.stringify(example);
-console.log(exampleJSON);
+const exampleJSON: string = JSON.stringify(example)
+console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as GroupJoinLinkDto;
-console.log(exampleParsed);
+const exampleParsed = JSON.parse(exampleJSON) as GroupJoinLinkDto
+console.log(exampleParsed)
 ```
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+

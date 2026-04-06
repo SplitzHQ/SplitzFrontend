@@ -2,6 +2,7 @@
 import { useFluent } from "fluent-vue";
 
 import SButton from "@/components/SButton/SButton.vue";
+import { formatCurrency } from "@/libs/format-currency";
 
 export interface BalanceCardProps {
   totalBalance: number;
@@ -13,14 +14,6 @@ const { totalBalance, currency, memberBalances } = defineProps<BalanceCardProps>
 const emit = defineEmits<{ settleUp: [] }>();
 
 const { $t } = useFluent();
-
-const formatCurrency = (amount: number, currency: string) => {
-  try {
-    return new Intl.NumberFormat(undefined, { currency, style: "currency" }).format(Math.abs(amount));
-  } catch {
-    return `${Math.abs(amount).toFixed(2)} ${currency}`;
-  }
-};
 </script>
 
 <template>
@@ -30,9 +23,9 @@ const formatCurrency = (amount: number, currency: string) => {
         <p class="text-sm text-base-text-quaternary">{{ $t("group-detail-total-balance") }}</p>
         <p
           class="text-display-lg font-medium"
-          :class="totalBalance <= 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
+          :class="totalBalance >= 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
         >
-          {{ formatCurrency(totalBalance, currency) }}
+          {{ formatCurrency(totalBalance, currency, false) }}
         </p>
       </div>
       <SButton variant="primary" color="brand" size="xl" @click="emit('settleUp')">

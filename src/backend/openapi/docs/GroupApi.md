@@ -1,20 +1,23 @@
 # GroupApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                       | HTTP request                          | Description                        |
-| ------------------------------------------------------------ | ------------------------------------- | ---------------------------------- |
-| [**addGroupMember**](GroupApi.md#addgroupmember)             | **POST** /group/{groupId}/members     | Add members to a group             |
-| [**createGroup**](GroupApi.md#creategroup)                   | **POST** /group                       | Create a new group                 |
-| [**createGroupJoinLink**](GroupApi.md#creategroupjoinlink)   | **POST** /group/{groupId}/join-link   | create a join link for a group     |
-| [**deleteGroup**](GroupApi.md#deletegroup)                   | **DELETE** /group/{groupId}           | Delete a group.                    |
-| [**getGroup**](GroupApi.md#getgroup)                         | **GET** /group/{groupId}              | Get the group info                 |
-| [**getGroupInfoByLink**](GroupApi.md#getgroupinfobylink)     | **GET** /group/join/{joinLinkId}      | get group info from join link      |
-| [**getGroupTransactions**](GroupApi.md#getgrouptransactions) | **GET** /group/{groupId}/transactions | Get the group transactions         |
-| [**getGroups**](GroupApi.md#getgroups)                       | **GET** /group                        | Get the current user\&#39;s groups |
-| [**joinGroupByLink**](GroupApi.md#joingroupbylink)           | **POST** /group/join/{joinLinkId}     | join a group by a join link        |
-| [**updateGroup**](GroupApi.md#updategroup)                   | **PUT** /group/{groupId}              | Update group info                  |
-| [**uploadGroupAvatar**](GroupApi.md#uploadgroupavatar)       | **POST** /group/{groupId}/avatar      | Upload a group avatar image.       |
+| Method | HTTP request | Description |
+|------------- | ------------- | -------------|
+| [**addGroupMember**](GroupApi.md#addgroupmember) | **POST** /group/{groupId}/members | Add members to a group |
+| [**createGroup**](GroupApi.md#creategroup) | **POST** /group | Create a new group |
+| [**createGroupJoinLink**](GroupApi.md#creategroupjoinlink) | **POST** /group/{groupId}/join-link | create a join link for a group |
+| [**deleteGroup**](GroupApi.md#deletegroup) | **DELETE** /group/{groupId} | Delete a group. |
+| [**getGroup**](GroupApi.md#getgroup) | **GET** /group/{groupId} | Get the group info |
+| [**getGroupInfoByLink**](GroupApi.md#getgroupinfobylink) | **GET** /group/join/{joinLinkId} | get group info from join link |
+| [**getGroupInvoices**](GroupApi.md#getgroupinvoices) | **GET** /group/{groupId}/invoices | Get the group invoices |
+| [**getGroupTransactions**](GroupApi.md#getgrouptransactions) | **GET** /group/{groupId}/transactions | Get the group transactions |
+| [**getGroups**](GroupApi.md#getgroups) | **GET** /group | Get the current user\&#39;s groups |
+| [**joinGroupByLink**](GroupApi.md#joingroupbylink) | **POST** /group/join/{joinLinkId} | join a group by a join link |
+| [**updateGroup**](GroupApi.md#updategroup) | **PUT** /group/{groupId} | Update group info |
+| [**uploadGroupAvatar**](GroupApi.md#uploadgroupavatar) | **POST** /group/{groupId}/avatar | Upload a group avatar image. |
+
+
 
 ## addGroupMember
 
@@ -33,7 +36,7 @@ import type { AddGroupMemberRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -60,10 +63,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name            | Type            | Description      | Notes                     |
-| --------------- | --------------- | ---------------- | ------------------------- |
-| **groupId**     | `string`        | group id         | [Defaults to `undefined`] |
-| **requestBody** | `Array<string>` | list of user ids | [Optional]                |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | group id | [Defaults to `undefined`] |
+| **requestBody** | `Array<string>` | list of user ids | [Optional] |
 
 ### Return type
 
@@ -78,15 +82,16 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **201**     | Created      | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **201** | Created |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## createGroup
 
@@ -105,7 +110,7 @@ import type { CreateGroupRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -130,9 +135,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name              | Type                              | Description | Notes      |
-| ----------------- | --------------------------------- | ----------- | ---------- |
-| **groupInputDto** | [GroupInputDto](GroupInputDto.md) | group info  | [Optional] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupInputDto** | [GroupInputDto](GroupInputDto.md) | group info | [Optional] |
 
 ### Return type
 
@@ -147,15 +153,16 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **201**     | Created      | -                |
-| **409**     | Conflict     | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **201** | Created |  -  |
+| **409** | Conflict |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## createGroupJoinLink
 
@@ -174,7 +181,7 @@ import type { CreateGroupJoinLinkRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -199,9 +206,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name        | Type     | Description | Notes                     |
-| ----------- | -------- | ----------- | ------------------------- |
-| **groupId** | `string` | group id    | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | group id | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -216,15 +224,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **200**     | OK           | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## deleteGroup
 
@@ -243,7 +252,7 @@ import type { DeleteGroupRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -268,9 +277,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name        | Type     | Description | Notes                     |
-| ----------- | -------- | ----------- | ------------------------- |
-| **groupId** | `string` |             | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -285,15 +295,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `text/plain`, `application/json`, `text/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **204**     | No Content   | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getGroup
 
@@ -312,7 +323,7 @@ import type { GetGroupRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -337,9 +348,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name        | Type     | Description | Notes                     |
-| ----------- | -------- | ----------- | ------------------------- |
-| **groupId** | `string` |             | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -354,15 +366,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getGroupInfoByLink
 
@@ -381,7 +394,7 @@ import type { GetGroupInfoByLinkRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -406,8 +419,9 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name           | Type     | Description  | Notes                     |
-| -------------- | -------- | ------------ | ------------------------- |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
 | **joinLinkId** | `string` | join link id | [Defaults to `undefined`] |
 
 ### Return type
@@ -423,15 +437,87 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **200**     | OK           | -                |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getGroupInvoices
+
+> Array&lt;InvoiceReducedDto&gt; getGroupInvoices(groupId)
+
+Get the group invoices
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetGroupInvoicesRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string | 
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies GetGroupInvoicesRequest;
+
+  try {
+    const data = await api.getGroupInvoices(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;InvoiceReducedDto&gt;**](InvoiceReducedDto.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getGroupTransactions
 
@@ -450,14 +536,14 @@ import type { GetGroupTransactionsRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
   const api = new GroupApi(config);
 
   const body = {
-    // string |
+    // string | 
     groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
   } satisfies GetGroupTransactionsRequest;
 
@@ -475,9 +561,10 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name        | Type     | Description | Notes                     |
-| ----------- | -------- | ----------- | ------------------------- |
-| **groupId** | `string` |             | [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -492,15 +579,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## getGroups
 
@@ -511,14 +599,17 @@ Get the current user\&#39;s groups
 ### Example
 
 ```ts
-import { Configuration, GroupApi } from "";
-import type { GetGroupsRequest } from "";
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetGroupsRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN"
+    accessToken: "YOUR BEARER TOKEN",
   });
   const api = new GroupApi(config);
 
@@ -551,14 +642,15 @@ This endpoint does not need any parameter.
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## joinGroupByLink
 
@@ -577,7 +669,7 @@ import type { JoinGroupByLinkRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -602,8 +694,9 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name           | Type     | Description  | Notes                     |
-| -------------- | -------- | ------------ | ------------------------- |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
 | **joinLinkId** | `string` | join link id | [Defaults to `undefined`] |
 
 ### Return type
@@ -619,15 +712,16 @@ example().catch(console.error);
 - **Content-Type**: Not defined
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## updateGroup
 
@@ -646,7 +740,7 @@ import type { UpdateGroupRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -673,10 +767,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name              | Type                              | Description | Notes                     |
-| ----------------- | --------------------------------- | ----------- | ------------------------- |
-| **groupId**       | `string`                          | Group Id    | [Defaults to `undefined`] |
-| **groupInputDto** | [GroupInputDto](GroupInputDto.md) | group info  | [Optional]                |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | Group Id | [Defaults to `undefined`] |
+| **groupInputDto** | [GroupInputDto](GroupInputDto.md) | group info | [Optional] |
 
 ### Return type
 
@@ -691,15 +786,16 @@ example().catch(console.error);
 - **Content-Type**: `application/json`, `text/json`, `application/*+json`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **201**     | Created      | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **201** | Created |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
 
 ## uploadGroupAvatar
 
@@ -718,7 +814,7 @@ import type { UploadGroupAvatarRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
-  const config = new Configuration({
+  const config = new Configuration({ 
     // Configure HTTP bearer authorization: Bearer
     accessToken: "YOUR BEARER TOKEN",
   });
@@ -745,10 +841,11 @@ example().catch(console.error);
 
 ### Parameters
 
-| Name        | Type     | Description | Notes                                |
-| ----------- | -------- | ----------- | ------------------------------------ |
-| **groupId** | `string` |             | [Defaults to `undefined`]            |
-| **file**    | `Blob`   |             | [Optional] [Defaults to `undefined`] |
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+| **file** | `Blob` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -763,13 +860,14 @@ example().catch(console.error);
 - **Content-Type**: `multipart/form-data`
 - **Accept**: `application/json`
 
-### HTTP response details
 
-| Status code | Description  | Response headers |
-| ----------- | ------------ | ---------------- |
-| **401**     | Unauthorized | -                |
-| **404**     | Not Found    | -                |
-| **400**     | Bad Request  | -                |
-| **200**     | OK           | -                |
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **400** | Bad Request |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+

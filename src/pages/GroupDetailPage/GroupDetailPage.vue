@@ -16,6 +16,7 @@ import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import BalanceCard from "./BalanceCard.vue";
+import InvoiceList from "./InvoiceList.vue";
 import TransactionList from "./TransactionList.vue";
 
 const { $t } = useFluent();
@@ -37,6 +38,13 @@ const { state: transactionsQuery } = useQuery({
   key: () => ["getGroupTransactions", groupId.value],
   query: () => groupApi.getGroupTransactions({ groupId: groupId.value }),
 });
+
+const { state: invoicesQuery } = useQuery({
+  key: () => ["getGroupInvoices", groupId.value],
+  query: () => groupApi.getGroupInvoices({ groupId: groupId.value }),
+});
+
+const groupInvoices = computed(() => invoicesQuery.value.data ?? []);
 
 const group = computed(() => groupQuery.value.data);
 const transactions = computed(() => transactionsQuery.value.data ?? []);
@@ -68,9 +76,9 @@ const memberBalances = computed(() => {
   return group.value.balances
     .filter((b) => b.user.id !== userStore.user?.id && b.balance !== "0")
     .map((b) => ({
-      // Other member's positive balance means they owe money (which the user is owed)
-      // We negate it to match our convention: negative = they owe you, positive = you owe them
-      amount: -Number.parseFloat(b.balance),
+      // Positive balance = creditor (they are owed), negative = debtor (they owe)
+      // From current user's perspective: their positive = you owe them, their negative = they owe you
+      amount: Number.parseFloat(b.balance),
       currency: b.currency,
       name: b.user.userName,
     }));
@@ -86,6 +94,11 @@ const tabs = computed(() => [
 const addExpense = () => {
   routerHistoryStore.takeSnapshot();
   void router.push({ name: "newExpense" });
+};
+
+const settleUp = () => {
+  routerHistoryStore.takeSnapshot();
+  void router.push({ name: "settleUp", params: { groupId: groupId.value } });
 };
 </script>
 
@@ -114,6 +127,7 @@ const addExpense = () => {
             :total-balance="totalBalance"
             :currency="currency"
             :member-balances="memberBalances"
+            @settle-up="settleUp"
           />
 
           <!-- Tab Buttons -->
@@ -123,6 +137,9 @@ const addExpense = () => {
             </SButton>
           </div>
         </div>
+
+        <!-- Invoices -->
+        <InvoiceList :invoices="groupInvoices" />
 
         <!-- Transaction List -->
         <TransactionList :transactions="transactions" />
