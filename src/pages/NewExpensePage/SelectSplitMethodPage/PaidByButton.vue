@@ -1,29 +1,26 @@
 <script setup lang="ts">
 import { PhCaretDown } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 
-import { AccountApi } from "@/backend";
-import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import { useTransactionStore } from "@/stores/transaction";
+import { useUserStore } from "@/stores/user";
 
 // i18n
 const { $t } = useFluent();
 
 const transactionStore = useTransactionStore();
-const accountApi = new AccountApi(config);
-const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
+const userStore = useUserStore();
 
 // Ensure that the paidBy is set to the current user if not already set
 watch(
-  userInfo,
+  () => userStore.user,
   (newValue) => {
-    if (newValue.data && !transactionStore.paidBy) {
-      transactionStore.paidBy = newValue.data.id;
+    if (newValue && !transactionStore.paidBy) {
+      transactionStore.paidBy = newValue.id;
     }
   },
   { immediate: true }
@@ -40,11 +37,11 @@ watch(
 const paidByUsername = computed(() => {
   if (!transactionStore.paidBy) return "...";
 
-  if (transactionStore.paidBy === userInfo.value.data?.id) {
+  if (transactionStore.paidBy === userStore.user?.id) {
     return $t("new-expense-pronoun-you");
   }
 
-  const friend = userInfo.value.data?.friends?.find((friend) => friend.friendUser.id === transactionStore.paidBy);
+  const friend = userStore.user?.friends?.find((friend) => friend.friendUser.id === transactionStore.paidBy);
   if (friend) {
     return friend.remark ?? friend.friendUser.userName;
   }

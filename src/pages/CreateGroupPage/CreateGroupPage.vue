@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { PhCopy } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
+import { useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
 import { toast } from "vue-sonner";
 
-import { AccountApi, GroupApi, type GroupDto, type GroupJoinLinkDto } from "@/backend";
+import { GroupApi, type GroupDto, type GroupJoinLinkDto } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -13,15 +13,15 @@ import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRouterHistoryStore } from "@/stores/routing-history";
+import { useUserStore } from "@/stores/user";
 
 const routerHistoryStore = useRouterHistoryStore();
 
 const { $t } = useFluent();
+const queryCache = useQueryCache();
 
-const accountApi = new AccountApi(config);
 const groupApi = new GroupApi(config);
-
-const { state: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
+const userStore = useUserStore();
 
 const groupName = ref("");
 const loading = ref(false);
@@ -39,11 +39,11 @@ const joinUrl = computed(() => {
 });
 
 const canSubmit = computed(() => {
-  return !!userInfo.value.data && groupName.value.trim().length > 0 && !loading.value;
+  return !!userStore.user && groupName.value.trim().length > 0 && !loading.value;
 });
 
 async function submit() {
-  if (!userInfo.value.data) {
+  if (!userStore.user) {
     toast.error($t("create-group-error-user-not-ready"));
     return;
   }
@@ -55,7 +55,7 @@ async function submit() {
   try {
     const group = await groupApi.createGroup({
       groupInputDto: {
-        membersId: [userInfo.value.data.id],
+        membersId: [userStore.user.id],
         name,
       },
     });
@@ -65,6 +65,7 @@ async function submit() {
     const link = await groupApi.createGroupJoinLink({ groupId: group.groupId });
     joinLink.value = link;
 
+    queryCache.invalidateQueries({ key: ["getGroups"] });
     toast.success($t("create-group-success"));
   } catch (error) {
     console.error(error);

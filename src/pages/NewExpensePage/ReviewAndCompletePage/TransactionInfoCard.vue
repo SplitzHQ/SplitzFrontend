@@ -1,25 +1,22 @@
 <script setup lang="ts">
 import { PhFiles } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
-import { AccountApi } from "@/backend";
-import config from "@/backend/config";
 import { useTransactionStore } from "@/stores/transaction";
+import { useUserStore } from "@/stores/user";
 
 const { $t } = useFluent();
 const transactionStore = useTransactionStore();
 const { transaction } = storeToRefs(transactionStore);
 
-const accountApi = new AccountApi(config);
-const { data: userInfo } = useQuery({ key: ["getUserInfo"], query: () => accountApi.getUserInfo() });
+const userStore = useUserStore();
 
 const amountOwed = computed(() => {
-  if (transactionStore.paidBy && userInfo.value?.id && transaction.value.amount) {
-    let owed = transactionStore.finalSplitAmount[userInfo.value.id] ?? 0;
-    if (transactionStore.paidBy === userInfo.value.id) {
+  if (transactionStore.paidBy && userStore.user?.id && transaction.value.amount) {
+    let owed = transactionStore.finalSplitAmount[userStore.user.id] ?? 0;
+    if (transactionStore.paidBy === userStore.user.id) {
       owed = owed - transaction.value.amount;
     }
     return owed;

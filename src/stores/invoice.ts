@@ -1,3 +1,4 @@
+import { useQueryCache } from "@pinia/colada";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -5,6 +6,8 @@ import { InvoiceApi, type InvoiceDto, type InvoiceInputDto, type TransactionDto 
 import config from "@/backend/config";
 
 export const useInvoiceStore = defineStore("invoice", () => {
+  const queryCache = useQueryCache();
+
   const invoiceId = ref<string | null>(null);
   const invoice = ref<InvoiceInputDto>({
     currency: "USD",
@@ -56,22 +59,28 @@ export const useInvoiceStore = defineStore("invoice", () => {
     const api = new InvoiceApi(config);
 
     // If the invoice doesn't have an ID, it means it's not created yet, so we create it. Otherwise, we update the existing invoice.
+    let result: InvoiceDto;
     if (!invoiceId.value) {
-      const result = await api.createInvoice({
+      result = await api.createInvoice({
         invoiceInputDto: invoice.value,
       });
       createdInvoice.value = result;
       invoiceId.value = result.invoiceId;
-      return result;
     } else {
       await api.updateInvoice({
         id: invoiceId.value,
         invoiceInputDto: invoice.value,
       });
-      const result = await api.getInvoice({ id: invoiceId.value });
+      result = await api.getInvoice({ id: invoiceId.value });
       createdInvoice.value = result;
-      return result;
     }
+
+    // Invalidate relevant queries to ensure UI reflects the latest data
+    const groupId = invoice.value.groupId;
+    if (groupId) {
+      await queryCache.invalidateQueries({ key: ["getGroupInvoices", groupId] });
+    }
+    return result;
   }
 
   function reset() {

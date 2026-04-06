@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useQuery } from "@pinia/colada";
+import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -12,6 +12,7 @@ import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 
 const { $t } = useFluent();
+const queryCache = useQueryCache();
 const route = useRoute();
 const router = useRouter();
 
@@ -31,6 +32,7 @@ async function join() {
   joining.value = true;
   try {
     await groupApi.joinGroupByLink({ joinLinkId: joinLinkId.value });
+    queryCache.invalidateQueries({ key: ["getGroups"] });
     toast.success($t("join-group-success"));
     await router.push("/");
   } catch (error) {
