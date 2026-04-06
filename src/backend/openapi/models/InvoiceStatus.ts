@@ -18,8 +18,8 @@
  * @export
  */
 export const InvoiceStatus = {
-    NUMBER_0: 0,
-    NUMBER_1: 1
+    Open: 'Open',
+    Settled: 'Settled'
 } as const;
 export type InvoiceStatus = typeof InvoiceStatus[keyof typeof InvoiceStatus];
 

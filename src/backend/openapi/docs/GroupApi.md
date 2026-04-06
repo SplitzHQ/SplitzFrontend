@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 | [**deleteGroup**](GroupApi.md#deletegroup) | **DELETE** /group/{groupId} | Delete a group. |
 | [**getGroup**](GroupApi.md#getgroup) | **GET** /group/{groupId} | Get the group info |
 | [**getGroupInfoByLink**](GroupApi.md#getgroupinfobylink) | **GET** /group/join/{joinLinkId} | get group info from join link |
+| [**getGroupInvoices**](GroupApi.md#getgroupinvoices) | **GET** /group/{groupId}/invoices | Get the group invoices |
 | [**getGroupTransactions**](GroupApi.md#getgrouptransactions) | **GET** /group/{groupId}/transactions | Get the group transactions |
 | [**getGroups**](GroupApi.md#getgroups) | **GET** /group | Get the current user\&#39;s groups |
 | [**joinGroupByLink**](GroupApi.md#joingroupbylink) | **POST** /group/join/{joinLinkId} | join a group by a join link |
@@ -443,6 +444,77 @@ example().catch(console.error);
 | **200** | OK |  -  |
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getGroupInvoices
+
+> Array&lt;InvoiceReducedDto&gt; getGroupInvoices(groupId)
+
+Get the group invoices
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetGroupInvoicesRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string | 
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies GetGroupInvoicesRequest;
+
+  try {
+    const data = await api.getGroupInvoices(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;InvoiceReducedDto&gt;**](InvoiceReducedDto.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

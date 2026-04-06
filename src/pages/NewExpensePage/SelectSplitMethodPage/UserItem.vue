@@ -32,7 +32,7 @@ const onPlusMinusButtonClick = () => {
 
 <template>
   <div v-if="user !== undefined" class="flex items-center justify-between gap-3 py-2">
-    <div class="flex items-center gap-3">
+    <div class="flex min-w-0 items-center gap-3">
       <div class="relative">
         <Avatar :images="[{ src: user.photo, alt: user.userName }]" size="sm" />
         <button class="absolute -right-1.5 -bottom-1.5 rounded-full bg-base-bg-primary" @click="onPlusMinusButtonClick">
@@ -40,8 +40,8 @@ const onPlusMinusButtonClick = () => {
           <PhPlusCircle v-else class="text-xl text-base-fg-brand" />
         </button>
       </div>
-      <div class="flex flex-col gap-1">
-        <div class="text-base font-semibold text-base-text-primary">
+      <div class="flex min-w-0 flex-col gap-1">
+        <div class="truncate text-base font-semibold text-base-text-primary">
           {{ user.userName }}
         </div>
         <div
@@ -61,6 +61,8 @@ const onPlusMinusButtonClick = () => {
         </div>
       </div>
     </div>
-    <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" is-focused />
+    <div class="shrink-0">
+      <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" is-focused />
+    </div>
   </div>
 </template>

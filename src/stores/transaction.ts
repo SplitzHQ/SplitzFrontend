@@ -256,9 +256,10 @@ export const useTransactionStore = defineStore("transaction", () => {
     const api = new TransactionApi(config);
 
     // Build the balance data from the final split amounts
+    // Positive balance = creditor (paid more than share), negative = debtor (owes money)
     const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => {
       return {
-        balance: (balance - (paidBy.value === userId ? (transaction.value.amount ?? 0) : 0)).toFixed(2),
+        balance: ((paidBy.value === userId ? (transaction.value.amount ?? 0) : 0) - balance).toFixed(2),
         transactionId: transactionId.value,
         userId,
       };

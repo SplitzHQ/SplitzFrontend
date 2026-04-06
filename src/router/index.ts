@@ -76,6 +76,26 @@ const router = createRouter({
       name: "profile",
       path: "/profile",
     },
+    {
+      name: "settleUp",
+      path: "/group/:groupId/settle-up",
+      redirect: (to) => `/group/${to.params.groupId as string}/settle-up/select-transactions`,
+    },
+    {
+      component: () => import("@/pages/SettleUpPage/SelectTransactionsPage.vue"),
+      name: "settleUpSelectTransactions",
+      path: "/group/:groupId/settle-up/select-transactions",
+    },
+    {
+      component: () => import("@/pages/SettleUpPage/ConfirmDetailsPage.vue"),
+      name: "settleUpConfirmDetails",
+      path: "/group/:groupId/settle-up/confirm-details",
+    },
+    {
+      component: () => import("@/pages/SettleUpPage/DonePage.vue"),
+      name: "settleUpDone",
+      path: "/group/:groupId/settle-up/done",
+    },
   ],
 });
 

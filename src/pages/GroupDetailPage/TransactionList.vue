@@ -2,8 +2,7 @@
 import { computed } from "vue";
 
 import type { TransactionDto } from "@/backend";
-
-import TransactionItem from "./TransactionItem.vue";
+import TransactionItem from "@/components/TransactionItem/TransactionItem.vue";
 
 const props = defineProps<{
   transactions: TransactionDto[];

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const model = defineModel<string>();
+const model = defineModel<string | null | undefined>();
 
 const { placeholder } = defineProps<{
   placeholder: string;

@@ -19,6 +19,7 @@ import type {
   GroupInputDto,
   GroupJoinLinkDto,
   GroupReducedDto,
+  InvoiceReducedDto,
   ProblemDetails,
   TransactionDto,
   UploadImageResult,
@@ -32,6 +33,8 @@ import {
     GroupJoinLinkDtoToJSON,
     GroupReducedDtoFromJSON,
     GroupReducedDtoToJSON,
+    InvoiceReducedDtoFromJSON,
+    InvoiceReducedDtoToJSON,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
     TransactionDtoFromJSON,
@@ -63,6 +66,10 @@ export interface GetGroupRequest {
 
 export interface GetGroupInfoByLinkRequest {
     joinLinkId: string;
+}
+
+export interface GetGroupInvoicesRequest {
+    groupId: string;
 }
 
 export interface GetGroupTransactionsRequest {
@@ -400,6 +407,59 @@ export class GroupApi extends runtime.BaseAPI {
      */
     async getGroupInfoByLink(requestParameters: GetGroupInfoByLinkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupReducedDto> {
         const response = await this.getGroupInfoByLinkRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getGroupInvoices without sending the request
+     */
+    async getGroupInvoicesRequestOpts(requestParameters: GetGroupInvoicesRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling getGroupInvoices().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/{groupId}/invoices`;
+        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the group invoices
+     */
+    async getGroupInvoicesRaw(requestParameters: GetGroupInvoicesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<InvoiceReducedDto>>> {
+        const requestOptions = await this.getGroupInvoicesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(InvoiceReducedDtoFromJSON));
+    }
+
+    /**
+     * Get the group invoices
+     */
+    async getGroupInvoices(requestParameters: GetGroupInvoicesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<InvoiceReducedDto>> {
+        const response = await this.getGroupInvoicesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
