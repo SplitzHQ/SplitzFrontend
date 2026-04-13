@@ -331,6 +331,50 @@ export const useTransactionStore = defineStore("transaction", () => {
     });
   };
 
+  const loadTransaction = (dto: TransactionDto, groupMembers: SplitzUserReducedDto[]) => {
+    // Reset first
+    resetTransactionStore();
+
+    // Set transaction ID for update mode
+    transactionId.value = dto.transactionId;
+
+    // Set members from group
+    members.value = groupMembers;
+
+    // Map DTO fields to store
+    transaction.value = {
+      amount: Number(dto.amount),
+      createTime: dto.createTime,
+      currency: dto.currency,
+      geoCoordinate: dto.geoCoordinate ?? undefined,
+      groupId: dto.groupId,
+      icon: dto.icon,
+      name: dto.name,
+      tags: dto.tags ?? [],
+      transactionTime: dto.transactionTime,
+      userId: "",
+    };
+
+    // Infer paidBy: user with max positive balance
+    const balances = dto.balances ?? [];
+    if (balances.length > 0) {
+      const sorted = [...balances].sort((a, b) => Number(b.balance) - Number(a.balance));
+      paidBy.value = sorted[0]!.userId;
+    }
+
+    // Set included members from balance entries
+    includedMembersId.value = balances.map((b) => b.userId);
+
+    // Set split method to custom and compute custom amounts from balances
+    // Balance = paidAmount - shareAmount, so shareAmount = paidAmount - balance
+    splitMethod.value = "custom";
+    const amount = Number(dto.amount);
+    for (const balance of balances) {
+      const paidAmount = balance.userId === paidBy.value ? amount : 0;
+      splitByCustomDetails.value[balance.userId] = paidAmount - Number(balance.balance);
+    }
+  };
+
   const resetTransactionStore = () => {
     transaction.value = {
       amount: 0,
@@ -338,6 +382,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       userId: "",
     };
     transactionId.value = undefined;
+    previewPhotoBase64.value = undefined;
     members.value = [];
     paidBy.value = undefined;
     includedMembersId.value = [];
@@ -356,6 +401,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     includedMembersId,
     increaseSplitByShares,
     isUserInputValid,
+    loadTransaction,
     members,
     paidBy,
     previewPhotoBase64,

@@ -16,6 +16,7 @@ import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { formatCurrency } from "@/libs/format-currency";
+import { useTransactionStore } from "@/stores/transaction";
 import { useUserStore } from "@/stores/user";
 
 import DeleteConfirmSheet from "./DeleteConfirmSheet.vue";
@@ -23,6 +24,7 @@ import DeleteConfirmSheet from "./DeleteConfirmSheet.vue";
 const { $t } = useFluent();
 const route = useRoute();
 const router = useRouter();
+const transactionStore = useTransactionStore();
 const userStore = useUserStore();
 const queryCache = useQueryCache();
 
@@ -113,6 +115,11 @@ async function handleDelete() {
   } finally {
     isDeleting.value = false;
   }
+}
+
+function handleEdit() {
+  transactionStore.resetTransactionStore();
+  void router.push({ name: "editTransaction", params: { groupId: groupId.value, transactionId: transactionId.value } });
 }
 </script>
 
@@ -225,7 +232,7 @@ async function handleDelete() {
 
           <!-- Actions -->
           <div class="mt-auto flex flex-col gap-2 pt-4">
-            <SButton variant="secondary" color="neutral" size="xxl" disabled>
+            <SButton variant="secondary" color="neutral" size="xxl" @click="handleEdit">
               <PhPencil class="mr-2" />
               {{ $t("transaction-detail-edit") }}
             </SButton>
