@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
+import { resolveAssetUrl } from "@/libs/asset-url";
+
 import defaultUser from "./default-user.svg";
 
 interface Image {
@@ -12,6 +16,8 @@ export interface AvatarProps {
 
 const { images, size } = defineProps<AvatarProps>();
 
+const resolvedImages = computed(() => images.map((image) => ({ ...image, src: resolveAssetUrl(image.src) })));
+
 if (images.length > 4) {
   console.warn("Avatar component only supports up to 4 images");
 }
@@ -22,12 +28,12 @@ if (images.length > 4) {
     <img
       v-if="images.length === 1"
       class="image-count-single"
-      :src="images[0]!.src ?? defaultUser"
-      :alt="images[0]!.alt"
+      :src="resolvedImages[0]!.src ?? defaultUser"
+      :alt="resolvedImages[0]!.alt"
     />
     <div v-else class="flex flex-wrap justify-center gap-0.5">
       <img
-        v-for="image in images.slice(0, 4)"
+        v-for="image in resolvedImages.slice(0, 4)"
         :key="image.src ?? defaultUser"
         class="image-count-multiple"
         :src="image.src ?? defaultUser"

@@ -3,11 +3,7 @@ import router, { publicRoutes } from "@/router";
 import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
 import { Configuration, type Middleware } from "./openapi/runtime";
 
-const getBasePath = () => {
-  return "https://splitz.pro/api";
-};
-
-const basePath = getBasePath();
+export const apiBasePath = import.meta.env.VITE_SPLITZ_API_BASE_URL ?? "https://splitz.pro/api";
 
 const unauthorizedMiddleware: Middleware = {
   post: async ({ response }) => {
@@ -26,13 +22,13 @@ const unauthorizedMiddleware: Middleware = {
 };
 
 const config = new Configuration({
-  basePath: basePath,
+  basePath: apiBasePath,
   middleware: [unauthorizedMiddleware],
 
   accessToken: async () => {
     let accessToken = localStorage.getItem("accessToken");
     const accessTokenExpiration = localStorage.getItem("accessTokenExpiration");
-    const backendApi = new SplitzBackendApi(new Configuration({ basePath: basePath }));
+    const backendApi = new SplitzBackendApi(new Configuration({ basePath: apiBasePath }));
 
     if (accessTokenExpiration && parseInt(accessTokenExpiration) < Date.now()) {
       accessToken = null;

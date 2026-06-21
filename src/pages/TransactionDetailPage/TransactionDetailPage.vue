@@ -14,6 +14,7 @@ import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMo
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import { resolveAssetUrl } from "@/libs/asset-url";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { formatCurrency } from "@/libs/format-currency";
 import { useUserStore } from "@/stores/user";
@@ -97,6 +98,8 @@ const formattedAmount = computed(() => {
   if (!transaction.value) return "";
   return formatCurrency(Number(transaction.value.amount), transaction.value.currency);
 });
+
+const receiptImageUrl = computed(() => resolveAssetUrl(transaction.value?.photo) ?? undefined);
 
 async function handleDelete() {
   if (isDeleting.value) return;
@@ -208,7 +211,7 @@ async function handleDelete() {
           <div v-if="transaction.photo" class="flex flex-col gap-2">
             <p class="text-sm font-semibold text-base-text-primary">{{ $t("transaction-detail-receipt") }}</p>
             <img
-              :src="transaction.photo"
+              :src="receiptImageUrl"
               :alt="$t('transaction-detail-receipt')"
               class="max-h-80 rounded-2xl object-contain"
             />
