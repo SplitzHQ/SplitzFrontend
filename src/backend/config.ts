@@ -3,7 +3,10 @@ import router, { publicRoutes } from "@/router";
 import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
 import { Configuration, type Middleware } from "./openapi/runtime";
 
-export const apiBasePath = import.meta.env.VITE_SPLITZ_API_BASE_URL ?? "https://splitz.pro/api";
+export const apiBasePath = import.meta.env.VITE_SPLITZ_API_BASE_URL;
+if (!apiBasePath) {
+  throw new Error("VITE_SPLITZ_API_BASE_URL environment variable is not set");
+}
 
 const unauthorizedMiddleware: Middleware = {
   post: async ({ response }) => {

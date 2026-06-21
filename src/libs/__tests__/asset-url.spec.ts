@@ -32,6 +32,12 @@ describe("resolveAssetUrlWithBase", () => {
     );
   });
 
+  it("preserves base paths when combining leading-slash relative urls", () => {
+    expect(resolveAssetUrlWithBase("/bucket/users/1/avatar.webp?sig=abc", "https://assets.splitz.test/assets")).toBe(
+      "https://assets.splitz.test/assets/bucket/users/1/avatar.webp?sig=abc"
+    );
+  });
+
   it("combines non-leading-slash relative urls with the base domain", () => {
     expect(resolveAssetUrlWithBase("bucket/users/1/avatar.webp?sig=abc", baseUrl)).toBe(
       "https://assets.splitz.test/bucket/users/1/avatar.webp?sig=abc"
