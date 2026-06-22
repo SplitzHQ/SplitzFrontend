@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFluent } from "fluent-vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
@@ -30,6 +30,12 @@ const resetRequestContext = computed(() => {
 });
 
 const isInvalidLink = computed(() => resetRequestContext.value === null);
+
+watch([newPassword, confirmPassword], () => {
+  if (errorMessageKey.value === "auth-reset-password-mismatch" && newPassword.value === confirmPassword.value) {
+    errorMessageKey.value = null;
+  }
+});
 
 async function handleResetPassword() {
   if (!resetRequestContext.value || loading.value) {

@@ -107,13 +107,15 @@ Note: Task 7 unit coverage verifies invalid links, password confirmation validat
 
 ## Task 8: Focused Auth Email Test Coverage
 
-- [ ] Add Playwright tests for forgot-password disabled state.
-- [ ] Add Playwright tests for forgot-password generic success.
-- [ ] Add Playwright tests for reset-password validation and success routing.
-- [ ] Add Playwright tests for confirm-email success and invalid/error states.
-- [ ] Mock backend responses; do not depend on Resend delivery.
-- [ ] Run `bun run test:e2e`.
-- [ ] Run frontend type-check/lint/build.
+- [x] Add Playwright tests for forgot-password disabled state.
+- [x] Add Playwright tests for forgot-password generic success.
+- [x] Add Playwright tests for reset-password validation and success routing.
+- [x] Add Playwright tests for confirm-email success and invalid/error states.
+- [x] Mock backend responses; do not depend on Resend delivery.
+- [x] Run `bun run test:e2e`.
+- [x] Run frontend type-check/lint/build.
+
+Note: Task 8 replaces the starter E2E smoke test with mocked auth email coverage across Chromium, Firefox, and WebKit. Playwright browsers were installed locally with `bunx playwright install` after Firefox/WebKit binaries were missing.
 
 ## Task 9: End-to-End Validation And Documentation Pass
 
