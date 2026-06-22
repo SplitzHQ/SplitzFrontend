@@ -119,13 +119,15 @@ Note: Task 8 replaces the starter E2E smoke test with mocked auth email coverage
 
 ## Task 9: End-to-End Validation And Documentation Pass
 
-- [ ] Run backend `dotnet restore`.
-- [ ] Run backend `dotnet build`.
-- [ ] Run backend `dotnet format SplitzBackend.sln --verify-no-changes`.
-- [ ] Run frontend `bun run type-check`.
-- [ ] Run frontend `bun run lint`.
-- [ ] Run frontend `bun run build`.
-- [ ] Run `bun run test:e2e` if E2E tests were added.
-- [ ] Review `git diff` for generated-file scope.
-- [ ] Review `git diff` for secret hygiene.
-- [ ] Update README or task notes with local email configuration and disabled-mode behavior if needed.
+- [x] Run backend `dotnet restore`.
+- [x] Run backend `dotnet build`.
+- [x] Run backend `dotnet format SplitzBackend.sln --verify-no-changes`.
+- [x] Run frontend `bun run type-check`.
+- [x] Run frontend `bun run lint`.
+- [x] Run frontend `bun run build`.
+- [x] Run `bun run test:e2e` if E2E tests were added.
+- [x] Review `git diff` for generated-file scope.
+- [x] Review `git diff` for secret hygiene.
+- [x] Update README or task notes with local email configuration and disabled-mode behavior if needed.
+
+Note: Task 9 backend restore/build/format and frontend type-check/lint/build/E2E validation pass. The final E2E run completed 18 Playwright tests. Backend README now documents local transactional email configuration and disabled-mode behavior; backend format verification required normalizing LF line endings on email feature files.
