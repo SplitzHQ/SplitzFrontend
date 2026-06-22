@@ -12,24 +12,27 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ProblemDetails,
-  TransactionDraftDto,
-  TransactionDraftInputDto,
-  UploadImageResult,
-} from '../models/index';
 import {
+    type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
+} from '../models/ProblemDetails';
+import {
+    type TransactionDraftDto,
     TransactionDraftDtoFromJSON,
     TransactionDraftDtoToJSON,
+} from '../models/TransactionDraftDto';
+import {
+    type TransactionDraftInputDto,
     TransactionDraftInputDtoFromJSON,
     TransactionDraftInputDtoToJSON,
+} from '../models/TransactionDraftInputDto';
+import {
+    type UploadImageResult,
     UploadImageResultFromJSON,
     UploadImageResultToJSON,
-} from '../models/index';
+} from '../models/UploadImageResult';
 
 export interface AddTransactionDraftRequest {
     transactionDraftInputDto?: TransactionDraftInputDto;
@@ -131,7 +134,7 @@ export class TransactionDraftApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/transactiondraft/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -183,7 +186,7 @@ export class TransactionDraftApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/transactiondraft/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -238,7 +241,7 @@ export class TransactionDraftApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/transactiondraft/{transactionDraftId}`;
-        urlPath = urlPath.replace(`{${"transactionDraftId"}}`, encodeURIComponent(String(requestParameters['transactionDraftId'])));
+        urlPath = urlPath.replace('{transactionDraftId}', encodeURIComponent(String(requestParameters['transactionDraftId'])));
 
         return {
             path: urlPath,
@@ -311,7 +314,7 @@ export class TransactionDraftApi extends runtime.BaseAPI {
 
 
         let urlPath = `/transactiondraft/{id}/receipt`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

@@ -12,24 +12,27 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ProblemDetails,
-  SplitzUserDto,
-  SplitzUserUpdateViewModel,
-  UploadImageResult,
-} from '../models/index';
 import {
+    type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
+} from '../models/ProblemDetails';
+import {
+    type SplitzUserDto,
     SplitzUserDtoFromJSON,
     SplitzUserDtoToJSON,
+} from '../models/SplitzUserDto';
+import {
+    type SplitzUserUpdateViewModel,
     SplitzUserUpdateViewModelFromJSON,
     SplitzUserUpdateViewModelToJSON,
+} from '../models/SplitzUserUpdateViewModel';
+import {
+    type UploadImageResult,
     UploadImageResultFromJSON,
     UploadImageResultToJSON,
-} from '../models/index';
+} from '../models/UploadImageResult';
 
 export interface AddFriendRequest {
     id: string;
@@ -85,7 +88,7 @@ export class AccountApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/account/friend/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -183,7 +186,7 @@ export class AccountApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/account/friend/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -239,7 +242,7 @@ export class AccountApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/account/friend/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

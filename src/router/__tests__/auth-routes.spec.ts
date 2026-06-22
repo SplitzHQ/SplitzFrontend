@@ -1,0 +1,26 @@
+import { describe, expect, it } from "vitest";
+
+import router, { publicRoutes } from "../index";
+
+describe("auth callback routes", () => {
+  it("exposes confirm email as a public callback route", () => {
+    const confirmEmailRoute = router.resolve("/confirm-email?userId=user-1&code=confirm-code");
+
+    expect(confirmEmailRoute.name).toBe("confirmEmail");
+    expect(publicRoutes).toContain("confirmEmail");
+  });
+
+  it("exposes forgot password as a public auth route", () => {
+    const forgotPasswordRoute = router.resolve("/forgot-password");
+
+    expect(forgotPasswordRoute.name).toBe("forgotPassword");
+    expect(publicRoutes).toContain("forgotPassword");
+  });
+
+  it("exposes reset password as a public callback route", () => {
+    const resetPasswordRoute = router.resolve("/reset-password?email=person@example.com&resetCode=reset-code");
+
+    expect(resetPasswordRoute.name).toBe("resetPassword");
+    expect(publicRoutes).toContain("resetPassword");
+  });
+});
