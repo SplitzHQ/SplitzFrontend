@@ -174,7 +174,7 @@ watch(isVisible, async (newValue) => {
       <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
       <div
         v-if="isVisible"
-        class="fixed inset-0 z-modal-backdrop bg-util-alpha-black-10 backdrop-blur-xs"
+        class="z-modal-backdrop fixed inset-0 bg-util-alpha-black-10 backdrop-blur-xs"
         @click="handleBackdropClick"
       >
         <div class="absolute inset-0 z-modal flex items-end justify-center">

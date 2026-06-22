@@ -120,7 +120,7 @@ const onItemSelected = (itemId: string) => {
     }));
     transaction.includedMembersId = transaction.members.map((user) => user.id);
     // Navigate to the next step
-    return router.push({ name: "newExpenseSelectSplitMethod" });
+    void router.push({ name: "newExpenseSelectSplitMethod" });
   }
 
   const friend = userStore.user?.friends?.find((f) => f.friendUser.id === itemId);
