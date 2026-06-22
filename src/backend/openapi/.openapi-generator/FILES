@@ -1,4 +1,5 @@
 apis/AccountApi.ts
+apis/AccountEmailApi.ts
 apis/GroupApi.ts
 apis/InvoiceApi.ts
 apis/NotificationApi.ts
@@ -8,6 +9,8 @@ apis/TransactionDraftApi.ts
 apis/index.ts
 docs/AccessTokenResponse.md
 docs/AccountApi.md
+docs/AccountEmailApi.md
+docs/EmailCapabilitiesDto.md
 docs/ForgotPasswordRequest.md
 docs/FriendDto.md
 docs/GroupApi.md
@@ -55,6 +58,7 @@ docs/TwoFactorResponse.md
 docs/UploadImageResult.md
 index.ts
 models/AccessTokenResponse.ts
+models/EmailCapabilitiesDto.ts
 models/ForgotPasswordRequest.ts
 models/FriendDto.ts
 models/GroupBalanceDto.ts

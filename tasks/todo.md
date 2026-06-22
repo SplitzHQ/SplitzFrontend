@@ -32,17 +32,19 @@ Note: Task 2 automated coverage verifies disabled-mode sender calls do not requi
 
 ## Task 3: Refresh Frontend API Contract
 
-- [ ] Run updated backend locally with OpenAPI enabled.
-- [ ] Regenerate `src/backend/openapi/**/*` from backend OpenAPI.
-- [ ] Review generated diff separately from handwritten changes.
-- [ ] Add store action for email capabilities.
-- [ ] Add store action for confirm email.
-- [ ] Add store action for resend confirmation email.
-- [ ] Add store action for forgot password.
-- [ ] Add store action for reset password.
-- [ ] Run `bun run type-check`.
-- [ ] Run `bun run lint`.
-- [ ] Run `bun run build`.
+- [x] Run updated backend locally with OpenAPI enabled.
+- [x] Regenerate `src/backend/openapi/**/*` from backend OpenAPI.
+- [x] Review generated diff separately from handwritten changes.
+- [x] Add store action for email capabilities.
+- [x] Add store action for confirm email.
+- [x] Add store action for resend confirmation email.
+- [x] Add store action for forgot password.
+- [x] Add store action for reset password.
+- [x] Run `bun run type-check`.
+- [x] Run `bun run lint`.
+- [x] Run `bun run build`.
+
+Note: Full `bun run test:unit --run` also passes after disabling the Vue DevTools Vite plugin during Vitest browser runs so Storybook a11y scans do not include the devtools overlay.
 
 ## Task 4: Registration And Login Confirmation Flow
 

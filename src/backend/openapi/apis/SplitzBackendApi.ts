@@ -12,48 +12,67 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  AccessTokenResponse,
-  ForgotPasswordRequest,
-  HttpValidationProblemDetails,
-  InfoRequest,
-  InfoResponse,
-  LoginRequest,
-  RefreshRequest,
-  RegisterRequest,
-  ResendConfirmationEmailRequest,
-  ResetPasswordRequest,
-  TwoFactorRequest,
-  TwoFactorResponse,
-} from '../models/index';
 import {
+    type AccessTokenResponse,
     AccessTokenResponseFromJSON,
     AccessTokenResponseToJSON,
+} from '../models/AccessTokenResponse';
+import {
+    type ForgotPasswordRequest,
     ForgotPasswordRequestFromJSON,
     ForgotPasswordRequestToJSON,
+} from '../models/ForgotPasswordRequest';
+import {
+    type HttpValidationProblemDetails,
     HttpValidationProblemDetailsFromJSON,
     HttpValidationProblemDetailsToJSON,
+} from '../models/HttpValidationProblemDetails';
+import {
+    type InfoRequest,
     InfoRequestFromJSON,
     InfoRequestToJSON,
+} from '../models/InfoRequest';
+import {
+    type InfoResponse,
     InfoResponseFromJSON,
     InfoResponseToJSON,
+} from '../models/InfoResponse';
+import {
+    type LoginRequest,
     LoginRequestFromJSON,
     LoginRequestToJSON,
+} from '../models/LoginRequest';
+import {
+    type RefreshRequest,
     RefreshRequestFromJSON,
     RefreshRequestToJSON,
+} from '../models/RefreshRequest';
+import {
+    type RegisterRequest,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
+} from '../models/RegisterRequest';
+import {
+    type ResendConfirmationEmailRequest,
     ResendConfirmationEmailRequestFromJSON,
     ResendConfirmationEmailRequestToJSON,
+} from '../models/ResendConfirmationEmailRequest';
+import {
+    type ResetPasswordRequest,
     ResetPasswordRequestFromJSON,
     ResetPasswordRequestToJSON,
+} from '../models/ResetPasswordRequest';
+import {
+    type TwoFactorRequest,
     TwoFactorRequestFromJSON,
     TwoFactorRequestToJSON,
+} from '../models/TwoFactorRequest';
+import {
+    type TwoFactorResponse,
     TwoFactorResponseFromJSON,
     TwoFactorResponseToJSON,
-} from '../models/index';
+} from '../models/TwoFactorResponse';
 
 export interface AccountForgotPasswordPostRequest {
     forgotPasswordRequest: ForgotPasswordRequest;
