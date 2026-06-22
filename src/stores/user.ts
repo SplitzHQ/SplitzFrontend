@@ -18,6 +18,7 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<SplitzUserDto | null>(null);
   const emailCapabilities = ref<EmailCapabilitiesDto | null>(null);
   const isAuthenticated = ref(false);
+  let emailCapabilitiesRequest: Promise<EmailCapabilitiesDto> | null = null;
   const api = new SplitzBackendApi(config);
   const accountApi = new AccountApi(config);
   const accountEmailApi = new AccountEmailApi(config);
@@ -60,9 +61,18 @@ export const useUserStore = defineStore("user", () => {
       return emailCapabilities.value;
     }
 
-    const capabilities = await accountEmailApi.getEmailCapabilities();
-    emailCapabilities.value = capabilities;
-    return capabilities;
+    // Share the request started during store initialization with page-level callers.
+    emailCapabilitiesRequest ??= accountEmailApi
+      .getEmailCapabilities()
+      .then((capabilities) => {
+        emailCapabilities.value = capabilities;
+        return capabilities;
+      })
+      .finally(() => {
+        emailCapabilitiesRequest = null;
+      });
+
+    return emailCapabilitiesRequest;
   }
 
   async function confirmEmail(request: MapIdentityApiAccountConfirmEmailRequest) {

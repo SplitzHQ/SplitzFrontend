@@ -48,14 +48,16 @@ Note: Full `bun run test:unit --run` also passes after disabling the Vue DevTool
 
 ## Task 4: Registration And Login Confirmation Flow
 
-- [ ] Create synchronized `src/locales/en/auth.ftl` and `src/locales/zh-cn/auth.ftl`.
-- [ ] Move login/register visible strings to Fluent messages.
-- [ ] Show registration success copy based on email availability.
-- [ ] Handle login failure with conservative resend-confirmation affordance.
-- [ ] Submit resend confirmation through the store.
-- [ ] Preserve existing 2FA toggle behavior.
-- [ ] Run frontend type-check/lint/build.
-- [ ] Browser smoke test register and login/resend states.
+- [x] Create synchronized `src/locales/en/auth.ftl` and `src/locales/zh-cn/auth.ftl`.
+- [x] Move login/register visible strings to Fluent messages.
+- [x] Show registration success copy based on email availability.
+- [x] Handle login failure with conservative resend-confirmation affordance.
+- [x] Submit resend confirmation through the store.
+- [x] Preserve existing 2FA toggle behavior.
+- [x] Run frontend type-check/lint/build.
+- [x] Browser smoke test register and login/resend states.
+
+Note: Task 4 unit coverage verifies the registration capability branches, login resend affordance, and 2FA toggle. Browser smoke confirmed the register page renders through Vite; backend-dependent capability and login API requests could not complete until the backend API is running.
 
 ## Task 5: Confirm Email Callback Page
 
