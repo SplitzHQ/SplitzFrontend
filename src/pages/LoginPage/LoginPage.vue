@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
-import { ResponseError, type ProblemDetails } from "@/backend";
+import { ResponseError, type ProblemDetails } from "@/backend/openapi";
 import SButton from "@/components/SButton/SButton.vue";
 import { useUserStore } from "@/stores/user";
 

@@ -61,16 +61,18 @@ Note: Task 4 unit coverage verifies the registration capability branches, login 
 
 ## Task 5: Confirm Email Callback Page
 
-- [ ] Add public `confirmEmail` route at `/confirm-email`.
-- [ ] Create `ConfirmEmailPage.vue`.
-- [ ] Read `userId`, `code`, and optional `changedEmail` query parameters.
-- [ ] Show invalid-link state when required parameters are missing.
-- [ ] Call confirm email store action for valid links.
-- [ ] Show success state with login navigation.
-- [ ] Show expired/invalid state with resend path.
-- [ ] Localize all visible strings.
-- [ ] Run frontend type-check/lint/build.
-- [ ] Browser smoke test success and error states.
+- [x] Add public `confirmEmail` route at `/confirm-email`.
+- [x] Create `ConfirmEmailPage.vue`.
+- [x] Read `userId`, `code`, and optional `changedEmail` query parameters.
+- [x] Show invalid-link state when required parameters are missing.
+- [x] Call confirm email store action for valid links.
+- [x] Show success state with login navigation.
+- [x] Show expired/invalid state with resend path.
+- [x] Localize all visible strings.
+- [x] Run frontend type-check/lint/build.
+- [x] Browser smoke test success and error states.
+
+Note: Task 5 adds focused unit coverage for invalid, success, and failed confirmation states plus route public access. Browser smoke verified invalid-link and backend-error states; success remains covered by mocked unit tests because it requires a live valid confirmation token.
 
 ## Task 6: Forgot Password Availability Flow
 
