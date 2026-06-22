@@ -30,8 +30,15 @@ async function handleRegister() {
       email: email.value,
       password: password.value,
     });
-    const capabilities = await userStore.fetchEmailCapabilities();
-    if (capabilities.emailEnabled === true) {
+    let emailEnabled = false;
+    try {
+      const capabilities = await userStore.fetchEmailCapabilities();
+      emailEnabled = capabilities.emailEnabled === true;
+    } catch (error) {
+      console.error("Email capability check failed after registration", error);
+    }
+
+    if (emailEnabled) {
       registrationComplete.value = true;
       toast.success($t("auth-register-success-email-enabled"));
       return;

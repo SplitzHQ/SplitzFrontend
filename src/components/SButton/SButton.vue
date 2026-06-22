@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import SButtonBase from "./SButtonBase.vue";
 
 export interface ButtonProps {
@@ -14,16 +16,17 @@ interface ButtonEvents {
 
 const { color, variant, size, disabled, loading } = defineProps<ButtonProps>();
 const emit = defineEmits<ButtonEvents>();
+const isDisabled = computed(() => disabled === true || loading === true);
 
 function clickHandler(e: MouseEvent) {
-  if (disabled) return;
+  if (isDisabled.value) return;
   emit("click", e);
 }
 </script>
 
 <template>
-  <button type="button" :disabled="disabled" @click="clickHandler">
-    <SButtonBase :color="color" :variant="variant" :size="size" :disabled="disabled" :loading="loading">
+  <button type="button" :disabled="isDisabled" @click="clickHandler">
+    <SButtonBase :color="color" :variant="variant" :size="size" :disabled="isDisabled" :loading="loading">
       <slot />
       <template #icon-left>
         <slot name="icon-left" />

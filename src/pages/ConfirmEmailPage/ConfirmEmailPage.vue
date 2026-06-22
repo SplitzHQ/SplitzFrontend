@@ -40,8 +40,7 @@ onMounted(async () => {
   try {
     await userStore.confirmEmail(confirmEmailRequest.value);
     state.value = "success";
-  } catch (error) {
-    console.error(error);
+  } catch {
     state.value = "error";
   }
 });

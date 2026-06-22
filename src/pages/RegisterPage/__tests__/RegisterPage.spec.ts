@@ -72,4 +72,19 @@ describe("RegisterPage", () => {
     expect(wrapper.text()).not.toContain("auth-register-success-email-disabled");
     expect(routerMock.push).toHaveBeenCalledWith({ name: "login" });
   });
+
+  it("does not report registration failure when email capability lookup fails after account creation", async () => {
+    userStoreMock.register.mockResolvedValue(true);
+    userStoreMock.fetchEmailCapabilities.mockRejectedValue(new Error("capabilities unavailable"));
+    const wrapper = mount(RegisterPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find("form").trigger("submit");
+
+    expect(toastMock.error).not.toHaveBeenCalledWith("auth-register-failed");
+    expect(toastMock.success).toHaveBeenCalledWith("auth-register-success");
+    expect(routerMock.push).toHaveBeenCalledWith({ name: "login" });
+  });
 });

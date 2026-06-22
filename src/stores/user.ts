@@ -62,15 +62,20 @@ export const useUserStore = defineStore("user", () => {
     }
 
     // Share the request started during store initialization with page-level callers.
-    emailCapabilitiesRequest ??= accountEmailApi
-      .getEmailCapabilities()
-      .then((capabilities) => {
+    emailCapabilitiesRequest ??= (async () => {
+      try {
+        const capabilities = await accountEmailApi.getEmailCapabilities();
         emailCapabilities.value = capabilities;
         return capabilities;
-      })
-      .finally(() => {
+      } catch (error) {
+        console.error("Failed to fetch email capabilities", error);
+        const unavailableCapabilities = { emailEnabled: false, passwordResetEnabled: false };
+        emailCapabilities.value = unavailableCapabilities;
+        return unavailableCapabilities;
+      } finally {
         emailCapabilitiesRequest = null;
-      });
+      }
+    })();
 
     return emailCapabilitiesRequest;
   }
