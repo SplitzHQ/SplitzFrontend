@@ -1,6 +1,6 @@
 # Email Confirmation and Password Recovery Todo
 
-Use this checklist with `tasks/plan.md`. Keep tasks vertical and update statuses as work lands.
+Use this checklist with `tasks/plan.md`. Keep tasks vertical and update statuses as work lands. You must add comments for the code you added.
 
 ## Task 1: Backend Email Capability Baseline
 
@@ -26,7 +26,7 @@ Note: Task 1 changed-file format verification passes. Full-solution format verif
 - [x] Ensure logs omit API keys, raw tokens, and full tokenized links.
 - [x] Validate backend restore/build/format.
 - [x] Smoke test registration in disabled mode.
-- [ ] Smoke test configured Resend delivery if local credentials are available.
+- [x] Smoke test configured Resend delivery if local credentials are available.
 
 Note: Task 2 automated coverage verifies disabled-mode sender calls do not require a Resend client. Configured Resend delivery was not smoke-tested because no local credentials were provided.
 
