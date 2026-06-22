@@ -58,7 +58,7 @@ describe("RegisterPage", () => {
     expect(routerMock.push).not.toHaveBeenCalled();
   });
 
-  it("explains unavailable confirmation email after registration when email is disabled", async () => {
+  it("treats registration as a normal success when email delivery is disabled", async () => {
     userStoreMock.register.mockResolvedValue(true);
     userStoreMock.fetchEmailCapabilities.mockResolvedValue({ emailEnabled: false, passwordResetEnabled: false });
     const wrapper = mount(RegisterPage);
@@ -68,7 +68,8 @@ describe("RegisterPage", () => {
     await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
     await wrapper.find("form").trigger("submit");
 
-    expect(toastMock.success).toHaveBeenCalledWith("auth-register-success-email-disabled");
-    expect(routerMock.push).not.toHaveBeenCalled();
+    expect(toastMock.success).toHaveBeenCalledWith("auth-register-success");
+    expect(wrapper.text()).not.toContain("auth-register-success-email-disabled");
+    expect(routerMock.push).toHaveBeenCalledWith({ name: "login" });
   });
 });

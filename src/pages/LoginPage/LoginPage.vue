@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
+import { ResponseError, type ProblemDetails } from "@/backend";
 import SButton from "@/components/SButton/SButton.vue";
 import { useUserStore } from "@/stores/user";
 
@@ -32,8 +33,12 @@ async function handleLogin() {
     await router.push("/");
   } catch (error) {
     console.error(error);
-    showResendConfirmation.value = email.value.trim().length > 0;
-    toast.error($t("auth-login-failed"));
+    if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
+      // user account is not confirmed, allow them to resend confirmation email
+      showResendConfirmation.value = true;
+    } else {
+      toast.error($t("auth-login-failed"));
+    }
   } finally {
     loading.value = false;
   }
@@ -50,6 +55,19 @@ async function handleResendConfirmation() {
     toast.error($t("auth-resend-confirmation-failed"));
   } finally {
     resendLoading.value = false;
+  }
+}
+
+async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
+  if (!(error instanceof ResponseError)) {
+    return false;
+  }
+
+  try {
+    const body = (await error.response.clone().json()) as ProblemDetails;
+    return body.detail === "NotAllowed";
+  } catch {
+    return false;
   }
 }
 </script>

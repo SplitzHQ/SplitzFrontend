@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useFluent } from "fluent-vue";
 import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import SButton from "@/components/SButton/SButton.vue";
@@ -9,6 +9,7 @@ import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
 const { $t } = useFluent();
+const router = useRouter();
 
 const email = ref("");
 const password = ref("");
@@ -30,11 +31,14 @@ async function handleRegister() {
       password: password.value,
     });
     const capabilities = await userStore.fetchEmailCapabilities();
-    registrationSuccessMessageKey.value = capabilities.emailEnabled
-      ? "auth-register-success-email-enabled"
-      : "auth-register-success-email-disabled";
-    registrationComplete.value = true;
-    toast.success($t(registrationSuccessMessageKey.value));
+    if (capabilities.emailEnabled === true) {
+      registrationComplete.value = true;
+      toast.success($t("auth-register-success-email-enabled"));
+      return;
+    }
+
+    toast.success($t("auth-register-success"));
+    await router.push({ name: "login" });
   } catch (error) {
     console.error(error);
     toast.error($t("auth-register-failed"));
@@ -53,7 +57,7 @@ async function handleRegister() {
         </h2>
       </div>
       <div v-if="registrationComplete" class="bg-indigo-50 text-indigo-900 space-y-6 rounded-md p-4 text-sm">
-        <p>{{ $t(registrationSuccessMessageKey) }}</p>
+        <p>{{ $t("auth-register-success-email-enabled") }}</p>
         <RouterLink :to="{ name: 'login' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
           {{ $t("auth-register-login-link") }}
         </RouterLink>
