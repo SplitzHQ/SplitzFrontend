@@ -91,17 +91,19 @@ Note: Task 6 unit coverage verifies the disabled capability branch, generic subm
 
 ## Task 7: Reset Password Callback Flow
 
-- [ ] Add public `resetPassword` route at `/reset-password`.
-- [ ] Create `ResetPasswordPage.vue`.
-- [ ] Read `email` and `resetCode` query parameters.
-- [ ] Show invalid-link state when required parameters are missing.
-- [ ] Validate new password and confirmation before submit.
-- [ ] Submit reset-password request through the store.
-- [ ] Route to login with success feedback after reset.
-- [ ] Show recoverable invalid/expired token error with forgot-password link.
-- [ ] Localize all visible strings.
-- [ ] Run frontend type-check/lint/build.
-- [ ] Browser smoke test validation, invalid-link, and success states.
+- [x] Add public `resetPassword` route at `/reset-password`.
+- [x] Create `ResetPasswordPage.vue`.
+- [x] Read `email` and `resetCode` query parameters.
+- [x] Show invalid-link state when required parameters are missing.
+- [x] Validate new password and confirmation before submit.
+- [x] Submit reset-password request through the store.
+- [x] Route to login with success feedback after reset.
+- [x] Show recoverable invalid/expired token error with forgot-password link.
+- [x] Localize all visible strings.
+- [x] Run frontend type-check/lint/build.
+- [x] Browser smoke test validation, invalid-link, and success states.
+
+Note: Task 7 unit coverage verifies invalid links, password confirmation validation, successful reset routing, and expired-token recovery. Browser smoke verified invalid-link, validation, and backend invalid-token states; success remains covered by mocked unit tests because it requires a live valid reset token.
 
 ## Task 8: Focused Auth Email Test Coverage
 

@@ -16,4 +16,11 @@ describe("auth callback routes", () => {
     expect(forgotPasswordRoute.name).toBe("forgotPassword");
     expect(publicRoutes).toContain("forgotPassword");
   });
+
+  it("exposes reset password as a public callback route", () => {
+    const resetPasswordRoute = router.resolve("/reset-password?email=person@example.com&resetCode=reset-code");
+
+    expect(resetPasswordRoute.name).toBe("resetPassword");
+    expect(publicRoutes).toContain("resetPassword");
+  });
 });
