@@ -17,16 +17,18 @@ Note: Task 1 changed-file format verification passes. Full-solution format verif
 
 ## Task 2: Backend Sends Frontend Email Links
 
-- [ ] Add official Resend .NET SDK package reference.
-- [ ] Register Resend SDK and Identity email sender in DI.
-- [ ] Configure Identity to require confirmed email before sign-in.
-- [ ] Implement confirmation email sending with frontend `/confirm-email` links.
-- [ ] Implement password reset email sending with frontend `/reset-password` links.
-- [ ] Skip confirmation sending safely when email is unavailable.
-- [ ] Ensure logs omit API keys, raw tokens, and full tokenized links.
-- [ ] Validate backend restore/build/format.
-- [ ] Smoke test registration in disabled mode.
+- [x] Add official Resend .NET SDK package reference.
+- [x] Register Resend SDK and Identity email sender in DI.
+- [x] Configure Identity to require confirmed email before sign-in.
+- [x] Implement confirmation email sending with frontend `/confirm-email` links.
+- [x] Implement password reset email sending with frontend `/reset-password` links.
+- [x] Skip confirmation sending safely when email is unavailable.
+- [x] Ensure logs omit API keys, raw tokens, and full tokenized links.
+- [x] Validate backend restore/build/format.
+- [x] Smoke test registration in disabled mode.
 - [ ] Smoke test configured Resend delivery if local credentials are available.
+
+Note: Task 2 automated coverage verifies disabled-mode sender calls do not require a Resend client. Configured Resend delivery was not smoke-tested because no local credentials were provided.
 
 ## Task 3: Refresh Frontend API Contract
 
