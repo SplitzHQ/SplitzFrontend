@@ -16,6 +16,7 @@ import {
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<SplitzUserDto | null>(null);
+  const emailCapabilities = ref<EmailCapabilitiesDto | null>(null);
   const isAuthenticated = ref(false);
   const api = new SplitzBackendApi(config);
   const accountApi = new AccountApi(config);
@@ -55,7 +56,13 @@ export const useUserStore = defineStore("user", () => {
 
   // Keep generated Identity email APIs behind store actions for auth pages.
   async function fetchEmailCapabilities(): Promise<EmailCapabilitiesDto> {
-    return await accountEmailApi.getEmailCapabilities();
+    if (emailCapabilities.value) {
+      return emailCapabilities.value;
+    }
+
+    const capabilities = await accountEmailApi.getEmailCapabilities();
+    emailCapabilities.value = capabilities;
+    return capabilities;
   }
 
   async function confirmEmail(request: MapIdentityApiAccountConfirmEmailRequest) {
@@ -92,12 +99,18 @@ export const useUserStore = defineStore("user", () => {
     isAuthenticated.value = false;
   }
 
+  // optimistically fetch user info and email capabilities on store initialization, since they're likely needed later.
   if (!user.value) {
     void fetchUserInfo();
   }
 
+  if (!emailCapabilities.value) {
+    void fetchEmailCapabilities();
+  }
+
   return {
     confirmEmail,
+    emailCapabilities,
     fetchEmailCapabilities,
     fetchUserInfo,
     forgotPassword,
