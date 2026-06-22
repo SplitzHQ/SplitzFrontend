@@ -72,6 +72,11 @@ const router = createRouter({
       path: "/confirm-email",
     },
     {
+      component: () => import("@/pages/ForgotPasswordPage/ForgotPasswordPage.vue"),
+      name: "forgotPassword",
+      path: "/forgot-password",
+    },
+    {
       component: () => import("@/pages/TwoFactorSetupPage/TwoFactorSetupPage.vue"),
       name: "2faSetup",
       path: "/2fa-setup",
@@ -113,6 +118,6 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-export const publicRoutes: RouteRecordNameGeneric[] = ["login", "register", "confirmEmail"];
+export const publicRoutes: RouteRecordNameGeneric[] = ["login", "register", "confirmEmail", "forgotPassword"];
 
 export default router;

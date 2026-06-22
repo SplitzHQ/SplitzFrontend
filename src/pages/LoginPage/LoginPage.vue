@@ -134,7 +134,7 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
           </SButton>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="text-sm">
             <a
               href="#"
@@ -145,7 +145,14 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
               {{ showTwoFactor ? $t("auth-hide-two-factor") : $t("auth-show-two-factor") }}
             </a>
           </div>
-          <div class="text-sm">
+          <div class="flex flex-wrap justify-end gap-x-4 gap-y-2 text-sm">
+            <RouterLink
+              :to="{ name: 'forgotPassword' }"
+              class="text-indigo-600 hover:text-indigo-500 font-medium"
+              data-test="forgot-password-link"
+            >
+              {{ $t("auth-forgot-password-link") }}
+            </RouterLink>
             <RouterLink :to="{ name: 'register' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
               {{ $t("auth-login-register-link") }}
             </RouterLink>

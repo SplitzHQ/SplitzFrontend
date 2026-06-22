@@ -21,7 +21,7 @@ const userStoreMock = vi.hoisted(() => ({
 vi.mock("vue-router", () => ({
   RouterLink: {
     props: ["to"],
-    template: "<a><slot /></a>",
+    template: "<a :data-to='typeof to === `object` ? to.name : to'><slot /></a>",
   },
   useRouter: () => routerMock,
 }));
@@ -54,6 +54,12 @@ describe("LoginPage", () => {
     await wrapper.get('[data-test="toggle-two-factor"]').trigger("click");
 
     expect(wrapper.find('input[name="2fa-code"]').exists()).toBe(true);
+  });
+
+  it("links to password recovery", () => {
+    const wrapper = mount(LoginPage);
+
+    expect(wrapper.get('[data-test="forgot-password-link"]').attributes("data-to")).toBe("forgotPassword");
   });
 
   it("offers a confirmation resend after Identity returns NotAllowed", async () => {

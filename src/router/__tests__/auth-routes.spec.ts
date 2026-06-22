@@ -9,4 +9,11 @@ describe("auth callback routes", () => {
     expect(confirmEmailRoute.name).toBe("confirmEmail");
     expect(publicRoutes).toContain("confirmEmail");
   });
+
+  it("exposes forgot password as a public auth route", () => {
+    const forgotPasswordRoute = router.resolve("/forgot-password");
+
+    expect(forgotPasswordRoute.name).toBe("forgotPassword");
+    expect(publicRoutes).toContain("forgotPassword");
+  });
 });

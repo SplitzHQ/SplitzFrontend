@@ -76,16 +76,18 @@ Note: Task 5 adds focused unit coverage for invalid, success, and failed confirm
 
 ## Task 6: Forgot Password Availability Flow
 
-- [ ] Add forgot-password link to login page.
-- [ ] Add public `forgotPassword` route at `/forgot-password`.
-- [ ] Create `ForgotPasswordPage.vue`.
-- [ ] Check email capabilities on page load.
-- [ ] Disable form when password recovery email is unavailable.
-- [ ] Submit forgot-password requests through the store when available.
-- [ ] Show generic anti-enumeration success copy.
-- [ ] Localize all visible strings.
-- [ ] Run frontend type-check/lint/build.
-- [ ] Browser smoke test disabled and submitted states.
+- [x] Add forgot-password link to login page.
+- [x] Add public `forgotPassword` route at `/forgot-password`.
+- [x] Create `ForgotPasswordPage.vue`.
+- [x] Check email capabilities on page load.
+- [x] Disable form when password recovery email is unavailable.
+- [x] Submit forgot-password requests through the store when available.
+- [x] Show generic anti-enumeration success copy.
+- [x] Localize all visible strings.
+- [x] Run frontend type-check/lint/build.
+- [x] Browser smoke test disabled and submitted states.
+
+Note: Task 6 unit coverage verifies the disabled capability branch, generic submitted branch, recoverable request error, login link, and public route. Browser smoke confirmed the page renders, transitions from loading-disabled to available with the local backend, and shows the generic submitted state after posting a test email.
 
 ## Task 7: Reset Password Callback Flow
 
