@@ -77,6 +77,22 @@ describe("useUserStore email account actions", () => {
     expect(accountEmailApiMock.getEmailCapabilities).toHaveBeenCalledOnce();
   });
 
+  it("retries transactional email capability lookup after a failure", async () => {
+    const capabilities = { emailEnabled: true, passwordResetEnabled: true };
+    accountEmailApiMock.getEmailCapabilities
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockResolvedValueOnce(capabilities);
+
+    const store = useUserStore();
+
+    await expect(store.fetchEmailCapabilities()).resolves.toEqual({
+      emailEnabled: false,
+      passwordResetEnabled: false,
+    });
+    await expect(store.fetchEmailCapabilities()).resolves.toEqual(capabilities);
+    expect(accountEmailApiMock.getEmailCapabilities).toHaveBeenCalledTimes(2);
+  });
+
   it("confirms email with Identity query parameters", async () => {
     const store = useUserStore();
 

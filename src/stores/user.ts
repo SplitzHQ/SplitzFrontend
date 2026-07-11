@@ -69,9 +69,7 @@ export const useUserStore = defineStore("user", () => {
         return capabilities;
       } catch (error) {
         console.error("Failed to fetch email capabilities", error);
-        const unavailableCapabilities = { emailEnabled: false, passwordResetEnabled: false };
-        emailCapabilities.value = unavailableCapabilities;
-        return unavailableCapabilities;
+        return { emailEnabled: false, passwordResetEnabled: false };
       } finally {
         emailCapabilitiesRequest = null;
       }

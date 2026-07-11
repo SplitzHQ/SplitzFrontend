@@ -54,18 +54,32 @@ test.describe("auth email flows", () => {
 
   test("reset-password validates passwords and routes to login after success", async ({ page }) => {
     await page.route("**/account/resetPassword", async (route) => {
+      expect(await route.request().postDataJSON()).toEqual({
+        email: "person@example.com",
+        newPassword: "Password1234",
+        resetCode: "reset-code",
+      });
       await route.fulfill({ status: 200 });
     });
 
     await page.goto("/reset-password?email=person%40example.com&resetCode=reset-code");
-    await page.getByPlaceholder("New password").fill("Passw0rd!");
+    await page.getByPlaceholder("New password").fill("Password1234");
     await page.getByPlaceholder("Confirm password").fill("Different1!");
     await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(page.getByText("Passwords do not match")).toBeVisible();
 
     await page.getByPlaceholder("Confirm password").clear();
-    await page.getByPlaceholder("Confirm password").fill("Passw0rd!");
+    await page.getByPlaceholder("Confirm password").fill("short1");
+    await page.getByPlaceholder("New password").fill("short1");
+    await page.getByRole("button", { name: "Reset password" }).click();
+
+    await expect(
+      page.getByText("Password must be at least 12 characters and include a lowercase letter and a number.")
+    ).toBeVisible();
+
+    await page.getByPlaceholder("New password").fill("Password1234");
+    await page.getByPlaceholder("Confirm password").fill("Password1234");
     await expect(page.getByText("Passwords do not match")).toBeHidden();
     await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
 

@@ -4,6 +4,7 @@ import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
+import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
 import SButton from "@/components/SButton/SButton.vue";
 import { useUserStore } from "@/stores/user";
 
@@ -49,6 +50,11 @@ async function handleResetPassword() {
     return;
   }
 
+  if (!meetsPasswordPolicy(newPassword.value)) {
+    errorMessageKey.value = "auth-reset-password-policy";
+    return;
+  }
+
   loading.value = true;
   try {
     await userStore.resetPassword({
@@ -60,10 +66,37 @@ async function handleResetPassword() {
     await router.push({ name: "login", query: { passwordReset: "success" } });
   } catch (error) {
     console.error(error);
-    errorMessageKey.value = "auth-reset-password-error";
+    errorMessageKey.value = await getResetPasswordErrorMessageKey(error);
   } finally {
     loading.value = false;
   }
+}
+
+function meetsPasswordPolicy(password: string): boolean {
+  return password.length >= 12 && /[a-z]/.test(password) && /\d/.test(password);
+}
+
+async function getResetPasswordErrorMessageKey(error: unknown): Promise<string> {
+  if (!(error instanceof ResponseError)) {
+    return "auth-reset-password-request-error";
+  }
+
+  try {
+    const body = (await error.response.clone().json()) as HttpValidationProblemDetails;
+    const errorCodes = Object.keys(body.errors ?? {});
+
+    if (errorCodes.some((code) => code.startsWith("Password"))) {
+      return "auth-reset-password-policy";
+    }
+
+    if (errorCodes.includes("InvalidToken")) {
+      return "auth-reset-password-error";
+    }
+  } catch {
+    return "auth-reset-password-request-error";
+  }
+
+  return "auth-reset-password-request-error";
 }
 
 function getSingleQueryValue(value: unknown): string | undefined {
