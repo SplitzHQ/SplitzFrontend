@@ -12,30 +12,37 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  InvoiceDto,
-  InvoiceInputDto,
-  InvoiceReducedDto,
-  InvoiceSettlementDto,
-  InvoiceSettlementInputDto,
-  ProblemDetails,
-} from '../models/index';
 import {
+    type InvoiceDto,
     InvoiceDtoFromJSON,
     InvoiceDtoToJSON,
+} from '../models/InvoiceDto';
+import {
+    type InvoiceInputDto,
     InvoiceInputDtoFromJSON,
     InvoiceInputDtoToJSON,
+} from '../models/InvoiceInputDto';
+import {
+    type InvoiceReducedDto,
     InvoiceReducedDtoFromJSON,
     InvoiceReducedDtoToJSON,
+} from '../models/InvoiceReducedDto';
+import {
+    type InvoiceSettlementDto,
     InvoiceSettlementDtoFromJSON,
     InvoiceSettlementDtoToJSON,
+} from '../models/InvoiceSettlementDto';
+import {
+    type InvoiceSettlementInputDto,
     InvoiceSettlementInputDtoFromJSON,
     InvoiceSettlementInputDtoToJSON,
+} from '../models/InvoiceSettlementInputDto';
+import {
+    type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
-} from '../models/index';
+} from '../models/ProblemDetails';
 
 export interface AddSettlementRequest {
     id: string;
@@ -96,7 +103,7 @@ export class InvoiceApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/invoice/{id}/settlement`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -198,7 +205,7 @@ export class InvoiceApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/invoice/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -257,8 +264,8 @@ export class InvoiceApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/invoice/{id}/settlement/{settlementId}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"settlementId"}}`, encodeURIComponent(String(requestParameters['settlementId'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{settlementId}', encodeURIComponent(String(requestParameters['settlementId'])));
 
         return {
             path: urlPath,
@@ -310,7 +317,7 @@ export class InvoiceApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/invoice/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -410,7 +417,7 @@ export class InvoiceApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/invoice/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

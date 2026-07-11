@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  NotificationDto,
-  ProblemDetails,
-} from '../models/index';
 import {
+    type NotificationDto,
     NotificationDtoFromJSON,
     NotificationDtoToJSON,
+} from '../models/NotificationDto';
+import {
+    type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
-} from '../models/index';
+} from '../models/ProblemDetails';
 
 export interface DismissNotificationRequest {
     id: string;
@@ -111,7 +110,7 @@ export class NotificationApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/notification/{id}/dismiss`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -212,7 +211,7 @@ export class NotificationApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/notification/{id}/read`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

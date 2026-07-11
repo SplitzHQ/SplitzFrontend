@@ -12,36 +12,47 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  GroupDto,
-  GroupInputDto,
-  GroupJoinLinkDto,
-  GroupReducedDto,
-  InvoiceReducedDto,
-  ProblemDetails,
-  TransactionDto,
-  UploadImageResult,
-} from '../models/index';
 import {
+    type GroupDto,
     GroupDtoFromJSON,
     GroupDtoToJSON,
+} from '../models/GroupDto';
+import {
+    type GroupInputDto,
     GroupInputDtoFromJSON,
     GroupInputDtoToJSON,
+} from '../models/GroupInputDto';
+import {
+    type GroupJoinLinkDto,
     GroupJoinLinkDtoFromJSON,
     GroupJoinLinkDtoToJSON,
+} from '../models/GroupJoinLinkDto';
+import {
+    type GroupReducedDto,
     GroupReducedDtoFromJSON,
     GroupReducedDtoToJSON,
+} from '../models/GroupReducedDto';
+import {
+    type InvoiceReducedDto,
     InvoiceReducedDtoFromJSON,
     InvoiceReducedDtoToJSON,
+} from '../models/InvoiceReducedDto';
+import {
+    type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
+} from '../models/ProblemDetails';
+import {
+    type TransactionDto,
     TransactionDtoFromJSON,
     TransactionDtoToJSON,
+} from '../models/TransactionDto';
+import {
+    type UploadImageResult,
     UploadImageResultFromJSON,
     UploadImageResultToJSON,
-} from '../models/index';
+} from '../models/UploadImageResult';
 
 export interface AddGroupMemberRequest {
     groupId: string;
@@ -122,7 +133,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}/members`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -224,7 +235,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}/join-link`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -277,7 +288,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -329,7 +340,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -382,7 +393,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/join/{joinLinkId}`;
-        urlPath = urlPath.replace(`{${"joinLinkId"}}`, encodeURIComponent(String(requestParameters['joinLinkId'])));
+        urlPath = urlPath.replace('{joinLinkId}', encodeURIComponent(String(requestParameters['joinLinkId'])));
 
         return {
             path: urlPath,
@@ -435,7 +446,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}/invoices`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -488,7 +499,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}/transactions`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -586,7 +597,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/join/{joinLinkId}`;
-        urlPath = urlPath.replace(`{${"joinLinkId"}}`, encodeURIComponent(String(requestParameters['joinLinkId'])));
+        urlPath = urlPath.replace('{joinLinkId}', encodeURIComponent(String(requestParameters['joinLinkId'])));
 
         return {
             path: urlPath,
@@ -641,7 +652,7 @@ export class GroupApi extends runtime.BaseAPI {
         }
 
         let urlPath = `/group/{groupId}`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,
@@ -715,7 +726,7 @@ export class GroupApi extends runtime.BaseAPI {
 
 
         let urlPath = `/group/{groupId}/avatar`;
-        urlPath = urlPath.replace(`{${"groupId"}}`, encodeURIComponent(String(requestParameters['groupId'])));
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
 
         return {
             path: urlPath,

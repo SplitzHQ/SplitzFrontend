@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccessTokenResponse';
+export * from './EmailCapabilitiesDto';
 export * from './ForgotPasswordRequest';
 export * from './FriendDto';
 export * from './GroupBalanceDto';
