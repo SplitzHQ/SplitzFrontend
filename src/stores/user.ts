@@ -87,11 +87,11 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function forgotPassword(email: string) {
-    await api.accountForgotPasswordPost({ forgotPasswordRequest: { email } });
+    await api.requestAccountRecovery({ forgotPasswordRequest: { email } });
   }
 
   async function resetPassword(resetPasswordRequest: ResetPasswordRequest) {
-    await api.accountResetPasswordPost({ resetPasswordRequest });
+    await api.resetRecoveredAccountPassword({ resetPasswordRequest });
   }
 
   async function fetchUserInfo() {

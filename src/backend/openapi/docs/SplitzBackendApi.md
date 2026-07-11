@@ -14,6 +14,8 @@ All URIs are relative to *http://localhost*
 | [**accountResendConfirmationEmailPost**](SplitzBackendApi.md#accountresendconfirmationemailpost) | **POST** /account/resendConfirmationEmail |  |
 | [**accountResetPasswordPost**](SplitzBackendApi.md#accountresetpasswordpost) | **POST** /account/resetPassword |  |
 | [**mapIdentityApiAccountConfirmEmail**](SplitzBackendApi.md#mapidentityapiaccountconfirmemail) | **GET** /account/confirmEmail |  |
+| [**requestAccountRecovery**](SplitzBackendApi.md#requestaccountrecovery) | **POST** /account/recovery/request |  |
+| [**resetRecoveredAccountPassword**](SplitzBackendApi.md#resetrecoveredaccountpassword) | **POST** /account/recovery/reset |  |
 
 
 
@@ -676,6 +678,137 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## requestAccountRecovery
+
+> requestAccountRecovery(forgotPasswordRequest)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  SplitzBackendApi,
+} from '';
+import type { RequestAccountRecoveryRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new SplitzBackendApi();
+
+  const body = {
+    // ForgotPasswordRequest
+    forgotPasswordRequest: ...,
+  } satisfies RequestAccountRecoveryRequest;
+
+  try {
+    const data = await api.requestAccountRecovery(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **forgotPasswordRequest** | [ForgotPasswordRequest](ForgotPasswordRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## resetRecoveredAccountPassword
+
+> resetRecoveredAccountPassword(resetPasswordRequest)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  SplitzBackendApi,
+} from '';
+import type { ResetRecoveredAccountPasswordRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new SplitzBackendApi();
+
+  const body = {
+    // ResetPasswordRequest
+    resetPasswordRequest: ...,
+  } satisfies ResetRecoveredAccountPasswordRequest;
+
+  try {
+    const data = await api.resetRecoveredAccountPassword(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **resetPasswordRequest** | [ResetPasswordRequest](ResetPasswordRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/problem+json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

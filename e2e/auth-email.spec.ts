@@ -38,7 +38,7 @@ test.describe("auth email flows", () => {
 
   test("forgot-password shows generic success after a mocked request", async ({ page }) => {
     await mockEmailCapabilities(page, true);
-    await page.route("**/account/forgotPassword", async (route) => {
+    await page.route("**/account/recovery/request", async (route) => {
       await route.fulfill({ status: 200 });
     });
 
@@ -53,7 +53,7 @@ test.describe("auth email flows", () => {
   });
 
   test("reset-password validates passwords and routes to login after success", async ({ page }) => {
-    await page.route("**/account/resetPassword", async (route) => {
+    await page.route("**/account/recovery/reset", async (route) => {
       expect(await route.request().postDataJSON()).toEqual({
         email: "person@example.com",
         newPassword: "Password1234",

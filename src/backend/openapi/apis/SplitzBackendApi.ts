@@ -114,6 +114,14 @@ export interface MapIdentityApiAccountConfirmEmailRequest {
     changedEmail?: string;
 }
 
+export interface RequestAccountRecoveryRequest {
+    forgotPasswordRequest: ForgotPasswordRequest;
+}
+
+export interface ResetRecoveredAccountPasswordRequest {
+    resetPasswordRequest: ResetPasswordRequest;
+}
+
 /**
  * 
  */
@@ -576,6 +584,94 @@ export class SplitzBackendApi extends runtime.BaseAPI {
      */
     async mapIdentityApiAccountConfirmEmail(requestParameters: MapIdentityApiAccountConfirmEmailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.mapIdentityApiAccountConfirmEmailRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for requestAccountRecovery without sending the request
+     */
+    async requestAccountRecoveryRequestOpts(requestParameters: RequestAccountRecoveryRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['forgotPasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'forgotPasswordRequest',
+                'Required parameter "forgotPasswordRequest" was null or undefined when calling requestAccountRecovery().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/account/recovery/request`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ForgotPasswordRequestToJSON(requestParameters['forgotPasswordRequest']),
+        };
+    }
+
+    /**
+     */
+    async requestAccountRecoveryRaw(requestParameters: RequestAccountRecoveryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.requestAccountRecoveryRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async requestAccountRecovery(requestParameters: RequestAccountRecoveryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.requestAccountRecoveryRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for resetRecoveredAccountPassword without sending the request
+     */
+    async resetRecoveredAccountPasswordRequestOpts(requestParameters: ResetRecoveredAccountPasswordRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['resetPasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'resetPasswordRequest',
+                'Required parameter "resetPasswordRequest" was null or undefined when calling resetRecoveredAccountPassword().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/account/recovery/reset`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ResetPasswordRequestToJSON(requestParameters['resetPasswordRequest']),
+        };
+    }
+
+    /**
+     */
+    async resetRecoveredAccountPasswordRaw(requestParameters: ResetRecoveredAccountPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.resetRecoveredAccountPasswordRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async resetRecoveredAccountPassword(requestParameters: ResetRecoveredAccountPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.resetRecoveredAccountPasswordRaw(requestParameters, initOverrides);
     }
 
 }

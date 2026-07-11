@@ -10,6 +10,8 @@ const splitzBackendApiMock = vi.hoisted(() => ({
   accountResendConfirmationEmailPost: vi.fn(),
   accountResetPasswordPost: vi.fn(),
   mapIdentityApiAccountConfirmEmail: vi.fn(),
+  requestAccountRecovery: vi.fn(),
+  resetRecoveredAccountPassword: vi.fn(),
 }));
 
 const accountApiMock = vi.hoisted(() => ({
@@ -118,7 +120,7 @@ describe("useUserStore email account actions", () => {
     const store = useUserStore();
 
     await expect(store.forgotPassword("person@example.com")).resolves.toBeUndefined();
-    expect(splitzBackendApiMock.accountForgotPasswordPost).toHaveBeenCalledWith({
+    expect(splitzBackendApiMock.requestAccountRecovery).toHaveBeenCalledWith({
       forgotPasswordRequest: { email: "person@example.com" },
     });
   });
@@ -128,7 +130,7 @@ describe("useUserStore email account actions", () => {
 
     await store.resetPassword({ email: "person@example.com", newPassword: "Passw0rd!", resetCode: "reset-code" });
 
-    expect(splitzBackendApiMock.accountResetPasswordPost).toHaveBeenCalledWith({
+    expect(splitzBackendApiMock.resetRecoveredAccountPassword).toHaveBeenCalledWith({
       resetPasswordRequest: {
         email: "person@example.com",
         newPassword: "Passw0rd!",
