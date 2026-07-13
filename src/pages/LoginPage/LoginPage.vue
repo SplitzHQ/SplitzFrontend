@@ -22,6 +22,7 @@ const showResendConfirmation = ref(false);
 const loading = ref(false);
 const resendLoading = ref(false);
 const loginCooldown = useRateLimitCooldown();
+const resendCooldown = useRateLimitCooldown();
 
 async function handleLogin() {
   if (loading.value || loginCooldown.isActive.value) {
@@ -55,6 +56,10 @@ async function handleLogin() {
 }
 
 async function handleResendConfirmation() {
+  if (resendLoading.value || resendCooldown.isActive.value) {
+    return;
+  }
+
   resendLoading.value = true;
   try {
     await userStore.resendConfirmationEmail(email.value);
@@ -62,7 +67,12 @@ async function handleResendConfirmation() {
     toast.success($t("auth-resend-confirmation-success"));
   } catch (error) {
     console.error(error);
-    toast.error($t("auth-resend-confirmation-failed"));
+    const rateLimitExpiry = getRateLimitExpiry(error);
+    if (rateLimitExpiry !== null) {
+      resendCooldown.start(rateLimitExpiry);
+    } else {
+      toast.error($t("auth-resend-confirmation-failed"));
+    }
   } finally {
     resendLoading.value = false;
   }
@@ -141,10 +151,20 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
 
         <div v-if="showResendConfirmation" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
           <p>{{ $t("auth-login-resend-confirmation") }}</p>
+          <p
+            v-if="resendCooldown.isActive.value"
+            class="text-red-600 mt-3 text-sm"
+            role="status"
+            aria-live="polite"
+            data-test="resend-rate-limit"
+          >
+            {{ $t("auth-rate-limit-countdown", { seconds: resendCooldown.remainingSeconds.value }) }}
+          </p>
           <SButton
             color="brand"
             variant="secondary"
             size="sm"
+            :disabled="resendCooldown.isActive.value"
             :loading="resendLoading"
             class="mt-3"
             data-test="resend-confirmation"
