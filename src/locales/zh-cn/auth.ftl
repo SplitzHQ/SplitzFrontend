@@ -9,6 +9,7 @@ auth-confirm-password-placeholder = 确认密码
 auth-login-title = 登录你的账户
 auth-login-success = 登录成功
 auth-login-failed = 登录失败。请检查你的邮箱和密码。
+auth-rate-limit-countdown = 请求过于频繁。请在 { $seconds } 秒后重试。
 auth-login-resend-confirmation = 你的账户还未验证，点击邮箱中的验证链接完成验证。
 auth-resend-confirmation-action = 重新发送确认邮件
 auth-resend-confirmation-success = 如果该邮箱有对应的账户，系统会发送一封确认邮件。

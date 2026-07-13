@@ -9,6 +9,7 @@ auth-confirm-password-placeholder = Confirm password
 auth-login-title = Sign in to your account
 auth-login-success = Logged in successfully
 auth-login-failed = Login failed. Please check your credentials.
+auth-rate-limit-countdown = Too many requests. Try again in { $seconds } seconds.
 auth-login-resend-confirmation = Confirm your account by clicking the link in the email sent to you.
 auth-resend-confirmation-action = Resend confirmation email
 auth-resend-confirmation-success = If an account exists for that email, a confirmation message will be sent.

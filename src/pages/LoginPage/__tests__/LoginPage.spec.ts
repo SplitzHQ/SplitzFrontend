@@ -36,7 +36,8 @@ vi.mock("@/stores/user", () => ({
 
 vi.mock("fluent-vue", () => ({
   useFluent: () => ({
-    $t: (key: string) => key,
+    $t: (key: string, args?: Record<string, unknown>) =>
+      typeof args?.seconds === "number" ? `${key}:${args.seconds}` : key,
   }),
 }));
 
@@ -92,5 +93,37 @@ describe("LoginPage", () => {
     await flushPromises();
 
     expect(wrapper.find('[data-test="resend-confirmation"]').exists()).toBe(false);
+  });
+
+  it("shows a login cooldown without exposing confirmation resend after a 429", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
+    const response = new Response(null, { headers: { "Retry-After": "2" }, status: 429 });
+    userStoreMock.login.mockRejectedValue(new ResponseError(response));
+    const wrapper = mount(LoginPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("wrong-password");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.get('[data-test="login-rate-limit"]').text()).toContain("2");
+    expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeDefined();
+    expect(wrapper.find('[data-test="resend-confirmation"]').exists()).toBe(false);
+
+    await wrapper.find("form").trigger("submit");
+    expect(userStoreMock.login).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="login-rate-limit"]').exists()).toBe(false);
+    expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeUndefined();
+    expect(userStoreMock.login).toHaveBeenCalledTimes(1);
+
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+    expect(userStoreMock.login).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 });

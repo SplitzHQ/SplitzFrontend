@@ -6,6 +6,8 @@ import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
 import SButton from "@/components/SButton/SButton.vue";
+import { getRateLimitExpiry } from "@/libs/rate-limit";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
@@ -19,8 +21,13 @@ const showTwoFactor = ref(false);
 const showResendConfirmation = ref(false);
 const loading = ref(false);
 const resendLoading = ref(false);
+const loginCooldown = useRateLimitCooldown();
 
 async function handleLogin() {
+  if (loading.value || loginCooldown.isActive.value) {
+    return;
+  }
+
   loading.value = true;
   showResendConfirmation.value = false;
   try {
@@ -33,7 +40,10 @@ async function handleLogin() {
     await router.push("/");
   } catch (error) {
     console.error(error);
-    if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
+    const rateLimitExpiry = getRateLimitExpiry(error);
+    if (rateLimitExpiry !== null) {
+      loginCooldown.start(rateLimitExpiry);
+    } else if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
       // user account is not confirmed, allow them to resend confirmation email
       showResendConfirmation.value = true;
     } else {
@@ -119,6 +129,16 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
           </div>
         </div>
 
+        <p
+          v-if="loginCooldown.isActive.value"
+          class="text-red-600 text-sm"
+          role="status"
+          aria-live="polite"
+          data-test="login-rate-limit"
+        >
+          {{ $t("auth-rate-limit-countdown", { seconds: loginCooldown.remainingSeconds.value }) }}
+        </p>
+
         <div v-if="showResendConfirmation" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
           <p>{{ $t("auth-login-resend-confirmation") }}</p>
           <SButton
@@ -164,8 +184,10 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
             color="brand"
             variant="primary"
             size="lg"
+            :disabled="loginCooldown.isActive.value"
             :loading="loading"
             class="w-full justify-center"
+            data-test="login-submit"
             @click="handleLogin"
           >
             {{ $t("auth-sign-in-action") }}

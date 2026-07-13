@@ -25,6 +25,47 @@ test.describe("auth email flows", () => {
     await mockSignedOutBootstrap(page);
   });
 
+  test("login rate limit shows a countdown and requires manual retry", async ({ page }) => {
+    let loginRequests = 0;
+    await mockEmailCapabilities(page, false);
+    await page.route("**/account/login", async (route) => {
+      loginRequests += 1;
+      await route.fulfill({
+        body: JSON.stringify({
+          code: "rate_limit_exceeded",
+          detail: "Too many requests were received. Please try again later.",
+          status: 429,
+          title: "Too Many Requests",
+        }),
+        contentType: "application/problem+json",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Expose-Headers": "Retry-After",
+          "Retry-After": "2",
+        },
+        status: 429,
+      });
+    });
+
+    await page.goto("/login");
+    await page.getByLabel("Email address").fill("person@example.com");
+    await page.getByLabel("Password").fill("WrongPassword123!");
+    await page.getByRole("button", { name: "Sign in" }).click();
+
+    await expect(page.getByRole("status")).toContainText("2");
+    await expect(page.getByRole("button", { name: "Sign in" })).toBeDisabled();
+
+    await page.getByRole("button", { name: "Sign in" }).click({ force: true });
+    expect(loginRequests).toBe(1);
+
+    await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
+    await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
+    expect(loginRequests).toBe(1);
+
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect.poll(() => loginRequests).toBe(2);
+  });
+
   test("forgot-password disables recovery when email is unavailable", async ({ page }) => {
     await mockEmailCapabilities(page, false);
 
