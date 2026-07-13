@@ -13,6 +13,8 @@ import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
+import { getRateLimitExpiry } from "@/libs/rate-limit";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
 import AddFriendSheet from "./AddFriendSheet.vue";
@@ -55,8 +57,10 @@ async function saveUsername() {
 // Avatar upload
 const fileInputRef = useTemplateRef("fileInputRef");
 const uploadingAvatar = ref(false);
+const avatarCooldown = useRateLimitCooldown();
 
 function triggerAvatarUpload() {
+  if (uploadingAvatar.value || avatarCooldown.isActive.value) return;
   fileInputRef.value?.click();
 }
 
@@ -64,6 +68,11 @@ const MAX_AVATAR_SIZE = 10 * 1024 * 1024; // 10 MB
 
 async function handleAvatarFile(event: Event) {
   const input = event.target as HTMLInputElement;
+  if (uploadingAvatar.value || avatarCooldown.isActive.value) {
+    input.value = "";
+    return;
+  }
+
   const file = input.files?.[0];
   if (!file) return;
 
@@ -78,8 +87,13 @@ async function handleAvatarFile(event: Event) {
     await accountApi.uploadUserAvatar({ file });
     await userStore.fetchUserInfo();
     toast.success($t("profile-avatar-upload-success"));
-  } catch {
-    toast.error($t("profile-avatar-upload-error"));
+  } catch (error) {
+    const rateLimitExpiry = getRateLimitExpiry(error);
+    if (rateLimitExpiry !== null) {
+      avatarCooldown.start(rateLimitExpiry);
+    } else {
+      toast.error($t("profile-avatar-upload-error"));
+    }
   } finally {
     uploadingAvatar.value = false;
     input.value = "";
@@ -140,13 +154,24 @@ function logout() {
             <button
               type="button"
               class="absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-full bg-util-color-brand-700 text-white"
-              :disabled="uploadingAvatar"
+              :aria-label="$t('profile-avatar-change')"
+              :disabled="uploadingAvatar || avatarCooldown.isActive.value"
+              data-test="avatar-upload-trigger"
               @click="triggerAvatarUpload"
             >
               <PhPencilSimple class="size-4" />
             </button>
           </div>
           <p class="text-sm text-base-text-tertiary">{{ $t("profile-avatar-change") }}</p>
+          <p
+            v-if="avatarCooldown.isActive.value"
+            class="text-sm text-util-color-error-700"
+            role="status"
+            aria-live="polite"
+            data-test="avatar-rate-limit"
+          >
+            {{ $t("profile-avatar-rate-limit", { seconds: avatarCooldown.remainingSeconds.value }) }}
+          </p>
         </div>
 
         <!-- User Info Section -->
@@ -244,7 +269,14 @@ function logout() {
 
   <!-- Hidden file input for avatar upload -->
   <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-  <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleAvatarFile" />
+  <input
+    ref="fileInputRef"
+    type="file"
+    accept="image/*"
+    class="hidden"
+    :disabled="uploadingAvatar || avatarCooldown.isActive.value"
+    @change="handleAvatarFile"
+  />
 
   <!-- Edit Nickname Sheet -->
   <EditNicknameSheet

@@ -9,6 +9,7 @@ profile-avatar-change = 更换头像
 profile-avatar-upload-success = 头像已更新
 profile-avatar-upload-error = 上传头像失败
 profile-avatar-too-large = 图片大小不能超过 10 MB
+profile-avatar-rate-limit = 上传过于频繁。请在 { $seconds } 秒后重试。
 profile-friends-label = 好友
 profile-friends-empty = 还没有好友
 profile-add-friend = 添加好友

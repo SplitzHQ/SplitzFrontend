@@ -9,6 +9,7 @@ profile-avatar-change = Change Avatar
 profile-avatar-upload-success = Avatar updated
 profile-avatar-upload-error = Failed to upload avatar
 profile-avatar-too-large = Image must be under 10 MB
+profile-avatar-rate-limit = Too many uploads. Try again in { $seconds } seconds.
 profile-friends-label = Friends
 profile-friends-empty = No friends yet
 profile-add-friend = Add Friend
