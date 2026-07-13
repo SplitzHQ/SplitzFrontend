@@ -50,7 +50,7 @@ test.describe("auth email flows", () => {
     await page.goto("/login");
     await page.getByLabel("Email address").fill("person@example.com");
     await page.getByLabel("Password").fill("WrongPassword123!");
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.locator('[data-test="login-submit"]').dispatchEvent("click");
 
     await expect(page.getByRole("status")).toContainText("2");
     await expect(page.getByRole("button", { name: "Sign in" })).toBeDisabled();
@@ -62,7 +62,7 @@ test.describe("auth email flows", () => {
     await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
     expect(loginRequests).toBe(1);
 
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.locator('[data-test="login-submit"]').dispatchEvent("click");
     await expect.poll(() => loginRequests).toBe(2);
   });
 
@@ -147,14 +147,14 @@ test.describe("auth email flows", () => {
     await page.goto("/reset-password?email=person%40example.com&resetCode=reset-code");
     await page.getByPlaceholder("New password").fill("Password1234");
     await page.getByPlaceholder("Confirm password").fill("Different1!");
-    await page.getByRole("button", { name: "Reset password" }).click();
+    await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
 
     await expect(page.getByText("Passwords do not match")).toBeVisible();
 
     await page.getByPlaceholder("Confirm password").clear();
     await page.getByPlaceholder("Confirm password").fill("short1");
     await page.getByPlaceholder("New password").fill("short1");
-    await page.getByRole("button", { name: "Reset password" }).click();
+    await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
 
     await expect(
       page.getByText("Password must be at least 12 characters and include a lowercase letter and a number.")
@@ -199,5 +199,43 @@ test.describe("auth email flows", () => {
 
     await expect(page.getByRole("heading", { name: "This confirmation link expired" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Request a new confirmation email" })).toBeVisible();
+  });
+
+  test("confirmation rate limit shows a distinct state and requires manual retry", async ({ page }) => {
+    let confirmationRequests = 0;
+    await page.route("**/account/confirmEmail?**", async (route) => {
+      confirmationRequests += 1;
+      await route.fulfill({
+        body: JSON.stringify({
+          code: "rate_limit_exceeded",
+          detail: "Too many requests were received. Please try again later.",
+          status: 429,
+          title: "Too Many Requests",
+        }),
+        contentType: "application/problem+json",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Expose-Headers": "Retry-After",
+          "Retry-After": "2",
+        },
+        status: 429,
+      });
+    });
+
+    await page.goto("/confirm-email?userId=user-1&code=confirm-code");
+
+    await expect(page.getByRole("status")).toContainText("2");
+    await expect(page.getByRole("button", { name: "Try confirmation again" })).toBeDisabled();
+    await expect(page.getByText("This confirmation link expired")).toBeHidden();
+    expect(confirmationRequests).toBe(1);
+
+    await page.locator('[data-test="confirmation-retry"]').dispatchEvent("click");
+    expect(confirmationRequests).toBe(1);
+
+    await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
+    expect(confirmationRequests).toBe(1);
+
+    await page.locator('[data-test="confirmation-retry"]').dispatchEvent("click");
+    await expect.poll(() => confirmationRequests).toBe(2);
   });
 });

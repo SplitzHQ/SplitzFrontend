@@ -1,6 +1,8 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ResponseError } from "@/backend/openapi";
 
 import ConfirmEmailPage from "../ConfirmEmailPage.vue";
 
@@ -25,7 +27,8 @@ vi.mock("@/stores/user", () => ({
 
 vi.mock("fluent-vue", () => ({
   useFluent: () => ({
-    $t: (key: string) => key,
+    $t: (key: string, args?: Record<string, unknown>) =>
+      typeof args?.seconds === "number" ? `${key}:${args.seconds}` : key,
   }),
 }));
 
@@ -34,6 +37,10 @@ describe("ConfirmEmailPage", () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     routeMock.query = {};
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("shows an invalid-link state when required query parameters are missing", async () => {
@@ -72,5 +79,34 @@ describe("ConfirmEmailPage", () => {
 
     expect(wrapper.text()).toContain("auth-confirm-email-error-title");
     expect(wrapper.text()).toContain("auth-confirm-email-resend-link");
+  });
+
+  it("shows a distinct confirmation cooldown and retries only after a manual click", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
+    routeMock.query = { code: "confirm-code", userId: "user-1" };
+    userStoreMock.confirmEmail.mockRejectedValue(
+      new ResponseError(new Response(null, { headers: { "Retry-After": "2" }, status: 429 }))
+    );
+
+    const wrapper = mount(ConfirmEmailPage);
+    await flushPromises();
+
+    expect(wrapper.get('[data-test="confirmation-rate-limit"]').text()).toContain("2");
+    expect(wrapper.get('[data-test="confirmation-retry"]').attributes("disabled")).toBeDefined();
+    expect(wrapper.text()).not.toContain("auth-confirm-email-error-title");
+    expect(userStoreMock.confirmEmail).toHaveBeenCalledTimes(1);
+
+    await wrapper.get('[data-test="confirmation-retry"]').trigger("click");
+    expect(userStoreMock.confirmEmail).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="confirmation-rate-limit"]').exists()).toBe(false);
+    expect(userStoreMock.confirmEmail).toHaveBeenCalledTimes(1);
+
+    await wrapper.get('[data-test="confirmation-retry"]').trigger("click");
+    await flushPromises();
+    expect(userStoreMock.confirmEmail).toHaveBeenCalledTimes(2);
   });
 });
