@@ -1,6 +1,6 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ResponseError } from "@/backend/openapi";
 
@@ -39,7 +39,8 @@ vi.mock("@/stores/user", () => ({
 
 vi.mock("fluent-vue", () => ({
   useFluent: () => ({
-    $t: (key: string) => key,
+    $t: (key: string, args?: Record<string, unknown>) =>
+      typeof args?.seconds === "number" ? `${key}:${args.seconds}` : key,
   }),
 }));
 
@@ -48,6 +49,10 @@ describe("ResetPasswordPage", () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
     routeMock.query = {};
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("shows an invalid-link state when required query parameters are missing", () => {
@@ -134,5 +139,61 @@ describe("ResetPasswordPage", () => {
 
     expect(wrapper.text()).toContain("auth-reset-password-policy");
     expect(wrapper.text()).not.toContain("auth-reset-password-error");
+  });
+
+  it("handles 429 before validation parsing and retries only after a manual submit", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
+    routeMock.query = { email: "person@example.com", resetCode: "reset-code" };
+    userStoreMock.resetPassword.mockRejectedValue(
+      new ResponseError(new Response("not a validation problem", { headers: { "Retry-After": "2" }, status: 429 }))
+    );
+    const wrapper = mount(ResetPasswordPage);
+
+    await wrapper.find('input[name="new-password"]').setValue("Password1234");
+    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.get('[data-test="reset-password-rate-limit"]').text()).toContain("2");
+    expect(wrapper.get('[data-test="reset-password-submit"]').attributes("disabled")).toBeDefined();
+    expect(wrapper.text()).not.toContain("auth-reset-password-request-error");
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(1);
+    expect(consoleError).not.toHaveBeenCalled();
+
+    await wrapper.find("form").trigger("submit");
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="reset-password-rate-limit"]').exists()).toBe(false);
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(1);
+
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(2);
+    consoleError.mockRestore();
+  });
+
+  it("preserves the generic error state without retrying automatically", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    routeMock.query = { email: "person@example.com", resetCode: "reset-code" };
+    userStoreMock.resetPassword.mockRejectedValue(new Error("network failure"));
+    const wrapper = mount(ResetPasswordPage);
+
+    await wrapper.find('input[name="new-password"]').setValue("Password1234");
+    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("auth-reset-password-request-error");
+    expect(routerMock.push).not.toHaveBeenCalled();
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(1);
+    expect(consoleError).not.toHaveBeenCalled();
+
+    await flushPromises();
+    expect(userStoreMock.resetPassword).toHaveBeenCalledTimes(1);
+    consoleError.mockRestore();
   });
 });
