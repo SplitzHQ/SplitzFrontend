@@ -51,7 +51,9 @@ new-expense-review-fields-receipt = 图片
 new-expense-review-fields-notes-label = 备注
 new-expense-review-fields-notes-placeholder = 还有什么需要补充的吗？
 new-expense-review-actions-done = 保存
+new-expense-review-actions-retry-receipt = 重试上传收据
 new-expense-review-error-saving-transaction = 保存失败，请重试
+new-expense-review-receipt-rate-limit = 上传过于频繁。请在 { $seconds } 秒后重试。
 new-expense-review-error-receipt-not-image = 请选择图片文件
 new-expense-review-error-receipt-too-large = 图片大小需小于 { $maxMb }MB
 

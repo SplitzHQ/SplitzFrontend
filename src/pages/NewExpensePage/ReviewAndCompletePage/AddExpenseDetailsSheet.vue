@@ -11,7 +11,9 @@ import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
+import { getRateLimitExpiry } from "@/libs/rate-limit";
 import reportError from "@/libs/report-error";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useTransactionStore } from "@/stores/transaction";
 
 import SelectCategorySheet from "./SelectCategorySheet.vue";
@@ -34,19 +36,28 @@ const showCategorySheet = ref(false);
 // receipt handling
 const receiptFile = ref<File | null>(null);
 const receiptPreview = ref<string | undefined>(previewPhotoBase64.value);
+const pendingReceiptUpload = ref(false);
+const receiptCooldown = useRateLimitCooldown();
 const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
 function triggerCamera() {
+  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   cameraInput.value?.click();
 }
 
 function triggerGallery() {
+  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   galleryInput.value?.click();
 }
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
+  if (saveDetailsLoading.value || receiptCooldown.isActive.value) {
+    input.value = "";
+    return;
+  }
+
   if (input.files?.[0]) {
     const file = input.files[0];
 
@@ -73,6 +84,7 @@ function handleFileChange(event: Event) {
 }
 
 function removeReceipt() {
+  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   receiptPreview.value = undefined;
   receiptFile.value = null;
 }
@@ -80,14 +92,33 @@ function removeReceipt() {
 // Save details back to transaction store
 const saveDetailsLoading = ref(false);
 async function saveDetails() {
+  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
+
   try {
     saveDetailsLoading.value = true;
-    transaction.value.name = localName.value.trim() || undefined;
-    transaction.value.icon = localCategory.value;
-    transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
-    previewPhotoBase64.value = receiptPreview.value;
-    await transactionStore.saveTransaction();
-    if (receiptFile.value) await transactionStore.uploadTransactionReceipt(receiptFile.value);
+    if (!pendingReceiptUpload.value) {
+      transaction.value.name = localName.value.trim() || undefined;
+      transaction.value.icon = localCategory.value;
+      transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
+      previewPhotoBase64.value = receiptPreview.value;
+      await transactionStore.saveTransaction();
+      pendingReceiptUpload.value = receiptFile.value !== null;
+    }
+
+    if (receiptFile.value) {
+      try {
+        await transactionStore.uploadTransactionReceipt(receiptFile.value);
+      } catch (error) {
+        const rateLimitExpiry = getRateLimitExpiry(error);
+        if (rateLimitExpiry === null) throw error;
+
+        pendingReceiptUpload.value = true;
+        receiptCooldown.start(rateLimitExpiry);
+        return;
+      }
+    }
+
+    pendingReceiptUpload.value = false;
     model.value = false;
   } catch (error) {
     toast.error($t("new-expense-review-error-saving-transaction"));
@@ -217,10 +248,18 @@ function getLocation() {
             accept="image/*"
             capture="environment"
             class="hidden"
+            :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
             @change="handleFileChange"
           />
           <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-          <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
+          <input
+            ref="galleryInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+            @change="handleFileChange"
+          />
 
           <div v-if="receiptPreview" class="relative w-fit">
             <img
@@ -232,6 +271,7 @@ function getLocation() {
               type="button"
               aria-label="Remove receipt"
               class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
+              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
               @click="removeReceipt"
             >
               <PhTrash class="icon-4 text-base-fg-error" />
@@ -242,6 +282,7 @@ function getLocation() {
               type="button"
               aria-label="Select image from camera"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
               @click="triggerCamera"
             >
               <PhCamera class="icon-8 text-base-fg-brand" />
@@ -250,11 +291,21 @@ function getLocation() {
               type="button"
               aria-label="Select image from gallery"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
               @click="triggerGallery"
             >
               <PhPlus class="icon-8 text-base-fg-brand" />
             </button>
           </div>
+          <p
+            v-if="receiptCooldown.isActive.value"
+            class="text-sm text-util-color-error-700"
+            role="status"
+            aria-live="polite"
+            data-test="receipt-rate-limit"
+          >
+            {{ $t("new-expense-review-receipt-rate-limit", { seconds: receiptCooldown.remainingSeconds.value }) }}
+          </p>
         </div>
 
         <!-- Notes -->
@@ -275,13 +326,17 @@ function getLocation() {
         <div class="flex gap-3">
           <SButton
             :loading="saveDetailsLoading"
+            :disabled="receiptCooldown.isActive.value"
+            data-test="save-details"
             class="flex-1"
             variant="primary"
             size="lg"
             color="brand"
             @click="saveDetails"
           >
-            {{ $t("new-expense-review-actions-done") }}
+            {{
+              $t(pendingReceiptUpload ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done")
+            }}
           </SButton>
         </div>
       </div>
