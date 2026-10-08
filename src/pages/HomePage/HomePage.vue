@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhBell, PhList, PhMagnifyingGlass, PhPlus, PhSlidersHorizontal } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhBell, PhList, PhPlus, PhSlidersHorizontal } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -10,12 +10,12 @@ import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
-import TextInput from "@/components/TextInput/TextInput.vue";
 import { formatCurrency } from "@/libs/format-currency";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import HomeEmptyState from "./HomeEmptyState.vue";
+import HomeSearchBar from "./HomeSearchBar.vue";
 
 const { $t } = useFluent();
 const router = useRouter();
@@ -115,11 +115,7 @@ const userBalances = computed(() => {
 
         <!-- Search Bar -->
         <div class="flex w-full items-start gap-2.5">
-          <TextInput v-model="searchKeyword" class="flex-1" :placeholder="$t('home-search-placeholder')">
-            <template #icon>
-              <PhMagnifyingGlass />
-            </template>
-          </TextInput>
+          <HomeSearchBar v-model="searchKeyword" class="flex-1" />
           <SIconButton variant="secondary" color="neutral" size="lg">
             <PhSlidersHorizontal class="size-5 text-base-text-primary" />
           </SIconButton>
