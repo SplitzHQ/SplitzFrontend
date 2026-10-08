@@ -16,5 +16,5 @@
     "functions": ["twJoin", "twMerge"]
   },
   "sortPackageJson": true,
-  "ignorePatterns": ["src/backend/**"]
+  "ignorePatterns": ["src/backend/**", ".agents/**"]
 }
