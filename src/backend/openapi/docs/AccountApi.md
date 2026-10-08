@@ -423,7 +423,7 @@ example().catch(console.error);
 ### HTTP request headers
 
 - **Content-Type**: `multipart/form-data`
-- **Accept**: `application/json`
+- **Accept**: `application/json`, `application/problem+json`
 
 
 ### HTTP response details
@@ -432,6 +432,7 @@ example().catch(console.error);
 | **401** | Unauthorized |  -  |
 | **400** | Bad Request |  -  |
 | **200** | OK |  -  |
+| **429** | Too Many Requests |  * Retry-After - delta-seconds or HTTP-date <br>  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

@@ -5,7 +5,9 @@ import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
@@ -17,6 +19,7 @@ const newPassword = ref("");
 const confirmPassword = ref("");
 const loading = ref(false);
 const errorMessageKey = ref<string | null>(null);
+const resetCooldown = useRateLimitCooldown();
 
 // Reset links are only useful when both token-bearing query parameters are single string values.
 const resetRequestContext = computed(() => {
@@ -39,7 +42,7 @@ watch([newPassword, confirmPassword], () => {
 });
 
 async function handleResetPassword() {
-  if (!resetRequestContext.value || loading.value) {
+  if (!resetRequestContext.value || loading.value || resetCooldown.isActive.value) {
     return;
   }
 
@@ -65,8 +68,9 @@ async function handleResetPassword() {
     toast.success($t("auth-reset-password-success-toast"));
     await router.push({ name: "login", query: { passwordReset: "success" } });
   } catch (error) {
-    console.error(error);
-    errorMessageKey.value = await getResetPasswordErrorMessageKey(error);
+    if (!resetCooldown.startFromError(error)) {
+      errorMessageKey.value = await getResetPasswordErrorMessageKey(error);
+    }
   } finally {
     loading.value = false;
   }
@@ -153,12 +157,18 @@ function getSingleQueryValue(value: unknown): string | undefined {
             />
           </div>
           <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
+          <RateLimitCountdown
+            :seconds="resetCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            data-test="reset-password-rate-limit"
+          />
         </div>
 
         <SButton
           color="brand"
           variant="primary"
           size="lg"
+          :disabled="resetCooldown.isActive.value"
           :loading="loading"
           class="w-full justify-center"
           data-test="reset-password-submit"

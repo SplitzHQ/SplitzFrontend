@@ -2,16 +2,18 @@
 import { PhCamera, PhCircleNotch, PhGpsFix, PhPlus, PhTrash } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
-import { ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { toast } from "vue-sonner";
 
 import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import reportError from "@/libs/report-error";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useTransactionStore } from "@/stores/transaction";
 
 import SelectCategorySheet from "./SelectCategorySheet.vue";
@@ -34,6 +36,11 @@ const showCategorySheet = ref(false);
 // receipt handling
 const receiptFile = ref<File | null>(null);
 const receiptPreview = ref<string | undefined>(previewPhotoBase64.value);
+// Set when the receipt upload was throttled, so the save button reads "retry" instead of "save".
+const receiptUploadPending = ref(false);
+const receiptCooldown = useRateLimitCooldown();
+const saveDetailsLoading = ref(false);
+const receiptControlsDisabled = computed(() => saveDetailsLoading.value || receiptCooldown.isActive.value);
 const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
@@ -47,6 +54,11 @@ function triggerGallery() {
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
+  if (receiptControlsDisabled.value) {
+    input.value = "";
+    return;
+  }
+
   if (input.files?.[0]) {
     const file = input.files[0];
 
@@ -75,11 +87,14 @@ function handleFileChange(event: Event) {
 function removeReceipt() {
   receiptPreview.value = undefined;
   receiptFile.value = null;
+  receiptUploadPending.value = false;
 }
 
-// Save details back to transaction store
-const saveDetailsLoading = ref(false);
+// Save details back to transaction store. Saving is create-or-update, so a retry after a throttled
+// receipt upload simply saves again; this also picks up any edits made in the meantime.
 async function saveDetails() {
+  if (receiptControlsDisabled.value) return;
+
   try {
     saveDetailsLoading.value = true;
     transaction.value.name = localName.value.trim() || undefined;
@@ -87,7 +102,20 @@ async function saveDetails() {
     transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
     previewPhotoBase64.value = receiptPreview.value;
     await transactionStore.saveTransaction();
-    if (receiptFile.value) await transactionStore.uploadTransactionReceipt(receiptFile.value);
+
+    if (receiptFile.value) {
+      try {
+        await transactionStore.uploadTransactionReceipt(receiptFile.value);
+      } catch (error) {
+        if (receiptCooldown.startFromError(error)) {
+          receiptUploadPending.value = true;
+          return;
+        }
+        throw error;
+      }
+    }
+
+    receiptUploadPending.value = false;
     model.value = false;
   } catch (error) {
     toast.error($t("new-expense-review-error-saving-transaction"));
@@ -217,10 +245,18 @@ function getLocation() {
             accept="image/*"
             capture="environment"
             class="hidden"
+            :disabled="receiptControlsDisabled"
             @change="handleFileChange"
           />
           <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-          <input ref="galleryInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
+          <input
+            ref="galleryInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            :disabled="receiptControlsDisabled"
+            @change="handleFileChange"
+          />
 
           <div v-if="receiptPreview" class="relative w-fit">
             <img
@@ -232,6 +268,7 @@ function getLocation() {
               type="button"
               aria-label="Remove receipt"
               class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
+              :disabled="receiptControlsDisabled"
               @click="removeReceipt"
             >
               <PhTrash class="icon-4 text-base-fg-error" />
@@ -242,6 +279,7 @@ function getLocation() {
               type="button"
               aria-label="Select image from camera"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+              :disabled="receiptControlsDisabled"
               @click="triggerCamera"
             >
               <PhCamera class="icon-8 text-base-fg-brand" />
@@ -250,11 +288,17 @@ function getLocation() {
               type="button"
               aria-label="Select image from gallery"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+              :disabled="receiptControlsDisabled"
               @click="triggerGallery"
             >
               <PhPlus class="icon-8 text-base-fg-brand" />
             </button>
           </div>
+          <RateLimitCountdown
+            :seconds="receiptCooldown.remainingSeconds.value"
+            message-key="new-expense-review-receipt-rate-limit"
+            data-test="receipt-rate-limit"
+          />
         </div>
 
         <!-- Notes -->
@@ -275,13 +319,17 @@ function getLocation() {
         <div class="flex gap-3">
           <SButton
             :loading="saveDetailsLoading"
+            :disabled="receiptControlsDisabled"
+            data-test="save-details"
             class="flex-1"
             variant="primary"
             size="lg"
             color="brand"
             @click="saveDetails"
           >
-            {{ $t("new-expense-review-actions-done") }}
+            {{
+              $t(receiptUploadPending ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done")
+            }}
           </SButton>
         </div>
       </div>

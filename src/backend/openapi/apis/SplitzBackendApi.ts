@@ -44,6 +44,11 @@ import {
     LoginRequestToJSON,
 } from '../models/LoginRequest';
 import {
+    type ProblemDetails,
+    ProblemDetailsFromJSON,
+    ProblemDetailsToJSON,
+} from '../models/ProblemDetails';
+import {
     type RefreshRequest,
     RefreshRequestFromJSON,
     RefreshRequestToJSON,

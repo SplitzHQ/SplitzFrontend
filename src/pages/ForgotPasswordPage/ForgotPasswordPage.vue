@@ -4,7 +4,9 @@ import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
 type RecoveryState = "checking" | "available" | "unavailable" | "submitted";
@@ -16,8 +18,10 @@ const email = ref("");
 const state = ref<RecoveryState>("checking");
 const loading = ref(false);
 const errorMessageKey = ref<string | null>(null);
+const recoveryCooldown = useRateLimitCooldown();
 
-const formDisabled = computed(() => state.value === "checking" || state.value === "unavailable" || loading.value);
+const inputDisabled = computed(() => state.value === "checking" || state.value === "unavailable");
+const submitDisabled = computed(() => inputDisabled.value || loading.value || recoveryCooldown.isActive.value);
 
 onMounted(async () => {
   try {
@@ -31,7 +35,7 @@ onMounted(async () => {
 });
 
 async function handleForgotPassword() {
-  if (formDisabled.value) {
+  if (submitDisabled.value) {
     return;
   }
 
@@ -43,8 +47,10 @@ async function handleForgotPassword() {
     toast.success($t("auth-forgot-password-success-toast"));
   } catch (error) {
     console.error(error);
-    errorMessageKey.value = "auth-forgot-password-error";
-    toast.error($t("auth-forgot-password-error"));
+    if (!recoveryCooldown.startFromError(error)) {
+      errorMessageKey.value = "auth-forgot-password-error";
+      toast.error($t("auth-forgot-password-error"));
+    }
   } finally {
     loading.value = false;
   }
@@ -78,18 +84,23 @@ async function handleForgotPassword() {
             type="email"
             autocomplete="email"
             required
-            :disabled="formDisabled"
+            :disabled="inputDisabled"
             class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 disabled:bg-gray-100 disabled:text-gray-500 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
             :placeholder="$t('auth-email-placeholder')"
           />
           <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
+          <RateLimitCountdown
+            :seconds="recoveryCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            data-test="recovery-rate-limit"
+          />
         </div>
 
         <SButton
           color="brand"
           variant="primary"
           size="lg"
-          :disabled="formDisabled"
+          :disabled="submitDisabled"
           :loading="loading"
           class="w-full justify-center"
           data-test="forgot-password-submit"

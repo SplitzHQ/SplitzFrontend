@@ -3,16 +3,20 @@ import { useFluent } from "fluent-vue";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
-type ConfirmationState = "loading" | "success" | "invalid" | "error";
+type ConfirmationState = "loading" | "success" | "invalid" | "error" | "rateLimited";
 
 const route = useRoute();
 const userStore = useUserStore();
 const { $t } = useFluent();
 
 const state = ref<ConfirmationState>("loading");
+const requestPending = ref(false);
+const confirmationCooldown = useRateLimitCooldown();
 
 // Only accept single query values so arrays or missing fields cannot be forwarded as token parameters.
 const confirmEmailRequest = computed(() => {
@@ -31,19 +35,29 @@ const confirmEmailRequest = computed(() => {
   };
 });
 
-onMounted(async () => {
+onMounted(confirmEmail);
+
+async function confirmEmail() {
+  if (requestPending.value || confirmationCooldown.isActive.value) {
+    return;
+  }
+
   if (!confirmEmailRequest.value) {
     state.value = "invalid";
     return;
   }
 
+  requestPending.value = true;
+  state.value = "loading";
   try {
     await userStore.confirmEmail(confirmEmailRequest.value);
     state.value = "success";
-  } catch {
-    state.value = "error";
+  } catch (error) {
+    state.value = confirmationCooldown.startFromError(error) ? "rateLimited" : "error";
+  } finally {
+    requestPending.value = false;
   }
-});
+}
 
 function getSingleQueryValue(value: unknown): string | undefined {
   if (typeof value === "string" && value.length > 0) {
@@ -72,6 +86,31 @@ function getSingleQueryValue(value: unknown): string | undefined {
             {{ $t("auth-confirm-email-login-link") }}
           </SButton>
         </RouterLink>
+      </div>
+
+      <div v-else-if="state === 'rateLimited'" class="space-y-6">
+        <div class="space-y-3">
+          <h1 class="text-3xl text-gray-900 font-bold tracking-tight">
+            {{ $t("auth-confirm-email-rate-limit-title") }}
+          </h1>
+          <p class="text-gray-600 text-sm">{{ $t("auth-confirm-email-rate-limit-body") }}</p>
+          <RateLimitCountdown
+            :seconds="confirmationCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            data-test="confirmation-rate-limit"
+          />
+        </div>
+        <SButton
+          color="brand"
+          variant="primary"
+          size="lg"
+          :disabled="confirmationCooldown.isActive.value"
+          :loading="requestPending"
+          data-test="confirmation-retry"
+          @click="confirmEmail"
+        >
+          {{ $t("auth-confirm-email-retry") }}
+        </SButton>
       </div>
 
       <div v-else class="space-y-6">

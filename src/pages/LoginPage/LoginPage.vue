@@ -5,7 +5,9 @@ import { useRouter, RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
@@ -19,8 +21,14 @@ const showTwoFactor = ref(false);
 const showResendConfirmation = ref(false);
 const loading = ref(false);
 const resendLoading = ref(false);
+const loginCooldown = useRateLimitCooldown();
+const resendCooldown = useRateLimitCooldown();
 
 async function handleLogin() {
+  if (loading.value || loginCooldown.isActive.value) {
+    return;
+  }
+
   loading.value = true;
   showResendConfirmation.value = false;
   try {
@@ -33,6 +41,10 @@ async function handleLogin() {
     await router.push("/");
   } catch (error) {
     console.error(error);
+    if (loginCooldown.startFromError(error)) {
+      return;
+    }
+
     if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
       // user account is not confirmed, allow them to resend confirmation email
       showResendConfirmation.value = true;
@@ -45,6 +57,10 @@ async function handleLogin() {
 }
 
 async function handleResendConfirmation() {
+  if (resendLoading.value || resendCooldown.isActive.value) {
+    return;
+  }
+
   resendLoading.value = true;
   try {
     await userStore.resendConfirmationEmail(email.value);
@@ -52,7 +68,9 @@ async function handleResendConfirmation() {
     toast.success($t("auth-resend-confirmation-success"));
   } catch (error) {
     console.error(error);
-    toast.error($t("auth-resend-confirmation-failed"));
+    if (!resendCooldown.startFromError(error)) {
+      toast.error($t("auth-resend-confirmation-failed"));
+    }
   } finally {
     resendLoading.value = false;
   }
@@ -119,12 +137,25 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
           </div>
         </div>
 
+        <RateLimitCountdown
+          :seconds="loginCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="login-rate-limit"
+        />
+
         <div v-if="showResendConfirmation" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
           <p>{{ $t("auth-login-resend-confirmation") }}</p>
+          <RateLimitCountdown
+            :seconds="resendCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            class="mt-3"
+            data-test="resend-rate-limit"
+          />
           <SButton
             color="brand"
             variant="secondary"
             size="sm"
+            :disabled="resendCooldown.isActive.value"
             :loading="resendLoading"
             class="mt-3"
             data-test="resend-confirmation"
@@ -164,8 +195,10 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
             color="brand"
             variant="primary"
             size="lg"
+            :disabled="loginCooldown.isActive.value"
             :loading="loading"
             class="w-full justify-center"
+            data-test="login-submit"
             @click="handleLogin"
           >
             {{ $t("auth-sign-in-action") }}

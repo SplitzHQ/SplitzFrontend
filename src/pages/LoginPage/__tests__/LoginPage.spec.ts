@@ -1,6 +1,6 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ResponseError } from "@/backend/openapi";
 
@@ -36,7 +36,8 @@ vi.mock("@/stores/user", () => ({
 
 vi.mock("fluent-vue", () => ({
   useFluent: () => ({
-    $t: (key: string) => key,
+    $t: (key: string, args?: Record<string, unknown>) =>
+      typeof args?.seconds === "number" ? `${key}:${args.seconds}` : key,
   }),
 }));
 
@@ -44,6 +45,10 @@ describe("LoginPage", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("preserves the 2FA code toggle", async () => {
@@ -92,5 +97,93 @@ describe("LoginPage", () => {
     await flushPromises();
 
     expect(wrapper.find('[data-test="resend-confirmation"]').exists()).toBe(false);
+  });
+
+  it("shows an independent resend cooldown and retries only after a manual click", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
+    userStoreMock.login.mockRejectedValue(new ResponseError(Response.json({ detail: "NotAllowed" }, { status: 401 })));
+    userStoreMock.resendConfirmationEmail.mockRejectedValue(
+      new ResponseError(new Response(null, { headers: { "Retry-After": "2" }, status: 429 }))
+    );
+    const wrapper = mount(LoginPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+    await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.get('[data-test="resend-rate-limit"]').text()).toContain("2");
+    expect(wrapper.get('[data-test="resend-confirmation"]').attributes("disabled")).toBeDefined();
+    expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeUndefined();
+    expect(toastMock.error).not.toHaveBeenCalledWith("auth-resend-confirmation-failed");
+
+    await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
+    expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="resend-rate-limit"]').exists()).toBe(false);
+    expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledTimes(1);
+
+    await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
+    await flushPromises();
+    expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledTimes(2);
+  });
+
+  it("ignores duplicate resend clicks while the first request is pending", async () => {
+    let resolveResend!: () => void;
+    userStoreMock.login.mockRejectedValue(new ResponseError(Response.json({ detail: "NotAllowed" }, { status: 401 })));
+    userStoreMock.resendConfirmationEmail.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveResend = resolve;
+      })
+    );
+    const wrapper = mount(LoginPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
+    await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
+
+    expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledTimes(1);
+
+    resolveResend();
+    await flushPromises();
+  });
+
+  it("shows a login cooldown without exposing confirmation resend after a 429", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
+    const response = new Response(null, { headers: { "Retry-After": "2" }, status: 429 });
+    userStoreMock.login.mockRejectedValue(new ResponseError(response));
+    const wrapper = mount(LoginPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("wrong-password");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.get('[data-test="login-rate-limit"]').text()).toContain("2");
+    expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeDefined();
+    expect(wrapper.find('[data-test="resend-confirmation"]').exists()).toBe(false);
+
+    await wrapper.find("form").trigger("submit");
+    expect(userStoreMock.login).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(wrapper.find('[data-test="login-rate-limit"]').exists()).toBe(false);
+    expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeUndefined();
+    expect(userStoreMock.login).toHaveBeenCalledTimes(1);
+
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+    expect(userStoreMock.login).toHaveBeenCalledTimes(2);
   });
 });
