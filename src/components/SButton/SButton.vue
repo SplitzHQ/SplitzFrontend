@@ -9,12 +9,14 @@ export interface ButtonProps {
   size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
   disabled?: boolean;
   loading?: boolean;
+  /** Native button type; "submit" lets a surrounding form handle Enter key submission. */
+  type?: "button" | "submit";
 }
 interface ButtonEvents {
   click: [e: MouseEvent];
 }
 
-const { color, variant, size, disabled, loading } = defineProps<ButtonProps>();
+const { color, variant, size, disabled, loading, type = "button" } = defineProps<ButtonProps>();
 const emit = defineEmits<ButtonEvents>();
 const isDisabled = computed(() => disabled === true || loading === true);
 
@@ -25,7 +27,7 @@ function clickHandler(e: MouseEvent) {
 </script>
 
 <template>
-  <button type="button" :disabled="isDisabled" @click="clickHandler">
+  <button :type="type" :disabled="isDisabled" @click="clickHandler">
     <SButtonBase :color="color" :variant="variant" :size="size" :disabled="isDisabled" :loading="loading">
       <slot />
       <template #icon-left>

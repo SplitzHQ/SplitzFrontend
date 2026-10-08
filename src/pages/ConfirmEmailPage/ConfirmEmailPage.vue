@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { PhCheck, PhCircleNotch, PhHourglassMedium, PhLinkBreak } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
+import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
@@ -34,6 +37,16 @@ const confirmEmailRequest = computed(() => {
     userId,
   };
 });
+
+const copyByState: Record<ConfirmationState, { body: string; title: string }> = {
+  error: { body: "auth-confirm-email-error-body", title: "auth-confirm-email-error-title" },
+  invalid: { body: "auth-confirm-email-invalid-body", title: "auth-confirm-email-invalid-title" },
+  loading: { body: "auth-confirm-email-loading-body", title: "auth-confirm-email-loading-title" },
+  rateLimited: { body: "auth-confirm-email-rate-limit-body", title: "auth-confirm-email-rate-limit-title" },
+  success: { body: "auth-confirm-email-success-body", title: "auth-confirm-email-success-title" },
+};
+
+const copy = computed(() => copyByState[state.value]);
 
 onMounted(confirmEmail);
 
@@ -69,68 +82,59 @@ function getSingleQueryValue(value: unknown): string | undefined {
 </script>
 
 <template>
-  <main class="bg-gray-50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-    <section class="w-full max-w-md space-y-6 text-center">
-      <div v-if="state === 'loading'" class="space-y-3">
-        <h1 class="text-3xl text-gray-900 font-bold tracking-tight">{{ $t("auth-confirm-email-loading-title") }}</h1>
-        <p class="text-gray-600 text-sm">{{ $t("auth-confirm-email-loading-body") }}</p>
+  <AuthShell centered :title="$t(copy.title)" :subtitle="$t(copy.body)">
+    <template #hero>
+      <div class="flex justify-center">
+        <StatusBadge v-if="state === 'loading'" tone="brand">
+          <PhCircleNotch class="animate-spin" />
+        </StatusBadge>
+        <StatusBadge v-else-if="state === 'success'" tone="success">
+          <PhCheck weight="bold" />
+        </StatusBadge>
+        <StatusBadge v-else-if="state === 'rateLimited'" tone="warning">
+          <PhHourglassMedium weight="duotone" />
+        </StatusBadge>
+        <StatusBadge v-else tone="error">
+          <PhLinkBreak weight="duotone" />
+        </StatusBadge>
       </div>
+    </template>
 
-      <div v-else-if="state === 'success'" class="space-y-6">
-        <div class="space-y-3">
-          <h1 class="text-3xl text-gray-900 font-bold tracking-tight">{{ $t("auth-confirm-email-success-title") }}</h1>
-          <p class="text-gray-600 text-sm">{{ $t("auth-confirm-email-success-body") }}</p>
-        </div>
-        <RouterLink :to="{ name: 'login' }" class="inline-flex">
-          <SButton color="brand" variant="primary" size="lg">
-            {{ $t("auth-confirm-email-login-link") }}
-          </SButton>
-        </RouterLink>
-      </div>
-
-      <div v-else-if="state === 'rateLimited'" class="space-y-6">
-        <div class="space-y-3">
-          <h1 class="text-3xl text-gray-900 font-bold tracking-tight">
-            {{ $t("auth-confirm-email-rate-limit-title") }}
-          </h1>
-          <p class="text-gray-600 text-sm">{{ $t("auth-confirm-email-rate-limit-body") }}</p>
-          <RateLimitCountdown
-            :seconds="confirmationCooldown.remainingSeconds.value"
-            message-key="auth-rate-limit-countdown"
-            data-test="confirmation-rate-limit"
-          />
-        </div>
-        <SButton
-          color="brand"
-          variant="primary"
-          size="lg"
-          :disabled="confirmationCooldown.isActive.value"
-          :loading="requestPending"
-          data-test="confirmation-retry"
-          @click="confirmEmail"
-        >
-          {{ $t("auth-confirm-email-retry") }}
+    <div v-if="state === 'success'" class="flex flex-col items-stretch">
+      <RouterLink :to="{ name: 'login' }" class="flex">
+        <SButton color="brand" variant="primary" size="xxl" class="w-full">
+          {{ $t("auth-confirm-email-login-link") }}
         </SButton>
-      </div>
+      </RouterLink>
+    </div>
 
-      <div v-else class="space-y-6">
-        <div class="space-y-3">
-          <h1 class="text-3xl text-gray-900 font-bold tracking-tight">
-            {{ $t(state === "invalid" ? "auth-confirm-email-invalid-title" : "auth-confirm-email-error-title") }}
-          </h1>
-          <p class="text-gray-600 text-sm">
-            {{ $t(state === "invalid" ? "auth-confirm-email-invalid-body" : "auth-confirm-email-error-body") }}
-          </p>
-        </div>
-        <div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <RouterLink :to="{ name: 'login' }" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
-            {{ $t("auth-confirm-email-resend-link") }}
-          </RouterLink>
-          <RouterLink :to="{ name: 'register' }" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
-            {{ $t("auth-confirm-email-register-link") }}
-          </RouterLink>
-        </div>
-      </div>
-    </section>
-  </main>
+    <div v-else-if="state === 'rateLimited'" class="flex flex-col items-center gap-4">
+      <RateLimitCountdown
+        :seconds="confirmationCooldown.remainingSeconds.value"
+        message-key="auth-rate-limit-countdown"
+        data-test="confirmation-rate-limit"
+      />
+      <SButton
+        color="brand"
+        variant="primary"
+        size="xxl"
+        class="w-full"
+        :disabled="confirmationCooldown.isActive.value"
+        :loading="requestPending"
+        data-test="confirmation-retry"
+        @click="confirmEmail"
+      >
+        {{ $t("auth-confirm-email-retry") }}
+      </SButton>
+    </div>
+
+    <template v-if="state === 'invalid' || state === 'error'" #footer>
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-confirm-email-resend-link") }}
+      </RouterLink>
+      <RouterLink :to="{ name: 'register' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-confirm-email-register-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>
