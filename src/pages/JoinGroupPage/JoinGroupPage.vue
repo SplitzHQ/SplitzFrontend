@@ -8,11 +8,11 @@ import { toast } from "vue-sonner";
 
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
-import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 
 const { $t } = useFluent();
 const queryCache = useQueryCache();

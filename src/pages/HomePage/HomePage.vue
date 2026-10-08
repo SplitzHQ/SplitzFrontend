@@ -115,10 +115,11 @@ const userBalances = computed(() => {
 
         <!-- Search Bar -->
         <div class="flex w-full items-start gap-2.5">
-          <div class="flex flex-1 items-center gap-2 rounded-full bg-util-alpha-black-5 p-2.5">
-            <PhMagnifyingGlass class="size-5 shrink-0 text-util-color-brand-700" />
-            <TextInput v-model="searchKeyword" class="grow" :placeholder="$t('home-search-placeholder')" />
-          </div>
+          <TextInput v-model="searchKeyword" class="flex-1" :placeholder="$t('home-search-placeholder')">
+            <template #icon>
+              <PhMagnifyingGlass />
+            </template>
+          </TextInput>
           <SIconButton variant="secondary" color="neutral" size="lg">
             <PhSlidersHorizontal class="size-5 text-base-text-primary" />
           </SIconButton>

@@ -6,10 +6,10 @@ import { RouterLink, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
-import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
-import FormField from "@/components/FormField/FormField.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -89,7 +89,7 @@ async function handleRegister() {
 
   <AuthShell v-else :title="$t('auth-register-title')" :subtitle="$t('auth-register-subtitle')">
     <form class="flex flex-col gap-5" @submit.prevent="handleRegister">
-      <FormField
+      <TextInput
         id="email-address"
         v-model="email"
         name="email"
@@ -103,9 +103,9 @@ async function handleRegister() {
         <template #icon>
           <PhEnvelopeSimple />
         </template>
-      </FormField>
+      </TextInput>
 
-      <FormField
+      <TextInput
         id="password"
         v-model="password"
         name="password"
@@ -119,9 +119,9 @@ async function handleRegister() {
         <template #icon>
           <PhLockSimple />
         </template>
-      </FormField>
+      </TextInput>
 
-      <FormField
+      <TextInput
         id="confirm-password"
         v-model="confirmPassword"
         name="confirm-password"
@@ -135,7 +135,7 @@ async function handleRegister() {
         <template #icon>
           <PhLockSimple />
         </template>
-      </FormField>
+      </TextInput>
 
       <RateLimitCountdown
         :seconds="registrationCooldown.remainingSeconds.value"

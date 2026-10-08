@@ -6,11 +6,11 @@ import { RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
-import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
-import FormField from "@/components/FormField/FormField.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -93,7 +93,7 @@ async function handleForgotPassword() {
         <p>{{ $t("auth-forgot-password-unavailable-body") }}</p>
       </Notice>
 
-      <FormField
+      <TextInput
         id="forgot-password-email"
         v-model="email"
         name="email"
@@ -109,7 +109,7 @@ async function handleForgotPassword() {
         <template #icon>
           <PhEnvelopeSimple />
         </template>
-      </FormField>
+      </TextInput>
 
       <Notice v-if="errorMessageKey" tone="error">
         <template #icon>

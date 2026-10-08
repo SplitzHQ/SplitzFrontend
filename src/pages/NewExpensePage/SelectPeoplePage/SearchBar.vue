@@ -30,7 +30,12 @@ const { selectedUsers } = defineProps<{ selectedUsers: { photo: string | null | 
           <UserTag :photo="user.photo" :name="user.userName" />
         </motion.div>
         <motion.div class="grow" layout>
-          <TextInput v-model="model" class="w-full" :placeholder="$t('new-expense-select-people-search-placeholder')" />
+          <TextInput
+            v-model="model"
+            variant="plain"
+            class="w-full"
+            :placeholder="$t('new-expense-select-people-search-placeholder')"
+          />
         </motion.div>
       </AnimatePresence>
     </LayoutGroup>

@@ -60,12 +60,12 @@ async function save() {
       </h2>
       <p class="text-sm text-base-text-tertiary">{{ friendName }}</p>
 
-      <div class="flex flex-col gap-2">
-        <div class="text-sm font-semibold text-base-text-primary">{{ $t("profile-edit-nickname-label") }}</div>
-        <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-          <TextInput v-model="remark" class="w-full" :placeholder="$t('profile-edit-nickname-placeholder')" />
-        </div>
-      </div>
+      <TextInput
+        id="edit-nickname"
+        v-model="remark"
+        :label="$t('profile-edit-nickname-label')"
+        :placeholder="$t('profile-edit-nickname-placeholder')"
+      />
 
       <SButton variant="primary" color="brand" size="xxl" class="w-full" :loading="loading" @click="save">
         {{ $t("profile-edit-nickname-save") }}

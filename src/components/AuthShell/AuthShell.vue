@@ -17,12 +17,12 @@ const { title, subtitle, centered } = defineProps<AuthShellProps>();
     <!-- Decorative backdrop: a soft brand glow plus the concentric rings used across the app. -->
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
       <div
-        class="absolute -top-40 left-1/2 h-[30rem] w-[44rem] -translate-x-1/2 rounded-full bg-radial from-core-alpha-brand-20 from-0% via-core-alpha-brand-5 via-45% to-transparent to-70%"
+        class="absolute -top-40 left-1/2 h-120 w-176 -translate-x-1/2 rounded-full bg-radial from-core-alpha-brand-20 from-0% via-core-alpha-brand-5 via-45% to-transparent to-70%"
       />
       <div class="absolute -top-24 -right-24 size-80 rounded-full border border-core-alpha-brand-10" />
-      <div class="absolute -top-40 -right-40 size-[28rem] rounded-full border border-core-alpha-brand-5" />
+      <div class="absolute -top-40 -right-40 size-112 rounded-full border border-core-alpha-brand-5" />
       <div class="absolute -bottom-36 -left-28 size-80 rounded-full border border-core-alpha-brand-10" />
-      <div class="absolute -bottom-52 -left-44 size-[28rem] rounded-full border border-core-alpha-brand-5" />
+      <div class="absolute -bottom-52 -left-44 size-112 rounded-full border border-core-alpha-brand-5" />
     </div>
 
     <div class="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-12 pb-10 sm:justify-center sm:py-12">

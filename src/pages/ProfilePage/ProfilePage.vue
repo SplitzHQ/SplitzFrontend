@@ -243,13 +243,13 @@ function logout() {
                 </SIconButton>
               </div>
               <form v-if="isEditingUsername" class="flex flex-col gap-2" @submit.prevent="saveUsername">
-                <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-                  <TextInput
-                    v-model="editedUsername"
-                    class="w-full"
-                    :placeholder="$t('profile-username-placeholder')"
-                  />
-                </div>
+                <TextInput
+                  id="edit-username"
+                  v-model="editedUsername"
+                  hide-label
+                  :label="$t('profile-username-label')"
+                  :placeholder="$t('profile-username-placeholder')"
+                />
                 <div class="flex justify-end gap-2">
                   <SButton
                     variant="ghost"

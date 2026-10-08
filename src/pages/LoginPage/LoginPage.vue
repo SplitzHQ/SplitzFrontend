@@ -7,10 +7,10 @@ import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
-import FormField from "@/components/FormField/FormField.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -97,13 +97,10 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
 <template>
   <AuthShell :title="$t('auth-login-title')" :subtitle="$t('auth-login-subtitle')">
     <form class="flex flex-col gap-5" @submit.prevent="handleLogin">
-      <FormField
+      <TextInput
         id="email-address"
         v-model="email"
         name="email"
-        type="email"
-        autocomplete="email"
-        inputmode="email"
         required
         :label="$t('auth-email-label')"
         :placeholder="$t('auth-email-placeholder')"
@@ -111,9 +108,9 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         <template #icon>
           <PhEnvelopeSimple />
         </template>
-      </FormField>
+      </TextInput>
 
-      <FormField
+      <TextInput
         id="password"
         v-model="password"
         name="password"
@@ -126,9 +123,9 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         <template #icon>
           <PhLockSimple />
         </template>
-      </FormField>
+      </TextInput>
 
-      <FormField
+      <TextInput
         v-if="showTwoFactor"
         id="2fa-code"
         v-model="twoFactorCode"
@@ -142,7 +139,7 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         <template #icon>
           <PhShieldCheck />
         </template>
-      </FormField>
+      </TextInput>
 
       <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm font-medium">
         <button

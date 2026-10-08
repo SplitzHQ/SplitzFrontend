@@ -7,11 +7,11 @@ import { toast } from "vue-sonner";
 
 import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
-import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
-import FormField from "@/components/FormField/FormField.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -148,7 +148,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
 
   <AuthShell v-else :title="$t('auth-reset-password-title')" :subtitle="$t('auth-reset-password-body')">
     <form class="flex flex-col gap-5" @submit.prevent="handleResetPassword">
-      <FormField
+      <TextInput
         id="new-password"
         v-model="newPassword"
         name="new-password"
@@ -163,9 +163,9 @@ function getSingleQueryValue(value: unknown): string | undefined {
         <template #icon>
           <PhLockSimple />
         </template>
-      </FormField>
+      </TextInput>
 
-      <FormField
+      <TextInput
         id="confirm-password"
         v-model="confirmPassword"
         name="confirm-password"
@@ -179,7 +179,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
         <template #icon>
           <PhLockSimple />
         </template>
-      </FormField>
+      </TextInput>
 
       <Notice v-if="errorMessageKey" tone="error">
         <template #icon>

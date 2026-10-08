@@ -7,12 +7,12 @@ import { toast } from "vue-sonner";
 
 import config from "@/backend/config";
 import { SplitzBackendApi, type TwoFactorResponse } from "@/backend/openapi";
-import FormField from "@/components/FormField/FormField.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { copyToClipboard } from "@/libs/copy-to-clipboard";
 import { useUserStore } from "@/stores/user";
 
@@ -286,7 +286,7 @@ onMounted(() => {
               </div>
 
               <form class="flex flex-col gap-4" @submit.prevent="enableTwoFactor">
-                <FormField
+                <TextInput
                   id="verification-code"
                   v-model="verificationCode"
                   name="verification-code"
@@ -299,7 +299,7 @@ onMounted(() => {
                   <template #icon>
                     <PhShieldCheck />
                   </template>
-                </FormField>
+                </TextInput>
                 <SButton type="submit" color="brand" variant="primary" size="xxl" class="w-full" :loading="enabling">
                   {{ $t("two-factor-enable-action") }}
                 </SButton>

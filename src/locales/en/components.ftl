@@ -1,2 +1,2 @@
-form-field-show-password = Show password
-form-field-hide-password = Hide password
+text-input-show-password = Show password
+text-input-hide-password = Hide password

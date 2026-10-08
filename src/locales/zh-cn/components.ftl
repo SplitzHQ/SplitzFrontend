@@ -1,2 +1,2 @@
-form-field-show-password = 显示密码
-form-field-hide-password = 隐藏密码
+text-input-show-password = 显示密码
+text-input-hide-password = 隐藏密码

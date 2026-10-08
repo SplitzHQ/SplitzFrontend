@@ -5,9 +5,9 @@ import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
-import StatusBadge from "@/components/AuthShell/StatusBadge.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
