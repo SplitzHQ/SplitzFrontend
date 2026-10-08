@@ -50,12 +50,12 @@ async function handleCreate() {
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-6 px-4">
         <!-- Invoice Name -->
-        <div class="flex flex-col gap-2">
-          <p class="text-sm font-medium text-base-text-secondary">{{ $t("settle-up-invoice-name-label") }}</p>
-          <div class="rounded-xl border border-base-border-primary px-4 py-3">
-            <TextInput v-model="invoiceStore.invoice.name" :placeholder="$t('settle-up-invoice-name-placeholder')" />
-          </div>
-        </div>
+        <TextInput
+          id="invoice-name"
+          v-model="invoiceStore.invoice.name"
+          :label="$t('settle-up-invoice-name-label')"
+          :placeholder="$t('settle-up-invoice-name-placeholder')"
+        />
 
         <!-- Summary -->
         <div class="flex flex-col gap-3">

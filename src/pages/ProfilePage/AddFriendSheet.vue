@@ -45,19 +45,19 @@ async function submit() {
     <div class="flex flex-col gap-4 px-4 pt-2 pb-6">
       <h2 class="text-lg font-semibold text-base-text-primary">{{ $t("profile-add-friend-title") }}</h2>
 
-      <div class="flex flex-col gap-2">
-        <div class="text-sm font-semibold text-base-text-primary">{{ $t("profile-add-friend-id-label") }}</div>
-        <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-          <TextInput v-model="friendId" class="w-full" :placeholder="$t('profile-add-friend-id-placeholder')" />
-        </div>
-      </div>
+      <TextInput
+        id="add-friend-id"
+        v-model="friendId"
+        :label="$t('profile-add-friend-id-label')"
+        :placeholder="$t('profile-add-friend-id-placeholder')"
+      />
 
-      <div class="flex flex-col gap-2">
-        <div class="text-sm font-semibold text-base-text-primary">{{ $t("profile-add-friend-remark-label") }}</div>
-        <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-          <TextInput v-model="remark" class="w-full" :placeholder="$t('profile-add-friend-remark-placeholder')" />
-        </div>
-      </div>
+      <TextInput
+        id="add-friend-remark"
+        v-model="remark"
+        :label="$t('profile-add-friend-remark-label')"
+        :placeholder="$t('profile-add-friend-remark-placeholder')"
+      />
 
       <SButton
         variant="primary"

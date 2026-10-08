@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { PhEnvelopeSimple, PhPaperPlaneTilt, PhWarningCircle } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
+import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -58,63 +63,85 @@ async function handleForgotPassword() {
 </script>
 
 <template>
-  <main class="bg-gray-50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-    <section class="w-full max-w-md space-y-8">
-      <div class="space-y-3 text-center">
-        <h1 class="text-3xl text-gray-900 font-bold tracking-tight">
-          {{ $t(state === "submitted" ? "auth-forgot-password-success-title" : "auth-forgot-password-title") }}
-        </h1>
-        <p class="text-gray-600 text-sm">
-          {{ $t(state === "submitted" ? "auth-forgot-password-success-body" : "auth-forgot-password-body") }}
-        </p>
+  <AuthShell
+    v-if="state === 'submitted'"
+    centered
+    :title="$t('auth-forgot-password-success-title')"
+    :subtitle="$t('auth-forgot-password-success-body')"
+  >
+    <template #hero>
+      <div class="flex justify-center">
+        <StatusBadge tone="success">
+          <PhPaperPlaneTilt weight="duotone" />
+        </StatusBadge>
       </div>
+    </template>
 
-      <div v-if="state === 'unavailable'" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
-        <p class="font-medium">{{ $t("auth-forgot-password-unavailable-title") }}</p>
-        <p class="mt-2">{{ $t("auth-forgot-password-unavailable-body") }}</p>
-      </div>
+    <template #footer>
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-forgot-password-login-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 
-      <form v-if="state !== 'submitted'" class="space-y-6" @submit.prevent="handleForgotPassword">
-        <div class="space-y-2">
-          <label for="forgot-password-email" class="sr-only">{{ $t("auth-email-label") }}</label>
-          <input
-            id="forgot-password-email"
-            v-model="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            required
-            :disabled="inputDisabled"
-            class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 disabled:bg-gray-100 disabled:text-gray-500 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-            :placeholder="$t('auth-email-placeholder')"
-          />
-          <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
-          <RateLimitCountdown
-            :seconds="recoveryCooldown.remainingSeconds.value"
-            message-key="auth-rate-limit-countdown"
-            data-test="recovery-rate-limit"
-          />
-        </div>
+  <AuthShell v-else :title="$t('auth-forgot-password-title')" :subtitle="$t('auth-forgot-password-body')">
+    <form class="flex flex-col gap-5" @submit.prevent="handleForgotPassword">
+      <Notice v-if="state === 'unavailable'" tone="warning" :title="$t('auth-forgot-password-unavailable-title')">
+        <template #icon>
+          <PhWarningCircle />
+        </template>
+        <p>{{ $t("auth-forgot-password-unavailable-body") }}</p>
+      </Notice>
 
-        <SButton
-          color="brand"
-          variant="primary"
-          size="lg"
-          :disabled="submitDisabled"
-          :loading="loading"
-          class="w-full justify-center"
-          data-test="forgot-password-submit"
-          @click="handleForgotPassword"
-        >
-          {{ $t("auth-forgot-password-action") }}
-        </SButton>
-      </form>
+      <TextInput
+        id="forgot-password-email"
+        v-model="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        required
+        :disabled="inputDisabled"
+        :invalid="errorMessageKey !== null"
+        :label="$t('auth-email-label')"
+        :placeholder="$t('auth-email-placeholder')"
+      >
+        <template #icon>
+          <PhEnvelopeSimple />
+        </template>
+      </TextInput>
 
-      <div class="text-center text-sm">
-        <RouterLink :to="{ name: 'login' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
-          {{ $t("auth-forgot-password-login-link") }}
-        </RouterLink>
-      </div>
-    </section>
-  </main>
+      <Notice v-if="errorMessageKey" tone="error">
+        <template #icon>
+          <PhWarningCircle />
+        </template>
+        <p>{{ $t(errorMessageKey) }}</p>
+      </Notice>
+
+      <RateLimitCountdown
+        :seconds="recoveryCooldown.remainingSeconds.value"
+        message-key="auth-rate-limit-countdown"
+        data-test="recovery-rate-limit"
+      />
+
+      <SButton
+        type="submit"
+        color="brand"
+        variant="primary"
+        size="xxl"
+        :disabled="submitDisabled"
+        :loading="loading"
+        class="w-full"
+        data-test="forgot-password-submit"
+      >
+        {{ $t("auth-forgot-password-action") }}
+      </SButton>
+    </form>
+
+    <template #footer>
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-forgot-password-login-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>

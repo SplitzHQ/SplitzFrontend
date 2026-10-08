@@ -1,6 +1,11 @@
 join-group-title = Join Group
 join-group-group-label = Group
 join-group-loading = Loading…
+join-group-invited-title = You're invited to
+join-group-invited-body = Join to see shared expenses, add your own, and settle up with everyone.
 join-group-join = Join
 join-group-success = Joined group
 join-group-error-join-failed = Failed to join group.
+join-group-error-not-found-title = This invite link doesn't work
+join-group-error-not-found-body = The link may have expired or been removed. Ask a group member for a new one.
+join-group-back-home = Back to home

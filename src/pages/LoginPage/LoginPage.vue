@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { PhEnvelopeSimple, PhLockSimple, PhPaperPlaneTilt, PhShieldCheck } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
+import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -91,120 +95,119 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
 </script>
 
 <template>
-  <div class="bg-gray-50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8">
-      <div>
-        <h2 class="text-3xl text-gray-900 mt-6 text-center font-bold tracking-tight">{{ $t("auth-login-title") }}</h2>
+  <AuthShell :title="$t('auth-login-title')" :subtitle="$t('auth-login-subtitle')">
+    <form class="flex flex-col gap-5" @submit.prevent="handleLogin">
+      <TextInput
+        id="email-address"
+        v-model="email"
+        name="email"
+        required
+        :label="$t('auth-email-label')"
+        :placeholder="$t('auth-email-placeholder')"
+      >
+        <template #icon>
+          <PhEnvelopeSimple />
+        </template>
+      </TextInput>
+
+      <TextInput
+        id="password"
+        v-model="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        :label="$t('auth-password-label')"
+        :placeholder="$t('auth-password-placeholder')"
+      >
+        <template #icon>
+          <PhLockSimple />
+        </template>
+      </TextInput>
+
+      <TextInput
+        v-if="showTwoFactor"
+        id="2fa-code"
+        v-model="twoFactorCode"
+        name="2fa-code"
+        type="text"
+        autocomplete="one-time-code"
+        inputmode="numeric"
+        :label="$t('auth-two-factor-label')"
+        :placeholder="$t('auth-two-factor-placeholder')"
+      >
+        <template #icon>
+          <PhShieldCheck />
+        </template>
+      </TextInput>
+
+      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm font-medium">
+        <button
+          type="button"
+          class="text-base-text-brand hover:text-base-text-brand_hover"
+          data-test="toggle-two-factor"
+          @click="showTwoFactor = !showTwoFactor"
+        >
+          {{ showTwoFactor ? $t("auth-hide-two-factor") : $t("auth-show-two-factor") }}
+        </button>
+        <RouterLink
+          :to="{ name: 'forgotPassword' }"
+          class="text-base-text-brand hover:text-base-text-brand_hover"
+          data-test="forgot-password-link"
+        >
+          {{ $t("auth-forgot-password-link") }}
+        </RouterLink>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <div class="-space-y-px rounded-md shadow-sm">
-          <div class="mb-4">
-            <label for="email-address" class="sr-only">{{ $t("auth-email-label") }}</label>
-            <input
-              id="email-address"
-              v-model="email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-              :placeholder="$t('auth-email-placeholder')"
-            />
-          </div>
-          <div class="mb-4">
-            <label for="password" class="sr-only">{{ $t("auth-password-label") }}</label>
-            <input
-              id="password"
-              v-model="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-              :placeholder="$t('auth-password-placeholder')"
-            />
-          </div>
-          <div v-if="showTwoFactor" class="mb-4">
-            <label for="2fa-code" class="sr-only">{{ $t("auth-two-factor-label") }}</label>
-            <input
-              id="2fa-code"
-              v-model="twoFactorCode"
-              name="2fa-code"
-              type="text"
-              class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-              :placeholder="$t('auth-two-factor-placeholder')"
-            />
-          </div>
-        </div>
 
+      <RateLimitCountdown
+        :seconds="loginCooldown.remainingSeconds.value"
+        message-key="auth-rate-limit-countdown"
+        data-test="login-rate-limit"
+      />
+
+      <Notice v-if="showResendConfirmation" tone="info" :title="$t('auth-login-unconfirmed-title')">
+        <template #icon>
+          <PhPaperPlaneTilt />
+        </template>
+        <p>{{ $t("auth-login-resend-confirmation") }}</p>
         <RateLimitCountdown
-          :seconds="loginCooldown.remainingSeconds.value"
+          :seconds="resendCooldown.remainingSeconds.value"
           message-key="auth-rate-limit-countdown"
-          data-test="login-rate-limit"
+          class="mt-1"
+          data-test="resend-rate-limit"
         />
+        <SButton
+          color="brand"
+          variant="secondary"
+          size="md"
+          :disabled="resendCooldown.isActive.value"
+          :loading="resendLoading"
+          class="mt-2 self-start"
+          data-test="resend-confirmation"
+          @click="handleResendConfirmation"
+        >
+          {{ $t("auth-resend-confirmation-action") }}
+        </SButton>
+      </Notice>
 
-        <div v-if="showResendConfirmation" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
-          <p>{{ $t("auth-login-resend-confirmation") }}</p>
-          <RateLimitCountdown
-            :seconds="resendCooldown.remainingSeconds.value"
-            message-key="auth-rate-limit-countdown"
-            class="mt-3"
-            data-test="resend-rate-limit"
-          />
-          <SButton
-            color="brand"
-            variant="secondary"
-            size="sm"
-            :disabled="resendCooldown.isActive.value"
-            :loading="resendLoading"
-            class="mt-3"
-            data-test="resend-confirmation"
-            @click="handleResendConfirmation"
-          >
-            {{ $t("auth-resend-confirmation-action") }}
-          </SButton>
-        </div>
+      <SButton
+        type="submit"
+        color="brand"
+        variant="primary"
+        size="xxl"
+        :disabled="loginCooldown.isActive.value"
+        :loading="loading"
+        class="w-full"
+        data-test="login-submit"
+      >
+        {{ $t("auth-sign-in-action") }}
+      </SButton>
+    </form>
 
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="text-sm">
-            <a
-              href="#"
-              class="text-indigo-600 hover:text-indigo-500 font-medium"
-              data-test="toggle-two-factor"
-              @click.prevent="showTwoFactor = !showTwoFactor"
-            >
-              {{ showTwoFactor ? $t("auth-hide-two-factor") : $t("auth-show-two-factor") }}
-            </a>
-          </div>
-          <div class="flex flex-wrap justify-end gap-x-4 gap-y-2 text-sm">
-            <RouterLink
-              :to="{ name: 'forgotPassword' }"
-              class="text-indigo-600 hover:text-indigo-500 font-medium"
-              data-test="forgot-password-link"
-            >
-              {{ $t("auth-forgot-password-link") }}
-            </RouterLink>
-            <RouterLink :to="{ name: 'register' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
-              {{ $t("auth-login-register-link") }}
-            </RouterLink>
-          </div>
-        </div>
-
-        <div>
-          <SButton
-            color="brand"
-            variant="primary"
-            size="lg"
-            :disabled="loginCooldown.isActive.value"
-            :loading="loading"
-            class="w-full justify-center"
-            data-test="login-submit"
-            @click="handleLogin"
-          >
-            {{ $t("auth-sign-in-action") }}
-          </SButton>
-        </div>
-      </form>
-    </div>
-  </div>
+    <template #footer>
+      <RouterLink :to="{ name: 'register' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-login-register-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>

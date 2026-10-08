@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { PhLinkBreak, PhLockSimple, PhWarningCircle } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
+import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
+import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -113,79 +118,103 @@ function getSingleQueryValue(value: unknown): string | undefined {
 </script>
 
 <template>
-  <main class="bg-gray-50 flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-    <section class="w-full max-w-md space-y-8">
-      <div class="space-y-3 text-center">
-        <h1 class="text-3xl text-gray-900 font-bold tracking-tight">
-          {{ $t(isInvalidLink ? "auth-reset-password-invalid-title" : "auth-reset-password-title") }}
-        </h1>
-        <p class="text-gray-600 text-sm">
-          {{ $t(isInvalidLink ? "auth-reset-password-invalid-body" : "auth-reset-password-body") }}
-        </p>
+  <AuthShell
+    v-if="isInvalidLink"
+    centered
+    :title="$t('auth-reset-password-invalid-title')"
+    :subtitle="$t('auth-reset-password-invalid-body')"
+  >
+    <template #hero>
+      <div class="flex justify-center">
+        <StatusBadge tone="error">
+          <PhLinkBreak weight="duotone" />
+        </StatusBadge>
       </div>
+    </template>
 
-      <div v-if="isInvalidLink" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
-        <p>{{ $t("auth-reset-password-invalid-help") }}</p>
-      </div>
+    <Notice tone="info">
+      <p>{{ $t("auth-reset-password-invalid-help") }}</p>
+    </Notice>
 
-      <form v-else class="space-y-6" @submit.prevent="handleResetPassword">
-        <div class="space-y-4">
-          <div>
-            <label for="new-password" class="sr-only">{{ $t("auth-new-password-label") }}</label>
-            <input
-              id="new-password"
-              v-model="newPassword"
-              name="new-password"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-              :placeholder="$t('auth-new-password-placeholder')"
-            />
-          </div>
-          <div>
-            <label for="confirm-password" class="sr-only">{{ $t("auth-confirm-password-label") }}</label>
-            <input
-              id="confirm-password"
-              v-model="confirmPassword"
-              name="confirm-password"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-indigo-600 relative block w-full rounded-md border-0 px-3 py-1.5 ring-1 ring-inset focus:z-10 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-              :placeholder="$t('auth-confirm-password-placeholder')"
-            />
-          </div>
-          <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
-          <RateLimitCountdown
-            :seconds="resetCooldown.remainingSeconds.value"
-            message-key="auth-rate-limit-countdown"
-            data-test="reset-password-rate-limit"
-          />
-        </div>
+    <template #footer>
+      <RouterLink :to="{ name: 'forgotPassword' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-reset-password-forgot-link") }}
+      </RouterLink>
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-reset-password-login-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 
-        <SButton
-          color="brand"
-          variant="primary"
-          size="lg"
-          :disabled="resetCooldown.isActive.value"
-          :loading="loading"
-          class="w-full justify-center"
-          data-test="reset-password-submit"
-          @click="handleResetPassword"
-        >
-          {{ $t("auth-reset-password-action") }}
-        </SButton>
-      </form>
+  <AuthShell v-else :title="$t('auth-reset-password-title')" :subtitle="$t('auth-reset-password-body')">
+    <form class="flex flex-col gap-5" @submit.prevent="handleResetPassword">
+      <TextInput
+        id="new-password"
+        v-model="newPassword"
+        name="new-password"
+        type="password"
+        autocomplete="new-password"
+        required
+        :label="$t('auth-new-password-label')"
+        :placeholder="$t('auth-new-password-placeholder')"
+        :hint="$t('auth-password-hint')"
+        :invalid="errorMessageKey === 'auth-reset-password-policy'"
+      >
+        <template #icon>
+          <PhLockSimple />
+        </template>
+      </TextInput>
 
-      <div class="flex flex-col items-center gap-3 text-sm sm:flex-row sm:justify-center">
-        <RouterLink :to="{ name: 'forgotPassword' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
-          {{ $t("auth-reset-password-forgot-link") }}
-        </RouterLink>
-        <RouterLink :to="{ name: 'login' }" class="text-indigo-600 hover:text-indigo-500 font-medium">
-          {{ $t("auth-reset-password-login-link") }}
-        </RouterLink>
-      </div>
-    </section>
-  </main>
+      <TextInput
+        id="confirm-password"
+        v-model="confirmPassword"
+        name="confirm-password"
+        type="password"
+        autocomplete="new-password"
+        required
+        :label="$t('auth-confirm-password-label')"
+        :placeholder="$t('auth-confirm-password-placeholder')"
+        :invalid="errorMessageKey === 'auth-reset-password-mismatch'"
+      >
+        <template #icon>
+          <PhLockSimple />
+        </template>
+      </TextInput>
+
+      <Notice v-if="errorMessageKey" tone="error">
+        <template #icon>
+          <PhWarningCircle />
+        </template>
+        <p>{{ $t(errorMessageKey) }}</p>
+      </Notice>
+
+      <RateLimitCountdown
+        :seconds="resetCooldown.remainingSeconds.value"
+        message-key="auth-rate-limit-countdown"
+        data-test="reset-password-rate-limit"
+      />
+
+      <SButton
+        type="submit"
+        color="brand"
+        variant="primary"
+        size="xxl"
+        :disabled="resetCooldown.isActive.value"
+        :loading="loading"
+        class="w-full"
+        data-test="reset-password-submit"
+      >
+        {{ $t("auth-reset-password-action") }}
+      </SButton>
+    </form>
+
+    <template #footer>
+      <RouterLink :to="{ name: 'forgotPassword' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-reset-password-forgot-link") }}
+      </RouterLink>
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+        {{ $t("auth-reset-password-login-link") }}
+      </RouterLink>
+    </template>
+  </AuthShell>
 </template>

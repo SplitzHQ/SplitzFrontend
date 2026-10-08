@@ -1,6 +1,11 @@
 join-group-title = 加入组
 join-group-group-label = 组
 join-group-loading = 加载中…
+join-group-invited-title = 邀请你加入
+join-group-invited-body = 加入后即可查看共同支出、记录自己的账单，并与大家结算。
 join-group-join = 加入
 join-group-success = 已加入组
 join-group-error-join-failed = 加入组失败。
+join-group-error-not-found-title = 这条邀请链接无法使用
+join-group-error-not-found-body = 链接可能已过期或被删除。请向组内成员索取新的链接。
+join-group-back-home = 返回首页

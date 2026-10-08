@@ -189,14 +189,12 @@ function getLocation() {
             >
               <CategoryIcon :category="localCategory" />
             </button>
-            <div class="grow rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
-              <TextInput
-                id="name"
-                v-model="localName"
-                :placeholder="$t('new-expense-review-fields-name-placeholder')"
-                class="w-full text-base"
-              />
-            </div>
+            <TextInput
+              id="name"
+              v-model="localName"
+              :placeholder="$t('new-expense-review-fields-name-placeholder')"
+              class="grow"
+            />
           </div>
         </div>
 
@@ -215,16 +213,12 @@ function getLocation() {
               <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
               <PhCircleNotch v-else class="animate-spin icon-5 text-base-fg-primary" />
             </button>
-            <div
-              class="flex grow items-center gap-2 rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid"
-            >
-              <TextInput
-                id="location"
-                v-model="localLocation"
-                :placeholder="$t('new-expense-review-fields-location-placeholder')"
-                class="w-full text-base"
-              />
-            </div>
+            <TextInput
+              id="location"
+              v-model="localLocation"
+              :placeholder="$t('new-expense-review-fields-location-placeholder')"
+              class="grow"
+            />
           </div>
           <span class="text-xs text-base-text-quaternary">
             {{ $t("new-expense-review-fields-location-disclaimer") }}

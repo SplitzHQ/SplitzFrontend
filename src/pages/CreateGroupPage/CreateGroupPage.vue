@@ -98,12 +98,12 @@ async function copyJoinLink() {
 
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col gap-4 px-4 pt-4 pb-28">
-        <div class="flex flex-col gap-2">
-          <div class="text-sm font-semibold text-base-text-primary">{{ $t("create-group-name-label") }}</div>
-          <div class="flex items-center gap-2 overflow-clip rounded-full bg-util-alpha-black-5 px-4 py-3">
-            <TextInput v-model="groupName" class="w-full" :placeholder="$t('create-group-name-placeholder')" />
-          </div>
-        </div>
+        <TextInput
+          id="group-name"
+          v-model="groupName"
+          :label="$t('create-group-name-label')"
+          :placeholder="$t('create-group-name-placeholder')"
+        />
 
         <div v-if="joinUrl" class="flex flex-col gap-2 rounded-2xl bg-base-bg-secondary_alt p-4">
           <div class="flex items-center justify-between gap-3">

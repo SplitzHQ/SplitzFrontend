@@ -82,14 +82,11 @@ watch(
 
       <div class="flex flex-col gap-3">
         <!-- Search -->
-        <div class="flex items-center gap-2 rounded-full bg-util-alpha-black-5 px-3 py-2.5">
-          <PhMagnifyingGlass class="icon-5 text-base-fg-brand" />
-          <TextInput
-            v-model="searchQuery"
-            :placeholder="$t('new-expense-review-category-search-placeholder')"
-            class="w-full"
-          />
-        </div>
+        <TextInput v-model="searchQuery" :placeholder="$t('new-expense-review-category-search-placeholder')">
+          <template #icon>
+            <PhMagnifyingGlass />
+          </template>
+        </TextInput>
 
         <!-- Category chips -->
         <div class="flex gap-2 overflow-x-auto whitespace-nowrap">
