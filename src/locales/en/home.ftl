@@ -12,4 +12,5 @@ home-empty-state-title = No expenses yet
 home-empty-state-description = Get started by recording your first expense or create a new group to organize your expenses.
 home-button-record-expense = Record New Expense
 home-button-create-group = Create Group
+home-create-group-hint = Start a new group to split expenses with others
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhBell, PhList, PhPlus, PhSlidersHorizontal } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhBell, PhList, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -206,6 +206,28 @@ const userBalances = computed(() => {
                     {{ $t("home-you-are-settled-up") }}
                   </span>
                 </div>
+              </div>
+            </button>
+
+            <!-- Create Group row. Keeps group creation reachable when the user already has groups. -->
+            <button
+              type="button"
+              class="flex w-full items-center gap-3 py-2 text-left"
+              data-testid="home-create-group"
+              @click="createGroup"
+            >
+              <div
+                class="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-base-border-secondary text-util-color-brand-700"
+              >
+                <PhUsers class="size-7" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-base font-semibold text-base-text-primary">
+                  {{ $t("home-button-create-group") }}
+                </p>
+                <p class="mt-1 text-sm font-medium text-base-text-quinary">
+                  {{ $t("home-create-group-hint") }}
+                </p>
               </div>
             </button>
           </div>
