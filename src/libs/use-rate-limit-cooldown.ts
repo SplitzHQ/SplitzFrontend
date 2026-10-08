@@ -1,6 +1,14 @@
 import { useIntervalFn } from "@vueuse/core";
 import { computed, ref } from "vue";
 
+import { getRateLimitExpiry } from "@/libs/rate-limit";
+
+export type RateLimitCooldown = ReturnType<typeof useRateLimitCooldown>;
+
+/**
+ * Tracks a "try again in N seconds" cooldown after a 429 response. The countdown ticks once a
+ * second while active and clears itself when it reaches zero.
+ */
 export function useRateLimitCooldown() {
   const expiresAt = ref<number | null>(null);
   const currentTime = ref(Date.now());
@@ -26,22 +34,30 @@ export function useRateLimitCooldown() {
     { immediate: false }
   );
 
+  /** Starts the countdown towards an absolute timestamp. An expiry in the past is ignored. */
   function start(expiry: number) {
-    expiresAt.value = expiry;
     currentTime.value = Date.now();
-    if (isActive.value) {
-      resume();
-    } else {
-      expiresAt.value = null;
+    expiresAt.value = expiry > currentTime.value ? expiry : null;
+    if (expiresAt.value === null) {
       pause();
+    } else {
+      resume();
     }
   }
 
-  function reset() {
-    expiresAt.value = null;
-    currentTime.value = Date.now();
-    pause();
+  /**
+   * Starts the countdown when `error` is a rate-limit response. Returns false for any other error
+   * so the caller can fall through to its normal error handling.
+   */
+  function startFromError(error: unknown): boolean {
+    const expiry = getRateLimitExpiry(error);
+    if (expiry === null) {
+      return false;
+    }
+
+    start(expiry);
+    return true;
   }
 
-  return { isActive, remainingSeconds, reset, start };
+  return { isActive, remainingSeconds, start, startFromError };
 }

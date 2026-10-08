@@ -3,8 +3,8 @@ import { useFluent } from "fluent-vue";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -53,13 +53,7 @@ async function confirmEmail() {
     await userStore.confirmEmail(confirmEmailRequest.value);
     state.value = "success";
   } catch (error) {
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      confirmationCooldown.start(rateLimitExpiry);
-      state.value = "rateLimited";
-    } else {
-      state.value = "error";
-    }
+    state.value = confirmationCooldown.startFromError(error) ? "rateLimited" : "error";
   } finally {
     requestPending.value = false;
   }
@@ -100,15 +94,11 @@ function getSingleQueryValue(value: unknown): string | undefined {
             {{ $t("auth-confirm-email-rate-limit-title") }}
           </h1>
           <p class="text-gray-600 text-sm">{{ $t("auth-confirm-email-rate-limit-body") }}</p>
-          <p
-            v-if="confirmationCooldown.isActive.value"
-            class="text-red-600 text-sm"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="confirmationCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
             data-test="confirmation-rate-limit"
-          >
-            {{ $t("auth-rate-limit-countdown", { seconds: confirmationCooldown.remainingSeconds.value }) }}
-          </p>
+          />
         </div>
         <SButton
           color="brand"

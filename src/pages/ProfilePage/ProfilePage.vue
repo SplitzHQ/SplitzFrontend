@@ -10,10 +10,10 @@ import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -58,9 +58,9 @@ async function saveUsername() {
 const fileInputRef = useTemplateRef("fileInputRef");
 const uploadingAvatar = ref(false);
 const avatarCooldown = useRateLimitCooldown();
+const avatarControlsDisabled = computed(() => uploadingAvatar.value || avatarCooldown.isActive.value);
 
 function triggerAvatarUpload() {
-  if (uploadingAvatar.value || avatarCooldown.isActive.value) return;
   fileInputRef.value?.click();
 }
 
@@ -68,7 +68,7 @@ const MAX_AVATAR_SIZE = 10 * 1024 * 1024; // 10 MB
 
 async function handleAvatarFile(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (uploadingAvatar.value || avatarCooldown.isActive.value) {
+  if (avatarControlsDisabled.value) {
     input.value = "";
     return;
   }
@@ -88,10 +88,7 @@ async function handleAvatarFile(event: Event) {
     await userStore.fetchUserInfo();
     toast.success($t("profile-avatar-upload-success"));
   } catch (error) {
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      avatarCooldown.start(rateLimitExpiry);
-    } else {
+    if (!avatarCooldown.startFromError(error)) {
       toast.error($t("profile-avatar-upload-error"));
     }
   } finally {
@@ -155,7 +152,7 @@ function logout() {
               type="button"
               class="absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-full bg-util-color-brand-700 text-white"
               :aria-label="$t('profile-avatar-change')"
-              :disabled="uploadingAvatar || avatarCooldown.isActive.value"
+              :disabled="avatarControlsDisabled"
               data-test="avatar-upload-trigger"
               @click="triggerAvatarUpload"
             >
@@ -163,15 +160,11 @@ function logout() {
             </button>
           </div>
           <p class="text-sm text-base-text-tertiary">{{ $t("profile-avatar-change") }}</p>
-          <p
-            v-if="avatarCooldown.isActive.value"
-            class="text-sm text-util-color-error-700"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="avatarCooldown.remainingSeconds.value"
+            message-key="profile-avatar-rate-limit"
             data-test="avatar-rate-limit"
-          >
-            {{ $t("profile-avatar-rate-limit", { seconds: avatarCooldown.remainingSeconds.value }) }}
-          </p>
+          />
         </div>
 
         <!-- User Info Section -->
@@ -274,7 +267,7 @@ function logout() {
     type="file"
     accept="image/*"
     class="hidden"
-    :disabled="uploadingAvatar || avatarCooldown.isActive.value"
+    :disabled="avatarControlsDisabled"
     @change="handleAvatarFile"
   />
 

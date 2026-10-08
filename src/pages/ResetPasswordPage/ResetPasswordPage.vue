@@ -5,8 +5,8 @@ import { RouterLink, useRoute, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -68,10 +68,7 @@ async function handleResetPassword() {
     toast.success($t("auth-reset-password-success-toast"));
     await router.push({ name: "login", query: { passwordReset: "success" } });
   } catch (error) {
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      resetCooldown.start(rateLimitExpiry);
-    } else {
+    if (!resetCooldown.startFromError(error)) {
       errorMessageKey.value = await getResetPasswordErrorMessageKey(error);
     }
   } finally {
@@ -160,15 +157,11 @@ function getSingleQueryValue(value: unknown): string | undefined {
             />
           </div>
           <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
-          <p
-            v-if="resetCooldown.isActive.value"
-            class="text-red-600 text-sm"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="resetCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
             data-test="reset-password-rate-limit"
-          >
-            {{ $t("auth-rate-limit-countdown", { seconds: resetCooldown.remainingSeconds.value }) }}
-          </p>
+          />
         </div>
 
         <SButton

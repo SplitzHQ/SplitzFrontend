@@ -40,7 +40,7 @@ describe("AddExpenseDetailsSheet receipt upload", () => {
     vi.restoreAllMocks();
   });
 
-  it("retries only the pending receipt upload after cooldown", async () => {
+  it("retries the receipt upload after the cooldown ends", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-07-12T12:00:00.000Z"));
     vi.spyOn(FileReader.prototype, "readAsDataURL").mockImplementation(function (this: FileReader) {
@@ -108,7 +108,8 @@ describe("AddExpenseDetailsSheet receipt upload", () => {
     await wrapper.get('[data-test="save-details"]').trigger("click");
     await flushPromises();
 
-    expect(saveTransaction).toHaveBeenCalledTimes(1);
+    // The retry saves the details again (create-or-update) so edits made during the cooldown are kept.
+    expect(saveTransaction).toHaveBeenCalledTimes(2);
     expect(uploadReceipt).toHaveBeenCalledTimes(2);
     expect(uploadReceipt).toHaveBeenLastCalledWith(receipt);
     expect(wrapper.emitted("update:modelValue")).toContainEqual([false]);
@@ -189,7 +190,7 @@ describe("AddExpenseDetailsSheet receipt upload", () => {
     await wrapper.get('[data-test="save-details"]').trigger("click");
     await flushPromises();
 
-    expect(saveTransaction).toHaveBeenCalledTimes(1);
+    expect(saveTransaction).toHaveBeenCalledTimes(2);
     expect(uploadReceipt).toHaveBeenCalledTimes(2);
     expect(uploadReceipt).toHaveBeenLastCalledWith(receipt);
     expect(wrapper.emitted("update:modelValue")).toContainEqual([false]);
@@ -201,6 +202,7 @@ function mountSheet() {
     global: {
       stubs: {
         CategoryIcon: true,
+        RateLimitCountdown: false,
         SButton: {
           emits: ["click"],
           props: ["disabled", "loading"],

@@ -4,8 +4,8 @@ import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -47,10 +47,7 @@ async function handleForgotPassword() {
     toast.success($t("auth-forgot-password-success-toast"));
   } catch (error) {
     console.error(error);
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      recoveryCooldown.start(rateLimitExpiry);
-    } else {
+    if (!recoveryCooldown.startFromError(error)) {
       errorMessageKey.value = "auth-forgot-password-error";
       toast.error($t("auth-forgot-password-error"));
     }
@@ -92,15 +89,11 @@ async function handleForgotPassword() {
             :placeholder="$t('auth-email-placeholder')"
           />
           <p v-if="errorMessageKey" class="text-red-600 text-sm">{{ $t(errorMessageKey) }}</p>
-          <p
-            v-if="recoveryCooldown.isActive.value"
-            class="text-red-600 text-sm"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="recoveryCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
             data-test="recovery-rate-limit"
-          >
-            {{ $t("auth-rate-limit-countdown", { seconds: recoveryCooldown.remainingSeconds.value }) }}
-          </p>
+          />
         </div>
 
         <SButton

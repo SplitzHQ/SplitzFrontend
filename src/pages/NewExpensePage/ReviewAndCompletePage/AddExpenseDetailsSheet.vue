@@ -2,16 +2,16 @@
 import { PhCamera, PhCircleNotch, PhGpsFix, PhPlus, PhTrash } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
-import { ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { toast } from "vue-sonner";
 
 import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { getCategory, getMainCategory } from "@/libs/categories";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import reportError from "@/libs/report-error";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useTransactionStore } from "@/stores/transaction";
@@ -36,24 +36,25 @@ const showCategorySheet = ref(false);
 // receipt handling
 const receiptFile = ref<File | null>(null);
 const receiptPreview = ref<string | undefined>(previewPhotoBase64.value);
-const pendingReceiptUpload = ref(false);
+// Set when the receipt upload was throttled, so the save button reads "retry" instead of "save".
+const receiptUploadPending = ref(false);
 const receiptCooldown = useRateLimitCooldown();
+const saveDetailsLoading = ref(false);
+const receiptControlsDisabled = computed(() => saveDetailsLoading.value || receiptCooldown.isActive.value);
 const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
 function triggerCamera() {
-  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   cameraInput.value?.click();
 }
 
 function triggerGallery() {
-  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   galleryInput.value?.click();
 }
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (saveDetailsLoading.value || receiptCooldown.isActive.value) {
+  if (receiptControlsDisabled.value) {
     input.value = "";
     return;
   }
@@ -84,41 +85,37 @@ function handleFileChange(event: Event) {
 }
 
 function removeReceipt() {
-  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
   receiptPreview.value = undefined;
   receiptFile.value = null;
+  receiptUploadPending.value = false;
 }
 
-// Save details back to transaction store
-const saveDetailsLoading = ref(false);
+// Save details back to transaction store. Saving is create-or-update, so a retry after a throttled
+// receipt upload simply saves again; this also picks up any edits made in the meantime.
 async function saveDetails() {
-  if (saveDetailsLoading.value || receiptCooldown.isActive.value) return;
+  if (receiptControlsDisabled.value) return;
 
   try {
     saveDetailsLoading.value = true;
-    if (!pendingReceiptUpload.value) {
-      transaction.value.name = localName.value.trim() || undefined;
-      transaction.value.icon = localCategory.value;
-      transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
-      previewPhotoBase64.value = receiptPreview.value;
-      await transactionStore.saveTransaction();
-      pendingReceiptUpload.value = receiptFile.value !== null;
-    }
+    transaction.value.name = localName.value.trim() || undefined;
+    transaction.value.icon = localCategory.value;
+    transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
+    previewPhotoBase64.value = receiptPreview.value;
+    await transactionStore.saveTransaction();
 
     if (receiptFile.value) {
       try {
         await transactionStore.uploadTransactionReceipt(receiptFile.value);
       } catch (error) {
-        const rateLimitExpiry = getRateLimitExpiry(error);
-        if (rateLimitExpiry === null) throw error;
-
-        pendingReceiptUpload.value = true;
-        receiptCooldown.start(rateLimitExpiry);
-        return;
+        if (receiptCooldown.startFromError(error)) {
+          receiptUploadPending.value = true;
+          return;
+        }
+        throw error;
       }
     }
 
-    pendingReceiptUpload.value = false;
+    receiptUploadPending.value = false;
     model.value = false;
   } catch (error) {
     toast.error($t("new-expense-review-error-saving-transaction"));
@@ -248,7 +245,7 @@ function getLocation() {
             accept="image/*"
             capture="environment"
             class="hidden"
-            :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+            :disabled="receiptControlsDisabled"
             @change="handleFileChange"
           />
           <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
@@ -257,7 +254,7 @@ function getLocation() {
             type="file"
             accept="image/*"
             class="hidden"
-            :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+            :disabled="receiptControlsDisabled"
             @change="handleFileChange"
           />
 
@@ -271,7 +268,7 @@ function getLocation() {
               type="button"
               aria-label="Remove receipt"
               class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
-              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+              :disabled="receiptControlsDisabled"
               @click="removeReceipt"
             >
               <PhTrash class="icon-4 text-base-fg-error" />
@@ -282,7 +279,7 @@ function getLocation() {
               type="button"
               aria-label="Select image from camera"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
-              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+              :disabled="receiptControlsDisabled"
               @click="triggerCamera"
             >
               <PhCamera class="icon-8 text-base-fg-brand" />
@@ -291,21 +288,17 @@ function getLocation() {
               type="button"
               aria-label="Select image from gallery"
               class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
-              :disabled="saveDetailsLoading || receiptCooldown.isActive.value"
+              :disabled="receiptControlsDisabled"
               @click="triggerGallery"
             >
               <PhPlus class="icon-8 text-base-fg-brand" />
             </button>
           </div>
-          <p
-            v-if="receiptCooldown.isActive.value"
-            class="text-sm text-util-color-error-700"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="receiptCooldown.remainingSeconds.value"
+            message-key="new-expense-review-receipt-rate-limit"
             data-test="receipt-rate-limit"
-          >
-            {{ $t("new-expense-review-receipt-rate-limit", { seconds: receiptCooldown.remainingSeconds.value }) }}
-          </p>
+          />
         </div>
 
         <!-- Notes -->
@@ -326,7 +319,7 @@ function getLocation() {
         <div class="flex gap-3">
           <SButton
             :loading="saveDetailsLoading"
-            :disabled="receiptCooldown.isActive.value"
+            :disabled="receiptControlsDisabled"
             data-test="save-details"
             class="flex-1"
             variant="primary"
@@ -335,7 +328,7 @@ function getLocation() {
             @click="saveDetails"
           >
             {{
-              $t(pendingReceiptUpload ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done")
+              $t(receiptUploadPending ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done")
             }}
           </SButton>
         </div>

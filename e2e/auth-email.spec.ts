@@ -50,7 +50,7 @@ test.describe("auth email flows", () => {
     await page.goto("/login");
     await page.getByLabel("Email address").fill("person@example.com");
     await page.getByLabel("Password").fill("WrongPassword123!");
-    await page.locator('[data-test="login-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Sign in" }).click();
 
     await expect(page.getByRole("status")).toContainText("2");
     await expect(page.getByRole("button", { name: "Sign in" })).toBeDisabled();
@@ -62,7 +62,7 @@ test.describe("auth email flows", () => {
     await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
     expect(loginRequests).toBe(1);
 
-    await page.locator('[data-test="login-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Sign in" }).click();
     await expect.poll(() => loginRequests).toBe(2);
   });
 
@@ -85,7 +85,7 @@ test.describe("auth email flows", () => {
 
     await page.goto("/forgot-password");
     await page.getByPlaceholder("Email address").fill("person@example.com");
-    await page.locator('[data-test="forgot-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Send reset email" }).click();
 
     await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
     await expect(
@@ -117,20 +117,20 @@ test.describe("auth email flows", () => {
 
     await page.goto("/forgot-password");
     await page.getByPlaceholder("Email address").fill("person@example.com");
-    await page.locator('[data-test="forgot-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Send reset email" }).click();
 
     await expect(page.getByRole("status")).toContainText("2");
     await expect(page.getByPlaceholder("Email address")).toBeEnabled();
     await expect(page.getByRole("button", { name: "Send reset email" })).toBeDisabled();
     await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
 
-    await page.locator('[data-test="forgot-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Send reset email" }).click({ force: true });
     expect(recoveryRequests).toBe(1);
 
     await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
     expect(recoveryRequests).toBe(1);
 
-    await page.locator('[data-test="forgot-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Send reset email" }).click();
     await expect.poll(() => recoveryRequests).toBe(2);
   });
 
@@ -147,14 +147,14 @@ test.describe("auth email flows", () => {
     await page.goto("/reset-password?email=person%40example.com&resetCode=reset-code");
     await page.getByPlaceholder("New password").fill("Password1234");
     await page.getByPlaceholder("Confirm password").fill("Different1!");
-    await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(page.getByText("Passwords do not match")).toBeVisible();
 
     await page.getByPlaceholder("Confirm password").clear();
     await page.getByPlaceholder("Confirm password").fill("short1");
     await page.getByPlaceholder("New password").fill("short1");
-    await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(
       page.getByText("Password must be at least 12 characters and include a lowercase letter and a number.")
@@ -163,7 +163,7 @@ test.describe("auth email flows", () => {
     await page.getByPlaceholder("New password").fill("Password1234");
     await page.getByPlaceholder("Confirm password").fill("Password1234");
     await expect(page.getByText("Passwords do not match")).toBeHidden();
-    await page.locator('[data-test="reset-password-submit"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(page).toHaveURL(/\/login\?passwordReset=success$/);
   });
@@ -229,13 +229,13 @@ test.describe("auth email flows", () => {
     await expect(page.getByText("This confirmation link expired")).toBeHidden();
     expect(confirmationRequests).toBe(1);
 
-    await page.locator('[data-test="confirmation-retry"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Try confirmation again" }).click({ force: true });
     expect(confirmationRequests).toBe(1);
 
     await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
     expect(confirmationRequests).toBe(1);
 
-    await page.locator('[data-test="confirmation-retry"]').dispatchEvent("click");
+    await page.getByRole("button", { name: "Try confirmation again" }).click();
     await expect.poll(() => confirmationRequests).toBe(2);
   });
 });

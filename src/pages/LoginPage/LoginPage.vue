@@ -5,8 +5,8 @@ import { useRouter, RouterLink } from "vue-router";
 import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -41,10 +41,11 @@ async function handleLogin() {
     await router.push("/");
   } catch (error) {
     console.error(error);
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      loginCooldown.start(rateLimitExpiry);
-    } else if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
+    if (loginCooldown.startFromError(error)) {
+      return;
+    }
+
+    if (email.value.trim().length > 0 && (await isIdentityNotAllowedError(error))) {
       // user account is not confirmed, allow them to resend confirmation email
       showResendConfirmation.value = true;
     } else {
@@ -67,10 +68,7 @@ async function handleResendConfirmation() {
     toast.success($t("auth-resend-confirmation-success"));
   } catch (error) {
     console.error(error);
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      resendCooldown.start(rateLimitExpiry);
-    } else {
+    if (!resendCooldown.startFromError(error)) {
       toast.error($t("auth-resend-confirmation-failed"));
     }
   } finally {
@@ -139,27 +137,20 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
           </div>
         </div>
 
-        <p
-          v-if="loginCooldown.isActive.value"
-          class="text-red-600 text-sm"
-          role="status"
-          aria-live="polite"
+        <RateLimitCountdown
+          :seconds="loginCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
           data-test="login-rate-limit"
-        >
-          {{ $t("auth-rate-limit-countdown", { seconds: loginCooldown.remainingSeconds.value }) }}
-        </p>
+        />
 
         <div v-if="showResendConfirmation" class="bg-indigo-50 text-indigo-900 rounded-md p-4 text-sm">
           <p>{{ $t("auth-login-resend-confirmation") }}</p>
-          <p
-            v-if="resendCooldown.isActive.value"
-            class="text-red-600 mt-3 text-sm"
-            role="status"
-            aria-live="polite"
+          <RateLimitCountdown
+            :seconds="resendCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            class="mt-3"
             data-test="resend-rate-limit"
-          >
-            {{ $t("auth-rate-limit-countdown", { seconds: resendCooldown.remainingSeconds.value }) }}
-          </p>
+          />
           <SButton
             color="brand"
             variant="secondary"

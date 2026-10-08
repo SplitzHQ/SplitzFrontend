@@ -4,8 +4,8 @@ import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
+import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import { getRateLimitExpiry } from "@/libs/rate-limit";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -55,10 +55,7 @@ async function handleRegister() {
     await router.push({ name: "login" });
   } catch (error) {
     console.error(error);
-    const rateLimitExpiry = getRateLimitExpiry(error);
-    if (rateLimitExpiry !== null) {
-      registrationCooldown.start(rateLimitExpiry);
-    } else {
+    if (!registrationCooldown.startFromError(error)) {
       toast.error($t("auth-register-failed"));
     }
   } finally {
@@ -132,15 +129,11 @@ async function handleRegister() {
           </div>
         </div>
 
-        <p
-          v-if="registrationCooldown.isActive.value"
-          class="text-red-600 text-sm"
-          role="status"
-          aria-live="polite"
+        <RateLimitCountdown
+          :seconds="registrationCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
           data-test="register-rate-limit"
-        >
-          {{ $t("auth-rate-limit-countdown", { seconds: registrationCooldown.remainingSeconds.value }) }}
-        </p>
+        />
 
         <div>
           <SButton

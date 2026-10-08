@@ -113,6 +113,7 @@ function mountPage() {
         Layout: {
           template: '<div><slot name="header" /><slot /></div>',
         },
+        RateLimitCountdown: false,
         SButton: true,
         SIconButton: true,
         TextInput: true,
