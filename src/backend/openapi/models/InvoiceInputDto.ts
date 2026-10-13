@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface InvoiceInputDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceInputDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceInputDto
      */
     name?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceInputDto
      */
     currency: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof InvoiceInputDto
      */
     transactionIds: Array<string>;
 }
@@ -66,7 +58,7 @@ export function InvoiceInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'groupId': json['groupId'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'name': json['name'] === undefined ? undefined : json['name'] === null ? null : json['name'],
         'currency': json['currency'],
         'transactionIds': json['transactionIds'],
     };

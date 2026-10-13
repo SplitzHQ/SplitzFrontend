@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface ResetPasswordRequest {
     /**
      * 
-     * @type {string}
-     * @memberof ResetPasswordRequest
      */
     email: string;
     /**
      * 
-     * @type {string}
-     * @memberof ResetPasswordRequest
      */
     resetCode: string;
     /**
      * 
-     * @type {string}
-     * @memberof ResetPasswordRequest
      */
     newPassword: string;
 }

@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface GroupReducedDto {
     /**
      * 
-     * @type {string}
-     * @memberof GroupReducedDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupReducedDto
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupReducedDto
      */
     photo?: string | null;
 }
@@ -60,7 +54,7 @@ export function GroupReducedDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'groupId': json['groupId'],
         'name': json['name'],
-        'photo': json['photo'] == null ? undefined : json['photo'],
+        'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
     };
 }
 

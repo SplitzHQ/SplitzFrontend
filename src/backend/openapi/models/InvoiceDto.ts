@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { TransactionDto } from './TransactionDto';
 import {
     TransactionDtoFromJSON,
@@ -57,62 +57,42 @@ import {
 export interface InvoiceDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDto
      */
     invoiceId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDto
      */
     name?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDto
      */
     currency: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceDto
      */
     createdBy: SplitzUserReducedDto;
     /**
      * 
-     * @type {Date}
-     * @memberof InvoiceDto
      */
     createTime: Date;
     /**
      * 
-     * @type {InvoiceStatus}
-     * @memberof InvoiceDto
      */
     status: InvoiceStatus;
     /**
      * 
-     * @type {Array<TransactionDto>}
-     * @memberof InvoiceDto
      */
     transactions?: Array<TransactionDto>;
     /**
      * 
-     * @type {Array<InvoiceDebtDto>}
-     * @memberof InvoiceDto
      */
     debts?: Array<InvoiceDebtDto>;
     /**
      * 
-     * @type {Array<InvoiceSettlementDto>}
-     * @memberof InvoiceDto
      */
     settlements?: Array<InvoiceSettlementDto>;
 }
@@ -144,10 +124,10 @@ export function InvoiceDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'invoiceId': json['invoiceId'],
         'groupId': json['groupId'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'name': json['name'] === undefined ? undefined : json['name'] === null ? null : json['name'],
         'currency': json['currency'],
         'createdBy': SplitzUserReducedDtoFromJSON(json['createdBy']),
-        'createTime': (new Date(json['createTime'])),
+        'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
         'status': InvoiceStatusFromJSON(json['status']),
         'transactions': json['transactions'] == null ? undefined : ((json['transactions'] as Array<any>).map(TransactionDtoFromJSON)),
         'debts': json['debts'] == null ? undefined : ((json['debts'] as Array<any>).map(InvoiceDebtDtoFromJSON)),
@@ -171,7 +151,7 @@ export function InvoiceDtoToJSONTyped(value?: InvoiceDto | null, ignoreDiscrimin
         'name': value['name'],
         'currency': value['currency'],
         'createdBy': SplitzUserReducedDtoToJSON(value['createdBy']),
-        'createTime': value['createTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
         'status': InvoiceStatusToJSON(value['status']),
         'transactions': value['transactions'] == null ? undefined : ((value['transactions'] as Array<any>).map(TransactionDtoToJSON)),
         'debts': value['debts'] == null ? undefined : ((value['debts'] as Array<any>).map(InvoiceDebtDtoToJSON)),

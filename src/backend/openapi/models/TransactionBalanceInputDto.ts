@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface TransactionBalanceInputDto {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionBalanceInputDto
      */
     transactionId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionBalanceInputDto
      */
     userId: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionBalanceInputDto
      */
     balance?: string;
 }

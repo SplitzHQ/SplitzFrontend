@@ -12,7 +12,22 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
+import type { NotificationPriority } from './NotificationPriority';
+import {
+    NotificationPriorityFromJSON,
+    NotificationPriorityFromJSONTyped,
+    NotificationPriorityToJSON,
+    NotificationPriorityToJSONTyped,
+} from './NotificationPriority';
+import type { NotificationCategory } from './NotificationCategory';
+import {
+    NotificationCategoryFromJSON,
+    NotificationCategoryFromJSONTyped,
+    NotificationCategoryToJSON,
+    NotificationCategoryToJSONTyped,
+} from './NotificationCategory';
+
 /**
  * 
  * @export
@@ -21,47 +36,49 @@ import { mapValues } from '../runtime';
 export interface NotificationDto {
     /**
      * 
-     * @type {string}
-     * @memberof NotificationDto
      */
     notificationId: string;
     /**
      * 
-     * @type {string}
-     * @memberof NotificationDto
      */
     type: string;
     /**
+     * Where a notification is surfaced in the client.
+     * Requests need a user decision (accept / ignore) and are shown on the avatar.
+     * Activity is informational and is shown behind the bell button.
+     */
+    category: NotificationCategory;
+    /**
+     * How urgent a notification is. Clients can sort or style by this value.
+     */
+    priority: NotificationPriority;
+    /**
      * 
-     * @type {string}
-     * @memberof NotificationDto
+     */
+    groupId?: string | null;
+    /**
+     * 
      */
     referenceId?: string | null;
     /**
-     * 
-     * @type {any}
-     * @memberof NotificationDto
+     * Deserialized payload. The concrete shape depends on Type.
      */
     data: any | null;
     /**
      * 
-     * @type {boolean}
-     * @memberof NotificationDto
      */
     isRead: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof NotificationDto
      */
     isDismissed: boolean;
     /**
      * 
-     * @type {Date}
-     * @memberof NotificationDto
      */
     createTime: Date;
 }
+
+
 
 /**
  * Check if a given object implements the NotificationDto interface.
@@ -69,6 +86,8 @@ export interface NotificationDto {
 export function instanceOfNotificationDto(value: object): value is NotificationDto {
     if (!('notificationId' in value) || value['notificationId'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('category' in value) || value['category'] === undefined) return false;
+    if (!('priority' in value) || value['priority'] === undefined) return false;
     if (!('data' in value) || value['data'] === undefined) return false;
     if (!('isRead' in value) || value['isRead'] === undefined) return false;
     if (!('isDismissed' in value) || value['isDismissed'] === undefined) return false;
@@ -88,11 +107,14 @@ export function NotificationDtoFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'notificationId': json['notificationId'],
         'type': json['type'],
-        'referenceId': json['referenceId'] == null ? undefined : json['referenceId'],
+        'category': NotificationCategoryFromJSON(json['category']),
+        'priority': NotificationPriorityFromJSON(json['priority']),
+        'groupId': json['groupId'] === undefined ? undefined : json['groupId'] === null ? null : json['groupId'],
+        'referenceId': json['referenceId'] === undefined ? undefined : json['referenceId'] === null ? null : json['referenceId'],
         'data': json['data'],
         'isRead': json['isRead'],
         'isDismissed': json['isDismissed'],
-        'createTime': (new Date(json['createTime'])),
+        'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
     };
 }
 
@@ -109,11 +131,14 @@ export function NotificationDtoToJSONTyped(value?: NotificationDto | null, ignor
         
         'notificationId': value['notificationId'],
         'type': value['type'],
+        'category': NotificationCategoryToJSON(value['category']),
+        'priority': NotificationPriorityToJSON(value['priority']),
+        'groupId': value['groupId'],
         'referenceId': value['referenceId'],
         'data': value['data'],
         'isRead': value['isRead'],
         'isDismissed': value['isDismissed'],
-        'createTime': value['createTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
     };
 }
 

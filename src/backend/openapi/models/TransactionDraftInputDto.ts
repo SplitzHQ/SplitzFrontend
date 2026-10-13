@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { TransactionDraftBalanceInputDto } from './TransactionDraftBalanceInputDto';
 import {
     TransactionDraftBalanceInputDtoFromJSON,
@@ -36,74 +36,50 @@ import {
 export interface TransactionDraftInputDto {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     transactionDraftId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     userId: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     groupId?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     name?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     icon?: string | null;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDraftInputDto
      */
     createTime?: Date | null;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDraftInputDto
      */
     transactionTime?: Date | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     amount?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     currency?: string | null;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof TransactionDraftInputDto
      */
     tags?: Array<Tag>;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftInputDto
      */
     geoCoordinate?: string | null;
     /**
      * 
-     * @type {Array<TransactionDraftBalanceInputDto>}
-     * @memberof TransactionDraftInputDto
      */
     balances?: Array<TransactionDraftBalanceInputDto>;
 }
@@ -128,15 +104,15 @@ export function TransactionDraftInputDtoFromJSONTyped(json: any, ignoreDiscrimin
         
         'transactionDraftId': json['transactionDraftId'] == null ? undefined : json['transactionDraftId'],
         'userId': json['userId'],
-        'groupId': json['groupId'] == null ? undefined : json['groupId'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'icon': json['icon'] == null ? undefined : json['icon'],
-        'createTime': json['createTime'] == null ? undefined : (new Date(json['createTime'])),
-        'transactionTime': json['transactionTime'] == null ? undefined : (new Date(json['transactionTime'])),
+        'groupId': json['groupId'] === undefined ? undefined : json['groupId'] === null ? null : json['groupId'],
+        'name': json['name'] === undefined ? undefined : json['name'] === null ? null : json['name'],
+        'icon': json['icon'] === undefined ? undefined : json['icon'] === null ? null : json['icon'],
+        'createTime': json['createTime'] === undefined ? undefined : json['createTime'] === null ? null : (parseDateTime(json['createTime'])),
+        'transactionTime': json['transactionTime'] === undefined ? undefined : json['transactionTime'] === null ? null : (parseDateTime(json['transactionTime'])),
         'amount': json['amount'] == null ? undefined : json['amount'],
-        'currency': json['currency'] == null ? undefined : json['currency'],
+        'currency': json['currency'] === undefined ? undefined : json['currency'] === null ? null : json['currency'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
-        'geoCoordinate': json['geoCoordinate'] == null ? undefined : json['geoCoordinate'],
+        'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionDraftBalanceInputDtoFromJSON)),
     };
 }
@@ -157,8 +133,8 @@ export function TransactionDraftInputDtoToJSONTyped(value?: TransactionDraftInpu
         'groupId': value['groupId'],
         'name': value['name'],
         'icon': value['icon'],
-        'createTime': value['createTime'] == null ? value['createTime'] : value['createTime'].toISOString(),
-        'transactionTime': value['transactionTime'] == null ? value['transactionTime'] : value['transactionTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
+        'transactionTime': value['transactionTime'] == null ? value['transactionTime'] : serializeDateTime(value['transactionTime']),
         'amount': value['amount'],
         'currency': value['currency'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),

@@ -22,32 +22,22 @@ export interface ProblemDetails {
     [key: string]: any | any;
     /**
      * 
-     * @type {string}
-     * @memberof ProblemDetails
      */
     type?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof ProblemDetails
      */
     title?: string | null;
     /**
      * 
-     * @type {number}
-     * @memberof ProblemDetails
      */
     status?: number | null;
     /**
      * 
-     * @type {string}
-     * @memberof ProblemDetails
      */
     detail?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof ProblemDetails
      */
     instance?: string | null;
 }
@@ -70,11 +60,11 @@ export function ProblemDetailsFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
             ...json,
-        'type': json['type'] == null ? undefined : json['type'],
-        'title': json['title'] == null ? undefined : json['title'],
-        'status': json['status'] == null ? undefined : json['status'],
-        'detail': json['detail'] == null ? undefined : json['detail'],
-        'instance': json['instance'] == null ? undefined : json['instance'],
+        'type': json['type'] === undefined ? undefined : json['type'] === null ? null : json['type'],
+        'title': json['title'] === undefined ? undefined : json['title'] === null ? null : json['title'],
+        'status': json['status'] === undefined ? undefined : json['status'] === null ? null : json['status'],
+        'detail': json['detail'] === undefined ? undefined : json['detail'] === null ? null : json['detail'],
+        'instance': json['instance'] === undefined ? undefined : json['instance'] === null ? null : json['instance'],
     };
 }
 

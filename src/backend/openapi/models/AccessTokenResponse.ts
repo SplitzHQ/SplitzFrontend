@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface AccessTokenResponse {
     /**
      * 
-     * @type {string}
-     * @memberof AccessTokenResponse
      */
     readonly tokenType?: string;
     /**
      * 
-     * @type {string}
-     * @memberof AccessTokenResponse
      */
     accessToken: string;
     /**
      * 
-     * @type {number}
-     * @memberof AccessTokenResponse
      */
     expiresIn: number;
     /**
      * 
-     * @type {string}
-     * @memberof AccessTokenResponse
      */
     refreshToken: string;
 }

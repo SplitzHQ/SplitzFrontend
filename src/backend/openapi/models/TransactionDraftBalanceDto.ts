@@ -29,26 +29,18 @@ import {
 export interface TransactionDraftBalanceDto {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftBalanceDto
      */
     transactionDraftId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftBalanceDto
      */
     userId: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftBalanceDto
      */
     balance?: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof TransactionDraftBalanceDto
      */
     user: SplitzUserReducedDto;
 }

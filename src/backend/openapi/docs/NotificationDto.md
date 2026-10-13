@@ -8,6 +8,9 @@ Name | Type
 ------------ | -------------
 `notificationId` | string
 `type` | string
+`category` | [NotificationCategory](NotificationCategory.md)
+`priority` | [NotificationPriority](NotificationPriority.md)
+`groupId` | string
 `referenceId` | string
 `data` | any
 `isRead` | boolean
@@ -23,6 +26,9 @@ import type { NotificationDto } from ''
 const example = {
   "notificationId": null,
   "type": null,
+  "category": null,
+  "priority": null,
+  "groupId": null,
   "referenceId": null,
   "data": null,
   "isRead": null,

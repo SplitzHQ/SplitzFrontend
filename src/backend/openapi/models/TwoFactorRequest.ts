@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface TwoFactorRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorRequest
      */
     enable?: boolean | null;
     /**
      * 
-     * @type {string}
-     * @memberof TwoFactorRequest
      */
     twoFactorCode?: string | null;
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorRequest
      */
     resetSharedKey?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorRequest
      */
     resetRecoveryCodes?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorRequest
      */
     forgetMachine?: boolean;
 }
@@ -68,8 +58,8 @@ export function TwoFactorRequestFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'enable': json['enable'] == null ? undefined : json['enable'],
-        'twoFactorCode': json['twoFactorCode'] == null ? undefined : json['twoFactorCode'],
+        'enable': json['enable'] === undefined ? undefined : json['enable'] === null ? null : json['enable'],
+        'twoFactorCode': json['twoFactorCode'] === undefined ? undefined : json['twoFactorCode'] === null ? null : json['twoFactorCode'],
         'resetSharedKey': json['resetSharedKey'] == null ? undefined : json['resetSharedKey'],
         'resetRecoveryCodes': json['resetRecoveryCodes'] == null ? undefined : json['resetRecoveryCodes'],
         'forgetMachine': json['forgetMachine'] == null ? undefined : json['forgetMachine'],

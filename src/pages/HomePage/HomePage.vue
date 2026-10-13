@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhBell, PhList, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhList, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -9,6 +9,8 @@ import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
+import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { formatCurrency } from "@/libs/format-currency";
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -100,16 +102,9 @@ const userBalances = computed(() => {
             </SIconButton>
             <h1 class="text-lg font-bold text-util-color-brand-700">Splitz</h1>
           </div>
-          <div class="flex items-start gap-2.5">
-            <SIconButton variant="ghost" color="neutral" size="lg">
-              <PhBell class="text-util-color-brand-700" />
-            </SIconButton>
-            <button type="button" :aria-label="$t('home-profile')" @click="router.push({ name: 'profile' })">
-              <Avatar
-                :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]"
-                size="xs"
-              />
-            </button>
+          <div class="flex items-center gap-2.5">
+            <NotificationBell />
+            <AvatarMenu />
           </div>
         </div>
 

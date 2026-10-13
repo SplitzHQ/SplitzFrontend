@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ResendConfirmationEmailRequest {
     /**
      * 
-     * @type {string}
-     * @memberof ResendConfirmationEmailRequest
      */
     email: string;
 }

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface SplitzUserUpdateViewModel {
     /**
      * 
-     * @type {string}
-     * @memberof SplitzUserUpdateViewModel
      */
     userName?: string | null;
 }
@@ -44,7 +42,7 @@ export function SplitzUserUpdateViewModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'userName': json['userName'] == null ? undefined : json['userName'],
+        'userName': json['userName'] === undefined ? undefined : json['userName'] === null ? null : json['userName'],
     };
 }
 

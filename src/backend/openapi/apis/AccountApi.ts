@@ -14,10 +14,25 @@
 
 import * as runtime from '../runtime';
 import {
+    type FriendRequestDto,
+    FriendRequestDtoFromJSON,
+    FriendRequestDtoToJSON,
+} from '../models/FriendRequestDto';
+import {
+    type FriendRequestListDto,
+    FriendRequestListDtoFromJSON,
+    FriendRequestListDtoToJSON,
+} from '../models/FriendRequestListDto';
+import {
     type ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
 } from '../models/ProblemDetails';
+import {
+    type SendFriendRequestRequest,
+    SendFriendRequestRequestFromJSON,
+    SendFriendRequestRequestToJSON,
+} from '../models/SendFriendRequestRequest';
 import {
     type SplitzUserDto,
     SplitzUserDtoFromJSON,
@@ -34,25 +49,67 @@ import {
     UploadImageResultToJSON,
 } from '../models/UploadImageResult';
 
-export interface AddFriendRequest {
-    id: string;
+export interface AcceptFriendRequestRequest {
+    /**
+     * friend request id
+     */
+    requestId: string;
+    /**
+     * 
+     */
     body?: string;
 }
 
+export interface CancelFriendRequestRequest {
+    /**
+     * 
+     */
+    requestId: string;
+}
+
+export interface IgnoreFriendRequestRequest {
+    /**
+     * 
+     */
+    requestId: string;
+}
+
 export interface RemoveFriendRequest {
+    /**
+     * friend's id
+     */
     id: string;
 }
 
+export interface SendFriendRequestOperationRequest {
+    /**
+     * Input for sending a friend request.
+     */
+    sendFriendRequestRequest?: SendFriendRequestRequest;
+}
+
 export interface UpdateFriendRemarkRequest {
+    /**
+     * friend's id
+     */
     id: string;
+    /**
+     * friend's new remark
+     */
     remark?: string;
 }
 
 export interface UpdateUserInfoRequest {
+    /**
+     * 
+     */
     splitzUserUpdateViewModel?: SplitzUserUpdateViewModel;
 }
 
 export interface UploadUserAvatarRequest {
+    /**
+     * 
+     */
     file?: Blob;
 }
 
@@ -62,13 +119,13 @@ export interface UploadUserAvatarRequest {
 export class AccountApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for addFriend without sending the request
+     * Creates request options for acceptFriendRequest without sending the request
      */
-    async addFriendRequestOpts(requestParameters: AddFriendRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['id'] == null) {
+    async acceptFriendRequestRequestOpts(requestParameters: AcceptFriendRequestRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['requestId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling addFriend().'
+                'requestId',
+                'Required parameter "requestId" was null or undefined when calling acceptFriendRequest().'
             );
         }
 
@@ -87,8 +144,8 @@ export class AccountApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/account/friend/{id}`;
-        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        let urlPath = `/account/friend/request/{requestId}/accept`;
+        urlPath = urlPath.replace('{requestId}', encodeURIComponent(String(requestParameters['requestId'])));
 
         return {
             path: urlPath,
@@ -100,20 +157,117 @@ export class AccountApi extends runtime.BaseAPI {
     }
 
     /**
-     * Add a friend to the current user
+     * Accept a friend request. Creates the friendship in both directions and tells the sender.
      */
-    async addFriendRaw(requestParameters: AddFriendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.addFriendRequestOpts(requestParameters);
+    async acceptFriendRequestRaw(requestParameters: AcceptFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.acceptFriendRequestRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
 
     /**
-     * Add a friend to the current user
+     * Accept a friend request. Creates the friendship in both directions and tells the sender.
      */
-    async addFriend(requestParameters: AddFriendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.addFriendRaw(requestParameters, initOverrides);
+    async acceptFriendRequest(requestParameters: AcceptFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.acceptFriendRequestRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for cancelFriendRequest without sending the request
+     */
+    async cancelFriendRequestRequestOpts(requestParameters: CancelFriendRequestRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['requestId'] == null) {
+            throw new runtime.RequiredError(
+                'requestId',
+                'Required parameter "requestId" was null or undefined when calling cancelFriendRequest().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/account/friend/request/{requestId}`;
+        urlPath = urlPath.replace('{requestId}', encodeURIComponent(String(requestParameters['requestId'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Cancel a friend request the current user sent.
+     */
+    async cancelFriendRequestRaw(requestParameters: CancelFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.cancelFriendRequestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Cancel a friend request the current user sent.
+     */
+    async cancelFriendRequest(requestParameters: CancelFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.cancelFriendRequestRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for getFriendRequests without sending the request
+     */
+    async getFriendRequestsRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/account/friend/request`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Pending friend requests sent to and by the current user.
+     */
+    async getFriendRequestsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FriendRequestListDto>> {
+        const requestOptions = await this.getFriendRequestsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FriendRequestListDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Pending friend requests sent to and by the current user.
+     */
+    async getFriendRequests(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FriendRequestListDto> {
+        const response = await this.getFriendRequestsRaw(initOverrides);
+        return await response.value();
     }
 
     /**
@@ -162,6 +316,58 @@ export class AccountApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for ignoreFriendRequest without sending the request
+     */
+    async ignoreFriendRequestRequestOpts(requestParameters: IgnoreFriendRequestRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['requestId'] == null) {
+            throw new runtime.RequiredError(
+                'requestId',
+                'Required parameter "requestId" was null or undefined when calling ignoreFriendRequest().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/account/friend/request/{requestId}/ignore`;
+        urlPath = urlPath.replace('{requestId}', encodeURIComponent(String(requestParameters['requestId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Ignore a friend request. The sender is not told.
+     */
+    async ignoreFriendRequestRaw(requestParameters: IgnoreFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.ignoreFriendRequestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Ignore a friend request. The sender is not told.
+     */
+    async ignoreFriendRequest(requestParameters: IgnoreFriendRequestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.ignoreFriendRequestRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * Creates request options for removeFriend without sending the request
      */
     async removeFriendRequestOpts(requestParameters: RemoveFriendRequest): Promise<runtime.RequestOpts> {
@@ -197,7 +403,7 @@ export class AccountApi extends runtime.BaseAPI {
     }
 
     /**
-     * Remove a friend from the current user
+     * Remove a friend. Friendship is mutual, so both directions are removed.
      */
     async removeFriendRaw(requestParameters: RemoveFriendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const requestOptions = await this.removeFriendRequestOpts(requestParameters);
@@ -207,10 +413,58 @@ export class AccountApi extends runtime.BaseAPI {
     }
 
     /**
-     * Remove a friend from the current user
+     * Remove a friend. Friendship is mutual, so both directions are removed.
      */
     async removeFriend(requestParameters: RemoveFriendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.removeFriendRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for sendFriendRequest without sending the request
+     */
+    async sendFriendRequestRequestOpts(requestParameters: SendFriendRequestOperationRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/account/friend/request`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SendFriendRequestRequestToJSON(requestParameters['sendFriendRequestRequest']),
+        };
+    }
+
+    /**
+     * Send a friend request. The other user becomes a friend only after they accept.  If they already sent a request to the current user, both requests are accepted at once.
+     */
+    async sendFriendRequestRaw(requestParameters: SendFriendRequestOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FriendRequestDto>> {
+        const requestOptions = await this.sendFriendRequestRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FriendRequestDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Send a friend request. The other user becomes a friend only after they accept.  If they already sent a request to the current user, both requests are accepted at once.
+     */
+    async sendFriendRequest(requestParameters: SendFriendRequestOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FriendRequestDto> {
+        const response = await this.sendFriendRequestRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

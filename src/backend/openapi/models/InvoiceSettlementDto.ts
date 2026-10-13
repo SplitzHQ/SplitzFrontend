@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { SplitzUserReducedDto } from './SplitzUserReducedDto';
 import {
     SplitzUserReducedDtoFromJSON,
@@ -29,44 +29,30 @@ import {
 export interface InvoiceSettlementDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementDto
      */
     invoiceSettlementId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementDto
      */
     invoiceId: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceSettlementDto
      */
     fromUser: SplitzUserReducedDto;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceSettlementDto
      */
     toUser: SplitzUserReducedDto;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementDto
      */
     amount: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceSettlementDto
      */
     recordedBy: SplitzUserReducedDto;
     /**
      * 
-     * @type {Date}
-     * @memberof InvoiceSettlementDto
      */
     recordedTime: Date;
 }
@@ -101,7 +87,7 @@ export function InvoiceSettlementDtoFromJSONTyped(json: any, ignoreDiscriminator
         'toUser': SplitzUserReducedDtoFromJSON(json['toUser']),
         'amount': json['amount'],
         'recordedBy': SplitzUserReducedDtoFromJSON(json['recordedBy']),
-        'recordedTime': (new Date(json['recordedTime'])),
+        'recordedTime': (json['recordedTime'] == null ? json['recordedTime'] : parseDateTime(json['recordedTime'])),
     };
 }
 
@@ -122,7 +108,7 @@ export function InvoiceSettlementDtoToJSONTyped(value?: InvoiceSettlementDto | n
         'toUser': SplitzUserReducedDtoToJSON(value['toUser']),
         'amount': value['amount'],
         'recordedBy': SplitzUserReducedDtoToJSON(value['recordedBy']),
-        'recordedTime': value['recordedTime'].toISOString(),
+        'recordedTime': value['recordedTime'] == null ? value['recordedTime'] : serializeDateTime(value['recordedTime']),
     };
 }
 

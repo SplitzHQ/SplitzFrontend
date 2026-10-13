@@ -80,50 +80,95 @@ import {
 } from '../models/TwoFactorResponse';
 
 export interface AccountForgotPasswordPostRequest {
+    /**
+     * 
+     */
     forgotPasswordRequest: ForgotPasswordRequest;
 }
 
 export interface AccountLoginPostRequest {
+    /**
+     * 
+     */
     loginRequest: LoginRequest;
+    /**
+     * 
+     */
     useCookies?: boolean;
+    /**
+     * 
+     */
     useSessionCookies?: boolean;
 }
 
 export interface AccountManage2faPostRequest {
+    /**
+     * 
+     */
     twoFactorRequest: TwoFactorRequest;
 }
 
 export interface AccountManageInfoPostRequest {
+    /**
+     * 
+     */
     infoRequest: InfoRequest;
 }
 
 export interface AccountRefreshPostRequest {
+    /**
+     * 
+     */
     refreshRequest: RefreshRequest;
 }
 
 export interface AccountRegisterPostRequest {
+    /**
+     * 
+     */
     registerRequest: RegisterRequest;
 }
 
 export interface AccountResendConfirmationEmailPostRequest {
+    /**
+     * 
+     */
     resendConfirmationEmailRequest: ResendConfirmationEmailRequest;
 }
 
 export interface AccountResetPasswordPostRequest {
+    /**
+     * 
+     */
     resetPasswordRequest: ResetPasswordRequest;
 }
 
 export interface MapIdentityApiAccountConfirmEmailRequest {
+    /**
+     * 
+     */
     userId: string;
+    /**
+     * 
+     */
     code: string;
+    /**
+     * 
+     */
     changedEmail?: string;
 }
 
 export interface RequestAccountRecoveryRequest {
+    /**
+     * 
+     */
     forgotPasswordRequest: ForgotPasswordRequest;
 }
 
 export interface ResetRecoveredAccountPasswordRequest {
+    /**
+     * 
+     */
     resetPasswordRequest: ResetPasswordRequest;
 }
 

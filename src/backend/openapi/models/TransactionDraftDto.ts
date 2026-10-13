@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { TransactionDraftBalanceDto } from './TransactionDraftBalanceDto';
 import {
     TransactionDraftBalanceDtoFromJSON,
@@ -36,80 +36,54 @@ import {
 export interface TransactionDraftDto {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     transactionDraftId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     userId: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     groupId?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     name?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     icon?: string | null;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDraftDto
      */
     createTime?: Date | null;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDraftDto
      */
     transactionTime?: Date | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     amount?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     currency?: string | null;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof TransactionDraftDto
      */
     tags?: Array<Tag>;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     geoCoordinate?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDraftDto
      */
     photo?: string | null;
     /**
      * 
-     * @type {Array<TransactionDraftBalanceDto>}
-     * @memberof TransactionDraftDto
      */
     balances?: Array<TransactionDraftBalanceDto>;
 }
@@ -134,16 +108,16 @@ export function TransactionDraftDtoFromJSONTyped(json: any, ignoreDiscriminator:
         
         'transactionDraftId': json['transactionDraftId'] == null ? undefined : json['transactionDraftId'],
         'userId': json['userId'],
-        'groupId': json['groupId'] == null ? undefined : json['groupId'],
-        'name': json['name'] == null ? undefined : json['name'],
-        'icon': json['icon'] == null ? undefined : json['icon'],
-        'createTime': json['createTime'] == null ? undefined : (new Date(json['createTime'])),
-        'transactionTime': json['transactionTime'] == null ? undefined : (new Date(json['transactionTime'])),
+        'groupId': json['groupId'] === undefined ? undefined : json['groupId'] === null ? null : json['groupId'],
+        'name': json['name'] === undefined ? undefined : json['name'] === null ? null : json['name'],
+        'icon': json['icon'] === undefined ? undefined : json['icon'] === null ? null : json['icon'],
+        'createTime': json['createTime'] === undefined ? undefined : json['createTime'] === null ? null : (parseDateTime(json['createTime'])),
+        'transactionTime': json['transactionTime'] === undefined ? undefined : json['transactionTime'] === null ? null : (parseDateTime(json['transactionTime'])),
         'amount': json['amount'] == null ? undefined : json['amount'],
-        'currency': json['currency'] == null ? undefined : json['currency'],
+        'currency': json['currency'] === undefined ? undefined : json['currency'] === null ? null : json['currency'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
-        'geoCoordinate': json['geoCoordinate'] == null ? undefined : json['geoCoordinate'],
-        'photo': json['photo'] == null ? undefined : json['photo'],
+        'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
+        'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionDraftBalanceDtoFromJSON)),
     };
 }
@@ -164,8 +138,8 @@ export function TransactionDraftDtoToJSONTyped(value?: TransactionDraftDto | nul
         'groupId': value['groupId'],
         'name': value['name'],
         'icon': value['icon'],
-        'createTime': value['createTime'] == null ? value['createTime'] : value['createTime'].toISOString(),
-        'transactionTime': value['transactionTime'] == null ? value['transactionTime'] : value['transactionTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
+        'transactionTime': value['transactionTime'] == null ? value['transactionTime'] : serializeDateTime(value['transactionTime']),
         'amount': value['amount'],
         'currency': value['currency'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),

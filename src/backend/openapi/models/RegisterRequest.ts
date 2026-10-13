@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface RegisterRequest {
     /**
      * 
-     * @type {string}
-     * @memberof RegisterRequest
      */
     email: string;
     /**
      * 
-     * @type {string}
-     * @memberof RegisterRequest
      */
     password: string;
 }
