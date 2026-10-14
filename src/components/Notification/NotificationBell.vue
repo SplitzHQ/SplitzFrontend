@@ -40,7 +40,7 @@ watch(open, (active) => {
 
 <template>
   <div class="relative">
-    <SPopover v-model="open" :enabled="isDesktop" :label="$t('notification-title')" class="w-[26rem]">
+    <SPopover v-model="open" :enabled="isDesktop" :label="$t('notification-title')" class="w-104">
       <template #trigger>
         <SIconButton
           variant="ghost"

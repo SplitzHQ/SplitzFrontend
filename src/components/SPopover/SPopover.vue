@@ -14,13 +14,11 @@ export interface PopoverProps {
   side?: PopoverContentProps["side"];
   align?: PopoverContentProps["align"];
   sideOffset?: number;
-  maxHeight?: string;
 }
 
 const props = withDefaults(defineProps<PopoverProps>(), {
   align: "end",
   enabled: true,
-  maxHeight: "min(70vh, 36rem)",
   side: "bottom",
   sideOffset: 8,
 });
@@ -42,28 +40,25 @@ watch(
     </PopoverTrigger>
     <slot v-else name="trigger" />
     <PopoverPortal>
-      <Transition name="popover">
-        <PopoverContent
-          v-if="props.enabled"
-          as-child
-          :side="props.side"
-          :align="props.align"
-          :side-offset="props.sideOffset"
-          :collision-padding="16"
-          :class="
-            twMerge(
-              's-popover z-popover flex w-96 flex-col overflow-y-auto rounded-3xl bg-base-bg-primary p-4 text-base-text-primary shadow-2xl ring-1 ring-base-border-tertiary outline-none',
-              props.class
-            )
-          "
-          :style="{ '--s-popover-max-height': props.maxHeight }"
-        >
-          <!-- Override Reka's trigger label so the panel has its own accessible name. -->
-          <div v-bind="$attrs" :aria-label="props.label" aria-labelledby="">
-            <slot />
-          </div>
-        </PopoverContent>
-      </Transition>
+      <PopoverContent
+        v-if="props.enabled"
+        as-child
+        :side="props.side"
+        :align="props.align"
+        :side-offset="props.sideOffset"
+        :collision-padding="16"
+        :class="
+          twMerge(
+            's-popover z-popover flex w-96 flex-col overflow-y-auto rounded-3xl bg-base-bg-primary p-4 text-base-text-primary shadow-2xl ring-1 ring-base-border-tertiary outline-none',
+            props.class
+          )
+        "
+      >
+        <!-- Override Reka's trigger label so the panel has its own accessible name. -->
+        <div v-bind="$attrs" :aria-label="props.label" aria-labelledby="">
+          <slot />
+        </div>
+      </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
 </template>
@@ -89,31 +84,38 @@ watch(
   --popover-enter-y: 0px;
 }
 
-.popover-enter-active {
-  transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.15s ease;
+.s-popover[data-state="open"] {
+  animation: popover-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.popover-leave-active {
-  transition:
-    transform 0.12s ease-in,
-    opacity 0.12s ease-in;
+.s-popover[data-state="closed"] {
+  animation: popover-out 0.1s ease-out;
 }
-.popover-enter-from,
-.popover-leave-to {
-  opacity: 0;
-  transform: translate(var(--popover-enter-x), var(--popover-enter-y)) scale(0.96);
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--popover-enter-x), var(--popover-enter-y)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes popover-out {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--popover-enter-x), var(--popover-enter-y)) scale(0.98);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .s-popover,
-  .popover-enter-active,
-  .popover-leave-active {
-    transition: none;
-  }
-  .popover-enter-from,
-  .popover-leave-to {
-    transform: none;
+  .s-popover[data-state] {
+    animation: none;
   }
 }
 </style>

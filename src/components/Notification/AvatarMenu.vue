@@ -56,8 +56,7 @@ watch(pendingRequestCount, (value) => {
     v-model="open"
     :enabled="showRequests"
     :label="$t('notification-requests-title')"
-    class="gap-3"
-    max-height="min(70vh, 32rem)"
+    class="gap-3 [--s-popover-max-height:min(70vh,32rem)]"
   >
     <template #trigger>
       <button
