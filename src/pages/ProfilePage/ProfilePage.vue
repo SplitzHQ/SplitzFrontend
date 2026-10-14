@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  PhBell,
   PhCaretRight,
   PhCopy,
   PhEnvelopeSimple,
@@ -10,7 +11,9 @@ import {
   PhTrash,
   PhUser,
   PhUsersThree,
+  PhX,
 } from "@phosphor-icons/vue";
+import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
@@ -21,12 +24,14 @@ import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import RequestCard, { type RequestNotification } from "@/components/Notification/RequestCard.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { copyToClipboard } from "@/libs/copy-to-clipboard";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
+import { useNotificationStore } from "@/stores/notification";
 import { useUserStore } from "@/stores/user";
 
 import AddFriendSheet from "./AddFriendSheet.vue";
@@ -35,7 +40,26 @@ import EditNicknameSheet from "./EditNicknameSheet.vue";
 const { $t } = useFluent();
 const router = useRouter();
 const userStore = useUserStore();
+const notificationStore = useNotificationStore();
 const accountApi = new AccountApi(config);
+
+// Incoming requests come from the notification store; outgoing ones need their own query.
+const incomingRequests = computed(() => notificationStore.requests as RequestNotification[]);
+const { state: friendRequestsQuery, refresh: refreshFriendRequests } = useQuery({
+  key: ["getFriendRequests"],
+  query: () => accountApi.getFriendRequests(),
+});
+const outgoingRequests = computed(() => friendRequestsQuery.value.data?.outgoing ?? []);
+
+async function cancelFriendRequest(requestId: string) {
+  try {
+    await accountApi.cancelFriendRequest({ requestId });
+    await refreshFriendRequests();
+    toast.success($t("profile-friend-request-cancel-success"));
+  } catch {
+    toast.error($t("notification-request-error"));
+  }
+}
 
 // Username editing
 const isEditingUsername = ref(false);
@@ -172,6 +196,21 @@ function logout() {
 
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col gap-6 px-4 pt-2 pb-28">
+        <!-- Pending requests (friend requests and group invites) -->
+        <Transition name="section">
+          <section v-if="incomingRequests.length > 0" class="flex flex-col gap-2" data-test="requests-section">
+            <div class="flex items-center justify-between px-1">
+              <h2 class="text-sm font-semibold text-base-text-quaternary">{{ $t("notification-requests-title") }}</h2>
+              <span class="text-xs font-medium text-util-color-brand-700">
+                {{ $t("notification-requests-badge", { count: incomingRequests.length }) }}
+              </span>
+            </div>
+            <TransitionGroup tag="div" name="list" class="relative flex flex-col gap-2">
+              <RequestCard v-for="request in incomingRequests" :key="request.notificationId" :notification="request" />
+            </TransitionGroup>
+          </section>
+        </Transition>
+
         <!-- Identity card -->
         <section
           class="relative flex flex-col items-center gap-3 overflow-hidden rounded-3xl bg-core-alpha-brand-10 px-6 pt-8 pb-6 text-center"
@@ -327,6 +366,26 @@ function logout() {
           </button>
         </section>
 
+        <!-- Preferences -->
+        <section class="flex flex-col gap-2">
+          <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("profile-preferences-label") }}</h2>
+          <button
+            type="button"
+            class="flex w-full items-center gap-3 rounded-3xl bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+            data-test="notification-settings-link"
+            @click="router.push({ name: 'notificationSettings' })"
+          >
+            <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
+              <PhBell class="size-5 text-util-color-brand-700" />
+            </span>
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span class="text-base font-medium text-base-text-primary">{{ $t("profile-notifications") }}</span>
+              <span class="text-xs text-base-text-quaternary">{{ $t("profile-notifications-hint") }}</span>
+            </span>
+            <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+          </button>
+        </section>
+
         <!-- Friends -->
         <section class="flex flex-col gap-2">
           <div class="flex items-center justify-between px-1">
@@ -343,7 +402,7 @@ function logout() {
           </div>
 
           <div
-            v-if="friends.length === 0"
+            v-if="friends.length === 0 && outgoingRequests.length === 0"
             class="flex flex-col items-center gap-2 rounded-3xl bg-util-alpha-black-5 px-4 py-8 text-center"
           >
             <span class="flex size-12 items-center justify-center rounded-2xl bg-core-alpha-brand-10">
@@ -353,7 +412,10 @@ function logout() {
             <p class="text-xs text-base-text-quaternary">{{ $t("profile-friends-empty-hint") }}</p>
           </div>
 
-          <div v-else class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+          <div
+            v-if="friends.length > 0"
+            class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5"
+          >
             <div v-for="friend in friends" :key="friend.friendUser.id" class="flex items-center gap-3 px-4 py-3">
               <Avatar :images="[{ src: friend.friendUser.photo ?? null, alt: friend.friendUser.userName }]" size="xs" />
               <div class="flex min-w-0 flex-1 flex-col">
@@ -382,6 +444,35 @@ function logout() {
               >
                 <PhTrash />
               </SIconButton>
+            </div>
+          </div>
+
+          <!-- Outgoing friend requests -->
+          <div v-if="outgoingRequests.length > 0" class="flex flex-col gap-1">
+            <p class="px-1 pt-1 text-xs font-medium text-base-text-quaternary">
+              {{ $t("profile-friend-requests-sent") }}
+            </p>
+            <div class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+              <div
+                v-for="request in outgoingRequests"
+                :key="request.friendRequestId"
+                class="flex items-center gap-3 px-4 py-3"
+              >
+                <Avatar :images="[{ src: request.toUser.photo ?? null, alt: request.toUser.userName }]" size="xs" />
+                <div class="flex min-w-0 flex-1 flex-col">
+                  <p class="truncate text-base font-medium text-base-text-primary">{{ request.toUser.userName }}</p>
+                  <p class="text-sm text-base-text-quaternary">{{ $t("profile-friend-request-pending") }}</p>
+                </div>
+                <SIconButton
+                  variant="ghost"
+                  color="neutral"
+                  size="md"
+                  :aria-label="$t('profile-friend-request-cancel')"
+                  @click="cancelFriendRequest(request.friendRequestId)"
+                >
+                  <PhX />
+                </SIconButton>
+              </div>
             </div>
           </div>
         </section>
@@ -418,3 +509,32 @@ function logout() {
     :current-remark="editingFriendRemark"
   />
 </template>
+
+<style scoped>
+.section-enter-active,
+.section-leave-active,
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.section-enter-from,
+.section-leave-to,
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+.list-leave-active {
+  position: absolute;
+  width: 100%;
+}
+</style>

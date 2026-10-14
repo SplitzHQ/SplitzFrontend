@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface Tag {
     /**
      * 
-     * @type {string}
-     * @memberof Tag
      */
     tagId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof Tag
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof Tag
      */
     icon?: string | null;
 }
@@ -59,7 +53,7 @@ export function TagFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tag {
         
         'tagId': json['tagId'] == null ? undefined : json['tagId'],
         'name': json['name'],
-        'icon': json['icon'] == null ? undefined : json['icon'],
+        'icon': json['icon'] === undefined ? undefined : json['icon'] === null ? null : json['icon'],
     };
 }
 

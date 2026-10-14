@@ -35,24 +35,45 @@ import {
 } from '../models/UploadImageResult';
 
 export interface AddTransactionDraftRequest {
+    /**
+     * 
+     */
     transactionDraftInputDto?: TransactionDraftInputDto;
 }
 
 export interface DeleteTransactionDraftRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface GetTransactionDraftRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface UpdateTransactionDraftRequest {
+    /**
+     * 
+     */
     transactionDraftId: string;
+    /**
+     * 
+     */
     transactionDraftInputDto?: TransactionDraftInputDto;
 }
 
 export interface UploadTransactionDraftReceiptRequest {
+    /**
+     * 
+     */
     id: string;
+    /**
+     * 
+     */
     file?: Blob;
 }
 

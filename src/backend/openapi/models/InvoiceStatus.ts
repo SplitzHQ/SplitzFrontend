@@ -19,7 +19,7 @@
  */
 export const InvoiceStatus = {
     Open: 'Open',
-    Settled: 'Settled'
+    Settled: 'Settled',
 } as const;
 export type InvoiceStatus = typeof InvoiceStatus[keyof typeof InvoiceStatus];
 

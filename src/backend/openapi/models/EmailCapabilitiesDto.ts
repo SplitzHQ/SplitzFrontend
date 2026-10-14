@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EmailCapabilitiesDto {
     /**
      * 
-     * @type {boolean}
-     * @memberof EmailCapabilitiesDto
      */
     emailEnabled?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof EmailCapabilitiesDto
      */
     passwordResetEnabled?: boolean;
 }

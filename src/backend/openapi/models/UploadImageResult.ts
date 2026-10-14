@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface UploadImageResult {
     /**
      * 
-     * @type {string}
-     * @memberof UploadImageResult
      */
     objectKey?: string;
     /**
      * 
-     * @type {string}
-     * @memberof UploadImageResult
      */
     contentType?: string;
 }

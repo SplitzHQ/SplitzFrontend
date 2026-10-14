@@ -29,26 +29,18 @@ import {
 export interface GroupBalanceDto {
     /**
      * 
-     * @type {string}
-     * @memberof GroupBalanceDto
      */
     groupId: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof GroupBalanceDto
      */
     user: SplitzUserReducedDto;
     /**
      * 
-     * @type {string}
-     * @memberof GroupBalanceDto
      */
     balance: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupBalanceDto
      */
     currency: string;
 }

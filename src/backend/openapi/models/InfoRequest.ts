@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface InfoRequest {
     /**
      * 
-     * @type {string}
-     * @memberof InfoRequest
      */
     newEmail?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof InfoRequest
      */
     newPassword?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof InfoRequest
      */
     oldPassword?: string | null;
 }
@@ -56,9 +50,9 @@ export function InfoRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'newEmail': json['newEmail'] == null ? undefined : json['newEmail'],
-        'newPassword': json['newPassword'] == null ? undefined : json['newPassword'],
-        'oldPassword': json['oldPassword'] == null ? undefined : json['oldPassword'],
+        'newEmail': json['newEmail'] === undefined ? undefined : json['newEmail'] === null ? null : json['newEmail'],
+        'newPassword': json['newPassword'] === undefined ? undefined : json['newPassword'] === null ? null : json['newPassword'],
+        'oldPassword': json['oldPassword'] === undefined ? undefined : json['oldPassword'] === null ? null : json['oldPassword'],
     };
 }
 

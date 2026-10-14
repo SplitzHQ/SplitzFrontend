@@ -29,14 +29,10 @@ import {
 export interface FriendDto {
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof FriendDto
      */
     friendUser: SplitzUserReducedDto;
     /**
      * A nickname about the friendship.
-     * @type {string}
-     * @memberof FriendDto
      */
     remark?: string | null;
 }
@@ -60,7 +56,7 @@ export function FriendDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'friendUser': SplitzUserReducedDtoFromJSON(json['friendUser']),
-        'remark': json['remark'] == null ? undefined : json['remark'],
+        'remark': json['remark'] === undefined ? undefined : json['remark'] === null ? null : json['remark'],
     };
 }
 

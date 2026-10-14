@@ -24,6 +24,11 @@ import {
     GroupInputDtoToJSON,
 } from '../models/GroupInputDto';
 import {
+    type GroupInviteDto,
+    GroupInviteDtoFromJSON,
+    GroupInviteDtoToJSON,
+} from '../models/GroupInviteDto';
+import {
     type GroupJoinLinkDto,
     GroupJoinLinkDtoFromJSON,
     GroupJoinLinkDtoToJSON,
@@ -54,50 +59,113 @@ import {
     UploadImageResultToJSON,
 } from '../models/UploadImageResult';
 
-export interface AddGroupMemberRequest {
-    groupId: string;
-    requestBody?: Array<string>;
+export interface AcceptGroupInviteRequest {
+    /**
+     * 
+     */
+    inviteId: string;
 }
 
 export interface CreateGroupRequest {
+    /**
+     * 
+     */
     groupInputDto?: GroupInputDto;
 }
 
 export interface CreateGroupJoinLinkRequest {
+    /**
+     * group id
+     */
     groupId: string;
 }
 
 export interface DeleteGroupRequest {
+    /**
+     * 
+     */
     groupId: string;
 }
 
 export interface GetGroupRequest {
+    /**
+     * 
+     */
     groupId: string;
 }
 
 export interface GetGroupInfoByLinkRequest {
+    /**
+     * join link id
+     */
     joinLinkId: string;
 }
 
+export interface GetGroupInvitesRequest {
+    /**
+     * 
+     */
+    groupId: string;
+}
+
 export interface GetGroupInvoicesRequest {
+    /**
+     * 
+     */
     groupId: string;
 }
 
 export interface GetGroupTransactionsRequest {
+    /**
+     * 
+     */
     groupId: string;
 }
 
+export interface IgnoreGroupInviteRequest {
+    /**
+     * 
+     */
+    inviteId: string;
+}
+
+export interface InviteGroupMembersRequest {
+    /**
+     * group id
+     */
+    groupId: string;
+    /**
+     * 
+     */
+    requestBody?: Array<string>;
+}
+
 export interface JoinGroupByLinkRequest {
+    /**
+     * join link id
+     */
     joinLinkId: string;
 }
 
 export interface UpdateGroupRequest {
+    /**
+     * Group Id
+     */
     groupId: string;
+    /**
+     * 
+     */
     groupInputDto?: GroupInputDto;
 }
 
 export interface UploadGroupAvatarRequest {
+    /**
+     * 
+     */
     groupId: string;
+    /**
+     * 
+     */
     file?: Blob;
 }
 
@@ -107,21 +175,19 @@ export interface UploadGroupAvatarRequest {
 export class GroupApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for addGroupMember without sending the request
+     * Creates request options for acceptGroupInvite without sending the request
      */
-    async addGroupMemberRequestOpts(requestParameters: AddGroupMemberRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['groupId'] == null) {
+    async acceptGroupInviteRequestOpts(requestParameters: AcceptGroupInviteRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['inviteId'] == null) {
             throw new runtime.RequiredError(
-                'groupId',
-                'Required parameter "groupId" was null or undefined when calling addGroupMember().'
+                'inviteId',
+                'Required parameter "inviteId" was null or undefined when calling acceptGroupInvite().'
             );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -132,33 +198,32 @@ export class GroupApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/group/{groupId}/members`;
-        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+        let urlPath = `/group/invite/{inviteId}/accept`;
+        urlPath = urlPath.replace('{inviteId}', encodeURIComponent(String(requestParameters['inviteId'])));
 
         return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['requestBody'],
         };
     }
 
     /**
-     * Add members to a group
+     * Accept a group invite and join the group.
      */
-    async addGroupMemberRaw(requestParameters: AddGroupMemberRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroupDto>> {
-        const requestOptions = await this.addGroupMemberRequestOpts(requestParameters);
+    async acceptGroupInviteRaw(requestParameters: AcceptGroupInviteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroupDto>> {
+        const requestOptions = await this.acceptGroupInviteRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GroupDtoFromJSON(jsonValue));
     }
 
     /**
-     * Add members to a group
+     * Accept a group invite and join the group.
      */
-    async addGroupMember(requestParameters: AddGroupMemberRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupDto> {
-        const response = await this.addGroupMemberRaw(requestParameters, initOverrides);
+    async acceptGroupInvite(requestParameters: AcceptGroupInviteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupDto> {
+        const response = await this.acceptGroupInviteRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -193,7 +258,7 @@ export class GroupApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new group
+     * Create a new group. The creator joins immediately; every other user in MembersId receives an invite.
      */
     async createGroupRaw(requestParameters: CreateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroupDto>> {
         const requestOptions = await this.createGroupRequestOpts(requestParameters);
@@ -203,7 +268,7 @@ export class GroupApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new group
+     * Create a new group. The creator joins immediately; every other user in MembersId receives an invite.
      */
     async createGroup(requestParameters: CreateGroupRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupDto> {
         const response = await this.createGroupRaw(requestParameters, initOverrides);
@@ -422,6 +487,59 @@ export class GroupApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getGroupInvites without sending the request
+     */
+    async getGroupInvitesRequestOpts(requestParameters: GetGroupInvitesRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling getGroupInvites().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/{groupId}/invites`;
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Pending invites for a group, so members can see who has not answered yet.
+     */
+    async getGroupInvitesRaw(requestParameters: GetGroupInvitesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroupInviteDto>>> {
+        const requestOptions = await this.getGroupInvitesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroupInviteDtoFromJSON));
+    }
+
+    /**
+     * Pending invites for a group, so members can see who has not answered yet.
+     */
+    async getGroupInvites(requestParameters: GetGroupInvitesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupInviteDto>> {
+        const response = await this.getGroupInvitesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getGroupInvoices without sending the request
      */
     async getGroupInvoicesRequestOpts(requestParameters: GetGroupInvoicesRequest): Promise<runtime.RequestOpts> {
@@ -569,6 +687,159 @@ export class GroupApi extends runtime.BaseAPI {
      */
     async getGroups(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupDto>> {
         const response = await this.getGroupsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getMyGroupInvites without sending the request
+     */
+    async getMyGroupInvitesRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/invites`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Pending invites addressed to the current user.
+     */
+    async getMyGroupInvitesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroupInviteDto>>> {
+        const requestOptions = await this.getMyGroupInvitesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroupInviteDtoFromJSON));
+    }
+
+    /**
+     * Pending invites addressed to the current user.
+     */
+    async getMyGroupInvites(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupInviteDto>> {
+        const response = await this.getMyGroupInvitesRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for ignoreGroupInvite without sending the request
+     */
+    async ignoreGroupInviteRequestOpts(requestParameters: IgnoreGroupInviteRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['inviteId'] == null) {
+            throw new runtime.RequiredError(
+                'inviteId',
+                'Required parameter "inviteId" was null or undefined when calling ignoreGroupInvite().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/invite/{inviteId}/ignore`;
+        urlPath = urlPath.replace('{inviteId}', encodeURIComponent(String(requestParameters['inviteId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Ignore a group invite. The inviter is not told.
+     */
+    async ignoreGroupInviteRaw(requestParameters: IgnoreGroupInviteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.ignoreGroupInviteRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Ignore a group invite. The inviter is not told.
+     */
+    async ignoreGroupInvite(requestParameters: IgnoreGroupInviteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.ignoreGroupInviteRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for inviteGroupMembers without sending the request
+     */
+    async inviteGroupMembersRequestOpts(requestParameters: InviteGroupMembersRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling inviteGroupMembers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/{groupId}/invites`;
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['requestBody'],
+        };
+    }
+
+    /**
+     * Invite friends to a group. Each invited user gets a request notification and joins only after accepting.  Users who are not friends of the inviter, are already members, or already have a pending invite are skipped.
+     */
+    async inviteGroupMembersRaw(requestParameters: InviteGroupMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroupInviteDto>>> {
+        const requestOptions = await this.inviteGroupMembersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroupInviteDtoFromJSON));
+    }
+
+    /**
+     * Invite friends to a group. Each invited user gets a request notification and joins only after accepting.  Users who are not friends of the inviter, are already members, or already have a pending invite are skipped.
+     */
+    async inviteGroupMembers(requestParameters: InviteGroupMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupInviteDto>> {
+        const response = await this.inviteGroupMembersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

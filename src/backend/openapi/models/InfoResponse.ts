@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface InfoResponse {
     /**
      * 
-     * @type {string}
-     * @memberof InfoResponse
      */
     email: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof InfoResponse
      */
     isEmailConfirmed: boolean;
 }

@@ -2,7 +2,7 @@
 import { PhGearSix, PhPlus } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { GroupApi } from "@/backend";
@@ -16,6 +16,8 @@ import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import BalanceCard from "./BalanceCard.vue";
+import GroupSettingsSheet from "./GroupSettingsSheet.vue";
+import InviteFriendsSheet from "./InviteFriendsSheet.vue";
 import InvoiceList from "./InvoiceList.vue";
 import TransactionList from "./TransactionList.vue";
 
@@ -26,6 +28,9 @@ const routerHistoryStore = useRouterHistoryStore();
 const userStore = useUserStore();
 
 const groupId = computed(() => route.params.groupId as string);
+
+const showSettings = ref(false);
+const showInvite = ref(false);
 
 const groupApi = new GroupApi(config);
 
@@ -111,7 +116,14 @@ const settleUp = () => {
           <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
         </div>
         <template #right>
-          <SIconButton variant="ghost" color="neutral" size="lg">
+          <SIconButton
+            variant="ghost"
+            color="neutral"
+            size="lg"
+            :aria-label="$t('group-settings-title')"
+            data-test="group-settings"
+            @click="showSettings = true"
+          >
             <PhGearSix />
           </SIconButton>
         </template>
@@ -167,4 +179,7 @@ const settleUp = () => {
       </div>
     </template>
   </Layout>
+
+  <GroupSettingsSheet v-model="showSettings" :group-id="groupId" @invite="showInvite = true" />
+  <InviteFriendsSheet v-if="group" v-model="showInvite" :group="group" />
 </template>

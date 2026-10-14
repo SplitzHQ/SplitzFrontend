@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { ref } from "vue";
+
+import SButton from "@/components/SButton/SButton.vue";
 
 import Sheet from "./Sheet.vue";
 
@@ -266,5 +269,148 @@ export const NonDismissible: Story = {
     showCloseButton: true,
     dismissOnBackdrop: false,
     dismissOnDrag: false,
+  },
+};
+
+/** Checks browser hit targets while the sheet covers raised page components. */
+export const InFrontOfOtherComponents: Story = {
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "Opens the sheet over dropdown, sticky, fixed, and offcanvas layers. Browser hit tests check that the sheet and backdrop receive pointer input, then confirm that the page is reachable after dismissal.",
+      },
+    },
+  },
+  args: {
+    detent: "medium",
+    detentSizing: "height",
+    showHandle: false,
+    showCloseButton: true,
+    dismissOnBackdrop: true,
+    dismissOnDrag: false,
+  },
+  render: (args) => ({
+    components: { Sheet, SButton },
+    setup() {
+      const isOpen = ref(false);
+      const sheetClicks = ref(0);
+      const pageClicks = ref(0);
+      return { args, isOpen, sheetClicks, pageClicks };
+    },
+    template: `
+      <div class="text-base-text-primary">
+        <div role="group" aria-label="Dropdown layer"
+          class="fixed top-0 left-0 z-dropdown flex h-1/2 w-1/2 items-center justify-center bg-base-bg-primary">
+          <SButton color="brand" variant="primary" size="md" @click="isOpen = true">
+            Open layering sheet
+          </SButton>
+        </div>
+        <div role="group" aria-label="Sticky layer"
+          class="fixed top-0 right-0 z-sticky flex h-1/2 w-1/2 items-center justify-center bg-base-bg-secondary">
+          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+            Sticky action
+          </SButton>
+        </div>
+        <div role="group" aria-label="Fixed layer"
+          class="fixed bottom-0 left-0 z-fixed flex h-1/2 w-1/2 items-center justify-center bg-base-bg-secondary">
+          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+            Fixed action
+          </SButton>
+        </div>
+        <div role="group" aria-label="Offcanvas layer"
+          class="fixed right-0 bottom-0 z-offcanvas flex h-1/2 w-1/2 items-center justify-center bg-base-bg-primary">
+          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+            Offcanvas action
+          </SButton>
+        </div>
+        <Sheet v-model="isOpen" v-bind="args">
+          <div class="flex flex-col gap-4">
+            <h2 class="text-xl font-semibold">Sheet layering</h2>
+            <SButton color="brand" variant="primary" size="md" @click="sheetClicks++">
+              Sheet action
+            </SButton>
+            <p role="status">Sheet clicks: {{ sheetClicks }}. Page clicks: {{ pageClicks }}.</p>
+          </div>
+        </Sheet>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const document = canvasElement.ownerDocument;
+    // Sheet content is teleported outside the story canvas.
+    const body = within(document.body);
+    const layers = ["Dropdown layer", "Sticky layer", "Fixed layer", "Offcanvas layer"].map((name) =>
+      canvas.getByRole("group", { name })
+    );
+
+    /** Reads the actual pointer target at the center of a rendered element. */
+    function hitTest(element: Element) {
+      const rect = element.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      expect(rect.width).toBeGreaterThan(0);
+      expect(rect.height).toBeGreaterThan(0);
+      expect(x).toBeGreaterThan(0);
+      expect(x).toBeLessThan(document.documentElement.clientWidth);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(document.documentElement.clientHeight);
+      return { target: document.elementFromPoint(x, y), stack: document.elementsFromPoint(x, y) };
+    }
+
+    await step("Page components receive pointer input before opening", async () => {
+      for (const layer of layers) {
+        expect(layer.contains(hitTest(layer).target)).toBe(true);
+      }
+      await userEvent.click(canvas.getByRole("button", { name: "Open layering sheet" }));
+    });
+
+    const sheetAction = await body.findByRole("button", { name: "Sheet action" });
+    const sheet = sheetAction.closest(".sheet")!;
+
+    try {
+      await step("Sheet and backdrop are above every overlapping page layer", async () => {
+        await waitFor(() => {
+          // Wait for the slide-in transition to finish before checking overlap.
+          expect(sheet.getBoundingClientRect().bottom).toBeLessThanOrEqual(document.documentElement.clientHeight);
+          for (const [index, layer] of layers.entries()) {
+            const { target, stack } = hitTest(layer);
+            expect(stack).toContain(layer);
+            expect(target).not.toBeNull();
+            expect(layer.contains(target)).toBe(false);
+            if (index < 2) {
+              expect(target!.contains(sheet)).toBe(true);
+            } else {
+              expect(sheet.contains(target)).toBe(true);
+            }
+          }
+        });
+      });
+
+      await step("The sheet action receives the hit-tested click", async () => {
+        const { target } = hitTest(sheetAction);
+        expect(sheetAction.contains(target)).toBe(true);
+        await userEvent.click(target!);
+        await expect(body.getByRole("status")).toHaveTextContent("Sheet clicks: 1. Page clicks: 0.");
+      });
+
+      await step("The backdrop intercepts a page click and dismisses the sheet", async () => {
+        const { target } = hitTest(layers[1]!);
+        expect(target!.contains(sheet)).toBe(true);
+        await userEvent.click(target!);
+        await waitFor(() => expect(sheet).not.toBeInTheDocument());
+        for (const layer of layers) {
+          expect(layer.contains(hitTest(layer).target)).toBe(true);
+        }
+      });
+    } finally {
+      // Restore scroll and remove the teleport if an assertion fails while open.
+      if (sheet.isConnected) {
+        await userEvent.keyboard("{Escape}");
+        await waitFor(() => expect(sheet).not.toBeInTheDocument());
+      }
+    }
   },
 };

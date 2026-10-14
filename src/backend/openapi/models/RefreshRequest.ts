@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface RefreshRequest {
     /**
      * 
-     * @type {string}
-     * @memberof RefreshRequest
      */
     refreshToken: string;
 }

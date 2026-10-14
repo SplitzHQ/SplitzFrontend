@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface LoginRequest {
     /**
      * 
-     * @type {string}
-     * @memberof LoginRequest
      */
     email: string;
     /**
      * 
-     * @type {string}
-     * @memberof LoginRequest
      */
     password: string;
     /**
      * 
-     * @type {string}
-     * @memberof LoginRequest
      */
     twoFactorCode?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof LoginRequest
      */
     twoFactorRecoveryCode?: string | null;
 }
@@ -66,8 +58,8 @@ export function LoginRequestFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'email': json['email'],
         'password': json['password'],
-        'twoFactorCode': json['twoFactorCode'] == null ? undefined : json['twoFactorCode'],
-        'twoFactorRecoveryCode': json['twoFactorRecoveryCode'] == null ? undefined : json['twoFactorRecoveryCode'],
+        'twoFactorCode': json['twoFactorCode'] === undefined ? undefined : json['twoFactorCode'] === null ? null : json['twoFactorCode'],
+        'twoFactorRecoveryCode': json['twoFactorRecoveryCode'] === undefined ? undefined : json['twoFactorRecoveryCode'] === null ? null : json['twoFactorRecoveryCode'],
     };
 }
 

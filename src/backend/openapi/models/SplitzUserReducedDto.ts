@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface SplitzUserReducedDto {
     /**
      * 
-     * @type {string}
-     * @memberof SplitzUserReducedDto
      */
     id: string;
     /**
      * 
-     * @type {string}
-     * @memberof SplitzUserReducedDto
      */
     userName: string;
     /**
      * 
-     * @type {string}
-     * @memberof SplitzUserReducedDto
      */
     photo?: string | null;
 }
@@ -60,7 +54,7 @@ export function SplitzUserReducedDtoFromJSONTyped(json: any, ignoreDiscriminator
         
         'id': json['id'],
         'userName': json['userName'],
-        'photo': json['photo'] == null ? undefined : json['photo'],
+        'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
     };
 }
 

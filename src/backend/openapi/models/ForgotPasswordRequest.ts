@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ForgotPasswordRequest {
     /**
      * 
-     * @type {string}
-     * @memberof ForgotPasswordRequest
      */
     email: string;
 }

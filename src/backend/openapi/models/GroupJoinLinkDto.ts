@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface GroupJoinLinkDto {
     /**
      * 
-     * @type {string}
-     * @memberof GroupJoinLinkDto
      */
     groupJoinLinkId: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupJoinLinkDto
      */
     groupId: string;
 }

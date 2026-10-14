@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { TransactionBalanceDto } from './TransactionBalanceDto';
 import {
     TransactionBalanceDtoFromJSON,
@@ -36,80 +36,54 @@ import {
 export interface TransactionDto {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     transactionId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     icon: string;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDto
      */
     createTime: Date;
     /**
      * 
-     * @type {Date}
-     * @memberof TransactionDto
      */
     transactionTime: Date;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     amount: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     currency: string;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof TransactionDto
      */
     tags: Array<Tag>;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     geoCoordinate?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     invoiceId?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionDto
      */
     photo?: string | null;
     /**
      * 
-     * @type {Array<TransactionBalanceDto>}
-     * @memberof TransactionDto
      */
     balances?: Array<TransactionBalanceDto>;
 }
@@ -143,14 +117,14 @@ export function TransactionDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'groupId': json['groupId'],
         'name': json['name'],
         'icon': json['icon'],
-        'createTime': (new Date(json['createTime'])),
-        'transactionTime': (new Date(json['transactionTime'])),
+        'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
+        'transactionTime': (json['transactionTime'] == null ? json['transactionTime'] : parseDateTime(json['transactionTime'])),
         'amount': json['amount'],
         'currency': json['currency'],
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
-        'geoCoordinate': json['geoCoordinate'] == null ? undefined : json['geoCoordinate'],
-        'invoiceId': json['invoiceId'] == null ? undefined : json['invoiceId'],
-        'photo': json['photo'] == null ? undefined : json['photo'],
+        'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
+        'invoiceId': json['invoiceId'] === undefined ? undefined : json['invoiceId'] === null ? null : json['invoiceId'],
+        'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionBalanceDtoFromJSON)),
     };
 }
@@ -170,8 +144,8 @@ export function TransactionDtoToJSONTyped(value?: TransactionDto | null, ignoreD
         'groupId': value['groupId'],
         'name': value['name'],
         'icon': value['icon'],
-        'createTime': value['createTime'].toISOString(),
-        'transactionTime': value['transactionTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
+        'transactionTime': value['transactionTime'] == null ? value['transactionTime'] : serializeDateTime(value['transactionTime']),
         'amount': value['amount'],
         'currency': value['currency'],
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),

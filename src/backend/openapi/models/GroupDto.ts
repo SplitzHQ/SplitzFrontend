@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { GroupBalanceDto } from './GroupBalanceDto';
 import {
     GroupBalanceDtoFromJSON,
@@ -36,52 +36,36 @@ import {
 export interface GroupDto {
     /**
      * 
-     * @type {string}
-     * @memberof GroupDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupDto
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof GroupDto
      */
     photo?: string | null;
     /**
      * 
-     * @type {Array<SplitzUserReducedDto>}
-     * @memberof GroupDto
      */
     members: Array<SplitzUserReducedDto>;
     /**
      * 
-     * @type {string}
-     * @memberof GroupDto
      */
     membersIdHash: string;
     /**
      * 
-     * @type {Array<GroupBalanceDto>}
-     * @memberof GroupDto
      */
     balances: Array<GroupBalanceDto>;
     /**
      * The number of transactions between the user and their friend.
      * This number is only for searching purposes and may not be accurate if transactions are deleted or modified.
-     * @type {number}
-     * @memberof GroupDto
      */
     transactionCount: number;
     /**
      * The date of the last transaction between the user and their friend.
      * This is only for searching purposes and may not be accurate if transactions are deleted or modified.
-     * @type {Date}
-     * @memberof GroupDto
      */
     lastActivityTime: Date;
 }
@@ -112,12 +96,12 @@ export function GroupDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         
         'groupId': json['groupId'],
         'name': json['name'],
-        'photo': json['photo'] == null ? undefined : json['photo'],
+        'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
         'members': ((json['members'] as Array<any>).map(SplitzUserReducedDtoFromJSON)),
         'membersIdHash': json['membersIdHash'],
         'balances': ((json['balances'] as Array<any>).map(GroupBalanceDtoFromJSON)),
         'transactionCount': json['transactionCount'],
-        'lastActivityTime': (new Date(json['lastActivityTime'])),
+        'lastActivityTime': (json['lastActivityTime'] == null ? json['lastActivityTime'] : parseDateTime(json['lastActivityTime'])),
     };
 }
 
@@ -139,7 +123,7 @@ export function GroupDtoToJSONTyped(value?: GroupDto | null, ignoreDiscriminator
         'membersIdHash': value['membersIdHash'],
         'balances': ((value['balances'] as Array<any>).map(GroupBalanceDtoToJSON)),
         'transactionCount': value['transactionCount'],
-        'lastActivityTime': value['lastActivityTime'].toISOString(),
+        'lastActivityTime': value['lastActivityTime'] == null ? value['lastActivityTime'] : serializeDateTime(value['lastActivityTime']),
     };
 }
 

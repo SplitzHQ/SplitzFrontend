@@ -85,6 +85,14 @@ Application code should import generated APIs and types from `@/backend` or `@/b
 - Prefer existing UI primitives such as `SButton`, `SIconButton`, `TextInput`, `Avatar`, and `Layout` before adding new primitives.
 - Money values from the backend commonly arrive as strings; parse them only at display or calculation boundaries.
 
+### Popover panels
+
+[SPopover](src/components/SPopover/SPopover.vue) follows the [shadcn-vue Popover](https://www.shadcn-vue.com/docs/components/popover) pattern using Reka UI primitives. It keeps the notification panels' rounded surface, shadow, and scale/fade transitions. The panel is portaled to the document body and stays within the viewport.
+
+Use `v-model` for the open state, a single button in the `trigger` slot, and the default slot for panel content. Set `label` to the translated accessible name. `class` and other attributes apply to the panel. `side`, `align`, `sideOffset`, and `maxHeight` control placement and size. Set `enabled` to `false` to leave the trigger usable without popover behavior, such as when opening a mobile sheet or navigating to a profile. Changing `enabled` closes the panel.
+
+Reka UI handles outside interactions, Escape, and focus restoration. The notification bell keeps its bottom sheet on mobile; the avatar opens requests only on desktop with pending requests. Reduced-motion preferences disable the panel transition.
+
 ## Validation
 
 Before opening a pull request, run the checks that match the change:

@@ -14,10 +14,35 @@
 
 import * as runtime from '../runtime';
 import {
+    type NotificationCategory,
+    NotificationCategoryFromJSON,
+    NotificationCategoryToJSON,
+} from '../models/NotificationCategory';
+import {
     type NotificationDto,
     NotificationDtoFromJSON,
     NotificationDtoToJSON,
 } from '../models/NotificationDto';
+import {
+    type NotificationPreferenceDto,
+    NotificationPreferenceDtoFromJSON,
+    NotificationPreferenceDtoToJSON,
+} from '../models/NotificationPreferenceDto';
+import {
+    type NotificationPreferenceInputDto,
+    NotificationPreferenceInputDtoFromJSON,
+    NotificationPreferenceInputDtoToJSON,
+} from '../models/NotificationPreferenceInputDto';
+import {
+    type NotificationSummaryDto,
+    NotificationSummaryDtoFromJSON,
+    NotificationSummaryDtoToJSON,
+} from '../models/NotificationSummaryDto';
+import {
+    type NotificationTypeDto,
+    NotificationTypeDtoFromJSON,
+    NotificationTypeDtoToJSON,
+} from '../models/NotificationTypeDto';
 import {
     type ProblemDetails,
     ProblemDetailsFromJSON,
@@ -25,15 +50,73 @@ import {
 } from '../models/ProblemDetails';
 
 export interface DismissNotificationRequest {
+    /**
+     * 
+     */
     id: string;
+}
+
+export interface GetNotificationPreferencesRequest {
+    /**
+     * When set, returns only the overrides for that group.
+     */
+    groupId?: string;
 }
 
 export interface GetNotificationsRequest {
+    /**
+     * Only return notifications in this category.
+     */
+    category?: NotificationCategory;
+    /**
+     * If true, includes dismissed notifications.
+     */
     includeDismissed?: boolean;
+    /**
+     * Maximum number of notifications to return (1-200).
+     */
+    limit?: number;
+}
+
+export interface MarkAllNotificationsReadRequest {
+    /**
+     * Where a notification is surfaced in the client.
+     * Requests need a user decision (accept / ignore) and are shown on the avatar.
+     * Activity is informational and is shown behind the bell button.
+     */
+    category?: NotificationCategory;
 }
 
 export interface MarkNotificationReadRequest {
+    /**
+     * 
+     */
     id: string;
+}
+
+export interface ResetGroupNotificationPreferencesRequest {
+    /**
+     * 
+     */
+    groupId: string;
+}
+
+export interface ResetNotificationPreferenceRequest {
+    /**
+     * Notification type.
+     */
+    type?: string;
+    /**
+     * Group override to remove, or null for the global setting.
+     */
+    groupId?: string;
+}
+
+export interface SetNotificationPreferenceRequest {
+    /**
+     * 
+     */
+    notificationPreferenceInputDto?: NotificationPreferenceInputDto;
 }
 
 /**
@@ -69,7 +152,7 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Dismiss all notifications for the current user
+     * Dismiss all activity notifications for the current user. Requests stay until they are accepted or ignored.
      */
     async dismissAllNotificationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const requestOptions = await this.dismissAllNotificationsRequestOpts();
@@ -79,7 +162,7 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Dismiss all notifications for the current user
+     * Dismiss all activity notifications for the current user. Requests stay until they are accepted or ignored.
      */
     async dismissAllNotifications(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.dismissAllNotificationsRaw(initOverrides);
@@ -138,13 +221,160 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getNotificationPreferences without sending the request
+     */
+    async getNotificationPreferencesRequestOpts(requestParameters: GetNotificationPreferencesRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['groupId'] != null) {
+            queryParameters['groupId'] = requestParameters['groupId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/preferences`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * The current user\'s notification preferences. Only explicit settings are returned;  a type without a row is enabled.
+     */
+    async getNotificationPreferencesRaw(requestParameters: GetNotificationPreferencesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NotificationPreferenceDto>>> {
+        const requestOptions = await this.getNotificationPreferencesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NotificationPreferenceDtoFromJSON));
+    }
+
+    /**
+     * The current user\'s notification preferences. Only explicit settings are returned;  a type without a row is enabled.
+     */
+    async getNotificationPreferences(requestParameters: GetNotificationPreferencesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<NotificationPreferenceDto>> {
+        const response = await this.getNotificationPreferencesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getNotificationSummary without sending the request
+     */
+    async getNotificationSummaryRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/summary`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Unread and pending counts, for badges on the bell and the avatar.
+     */
+    async getNotificationSummaryRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NotificationSummaryDto>> {
+        const requestOptions = await this.getNotificationSummaryRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationSummaryDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Unread and pending counts, for badges on the bell and the avatar.
+     */
+    async getNotificationSummary(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NotificationSummaryDto> {
+        const response = await this.getNotificationSummaryRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getNotificationTypes without sending the request
+     */
+    async getNotificationTypesRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/types`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * All notification types with their category, priority and whether they can be turned off.
+     */
+    async getNotificationTypesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NotificationTypeDto>>> {
+        const requestOptions = await this.getNotificationTypesRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NotificationTypeDtoFromJSON));
+    }
+
+    /**
+     * All notification types with their category, priority and whether they can be turned off.
+     */
+    async getNotificationTypes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<NotificationTypeDto>> {
+        const response = await this.getNotificationTypesRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getNotifications without sending the request
      */
     async getNotificationsRequestOpts(requestParameters: GetNotificationsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
+        if (requestParameters['category'] != null) {
+            queryParameters['category'] = requestParameters['category'];
+        }
+
         if (requestParameters['includeDismissed'] != null) {
             queryParameters['includeDismissed'] = requestParameters['includeDismissed'];
+        }
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -169,7 +399,7 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
-     * List notifications for the current user. Returns undismissed notifications by default.
+     * List notifications for the current user, newest first. Returns undismissed notifications by default.
      */
     async getNotificationsRaw(requestParameters: GetNotificationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NotificationDto>>> {
         const requestOptions = await this.getNotificationsRequestOpts(requestParameters);
@@ -179,11 +409,59 @@ export class NotificationApi extends runtime.BaseAPI {
     }
 
     /**
-     * List notifications for the current user. Returns undismissed notifications by default.
+     * List notifications for the current user, newest first. Returns undismissed notifications by default.
      */
     async getNotifications(requestParameters: GetNotificationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<NotificationDto>> {
         const response = await this.getNotificationsRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for markAllNotificationsRead without sending the request
+     */
+    async markAllNotificationsReadRequestOpts(requestParameters: MarkAllNotificationsReadRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['category'] != null) {
+            queryParameters['category'] = requestParameters['category'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/read-all`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Mark every undismissed notification as read, optionally only within one category.
+     */
+    async markAllNotificationsReadRaw(requestParameters: MarkAllNotificationsReadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.markAllNotificationsReadRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Mark every undismissed notification as read, optionally only within one category.
+     */
+    async markAllNotificationsRead(requestParameters: MarkAllNotificationsReadRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.markAllNotificationsReadRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -236,6 +514,158 @@ export class NotificationApi extends runtime.BaseAPI {
      */
     async markNotificationRead(requestParameters: MarkNotificationReadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.markNotificationReadRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for resetGroupNotificationPreferences without sending the request
+     */
+    async resetGroupNotificationPreferencesRequestOpts(requestParameters: ResetGroupNotificationPreferencesRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling resetGroupNotificationPreferences().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/preferences/group/{groupId}`;
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Remove every override for one group so it follows the global settings again.
+     */
+    async resetGroupNotificationPreferencesRaw(requestParameters: ResetGroupNotificationPreferencesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.resetGroupNotificationPreferencesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Remove every override for one group so it follows the global settings again.
+     */
+    async resetGroupNotificationPreferences(requestParameters: ResetGroupNotificationPreferencesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.resetGroupNotificationPreferencesRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for resetNotificationPreference without sending the request
+     */
+    async resetNotificationPreferenceRequestOpts(requestParameters: ResetNotificationPreferenceRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        if (requestParameters['type'] != null) {
+            queryParameters['type'] = requestParameters['type'];
+        }
+
+        if (requestParameters['groupId'] != null) {
+            queryParameters['groupId'] = requestParameters['groupId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/preferences`;
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Remove a preference so the type falls back to its default (or to the global setting for a group override).
+     */
+    async resetNotificationPreferenceRaw(requestParameters: ResetNotificationPreferenceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.resetNotificationPreferenceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Remove a preference so the type falls back to its default (or to the global setting for a group override).
+     */
+    async resetNotificationPreference(requestParameters: ResetNotificationPreferenceRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.resetNotificationPreferenceRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for setNotificationPreference without sending the request
+     */
+    async setNotificationPreferenceRequestOpts(requestParameters: SetNotificationPreferenceRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/notification/preferences`;
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NotificationPreferenceInputDtoToJSON(requestParameters['notificationPreferenceInputDto']),
+        };
+    }
+
+    /**
+     * Create or update one preference. Pass a group ID to override the global setting for that group.
+     */
+    async setNotificationPreferenceRaw(requestParameters: SetNotificationPreferenceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NotificationPreferenceDto>> {
+        const requestOptions = await this.setNotificationPreferenceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationPreferenceDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Create or update one preference. Pass a group ID to override the global setting for that group.
+     */
+    async setNotificationPreference(requestParameters: SetNotificationPreferenceRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NotificationPreferenceDto> {
+        const response = await this.setNotificationPreferenceRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -45,29 +45,56 @@ import {
 } from '../models/ProblemDetails';
 
 export interface AddSettlementRequest {
+    /**
+     * 
+     */
     id: string;
+    /**
+     * 
+     */
     invoiceSettlementInputDto?: InvoiceSettlementInputDto;
 }
 
 export interface CreateInvoiceRequest {
+    /**
+     * 
+     */
     invoiceInputDto?: InvoiceInputDto;
 }
 
 export interface DeleteInvoiceRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface DeleteSettlementRequest {
+    /**
+     * 
+     */
     id: string;
+    /**
+     * 
+     */
     settlementId: string;
 }
 
 export interface GetInvoiceRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface UpdateInvoiceRequest {
+    /**
+     * 
+     */
     id: string;
+    /**
+     * 
+     */
     invoiceInputDto?: InvoiceInputDto;
 }
 

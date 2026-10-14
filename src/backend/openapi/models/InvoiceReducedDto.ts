@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { InvoiceStatus } from './InvoiceStatus';
 import {
     InvoiceStatusFromJSON,
@@ -36,44 +36,30 @@ import {
 export interface InvoiceReducedDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceReducedDto
      */
     invoiceId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceReducedDto
      */
     groupId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceReducedDto
      */
     name?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceReducedDto
      */
     currency: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceReducedDto
      */
     createdBy: SplitzUserReducedDto;
     /**
      * 
-     * @type {Date}
-     * @memberof InvoiceReducedDto
      */
     createTime: Date;
     /**
      * 
-     * @type {InvoiceStatus}
-     * @memberof InvoiceReducedDto
      */
     status: InvoiceStatus;
 }
@@ -105,10 +91,10 @@ export function InvoiceReducedDtoFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'invoiceId': json['invoiceId'],
         'groupId': json['groupId'],
-        'name': json['name'] == null ? undefined : json['name'],
+        'name': json['name'] === undefined ? undefined : json['name'] === null ? null : json['name'],
         'currency': json['currency'],
         'createdBy': SplitzUserReducedDtoFromJSON(json['createdBy']),
-        'createTime': (new Date(json['createTime'])),
+        'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
         'status': InvoiceStatusFromJSON(json['status']),
     };
 }
@@ -129,7 +115,7 @@ export function InvoiceReducedDtoToJSONTyped(value?: InvoiceReducedDto | null, i
         'name': value['name'],
         'currency': value['currency'],
         'createdBy': SplitzUserReducedDtoToJSON(value['createdBy']),
-        'createTime': value['createTime'].toISOString(),
+        'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
         'status': InvoiceStatusToJSON(value['status']),
     };
 }

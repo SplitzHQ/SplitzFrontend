@@ -29,26 +29,18 @@ import {
 export interface InvoiceDebtDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDebtDto
      */
     invoiceId: string;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceDebtDto
      */
     fromUser: SplitzUserReducedDto;
     /**
      * 
-     * @type {SplitzUserReducedDto}
-     * @memberof InvoiceDebtDto
      */
     toUser: SplitzUserReducedDto;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceDebtDto
      */
     amount: string;
 }

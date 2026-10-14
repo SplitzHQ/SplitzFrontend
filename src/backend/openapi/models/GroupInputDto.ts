@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface GroupInputDto {
     /**
      * 
-     * @type {string}
-     * @memberof GroupInputDto
      */
     name: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof GroupInputDto
      */
     membersId: Array<string>;
 }

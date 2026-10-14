@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface InvoiceSettlementInputDto {
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementInputDto
      */
     fromUserId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementInputDto
      */
     toUserId: string;
     /**
      * 
-     * @type {string}
-     * @memberof InvoiceSettlementInputDto
      */
     amount: string;
 }

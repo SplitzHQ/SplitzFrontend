@@ -35,24 +35,45 @@ import {
 } from '../models/UploadImageResult';
 
 export interface AddTransactionRequest {
+    /**
+     * 
+     */
     transactionInputDto?: TransactionInputDto;
 }
 
 export interface DeleteTransactionRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface GetTransactionRequest {
+    /**
+     * 
+     */
     id: string;
 }
 
 export interface UpdateTransactionRequest {
+    /**
+     * 
+     */
     transactionId: string;
+    /**
+     * 
+     */
     transactionInputDto?: TransactionInputDto;
 }
 
 export interface UploadTransactionReceiptRequest {
+    /**
+     * 
+     */
     id: string;
+    /**
+     * 
+     */
     file?: Blob;
 }
 

@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface TwoFactorResponse {
     /**
      * 
-     * @type {string}
-     * @memberof TwoFactorResponse
      */
     sharedKey: string;
     /**
      * 
-     * @type {number}
-     * @memberof TwoFactorResponse
      */
     recoveryCodesLeft: number;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof TwoFactorResponse
      */
     recoveryCodes?: Array<string> | null;
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorResponse
      */
     isTwoFactorEnabled: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TwoFactorResponse
      */
     isMachineRemembered: boolean;
 }
@@ -74,7 +64,7 @@ export function TwoFactorResponseFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'sharedKey': json['sharedKey'],
         'recoveryCodesLeft': json['recoveryCodesLeft'],
-        'recoveryCodes': json['recoveryCodes'] == null ? undefined : json['recoveryCodes'],
+        'recoveryCodes': json['recoveryCodes'] === undefined ? undefined : json['recoveryCodes'] === null ? null : json['recoveryCodes'],
         'isTwoFactorEnabled': json['isTwoFactorEnabled'],
         'isMachineRemembered': json['isMachineRemembered'],
     };

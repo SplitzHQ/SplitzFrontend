@@ -92,6 +92,16 @@ const router = createRouter({
       path: "/profile",
     },
     {
+      component: () => import("@/pages/NotificationSettingsPage/NotificationSettingsPage.vue"),
+      name: "notificationSettings",
+      path: "/profile/notifications",
+    },
+    {
+      component: () => import("@/pages/NotificationSettingsPage/NotificationSettingsPage.vue"),
+      name: "groupNotificationSettings",
+      path: "/group/:groupId/notifications",
+    },
+    {
       name: "settleUp",
       path: "/group/:groupId/settle-up",
       redirect: (to) => `/group/${to.params.groupId as string}/settle-up/select-transactions`,

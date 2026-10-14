@@ -4,26 +4,30 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**addGroupMember**](GroupApi.md#addgroupmember) | **POST** /group/{groupId}/members | Add members to a group |
-| [**createGroup**](GroupApi.md#creategroup) | **POST** /group | Create a new group |
+| [**acceptGroupInvite**](GroupApi.md#acceptgroupinvite) | **POST** /group/invite/{inviteId}/accept | Accept a group invite and join the group. |
+| [**createGroup**](GroupApi.md#creategroup) | **POST** /group | Create a new group. The creator joins immediately; every other user in MembersId receives an invite. |
 | [**createGroupJoinLink**](GroupApi.md#creategroupjoinlink) | **POST** /group/{groupId}/join-link | create a join link for a group |
 | [**deleteGroup**](GroupApi.md#deletegroup) | **DELETE** /group/{groupId} | Delete a group. |
 | [**getGroup**](GroupApi.md#getgroup) | **GET** /group/{groupId} | Get the group info |
 | [**getGroupInfoByLink**](GroupApi.md#getgroupinfobylink) | **GET** /group/join/{joinLinkId} | get group info from join link |
+| [**getGroupInvites**](GroupApi.md#getgroupinvites) | **GET** /group/{groupId}/invites | Pending invites for a group, so members can see who has not answered yet. |
 | [**getGroupInvoices**](GroupApi.md#getgroupinvoices) | **GET** /group/{groupId}/invoices | Get the group invoices |
 | [**getGroupTransactions**](GroupApi.md#getgrouptransactions) | **GET** /group/{groupId}/transactions | Get the group transactions |
 | [**getGroups**](GroupApi.md#getgroups) | **GET** /group | Get the current user\&#39;s groups |
+| [**getMyGroupInvites**](GroupApi.md#getmygroupinvites) | **GET** /group/invites | Pending invites addressed to the current user. |
+| [**ignoreGroupInvite**](GroupApi.md#ignoregroupinvite) | **POST** /group/invite/{inviteId}/ignore | Ignore a group invite. The inviter is not told. |
+| [**inviteGroupMembers**](GroupApi.md#invitegroupmembers) | **POST** /group/{groupId}/invites | Invite friends to a group. Each invited user gets a request notification and joins only after accepting.  Users who are not friends of the inviter, are already members, or already have a pending invite are skipped. |
 | [**joinGroupByLink**](GroupApi.md#joingroupbylink) | **POST** /group/join/{joinLinkId} | join a group by a join link |
 | [**updateGroup**](GroupApi.md#updategroup) | **PUT** /group/{groupId} | Update group info |
 | [**uploadGroupAvatar**](GroupApi.md#uploadgroupavatar) | **POST** /group/{groupId}/avatar | Upload a group avatar image. |
 
 
 
-## addGroupMember
+## acceptGroupInvite
 
-> GroupDto addGroupMember(groupId, requestBody)
+> GroupDto acceptGroupInvite(inviteId)
 
-Add members to a group
+Accept a group invite and join the group.
 
 ### Example
 
@@ -32,7 +36,7 @@ import {
   Configuration,
   GroupApi,
 } from '';
-import type { AddGroupMemberRequest } from '';
+import type { AcceptGroupInviteRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -43,14 +47,12 @@ async function example() {
   const api = new GroupApi(config);
 
   const body = {
-    // string | group id
-    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
-    // Array<string> | list of user ids (optional)
-    requestBody: ...,
-  } satisfies AddGroupMemberRequest;
+    // string
+    inviteId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies AcceptGroupInviteRequest;
 
   try {
-    const data = await api.addGroupMember(body);
+    const data = await api.acceptGroupInvite(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -66,8 +68,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **groupId** | `string` | group id | [Defaults to `undefined`] |
-| **requestBody** | `Array<string>` | list of user ids | [Optional] |
+| **inviteId** | `string` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -79,7 +80,7 @@ example().catch(console.error);
 
 ### HTTP request headers
 
-- **Content-Type**: `application/json`, `text/json`, `application/*+json`
+- **Content-Type**: Not defined
 - **Accept**: `application/json`
 
 
@@ -88,7 +89,7 @@ example().catch(console.error);
 |-------------|-------------|------------------|
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
-| **201** | Created |  -  |
+| **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -97,7 +98,7 @@ example().catch(console.error);
 
 > GroupDto createGroup(groupInputDto)
 
-Create a new group
+Create a new group. The creator joins immediately; every other user in MembersId receives an invite.
 
 ### Example
 
@@ -448,6 +449,77 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## getGroupInvites
+
+> Array&lt;GroupInviteDto&gt; getGroupInvites(groupId)
+
+Pending invites for a group, so members can see who has not answered yet.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetGroupInvitesRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies GetGroupInvitesRequest;
+
+  try {
+    const data = await api.getGroupInvites(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;GroupInviteDto&gt;**](GroupInviteDto.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getGroupInvoices
 
 > Array&lt;InvoiceReducedDto&gt; getGroupInvoices(groupId)
@@ -647,6 +719,213 @@ This endpoint does not need any parameter.
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **401** | Unauthorized |  -  |
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getMyGroupInvites
+
+> Array&lt;GroupInviteDto&gt; getMyGroupInvites()
+
+Pending invites addressed to the current user.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { GetMyGroupInvitesRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  try {
+    const data = await api.getMyGroupInvites();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Array&lt;GroupInviteDto&gt;**](GroupInviteDto.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## ignoreGroupInvite
+
+> ignoreGroupInvite(inviteId)
+
+Ignore a group invite. The inviter is not told.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { IgnoreGroupInviteRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string
+    inviteId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies IgnoreGroupInviteRequest;
+
+  try {
+    const data = await api.ignoreGroupInvite(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **inviteId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## inviteGroupMembers
+
+> Array&lt;GroupInviteDto&gt; inviteGroupMembers(groupId, requestBody)
+
+Invite friends to a group. Each invited user gets a request notification and joins only after accepting.  Users who are not friends of the inviter, are already members, or already have a pending invite are skipped.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { InviteGroupMembersRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string | group id
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // Array<string> | list of user ids (optional)
+    requestBody: ...,
+  } satisfies InviteGroupMembersRequest;
+
+  try {
+    const data = await api.inviteGroupMembers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` | group id | [Defaults to `undefined`] |
+| **requestBody** | `Array<string>` | list of user ids | [Optional] |
+
+### Return type
+
+[**Array&lt;GroupInviteDto&gt;**](GroupInviteDto.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`, `text/json`, `application/*+json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 | **200** | OK |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
