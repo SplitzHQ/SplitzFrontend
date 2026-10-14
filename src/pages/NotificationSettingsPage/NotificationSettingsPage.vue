@@ -29,12 +29,12 @@ const { state: typesQuery } = useQuery({
   query: () => notificationApi.getNotificationTypes(),
 });
 
-const { state: globalPrefsQuery, refresh: refreshGlobal } = useQuery({
+const { state: globalPrefsQuery, refetch: refetchGlobal } = useQuery({
   key: ["getNotificationPreferences", "global"],
   query: () => notificationApi.getNotificationPreferences({}),
 });
 
-const { state: groupPrefsQuery, refresh: refreshGroup } = useQuery({
+const { state: groupPrefsQuery, refetch: refetchGroup } = useQuery({
   enabled: () => isGroupScope.value,
   key: () => ["getNotificationPreferences", groupId.value ?? "none"],
   query: () => notificationApi.getNotificationPreferences({ groupId: groupId.value! }),
@@ -60,11 +60,14 @@ const configurableTypes = computed(() => {
 
 /** Local overlay so toggles respond instantly; the queries refresh afterwards. */
 const optimisticUpdateOverlay = ref(new Map<string, boolean>());
+const resetting = ref(false);
 
-function findPreference(list: NotificationPreferenceDto[] | undefined, type: string) {
-  return list?.find((p) => p.type === type);
+/** Find an explicit setting for one notification type and scope. */
+function findPreference(list: NotificationPreferenceDto[] | undefined, type: string, preferenceGroupId: string | null) {
+  return list?.find((p) => p.type === type && (p.groupId ?? null) === preferenceGroupId);
 }
 
+/** The displayed setting, including its group inheritance state. */
 interface NotificationPreference {
   type: string;
   enabled: boolean;
@@ -72,20 +75,20 @@ interface NotificationPreference {
   inherited: boolean;
 }
 
+/** Resolve the pending value, group override, or global default. */
 function getNotificationPreference(type: string): NotificationPreference {
-  const globalPref = findPreference(globalPrefsQuery.value.data, type);
-  const globalEnabled = globalPref?.enabled ?? true;
-
-  if (!isGroupScope.value) {
-    return { enabled: optimisticUpdateOverlay.value.get(type) ?? globalEnabled, inherited: false, type };
+  const preferenceGroupScoped = findPreference(groupPrefsQuery.value.data, type, groupId.value);
+  if (isGroupScope.value && preferenceGroupScoped) {
+    return {
+      enabled: optimisticUpdateOverlay.value.get(type) ?? preferenceGroupScoped.enabled,
+      inherited: false,
+      type,
+    };
   }
 
-  const groupPref = findPreference(groupPrefsQuery.value.data, type);
-  const local = optimisticUpdateOverlay.value.get(type);
-  if (local !== undefined) return { enabled: local, inherited: false, type };
-  return groupPref
-    ? { enabled: groupPref.enabled, inherited: false, type }
-    : { enabled: globalEnabled, inherited: true, type };
+  const preferenceGlobalScoped = findPreference(globalPrefsQuery.value.data, type, null);
+  const preferenceGlobalScopedEnabled = preferenceGlobalScoped?.enabled ?? true;
+  return { enabled: optimisticUpdateOverlay.value.get(type) ?? preferenceGlobalScopedEnabled, inherited: false, type };
 }
 
 const sections = computed(() =>
@@ -101,13 +104,15 @@ const hasGroupOverrides = computed(
   () => (groupPrefsQuery.value.data?.length ?? 0) > 0 || optimisticUpdateOverlay.value.size > 0
 );
 
+/** Save one setting without overlapping writes for the same type. */
 async function setEnabled(type: string, enabled: boolean) {
+  if (resetting.value || optimisticUpdateOverlay.value.has(type)) return;
   optimisticUpdateOverlay.value.set(type, enabled);
   try {
     await notificationApi.setNotificationPreference({
       notificationPreferenceInputDto: { enabled, groupId: groupId.value, type },
     });
-    await (isGroupScope.value ? refreshGroup() : refreshGlobal());
+    await (isGroupScope.value ? refetchGroup() : refetchGlobal());
   } catch (error) {
     reportError("notification.setPreference", error);
     toast.error($t("notification-settings-error"));
@@ -116,15 +121,14 @@ async function setEnabled(type: string, enabled: boolean) {
   }
 }
 
-const resetting = ref(false);
-
+/** Remove group overrides when no preference save is pending. */
 async function resetGroupNotificationPreferences() {
-  if (!groupId.value) return;
+  if (!groupId.value || resetting.value || optimisticUpdateOverlay.value.size > 0) return;
   resetting.value = true;
   try {
     await notificationApi.resetGroupNotificationPreferences({ groupId: groupId.value });
     optimisticUpdateOverlay.value.clear();
-    await refreshGroup();
+    await refetchGroup();
     toast.success($t("notification-settings-reset-group-success"));
   } catch (error) {
     reportError("notification.resetGroup", error);
@@ -181,6 +185,7 @@ async function resetGroupNotificationPreferences() {
                 <SSwitch
                   :model-value="row.enabled"
                   :inherited="row.inherited"
+                  :disabled="resetting || optimisticUpdateOverlay.has(row.type)"
                   :label="$t(`notification-type-${row.type}`)"
                   @update:model-value="setEnabled(row.type, $event)"
                 />
@@ -195,6 +200,7 @@ async function resetGroupNotificationPreferences() {
             size="xl"
             class="w-full"
             :loading="resetting"
+            :disabled="optimisticUpdateOverlay.size > 0"
             @click="resetGroupNotificationPreferences"
           >
             {{ $t("notification-settings-reset-group") }}
