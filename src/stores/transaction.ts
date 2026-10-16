@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 
 import {
   TransactionApi,
+  type ReceiptRecognitionDto,
   type SplitzUserReducedDto,
   type TransactionDraftInputDto,
   type TransactionInputDto,
@@ -11,6 +12,8 @@ import {
   type TransactionDto,
 } from "@/backend";
 import config from "@/backend/config";
+import { resolveAssetUrl } from "@/libs/asset-url";
+import { getCategory } from "@/libs/categories";
 import type { SplitMethod } from "@/types/split-method";
 
 const ROUNDING_TOLERANCE = 0.01;
@@ -33,6 +36,40 @@ export const useTransactionStore = defineStore("transaction", () => {
   });
   const transactionId = ref<string | undefined>(undefined);
   const previewPhotoBase64 = ref<string | undefined>(undefined);
+  /** The receipt recognition this expense was prefilled from; sent with the save so the backend links them. */
+  const receiptRecognitionId = ref<string | undefined>(undefined);
+
+  /**
+   * Prefill the draft from a recognized receipt. Only fields the model filled are copied,
+   * so a partial result never clears what the user already typed.
+   */
+  const applyReceiptRecognition = (recognition: ReceiptRecognitionDto) => {
+    receiptRecognitionId.value = recognition.receiptRecognitionId;
+
+    const amount = recognition.amount === undefined ? Number.NaN : Number.parseFloat(recognition.amount);
+    if (Number.isFinite(amount) && amount > 0) {
+      transaction.value.amount = amount;
+    }
+    if (recognition.currency) {
+      transaction.value.currency = recognition.currency;
+    }
+    if (recognition.name) {
+      transaction.value.name = recognition.name;
+    }
+    if (recognition.category) {
+      transaction.value.icon = getCategory(recognition.category);
+    }
+    if (recognition.transactionTime) {
+      transaction.value.transactionTime = recognition.transactionTime;
+    }
+    if (recognition.location) {
+      transaction.value.geoCoordinate = recognition.location;
+    }
+    const firstImage = recognition.images?.[0];
+    if (firstImage) {
+      previewPhotoBase64.value = resolveAssetUrl(firstImage);
+    }
+  };
 
   const members = ref<SplitzUserReducedDto[]>([]);
   const paidBy = ref<string>();
@@ -268,9 +305,9 @@ export const useTransactionStore = defineStore("transaction", () => {
       };
     });
 
-    // prefill datetime
-    transaction.value.createTime = new Date();
-    transaction.value.transactionTime = new Date();
+    // prefill datetime; a date read from a receipt is kept
+    transaction.value.createTime ??= new Date();
+    transaction.value.transactionTime ??= new Date();
 
     // Construct the TransactionInputDto using data from the transaction store
     const transactionInput: TransactionInputDto = {
@@ -282,6 +319,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       groupId,
       icon: transaction.value.icon ?? "default",
       name: transaction.value.name,
+      receiptRecognitionId: receiptRecognitionId.value,
       tags: transaction.value.tags ?? [],
       transactionId: transactionId.value,
       transactionTime: transaction.value.transactionTime ?? new Date(),
@@ -338,6 +376,8 @@ export const useTransactionStore = defineStore("transaction", () => {
       userId: "",
     };
     transactionId.value = undefined;
+    previewPhotoBase64.value = undefined;
+    receiptRecognitionId.value = undefined;
     members.value = [];
     paidBy.value = undefined;
     includedMembersId.value = [];
@@ -350,6 +390,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   return {
     addToIncludedMembers,
+    applyReceiptRecognition,
     decreaseSplitByShares,
     excludedMembersId,
     finalSplitAmount,
@@ -359,6 +400,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     members,
     paidBy,
     previewPhotoBase64,
+    receiptRecognitionId,
     removeFromIncludedMembers,
     resetTransactionStore,
     saveTransaction,

@@ -7,6 +7,7 @@ import {
   PhIdentificationCard,
   PhPencilSimple,
   PhPlus,
+  PhScan,
   PhShieldCheck,
   PhTrash,
   PhUser,
@@ -369,21 +370,40 @@ function logout() {
         <!-- Preferences -->
         <section class="flex flex-col gap-2">
           <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("profile-preferences-label") }}</h2>
-          <button
-            type="button"
-            class="flex w-full items-center gap-3 rounded-3xl bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
-            data-test="notification-settings-link"
-            @click="router.push({ name: 'notificationSettings' })"
-          >
-            <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-              <PhBell class="size-5 text-util-color-brand-700" />
-            </span>
-            <span class="flex min-w-0 flex-1 flex-col">
-              <span class="text-base font-medium text-base-text-primary">{{ $t("profile-notifications") }}</span>
-              <span class="text-xs text-base-text-quaternary">{{ $t("profile-notifications-hint") }}</span>
-            </span>
-            <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
-          </button>
+          <div class="flex flex-col divide-y divide-base-border-tertiary overflow-hidden rounded-3xl">
+            <button
+              type="button"
+              class="flex w-full items-center gap-3 bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+              data-test="notification-settings-link"
+              @click="router.push({ name: 'notificationSettings' })"
+            >
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
+                <PhBell class="size-5 text-util-color-brand-700" />
+              </span>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="text-base font-medium text-base-text-primary">{{ $t("profile-notifications") }}</span>
+                <span class="text-xs text-base-text-quaternary">{{ $t("profile-notifications-hint") }}</span>
+              </span>
+              <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+            </button>
+            <button
+              type="button"
+              class="flex w-full items-center gap-3 bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+              data-test="receipt-recognition-settings-link"
+              @click="router.push({ name: 'receiptRecognitionSettings' })"
+            >
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
+                <PhScan class="size-5 text-util-color-brand-700" />
+              </span>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="text-base font-medium text-base-text-primary">{{
+                  $t("profile-receipt-recognition")
+                }}</span>
+                <span class="text-xs text-base-text-quaternary">{{ $t("profile-receipt-recognition-hint") }}</span>
+              </span>
+              <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+            </button>
+          </div>
         </section>
 
         <!-- Friends -->
