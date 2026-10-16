@@ -276,7 +276,7 @@ let subcategoryToMainCategory: Record<Subcategory, MainCategory> | undefined;
 export function getMainCategory(subCategory: string | null | undefined): MainCategory {
   if (!subCategory) return "other";
   // If already a main category, return it directly
-  if ((mainCategories as readonly string[]).includes(subCategory as MainCategory)) {
+  if ((mainCategories as readonly string[]).includes(subCategory)) {
     return subCategory as MainCategory;
   }
   // Populate mapping lazily on first call if empty

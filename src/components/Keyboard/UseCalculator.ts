@@ -18,7 +18,7 @@ export default function useCalculator() {
     if (stack.value.length === 0) {
       stack.value.push([new Big(input), false, 0]);
     } else {
-      const last = stack.value[stack.value.length - 1]!;
+      const last = stack.value[stack.value.length - 1];
       if (isOperator(last)) {
         // if last is an operator, add a new number
         stack.value.push([new Big(input), false, 0]);
@@ -43,7 +43,7 @@ export default function useCalculator() {
 
   function plus() {
     if (stack.value.length === 0) return;
-    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop();
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop();
     stack.value.push("+");
   }
 
@@ -53,19 +53,19 @@ export default function useCalculator() {
       stack.value.push([Big(0), false, 0], "-");
       return;
     }
-    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop();
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop();
     stack.value.push("-");
   }
 
   function times() {
     if (stack.value.length === 0) return;
-    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop();
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop();
     stack.value.push("×");
   }
 
   function div() {
     if (stack.value.length === 0) return;
-    if (isOperator(stack.value[stack.value.length - 1]!)) stack.value.pop();
+    if (isOperator(stack.value[stack.value.length - 1])) stack.value.pop();
     stack.value.push("÷");
   }
 
@@ -73,7 +73,7 @@ export default function useCalculator() {
     if (stack.value.length === 0) {
       stack.value.push([Big(0), true, 0]);
     } else {
-      const last = stack.value[stack.value.length - 1]!;
+      const last = stack.value[stack.value.length - 1];
       if (typeof last === "string") {
         // if last is an operator, add a 0 before the dot
         stack.value.push([Big(0), true, 0]);
@@ -88,7 +88,7 @@ export default function useCalculator() {
 
   function backspace() {
     if (stack.value.length > 0) {
-      const last = stack.value[stack.value.length - 1]!;
+      const last = stack.value[stack.value.length - 1];
       if (isOperator(last)) {
         stack.value.pop();
       } else {
