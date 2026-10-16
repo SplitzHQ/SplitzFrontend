@@ -78,6 +78,11 @@ export interface TransactionInputDto {
      * 
      */
     balances?: Array<TransactionBalanceInputDto>;
+    /**
+     * A receipt recognition owned by the caller that this expense was prefilled from. The recognition
+     * is linked to the saved expense and its first image becomes the photo when none is set.
+     */
+    receiptRecognitionId?: string | null;
 }
 
 /**
@@ -116,6 +121,7 @@ export function TransactionInputDtoFromJSONTyped(json: any, ignoreDiscriminator:
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionBalanceInputDtoFromJSON)),
+        'receiptRecognitionId': json['receiptRecognitionId'] === undefined ? undefined : json['receiptRecognitionId'] === null ? null : json['receiptRecognitionId'],
     };
 }
 
@@ -141,6 +147,7 @@ export function TransactionInputDtoToJSONTyped(value?: TransactionInputDto | nul
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         'geoCoordinate': value['geoCoordinate'],
         'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(TransactionBalanceInputDtoToJSON)),
+        'receiptRecognitionId': value['receiptRecognitionId'],
     };
 }
 
