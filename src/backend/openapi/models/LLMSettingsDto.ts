@@ -14,13 +14,13 @@
 
 import { mapValues } from '../runtime';
 /**
- * Recognition availability and the user's custom provider, with the key reduced to a flag.
+ * Provider availability and the user's settings. The API key is represented by a flag.
  * @export
- * @interface ReceiptRecognitionSettingsDto
+ * @interface LLMSettingsDto
  */
-export interface ReceiptRecognitionSettingsDto {
+export interface LLMSettingsDto {
     /**
-     * True when the server has its own provider configured.
+     * True when the server has a provider configured.
      */
     serverProviderAvailable: boolean;
     /**
@@ -44,33 +44,28 @@ export interface ReceiptRecognitionSettingsDto {
      */
     hasApiKey: boolean;
     /**
-     * True when a recognition request from this user would have a provider to call.
+     * True when this user has a provider available for AI requests.
      */
     available: boolean;
-    /**
-     * Most images one recognition request accepts.
-     */
-    maxImages: number;
 }
 
 /**
- * Check if a given object implements the ReceiptRecognitionSettingsDto interface.
+ * Check if a given object implements the LLMSettingsDto interface.
  */
-export function instanceOfReceiptRecognitionSettingsDto(value: object): value is ReceiptRecognitionSettingsDto {
+export function instanceOfLLMSettingsDto(value: object): value is LLMSettingsDto {
     if (!('serverProviderAvailable' in value) || value['serverProviderAvailable'] === undefined) return false;
     if (!('customProviderAllowed' in value) || value['customProviderAllowed'] === undefined) return false;
     if (!('customProviderEnabled' in value) || value['customProviderEnabled'] === undefined) return false;
     if (!('hasApiKey' in value) || value['hasApiKey'] === undefined) return false;
     if (!('available' in value) || value['available'] === undefined) return false;
-    if (!('maxImages' in value) || value['maxImages'] === undefined) return false;
     return true;
 }
 
-export function ReceiptRecognitionSettingsDtoFromJSON(json: any): ReceiptRecognitionSettingsDto {
-    return ReceiptRecognitionSettingsDtoFromJSONTyped(json, false);
+export function LLMSettingsDtoFromJSON(json: any): LLMSettingsDto {
+    return LLMSettingsDtoFromJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionSettingsDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ReceiptRecognitionSettingsDto {
+export function LLMSettingsDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): LLMSettingsDto {
     if (json == null) {
         return json;
     }
@@ -83,15 +78,14 @@ export function ReceiptRecognitionSettingsDtoFromJSONTyped(json: any, ignoreDisc
         'model': json['model'] === undefined ? undefined : json['model'] === null ? null : json['model'],
         'hasApiKey': json['hasApiKey'],
         'available': json['available'],
-        'maxImages': json['maxImages'],
     };
 }
 
-export function ReceiptRecognitionSettingsDtoToJSON(json: any): ReceiptRecognitionSettingsDto {
-    return ReceiptRecognitionSettingsDtoToJSONTyped(json, false);
+export function LLMSettingsDtoToJSON(json: any): LLMSettingsDto {
+    return LLMSettingsDtoToJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionSettingsDtoToJSONTyped(value?: ReceiptRecognitionSettingsDto | null, ignoreDiscriminator: boolean = false): any {
+export function LLMSettingsDtoToJSONTyped(value?: LLMSettingsDto | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -105,7 +99,6 @@ export function ReceiptRecognitionSettingsDtoToJSONTyped(value?: ReceiptRecognit
         'model': value['model'],
         'hasApiKey': value['hasApiKey'],
         'available': value['available'],
-        'maxImages': value['maxImages'],
     };
 }
 

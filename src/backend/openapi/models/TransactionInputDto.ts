@@ -79,8 +79,7 @@ export interface TransactionInputDto {
      */
     balances?: Array<TransactionBalanceInputDto>;
     /**
-     * A receipt recognition owned by the caller that this expense was prefilled from. The recognition
-     * is linked to the saved expense and its first image becomes the photo when none is set.
+     * 
      */
     receiptRecognitionId?: string | null;
 }

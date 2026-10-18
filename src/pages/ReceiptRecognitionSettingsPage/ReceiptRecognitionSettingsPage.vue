@@ -5,7 +5,7 @@ import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 import { toast } from "vue-sonner";
 
-import { ReceiptRecognitionApi, ResponseError } from "@/backend";
+import { LLMSettingsApi, ResponseError } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -15,11 +15,11 @@ import TextInput from "@/components/TextInput/TextInput.vue";
 import reportError from "@/libs/report-error";
 
 const { $t } = useFluent();
-const api = new ReceiptRecognitionApi(config);
+const api = new LLMSettingsApi(config);
 
 const { state: settingsQuery, refetch } = useQuery({
-  key: ["getReceiptRecognitionSettings"],
-  query: () => api.getReceiptRecognitionSettings(),
+  key: ["getLLMSettings"],
+  query: () => api.getLLMSettings(),
 });
 const settings = computed(() => settingsQuery.value.data);
 const loading = computed(() => settingsQuery.value.status === "pending");
@@ -64,8 +64,8 @@ async function save() {
 
   saving.value = true;
   try {
-    await api.updateReceiptRecognitionSettings({
-      receiptRecognitionSettingsInputDto: {
+    await api.updateLLMSettings({
+      lLMSettingsInputDto: {
         apiKey: apiKey.value.trim() || null,
         enabled: enabled.value,
         endpoint: endpoint.value.trim() || null,
@@ -99,7 +99,7 @@ async function remove() {
 
   removing.value = true;
   try {
-    await api.clearReceiptRecognitionSettings();
+    await api.clearLLMSettings();
     await refetch();
     toast.success($t("receipt-recognition-removed"));
   } catch (error) {

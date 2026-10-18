@@ -1,29 +1,26 @@
 
-# ReceiptRecognitionSettingsInputDto
+# ReceiptRecognitionCapabilitiesDto
 
-Body for saving the custom provider.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`enabled` | boolean
-`endpoint` | string
-`model` | string
-`apiKey` | string
+`available` | boolean
+`customProviderAllowed` | boolean
+`maxImages` | number
 
 ## Example
 
 ```typescript
-import type { ReceiptRecognitionSettingsInputDto } from ''
+import type { ReceiptRecognitionCapabilitiesDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "enabled": null,
-  "endpoint": null,
-  "model": null,
-  "apiKey": null,
-} satisfies ReceiptRecognitionSettingsInputDto
+  "available": null,
+  "customProviderAllowed": null,
+  "maxImages": null,
+} satisfies ReceiptRecognitionCapabilitiesDto
 
 console.log(example)
 
@@ -32,7 +29,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as ReceiptRecognitionSettingsInputDto
+const exampleParsed = JSON.parse(exampleJSON) as ReceiptRecognitionCapabilitiesDto
 console.log(exampleParsed)
 ```
 

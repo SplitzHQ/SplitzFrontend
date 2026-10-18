@@ -4,74 +4,10 @@ All URIs are relative to *http://localhost*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**clearReceiptRecognitionSettings**](ReceiptRecognitionApi.md#clearreceiptrecognitionsettings) | **DELETE** /receiptrecognition/settings | Remove the current user\&#39;s custom provider and its stored key. |
 | [**getReceiptRecognition**](ReceiptRecognitionApi.md#getreceiptrecognition) | **GET** /receiptrecognition/{id} | Get one of the current user\&#39;s recognitions. |
-| [**getReceiptRecognitionSettings**](ReceiptRecognitionApi.md#getreceiptrecognitionsettings) | **GET** /receiptrecognition/settings | Recognition availability and the current user\&#39;s custom provider. The API key is never returned. |
+| [**getReceiptRecognitionCapabilities**](ReceiptRecognitionApi.md#getreceiptrecognitioncapabilities) | **GET** /receiptrecognition/capabilities | Get receipt recognition availability and image limits for the current user. |
 | [**recognizeReceipt**](ReceiptRecognitionApi.md#recognizereceipt) | **POST** /receiptrecognition | Recognize an expense from one or more photos of the same receipt.  The images and the model reply are kept; the parsed fields are returned for the client to prefill.  A model failure is reported in the body with status &#x60;Failed&#x60;, not as an HTTP error. |
-| [**updateReceiptRecognitionSettings**](ReceiptRecognitionApi.md#updatereceiptrecognitionsettings) | **PUT** /receiptrecognition/settings | Save the current user\&#39;s custom provider. Leaving &#x60;apiKey&#x60; empty keeps the stored key.  Returns 400 with a reason when the provider is turned on but incomplete. |
 
-
-
-## clearReceiptRecognitionSettings
-
-> clearReceiptRecognitionSettings()
-
-Remove the current user\&#39;s custom provider and its stored key.
-
-### Example
-
-```ts
-import {
-  Configuration,
-  ReceiptRecognitionApi,
-} from '';
-import type { ClearReceiptRecognitionSettingsRequest } from '';
-
-async function example() {
-  console.log("🚀 Testing  SDK...");
-  const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN",
-  });
-  const api = new ReceiptRecognitionApi(config);
-
-  try {
-    const data = await api.clearReceiptRecognitionSettings();
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Run the test
-example().catch(console.error);
-```
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-`void` (Empty response body)
-
-### Authorization
-
-[Bearer](../README.md#Bearer)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: `text/plain`, `application/json`, `text/json`
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **204** | No Content |  -  |
-| **401** | Unauthorized |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getReceiptRecognition
@@ -145,11 +81,11 @@ example().catch(console.error);
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## getReceiptRecognitionSettings
+## getReceiptRecognitionCapabilities
 
-> ReceiptRecognitionSettingsDto getReceiptRecognitionSettings()
+> ReceiptRecognitionCapabilitiesDto getReceiptRecognitionCapabilities()
 
-Recognition availability and the current user\&#39;s custom provider. The API key is never returned.
+Get receipt recognition availability and image limits for the current user.
 
 ### Example
 
@@ -158,7 +94,7 @@ import {
   Configuration,
   ReceiptRecognitionApi,
 } from '';
-import type { GetReceiptRecognitionSettingsRequest } from '';
+import type { GetReceiptRecognitionCapabilitiesRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -169,7 +105,7 @@ async function example() {
   const api = new ReceiptRecognitionApi(config);
 
   try {
-    const data = await api.getReceiptRecognitionSettings();
+    const data = await api.getReceiptRecognitionCapabilities();
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -186,7 +122,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**ReceiptRecognitionSettingsDto**](ReceiptRecognitionSettingsDto.md)
+[**ReceiptRecognitionCapabilitiesDto**](ReceiptRecognitionCapabilitiesDto.md)
 
 ### Authorization
 
@@ -278,77 +214,6 @@ example().catch(console.error);
 | **400** | Bad Request |  -  |
 | **401** | Unauthorized |  -  |
 | **429** | Too Many Requests |  * Retry-After - delta-seconds or HTTP-date <br>  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
-
-
-## updateReceiptRecognitionSettings
-
-> ReceiptRecognitionSettingsDto updateReceiptRecognitionSettings(receiptRecognitionSettingsInputDto)
-
-Save the current user\&#39;s custom provider. Leaving &#x60;apiKey&#x60; empty keeps the stored key.  Returns 400 with a reason when the provider is turned on but incomplete.
-
-### Example
-
-```ts
-import {
-  Configuration,
-  ReceiptRecognitionApi,
-} from '';
-import type { UpdateReceiptRecognitionSettingsRequest } from '';
-
-async function example() {
-  console.log("🚀 Testing  SDK...");
-  const config = new Configuration({ 
-    // Configure HTTP bearer authorization: Bearer
-    accessToken: "YOUR BEARER TOKEN",
-  });
-  const api = new ReceiptRecognitionApi(config);
-
-  const body = {
-    // ReceiptRecognitionSettingsInputDto (optional)
-    receiptRecognitionSettingsInputDto: ...,
-  } satisfies UpdateReceiptRecognitionSettingsRequest;
-
-  try {
-    const data = await api.updateReceiptRecognitionSettings(body);
-    console.log(data);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Run the test
-example().catch(console.error);
-```
-
-### Parameters
-
-
-| Name | Type | Description  | Notes |
-|------------- | ------------- | ------------- | -------------|
-| **receiptRecognitionSettingsInputDto** | [ReceiptRecognitionSettingsInputDto](ReceiptRecognitionSettingsInputDto.md) |  | [Optional] |
-
-### Return type
-
-[**ReceiptRecognitionSettingsDto**](ReceiptRecognitionSettingsDto.md)
-
-### Authorization
-
-[Bearer](../README.md#Bearer)
-
-### HTTP request headers
-
-- **Content-Type**: `application/json`, `text/json`, `application/*+json`
-- **Accept**: `application/json`
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
-| **400** | Bad Request |  -  |
-| **401** | Unauthorized |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

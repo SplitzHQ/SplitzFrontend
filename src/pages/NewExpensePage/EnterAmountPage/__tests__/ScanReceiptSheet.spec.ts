@@ -2,32 +2,41 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
-import type { ReceiptRecognitionDto, ReceiptRecognitionSettingsDto, RecognizeReceiptRequest } from "@/backend";
+import type {
+  ReceiptRecognitionApi,
+  ReceiptRecognitionCapabilitiesDto,
+  ReceiptRecognitionDto,
+  RecognizeReceiptRequest,
+} from "@/backend";
 import { ResponseError } from "@/backend/openapi";
 
 import ScanReceiptSheet from "../ScanReceiptSheet.vue";
 
 const mocks = vi.hoisted(() => ({
   api: {
-    getReceiptRecognitionSettings: vi.fn(),
+    getReceiptRecognitionCapabilities: vi.fn<ReceiptRecognitionApi["getReceiptRecognitionCapabilities"]>(),
     recognizeReceipt: vi.fn<(request: RecognizeReceiptRequest) => Promise<ReceiptRecognitionDto>>(),
   },
+  capabilities: { value: { data: undefined as ReceiptRecognitionCapabilitiesDto | undefined, status: "success" } },
   push: vi.fn(),
+  refetch: vi.fn(),
   reportError: vi.fn(),
-  settings: { value: { data: undefined as ReceiptRecognitionSettingsDto | undefined, status: "success" } },
   toast: { error: vi.fn(), success: vi.fn() },
 }));
 
 vi.mock("@/backend", () => ({
   ReceiptRecognitionApi: class {
-    getReceiptRecognitionSettings = mocks.api.getReceiptRecognitionSettings;
+    getReceiptRecognitionCapabilities = mocks.api.getReceiptRecognitionCapabilities;
     recognizeReceipt = mocks.api.recognizeReceipt;
   },
   ReceiptRecognitionStatus: { Failed: "Failed", Pending: "Pending", Succeeded: "Succeeded" },
 }));
 vi.mock("@/backend/config", () => ({ default: {} }));
 vi.mock("@pinia/colada", () => ({
-  useQuery: () => ({ refetch: vi.fn(), state: mocks.settings }),
+  useQuery: ({ query }: { query: () => Promise<ReceiptRecognitionCapabilitiesDto> }) => {
+    void query();
+    return { refetch: mocks.refetch, state: mocks.capabilities };
+  },
 }));
 vi.mock("@/libs/report-error", () => ({ default: mocks.reportError }));
 vi.mock("vue-router", () => ({ useRouter: () => ({ push: mocks.push }) }));
@@ -39,13 +48,10 @@ vi.mock("fluent-vue", () => ({
   }),
 }));
 
-const availableSettings: ReceiptRecognitionSettingsDto = {
+const availableCapabilities: ReceiptRecognitionCapabilitiesDto = {
   available: true,
   customProviderAllowed: true,
-  customProviderEnabled: true,
-  hasApiKey: true,
   maxImages: 2,
-  serverProviderAvailable: false,
 };
 
 const succeeded: ReceiptRecognitionDto = {
@@ -63,13 +69,27 @@ const succeeded: ReceiptRecognitionDto = {
 describe("ScanReceiptSheet", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.settings = ref({ data: availableSettings, status: "success" }) as typeof mocks.settings;
+    mocks.refetch.mockResolvedValue(undefined);
+    mocks.api.getReceiptRecognitionCapabilities.mockResolvedValue(availableCapabilities);
+    mocks.capabilities = ref({ data: availableCapabilities, status: "success" }) as typeof mocks.capabilities;
     Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn(() => "blob:preview") });
     Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
   });
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it("loads recognition capabilities and refreshes them when the sheet reopens", async () => {
+    const wrapper = mountSheet();
+
+    expect(mocks.api.getReceiptRecognitionCapabilities).toHaveBeenCalledTimes(1);
+
+    await wrapper.setProps({ modelValue: false });
+    expect(mocks.refetch).not.toHaveBeenCalled();
+
+    await wrapper.setProps({ modelValue: true });
+    expect(mocks.refetch).toHaveBeenCalledTimes(1);
   });
 
   it("sends every picked image with the category keys and emits the result", async () => {
@@ -147,11 +167,24 @@ describe("ScanReceiptSheet", () => {
     expect(wrapper.get('[data-test="scan-recognize"]').attributes("disabled")).toBeUndefined();
   });
 
-  it("points to the provider settings when recognition is not available", async () => {
-    mocks.settings = ref({
-      data: { ...availableSettings, available: false, customProviderEnabled: false, hasApiKey: false },
+  it("hides provider settings when recognition is unavailable and custom providers are disabled", () => {
+    mocks.capabilities = ref({
+      data: { ...availableCapabilities, available: false, customProviderAllowed: false },
       status: "success",
-    }) as typeof mocks.settings;
+    }) as typeof mocks.capabilities;
+    const wrapper = mountSheet();
+
+    expect(wrapper.get('[data-test="scan-unavailable"]').text()).toContain("new-expense-scan-unavailable-fixed");
+    expect(wrapper.find('[data-test="scan-open-settings"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="scan-recognize"]').exists()).toBe(false);
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it("points to the provider settings when recognition is not available", async () => {
+    mocks.capabilities = ref({
+      data: { ...availableCapabilities, available: false },
+      status: "success",
+    }) as typeof mocks.capabilities;
     const wrapper = mountSheet();
 
     expect(wrapper.find('[data-test="scan-unavailable"]').exists()).toBe(true);

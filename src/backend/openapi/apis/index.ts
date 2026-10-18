@@ -4,6 +4,7 @@ export * from './AccountApi';
 export * from './AccountEmailApi';
 export * from './GroupApi';
 export * from './InvoiceApi';
+export * from './LLMSettingsApi';
 export * from './NotificationApi';
 export * from './ReceiptRecognitionApi';
 export * from './SplitzBackendApi';

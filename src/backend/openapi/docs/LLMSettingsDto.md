@@ -1,7 +1,7 @@
 
-# ReceiptRecognitionSettingsDto
+# LLMSettingsDto
 
-Recognition availability and the user\'s custom provider, with the key reduced to a flag.
+Provider availability and the user\'s settings. The API key is represented by a flag.
 
 ## Properties
 
@@ -14,12 +14,11 @@ Name | Type
 `model` | string
 `hasApiKey` | boolean
 `available` | boolean
-`maxImages` | number
 
 ## Example
 
 ```typescript
-import type { ReceiptRecognitionSettingsDto } from ''
+import type { LLMSettingsDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
@@ -30,8 +29,7 @@ const example = {
   "model": null,
   "hasApiKey": null,
   "available": null,
-  "maxImages": null,
-} satisfies ReceiptRecognitionSettingsDto
+} satisfies LLMSettingsDto
 
 console.log(example)
 
@@ -40,7 +38,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as ReceiptRecognitionSettingsDto
+const exampleParsed = JSON.parse(exampleJSON) as LLMSettingsDto
 console.log(exampleParsed)
 ```
 

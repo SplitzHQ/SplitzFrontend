@@ -39,18 +39,18 @@ const { $t } = useFluent();
 const router = useRouter();
 const api = new ReceiptRecognitionApi(config);
 
-// Availability depends on server settings and the user's own provider, so it is checked each time the sheet opens.
-const { state: settingsQuery, refetch: refetchSettings } = useQuery({
-  key: ["getReceiptRecognitionSettings"],
-  query: () => api.getReceiptRecognitionSettings(),
+// Availability and upload limits can change, so check them each time the sheet opens.
+const { state: capabilitiesQuery, refetch: refetchCapabilities } = useQuery({
+  key: ["getReceiptRecognitionCapabilities"],
+  query: () => api.getReceiptRecognitionCapabilities(),
 });
-const settingsLoading = computed(() => settingsQuery.value.status === "pending");
-const available = computed(() => settingsQuery.value.data?.available ?? false);
-const customProviderAllowed = computed(() => settingsQuery.value.data?.customProviderAllowed ?? false);
-const maxImages = computed(() => settingsQuery.value.data?.maxImages ?? DEFAULT_MAX_IMAGES);
+const capabilitiesLoading = computed(() => capabilitiesQuery.value.status === "pending");
+const available = computed(() => capabilitiesQuery.value.data?.available ?? false);
+const customProviderAllowed = computed(() => capabilitiesQuery.value.data?.customProviderAllowed ?? false);
+const maxImages = computed(() => capabilitiesQuery.value.data?.maxImages ?? DEFAULT_MAX_IMAGES);
 
 watch(model, (open) => {
-  if (open) void refetchSettings();
+  if (open) void refetchCapabilities();
 });
 
 const images = ref<PendingImage[]>([]);
@@ -162,7 +162,9 @@ function openSettings() {
         <p class="text-sm text-base-text-tertiary">{{ $t("new-expense-scan-intro") }}</p>
       </div>
 
-      <p v-if="settingsLoading" class="text-sm text-base-text-quaternary">{{ $t("new-expense-scan-loading") }}</p>
+      <p v-if="capabilitiesLoading" class="text-sm text-base-text-quaternary">
+        {{ $t("new-expense-scan-loading") }}
+      </p>
 
       <div
         v-else-if="!available"

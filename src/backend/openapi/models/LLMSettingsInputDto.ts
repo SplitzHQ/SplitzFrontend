@@ -14,17 +14,17 @@
 
 import { mapValues } from '../runtime';
 /**
- * Body for saving the custom provider.
+ * Settings for saving a user's provider.
  * @export
- * @interface ReceiptRecognitionSettingsInputDto
+ * @interface LLMSettingsInputDto
  */
-export interface ReceiptRecognitionSettingsInputDto {
+export interface LLMSettingsInputDto {
     /**
      * 
      */
     enabled: boolean;
     /**
-     * Base URL of an OpenAI-compatible API. Required when SplitzBackend.Models.ReceiptRecognitionSettingsInputDto.Enabled is true.
+     * Base URL of an OpenAI-compatible API. Required when the provider is enabled.
      */
     endpoint?: string | null;
     /**
@@ -32,24 +32,24 @@ export interface ReceiptRecognitionSettingsInputDto {
      */
     model?: string | null;
     /**
-     * A new API key. Null or empty keeps the key that is already stored.
+     * A new API key. Null or empty keeps the stored key.
      */
     apiKey?: string | null;
 }
 
 /**
- * Check if a given object implements the ReceiptRecognitionSettingsInputDto interface.
+ * Check if a given object implements the LLMSettingsInputDto interface.
  */
-export function instanceOfReceiptRecognitionSettingsInputDto(value: object): value is ReceiptRecognitionSettingsInputDto {
+export function instanceOfLLMSettingsInputDto(value: object): value is LLMSettingsInputDto {
     if (!('enabled' in value) || value['enabled'] === undefined) return false;
     return true;
 }
 
-export function ReceiptRecognitionSettingsInputDtoFromJSON(json: any): ReceiptRecognitionSettingsInputDto {
-    return ReceiptRecognitionSettingsInputDtoFromJSONTyped(json, false);
+export function LLMSettingsInputDtoFromJSON(json: any): LLMSettingsInputDto {
+    return LLMSettingsInputDtoFromJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionSettingsInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ReceiptRecognitionSettingsInputDto {
+export function LLMSettingsInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): LLMSettingsInputDto {
     if (json == null) {
         return json;
     }
@@ -62,11 +62,11 @@ export function ReceiptRecognitionSettingsInputDtoFromJSONTyped(json: any, ignor
     };
 }
 
-export function ReceiptRecognitionSettingsInputDtoToJSON(json: any): ReceiptRecognitionSettingsInputDto {
-    return ReceiptRecognitionSettingsInputDtoToJSONTyped(json, false);
+export function LLMSettingsInputDtoToJSON(json: any): LLMSettingsInputDto {
+    return LLMSettingsInputDtoToJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionSettingsInputDtoToJSONTyped(value?: ReceiptRecognitionSettingsInputDto | null, ignoreDiscriminator: boolean = false): any {
+export function LLMSettingsInputDtoToJSONTyped(value?: LLMSettingsInputDto | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

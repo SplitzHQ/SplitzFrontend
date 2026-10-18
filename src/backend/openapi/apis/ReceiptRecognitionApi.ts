@@ -19,20 +19,15 @@ import {
     ProblemDetailsToJSON,
 } from '../models/ProblemDetails';
 import {
+    type ReceiptRecognitionCapabilitiesDto,
+    ReceiptRecognitionCapabilitiesDtoFromJSON,
+    ReceiptRecognitionCapabilitiesDtoToJSON,
+} from '../models/ReceiptRecognitionCapabilitiesDto';
+import {
     type ReceiptRecognitionDto,
     ReceiptRecognitionDtoFromJSON,
     ReceiptRecognitionDtoToJSON,
 } from '../models/ReceiptRecognitionDto';
-import {
-    type ReceiptRecognitionSettingsDto,
-    ReceiptRecognitionSettingsDtoFromJSON,
-    ReceiptRecognitionSettingsDtoToJSON,
-} from '../models/ReceiptRecognitionSettingsDto';
-import {
-    type ReceiptRecognitionSettingsInputDto,
-    ReceiptRecognitionSettingsInputDtoFromJSON,
-    ReceiptRecognitionSettingsInputDtoToJSON,
-} from '../models/ReceiptRecognitionSettingsInputDto';
 
 export interface GetReceiptRecognitionRequest {
     /**
@@ -52,61 +47,10 @@ export interface RecognizeReceiptRequest {
     categories?: Array<string>;
 }
 
-export interface UpdateReceiptRecognitionSettingsRequest {
-    /**
-     * Body for saving the custom provider.
-     */
-    receiptRecognitionSettingsInputDto?: ReceiptRecognitionSettingsInputDto;
-}
-
 /**
  * 
  */
 export class ReceiptRecognitionApi extends runtime.BaseAPI {
-
-    /**
-     * Creates request options for clearReceiptRecognitionSettings without sending the request
-     */
-    async clearReceiptRecognitionSettingsRequestOpts(): Promise<runtime.RequestOpts> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/receiptrecognition/settings`;
-
-        return {
-            path: urlPath,
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     * Remove the current user\'s custom provider and its stored key.
-     */
-    async clearReceiptRecognitionSettingsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const requestOptions = await this.clearReceiptRecognitionSettingsRequestOpts();
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Remove the current user\'s custom provider and its stored key.
-     */
-    async clearReceiptRecognitionSettings(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.clearReceiptRecognitionSettingsRaw(initOverrides);
-    }
 
     /**
      * Creates request options for getReceiptRecognition without sending the request
@@ -162,9 +106,9 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates request options for getReceiptRecognitionSettings without sending the request
+     * Creates request options for getReceiptRecognitionCapabilities without sending the request
      */
-    async getReceiptRecognitionSettingsRequestOpts(): Promise<runtime.RequestOpts> {
+    async getReceiptRecognitionCapabilitiesRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -178,7 +122,7 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/receiptrecognition/settings`;
+        let urlPath = `/receiptrecognition/capabilities`;
 
         return {
             path: urlPath,
@@ -189,20 +133,20 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Recognition availability and the current user\'s custom provider. The API key is never returned.
+     * Get receipt recognition availability and image limits for the current user.
      */
-    async getReceiptRecognitionSettingsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptRecognitionSettingsDto>> {
-        const requestOptions = await this.getReceiptRecognitionSettingsRequestOpts();
+    async getReceiptRecognitionCapabilitiesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptRecognitionCapabilitiesDto>> {
+        const requestOptions = await this.getReceiptRecognitionCapabilitiesRequestOpts();
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptRecognitionSettingsDtoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptRecognitionCapabilitiesDtoFromJSON(jsonValue));
     }
 
     /**
-     * Recognition availability and the current user\'s custom provider. The API key is never returned.
+     * Get receipt recognition availability and image limits for the current user.
      */
-    async getReceiptRecognitionSettings(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionSettingsDto> {
-        const response = await this.getReceiptRecognitionSettingsRaw(initOverrides);
+    async getReceiptRecognitionCapabilities(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionCapabilitiesDto> {
+        const response = await this.getReceiptRecognitionCapabilitiesRaw(initOverrides);
         return await response.value();
     }
 
@@ -284,54 +228,6 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
      */
     async recognizeReceipt(requestParameters: RecognizeReceiptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionDto> {
         const response = await this.recognizeReceiptRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for updateReceiptRecognitionSettings without sending the request
-     */
-    async updateReceiptRecognitionSettingsRequestOpts(requestParameters: UpdateReceiptRecognitionSettingsRequest): Promise<runtime.RequestOpts> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/receiptrecognition/settings`;
-
-        return {
-            path: urlPath,
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ReceiptRecognitionSettingsInputDtoToJSON(requestParameters['receiptRecognitionSettingsInputDto']),
-        };
-    }
-
-    /**
-     * Save the current user\'s custom provider. Leaving `apiKey` empty keeps the stored key.  Returns 400 with a reason when the provider is turned on but incomplete.
-     */
-    async updateReceiptRecognitionSettingsRaw(requestParameters: UpdateReceiptRecognitionSettingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptRecognitionSettingsDto>> {
-        const requestOptions = await this.updateReceiptRecognitionSettingsRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptRecognitionSettingsDtoFromJSON(jsonValue));
-    }
-
-    /**
-     * Save the current user\'s custom provider. Leaving `apiKey` empty keeps the stored key.  Returns 400 with a reason when the provider is turned on but incomplete.
-     */
-    async updateReceiptRecognitionSettings(requestParameters: UpdateReceiptRecognitionSettingsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionSettingsDto> {
-        const response = await this.updateReceiptRecognitionSettingsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
