@@ -23,12 +23,10 @@ const { transaction, previewPhotoBase64, receiptId } = storeToRefs(transactionSt
 const showScanSheet = ref(false);
 
 // format amount as currency
-const formatOptions = computed(
-  (): Format => ({
-    currency: transaction.value.currency ?? "USD",
-    style: "currency",
-  })
-);
+const formatOptions = computed((): Format => ({
+  currency: transaction.value.currency ?? "USD",
+  style: "currency",
+}));
 const formattedAmount = computed(() => {
   const amount = transaction.value.amount;
   return amount === null || amount === undefined ? "" : amount.toLocaleString(undefined, formatOptions.value);

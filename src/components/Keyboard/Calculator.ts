@@ -17,7 +17,7 @@ export default class Calculator {
     if (this.stack.length === 0) {
       this.stack.push([new Big(input), false, 0]);
     } else {
-      const last = this.stack[this.stack.length - 1]!;
+      const last = this.stack[this.stack.length - 1];
       if (this.isOperator(last)) {
         // if last is an operator, add a new number
         this.stack.push([new Big(input), false, 0]);
@@ -34,25 +34,25 @@ export default class Calculator {
 
   plus() {
     if (this.stack.length === 0) return;
-    if (this.isOperator(this.stack[this.stack.length - 1]!)) this.stack.pop();
+    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop();
     this.stack.push("+");
   }
 
   minus() {
     if (this.stack.length === 0) return;
-    if (this.isOperator(this.stack[this.stack.length - 1]!)) this.stack.pop();
+    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop();
     this.stack.push("-");
   }
 
   times() {
     if (this.stack.length === 0) return;
-    if (this.isOperator(this.stack[this.stack.length - 1]!)) this.stack.pop();
+    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop();
     this.stack.push("×");
   }
 
   div() {
     if (this.stack.length === 0) return;
-    if (this.isOperator(this.stack[this.stack.length - 1]!)) this.stack.pop();
+    if (this.isOperator(this.stack[this.stack.length - 1])) this.stack.pop();
     this.stack.push("÷");
   }
 
@@ -60,7 +60,7 @@ export default class Calculator {
     if (this.stack.length === 0) {
       this.stack.push([Big(0), true, 0]);
     } else {
-      const last = this.stack[this.stack.length - 1]!;
+      const last = this.stack[this.stack.length - 1];
       if (typeof last === "string") {
         // if last is an operator, add a 0 before the dot
         this.stack.push([Big(0), true, 0]);
@@ -75,7 +75,7 @@ export default class Calculator {
 
   backspace() {
     if (this.stack.length > 0) {
-      const last = this.stack[this.stack.length - 1]!;
+      const last = this.stack[this.stack.length - 1];
       if (this.isOperator(last)) {
         this.stack.pop();
       } else {

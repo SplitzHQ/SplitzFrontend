@@ -9,7 +9,10 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
-const isStorybookOrTestProcess = process.env.npm_lifecycle_event === "storybook" || process.env.VITEST === "true";
+const isStorybookOrTestProcess =
+  process.env.npm_lifecycle_event === "storybook" ||
+  process.env.npm_lifecycle_event === "build-storybook" ||
+  process.env.VITEST === "true";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,6 +32,7 @@ export default defineConfig({
       },
     },
     VitePWA({
+      disable: isStorybookOrTestProcess,
       registerType: "prompt",
       includeAssets: ["favicon.svg", "apple-touch-icon-180x180.png"],
       manifest: {

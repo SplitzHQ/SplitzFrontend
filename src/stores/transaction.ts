@@ -162,12 +162,12 @@ export const useTransactionStore = defineStore("transaction", () => {
       // Distribute the remainder to members, starting with the first member
       // end early if the remainder is all distributed
       for (let i = 0; i < memberIds.length && remainder - distributedRemainder > FLOAT_COMPARE_TOLERANCE; i++) {
-        const memberId = memberIds[i]!;
+        const memberId = memberIds[i];
         if (i === memberIds.length - 1) {
           // Give the last member any remaining amount to ensure exact total
-          result[memberId] = round(result[memberId]! + remainder - distributedRemainder);
+          result[memberId] = round(result[memberId] + remainder - distributedRemainder);
         } else {
-          result[memberId] = result[memberId]! + remainderPerMember;
+          result[memberId] = result[memberId] + remainderPerMember;
           distributedRemainder += remainderPerMember;
         }
       }
