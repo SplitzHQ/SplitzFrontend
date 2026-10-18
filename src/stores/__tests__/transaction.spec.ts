@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { AddTransactionRequest, ReceiptRecognitionDto, TransactionDto } from "@/backend";
+import type { AddTransactionRequest, ReceiptDto, TransactionDto } from "@/backend";
 
 import { useTransactionStore } from "../transaction";
 
@@ -25,7 +25,7 @@ vi.mock("@/libs/asset-url", () => ({
   resolveAssetUrl: (url: string) => `https://assets.example.test/${url}`,
 }));
 
-const recognition: ReceiptRecognitionDto = {
+const recognition: ReceiptDto = {
   amount: "12.50",
   category: "dining_out",
   createTime: new Date("2026-03-14T18:40:00.000Z"),
@@ -34,7 +34,7 @@ const recognition: ReceiptRecognitionDto = {
   location: "Mint St",
   model: "vision-1",
   name: "Blue Bottle",
-  receiptRecognitionId: "00000000-0000-0000-0000-00000000000a",
+  receiptId: "00000000-0000-0000-0000-00000000000a",
   status: "Succeeded",
   transactionTime: new Date("2026-03-14T18:30:00.000Z"),
   usedCustomProvider: true,
@@ -52,7 +52,7 @@ describe("useTransactionStore receipt recognition", () => {
 
     store.applyReceiptRecognition(recognition);
 
-    expect(store.receiptRecognitionId).toBe(recognition.receiptRecognitionId);
+    expect(store.receiptId).toBe(recognition.receiptId);
     expect(store.transaction.amount).toBe(12.5);
     expect(store.transaction.currency).toBe("EUR");
     expect(store.transaction.name).toBe("Blue Bottle");
@@ -100,14 +100,14 @@ describe("useTransactionStore receipt recognition", () => {
 
     expect(transactionApiMock.addTransaction).toHaveBeenCalledTimes(1);
     const transactionInputDto = transactionApiMock.addTransaction.mock.calls[0]![0].transactionInputDto!;
-    expect(transactionInputDto.receiptRecognitionId).toBe(recognition.receiptRecognitionId);
+    expect(transactionInputDto.receiptId).toBe(recognition.receiptId);
     expect(transactionInputDto.transactionTime).toEqual(recognition.transactionTime);
     expect(transactionInputDto.amount).toBe("12.50");
     expect(transactionInputDto.currency).toBe("EUR");
     expect(transactionInputDto.icon).toBe("dining_out");
 
     store.resetTransactionStore();
-    expect(store.receiptRecognitionId).toBeUndefined();
+    expect(store.receiptId).toBeUndefined();
     expect(store.previewPhotoBase64).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 
 # ReceiptRecognitionStatus
 
-Outcome of one recognition request.
+Recognition status of a receipt.
 
 ## Properties
 

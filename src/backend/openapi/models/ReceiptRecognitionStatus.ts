@@ -14,7 +14,7 @@
 
 
 /**
- * Outcome of one recognition request.
+ * Recognition status of a receipt.
  * @export
  */
 export const ReceiptRecognitionStatus = {

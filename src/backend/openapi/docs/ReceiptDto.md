@@ -1,13 +1,13 @@
 
-# ReceiptRecognitionDto
+# ReceiptDto
 
-What the client receives after a recognition request, or when it fetches an old one.
+Receipt details returned after recognition or when fetching a stored receipt.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`receiptRecognitionId` | string
+`receiptId` | string
 `createTime` | Date
 `images` | Array&lt;string&gt;
 `model` | string
@@ -28,11 +28,11 @@ Name | Type
 ## Example
 
 ```typescript
-import type { ReceiptRecognitionDto } from ''
+import type { ReceiptDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "receiptRecognitionId": null,
+  "receiptId": null,
   "createTime": null,
   "images": null,
   "model": null,
@@ -49,7 +49,7 @@ const example = {
   "location": null,
   "notes": null,
   "transactionId": null,
-} satisfies ReceiptRecognitionDto
+} satisfies ReceiptDto
 
 console.log(example)
 
@@ -58,7 +58,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as ReceiptRecognitionDto
+const exampleParsed = JSON.parse(exampleJSON) as ReceiptDto
 console.log(exampleParsed)
 ```
 

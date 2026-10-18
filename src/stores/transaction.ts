@@ -4,7 +4,7 @@ import { computed, ref } from "vue";
 
 import {
   TransactionApi,
-  type ReceiptRecognitionDto,
+  type ReceiptDto,
   type SplitzUserReducedDto,
   type TransactionDraftInputDto,
   type TransactionInputDto,
@@ -37,14 +37,14 @@ export const useTransactionStore = defineStore("transaction", () => {
   const transactionId = ref<string | undefined>(undefined);
   const previewPhotoBase64 = ref<string | undefined>(undefined);
   /** The receipt recognition this expense was prefilled from; sent with the save so the backend links them. */
-  const receiptRecognitionId = ref<string | undefined>(undefined);
+  const receiptId = ref<string | undefined>(undefined);
 
   /**
    * Prefill the draft from a recognized receipt. Only fields the model filled are copied,
    * so a partial result never clears what the user already typed.
    */
-  const applyReceiptRecognition = (recognition: ReceiptRecognitionDto) => {
-    receiptRecognitionId.value = recognition.receiptRecognitionId;
+  const applyReceiptRecognition = (recognition: ReceiptDto) => {
+    receiptId.value = recognition.receiptId;
 
     const amount = recognition.amount === undefined ? Number.NaN : Number.parseFloat(recognition.amount);
     if (Number.isFinite(amount) && amount > 0) {
@@ -319,7 +319,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       groupId,
       icon: transaction.value.icon ?? "default",
       name: transaction.value.name,
-      receiptRecognitionId: receiptRecognitionId.value,
+      receiptId: receiptId.value,
       tags: transaction.value.tags ?? [],
       transactionId: transactionId.value,
       transactionTime: transaction.value.transactionTime ?? new Date(),
@@ -377,7 +377,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     };
     transactionId.value = undefined;
     previewPhotoBase64.value = undefined;
-    receiptRecognitionId.value = undefined;
+    receiptId.value = undefined;
     members.value = [];
     paidBy.value = undefined;
     includedMembersId.value = [];
@@ -400,7 +400,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     members,
     paidBy,
     previewPhotoBase64,
-    receiptRecognitionId,
+    receiptId,
     removeFromIncludedMembers,
     resetTransactionStore,
     saveTransaction,

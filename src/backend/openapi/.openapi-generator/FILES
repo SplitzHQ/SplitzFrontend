@@ -4,7 +4,7 @@ apis/GroupApi.ts
 apis/InvoiceApi.ts
 apis/LLMSettingsApi.ts
 apis/NotificationApi.ts
-apis/ReceiptRecognitionApi.ts
+apis/ReceiptApi.ts
 apis/SplitzBackendApi.ts
 apis/TransactionApi.ts
 apis/TransactionDraftApi.ts
@@ -48,9 +48,9 @@ docs/NotificationPriority.md
 docs/NotificationSummaryDto.md
 docs/NotificationTypeDto.md
 docs/ProblemDetails.md
-docs/ReceiptRecognitionApi.md
+docs/ReceiptApi.md
+docs/ReceiptDto.md
 docs/ReceiptRecognitionCapabilitiesDto.md
-docs/ReceiptRecognitionDto.md
 docs/ReceiptRecognitionStatus.md
 docs/RefreshRequest.md
 docs/RegisterRequest.md
@@ -110,8 +110,8 @@ models/NotificationPriority.ts
 models/NotificationSummaryDto.ts
 models/NotificationTypeDto.ts
 models/ProblemDetails.ts
+models/ReceiptDto.ts
 models/ReceiptRecognitionCapabilitiesDto.ts
-models/ReceiptRecognitionDto.ts
 models/ReceiptRecognitionStatus.ts
 models/RefreshRequest.ts
 models/RegisterRequest.ts

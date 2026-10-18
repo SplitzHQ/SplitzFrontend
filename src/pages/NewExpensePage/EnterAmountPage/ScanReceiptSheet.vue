@@ -6,7 +6,7 @@ import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
-import { ReceiptRecognitionApi, ReceiptRecognitionStatus, type ReceiptRecognitionDto } from "@/backend";
+import { ReceiptApi, ReceiptStatus, type ReceiptDto } from "@/backend";
 import config from "@/backend/config";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
@@ -17,7 +17,7 @@ import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 
 interface ScanReceiptSheetEvents {
   /** Fired with a successful recognition; the parent decides how to apply it. */
-  recognized: [recognition: ReceiptRecognitionDto];
+  recognized: [recognition: ReceiptDto];
 }
 
 /** One picked photo, kept with its preview URL until it is removed or sent. */
@@ -37,7 +37,7 @@ const emit = defineEmits<ScanReceiptSheetEvents>();
 
 const { $t } = useFluent();
 const router = useRouter();
-const api = new ReceiptRecognitionApi(config);
+const api = new ReceiptApi(config);
 
 // Availability and upload limits can change, so check them each time the sheet opens.
 const { state: capabilitiesQuery, refetch: refetchCapabilities } = useQuery({
@@ -129,7 +129,7 @@ async function recognize() {
       files: images.value.map((image) => image.file),
     });
 
-    if (recognition.status !== ReceiptRecognitionStatus.Succeeded) {
+    if (recognition.status !== ReceiptStatus.Succeeded) {
       reportError("recognizeReceipt", recognition.error);
       toast.error($t("new-expense-scan-failed"));
       return;

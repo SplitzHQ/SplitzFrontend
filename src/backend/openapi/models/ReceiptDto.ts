@@ -22,15 +22,15 @@ import {
 } from './ReceiptRecognitionStatus';
 
 /**
- * What the client receives after a recognition request, or when it fetches an old one.
+ * Receipt details returned after recognition or when fetching a stored receipt.
  * @export
- * @interface ReceiptRecognitionDto
+ * @interface ReceiptDto
  */
-export interface ReceiptRecognitionDto {
+export interface ReceiptDto {
     /**
-     * 
+     * Unique identifier of the receipt.
      */
-    receiptRecognitionId: string;
+    receiptId: string;
     /**
      * 
      */
@@ -48,7 +48,7 @@ export interface ReceiptRecognitionDto {
      */
     usedCustomProvider: boolean;
     /**
-     * Outcome of one recognition request.
+     * Recognition status of a receipt.
      */
     status: ReceiptRecognitionStatus;
     /**
@@ -100,10 +100,10 @@ export interface ReceiptRecognitionDto {
 
 
 /**
- * Check if a given object implements the ReceiptRecognitionDto interface.
+ * Check if a given object implements the ReceiptDto interface.
  */
-export function instanceOfReceiptRecognitionDto(value: object): value is ReceiptRecognitionDto {
-    if (!('receiptRecognitionId' in value) || value['receiptRecognitionId'] === undefined) return false;
+export function instanceOfReceiptDto(value: object): value is ReceiptDto {
+    if (!('receiptId' in value) || value['receiptId'] === undefined) return false;
     if (!('createTime' in value) || value['createTime'] === undefined) return false;
     if (!('model' in value) || value['model'] === undefined) return false;
     if (!('usedCustomProvider' in value) || value['usedCustomProvider'] === undefined) return false;
@@ -111,17 +111,17 @@ export function instanceOfReceiptRecognitionDto(value: object): value is Receipt
     return true;
 }
 
-export function ReceiptRecognitionDtoFromJSON(json: any): ReceiptRecognitionDto {
-    return ReceiptRecognitionDtoFromJSONTyped(json, false);
+export function ReceiptDtoFromJSON(json: any): ReceiptDto {
+    return ReceiptDtoFromJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ReceiptRecognitionDto {
+export function ReceiptDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ReceiptDto {
     if (json == null) {
         return json;
     }
     return {
         
-        'receiptRecognitionId': json['receiptRecognitionId'],
+        'receiptId': json['receiptId'],
         'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
         'images': json['images'] == null ? undefined : json['images'],
         'model': json['model'],
@@ -141,18 +141,18 @@ export function ReceiptRecognitionDtoFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function ReceiptRecognitionDtoToJSON(json: any): ReceiptRecognitionDto {
-    return ReceiptRecognitionDtoToJSONTyped(json, false);
+export function ReceiptDtoToJSON(json: any): ReceiptDto {
+    return ReceiptDtoToJSONTyped(json, false);
 }
 
-export function ReceiptRecognitionDtoToJSONTyped(value?: ReceiptRecognitionDto | null, ignoreDiscriminator: boolean = false): any {
+export function ReceiptDtoToJSONTyped(value?: ReceiptDto | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'receiptRecognitionId': value['receiptRecognitionId'],
+        'receiptId': value['receiptId'],
         'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
         'images': value['images'],
         'model': value['model'],

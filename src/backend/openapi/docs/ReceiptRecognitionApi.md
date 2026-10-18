@@ -12,7 +12,7 @@ All URIs are relative to *http://localhost*
 
 ## getReceiptRecognition
 
-> ReceiptRecognitionDto getReceiptRecognition(id)
+> ReceiptDto getReceiptRecognition(id)
 
 Get one of the current user\&#39;s recognitions.
 
@@ -59,7 +59,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**ReceiptRecognitionDto**](ReceiptRecognitionDto.md)
+[**ReceiptDto**](ReceiptDto.md)
 
 ### Authorization
 
@@ -145,7 +145,7 @@ This endpoint does not need any parameter.
 
 ## recognizeReceipt
 
-> ReceiptRecognitionDto recognizeReceipt(files, categories)
+> ReceiptDto recognizeReceipt(files, categories)
 
 Recognize an expense from one or more photos of the same receipt.  The images and the model reply are kept; the parsed fields are returned for the client to prefill.  A model failure is reported in the body with status &#x60;Failed&#x60;, not as an HTTP error.
 
@@ -195,7 +195,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**ReceiptRecognitionDto**](ReceiptRecognitionDto.md)
+[**ReceiptDto**](ReceiptDto.md)
 
 ### Authorization
 

@@ -2,20 +2,15 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
-import type {
-  ReceiptRecognitionApi,
-  ReceiptRecognitionCapabilitiesDto,
-  ReceiptRecognitionDto,
-  RecognizeReceiptRequest,
-} from "@/backend";
+import type { ReceiptApi, ReceiptRecognitionCapabilitiesDto, ReceiptDto, RecognizeReceiptRequest } from "@/backend";
 import { ResponseError } from "@/backend/openapi";
 
 import ScanReceiptSheet from "../ScanReceiptSheet.vue";
 
 const mocks = vi.hoisted(() => ({
   api: {
-    getReceiptRecognitionCapabilities: vi.fn<ReceiptRecognitionApi["getReceiptRecognitionCapabilities"]>(),
-    recognizeReceipt: vi.fn<(request: RecognizeReceiptRequest) => Promise<ReceiptRecognitionDto>>(),
+    getReceiptRecognitionCapabilities: vi.fn<ReceiptApi["getReceiptRecognitionCapabilities"]>(),
+    recognizeReceipt: vi.fn<(request: RecognizeReceiptRequest) => Promise<ReceiptDto>>(),
   },
   capabilities: { value: { data: undefined as ReceiptRecognitionCapabilitiesDto | undefined, status: "success" } },
   push: vi.fn(),
@@ -25,11 +20,11 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/backend", () => ({
-  ReceiptRecognitionApi: class {
+  ReceiptApi: class {
     getReceiptRecognitionCapabilities = mocks.api.getReceiptRecognitionCapabilities;
     recognizeReceipt = mocks.api.recognizeReceipt;
   },
-  ReceiptRecognitionStatus: { Failed: "Failed", Pending: "Pending", Succeeded: "Succeeded" },
+  ReceiptStatus: { Failed: "Failed", Pending: "Pending", Succeeded: "Succeeded" },
 }));
 vi.mock("@/backend/config", () => ({ default: {} }));
 vi.mock("@pinia/colada", () => ({
@@ -54,14 +49,14 @@ const availableCapabilities: ReceiptRecognitionCapabilitiesDto = {
   maxImages: 2,
 };
 
-const succeeded: ReceiptRecognitionDto = {
+const succeeded: ReceiptDto = {
   amount: "12.50",
   createTime: new Date(),
   currency: "USD",
   images: ["receipts/u1/r1/1.webp"],
   model: "vision-1",
   name: "Blue Bottle",
-  receiptRecognitionId: "r1",
+  receiptId: "r1",
   status: "Succeeded",
   usedCustomProvider: true,
 };

@@ -6,7 +6,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { toast } from "vue-sonner";
 
-import type { ReceiptRecognitionDto } from "@/backend";
+import type { ReceiptDto } from "@/backend";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Keyboard from "@/components/Keyboard/Keyboard.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -18,7 +18,7 @@ import ScanReceiptSheet from "./ScanReceiptSheet.vue";
 
 const { $t } = useFluent();
 const transactionStore = useTransactionStore();
-const { transaction, previewPhotoBase64, receiptRecognitionId } = storeToRefs(transactionStore);
+const { transaction, previewPhotoBase64, receiptId } = storeToRefs(transactionStore);
 
 const showScanSheet = ref(false);
 
@@ -35,7 +35,7 @@ const formattedAmount = computed(() => {
 });
 
 /** Copy the recognized fields into the draft and tell the user to check them. */
-function handleRecognized(recognition: ReceiptRecognitionDto) {
+function handleRecognized(recognition: ReceiptDto) {
   transactionStore.applyReceiptRecognition(recognition);
   toast.success($t("new-expense-scan-applied"));
 }
@@ -76,7 +76,7 @@ function handleRecognized(recognition: ReceiptRecognitionDto) {
           </div>
           <Transition name="receipt-hint">
             <div
-              v-if="receiptRecognitionId"
+              v-if="receiptId"
               class="flex items-center gap-2 rounded-full bg-util-alpha-black-5 py-1 pr-3 pl-1"
               data-test="scan-applied"
             >

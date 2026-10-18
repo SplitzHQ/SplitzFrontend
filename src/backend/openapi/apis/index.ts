@@ -6,7 +6,7 @@ export * from './GroupApi';
 export * from './InvoiceApi';
 export * from './LLMSettingsApi';
 export * from './NotificationApi';
-export * from './ReceiptRecognitionApi';
+export * from './ReceiptApi';
 export * from './SplitzBackendApi';
 export * from './TransactionApi';
 export * from './TransactionDraftApi';

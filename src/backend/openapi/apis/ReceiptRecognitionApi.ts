@@ -19,15 +19,15 @@ import {
     ProblemDetailsToJSON,
 } from '../models/ProblemDetails';
 import {
+    type ReceiptDto,
+    ReceiptDtoFromJSON,
+    ReceiptDtoToJSON,
+} from '../models/ReceiptDto';
+import {
     type ReceiptRecognitionCapabilitiesDto,
     ReceiptRecognitionCapabilitiesDtoFromJSON,
     ReceiptRecognitionCapabilitiesDtoToJSON,
 } from '../models/ReceiptRecognitionCapabilitiesDto';
-import {
-    type ReceiptRecognitionDto,
-    ReceiptRecognitionDtoFromJSON,
-    ReceiptRecognitionDtoToJSON,
-} from '../models/ReceiptRecognitionDto';
 
 export interface GetReceiptRecognitionRequest {
     /**
@@ -90,17 +90,17 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
     /**
      * Get one of the current user\'s recognitions.
      */
-    async getReceiptRecognitionRaw(requestParameters: GetReceiptRecognitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptRecognitionDto>> {
+    async getReceiptRecognitionRaw(requestParameters: GetReceiptRecognitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptDto>> {
         const requestOptions = await this.getReceiptRecognitionRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptRecognitionDtoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptDtoFromJSON(jsonValue));
     }
 
     /**
      * Get one of the current user\'s recognitions.
      */
-    async getReceiptRecognition(requestParameters: GetReceiptRecognitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionDto> {
+    async getReceiptRecognition(requestParameters: GetReceiptRecognitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptDto> {
         const response = await this.getReceiptRecognitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -216,17 +216,17 @@ export class ReceiptRecognitionApi extends runtime.BaseAPI {
     /**
      * Recognize an expense from one or more photos of the same receipt.  The images and the model reply are kept; the parsed fields are returned for the client to prefill.  A model failure is reported in the body with status `Failed`, not as an HTTP error.
      */
-    async recognizeReceiptRaw(requestParameters: RecognizeReceiptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptRecognitionDto>> {
+    async recognizeReceiptRaw(requestParameters: RecognizeReceiptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ReceiptDto>> {
         const requestOptions = await this.recognizeReceiptRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptRecognitionDtoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ReceiptDtoFromJSON(jsonValue));
     }
 
     /**
      * Recognize an expense from one or more photos of the same receipt.  The images and the model reply are kept; the parsed fields are returned for the client to prefill.  A model failure is reported in the body with status `Failed`, not as an HTTP error.
      */
-    async recognizeReceipt(requestParameters: RecognizeReceiptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptRecognitionDto> {
+    async recognizeReceipt(requestParameters: RecognizeReceiptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ReceiptDto> {
         const response = await this.recognizeReceiptRaw(requestParameters, initOverrides);
         return await response.value();
     }

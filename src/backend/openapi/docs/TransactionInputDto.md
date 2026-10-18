@@ -17,7 +17,7 @@ Name | Type
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `geoCoordinate` | string
 `balances` | [Array&lt;TransactionBalanceInputDto&gt;](TransactionBalanceInputDto.md)
-`receiptRecognitionId` | string
+`receiptId` | string
 
 ## Example
 
@@ -37,7 +37,7 @@ const example = {
   "tags": null,
   "geoCoordinate": null,
   "balances": null,
-  "receiptRecognitionId": null,
+  "receiptId": null,
 } satisfies TransactionInputDto
 
 console.log(example)
