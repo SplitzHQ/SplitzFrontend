@@ -59,3 +59,24 @@ new-expense-review-error-receipt-too-large = 图片大小需小于 { $maxMb }MB
 
 new-expense-review-actions-select-category = 选择类别
 new-expense-review-category-search-placeholder = 搜索
+
+new-expense-scan-button = 扫描收据
+new-expense-scan-title = 扫描收据
+new-expense-scan-intro = 添加同一张收据的一张或多张照片。金额、币种、名称、类别和日期会自动填好，请在继续前核对。
+new-expense-scan-loading = 正在检查是否可用…
+new-expense-scan-add-gallery = 相册
+new-expense-scan-add-camera = 相机
+new-expense-scan-remove-image = 移除图片
+new-expense-scan-count = { $count } / { $max } 张图片
+new-expense-scan-too-many = 最多可添加 { $max } 张图片
+new-expense-scan-recognize = 识别收据
+new-expense-scan-recognizing = 正在识别…
+new-expense-scan-applied = 已根据收据填写。继续前请核对信息。
+new-expense-scan-from-receipt = 来自收据：{ $name }
+new-expense-scan-failed = 无法识别这张收据，请换一张更清晰的照片。
+new-expense-scan-error = 识别收据时出错，请重试。
+new-expense-scan-rate-limit = 扫描过于频繁。请在 { $seconds } 秒后重试。
+new-expense-scan-unavailable = 尚未设置收据扫描。请在个人资料中添加你自己的模型服务后使用。
+new-expense-scan-unavailable-fixed = 此服务器不提供收据扫描。
+new-expense-scan-open-settings = 设置模型服务
+new-expense-scan-privacy = 照片会发送给所配置的模型服务，并随此笔费用一起保存。

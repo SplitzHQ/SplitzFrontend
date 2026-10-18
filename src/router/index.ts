@@ -102,6 +102,11 @@ const router = createRouter({
       path: "/group/:groupId/notifications",
     },
     {
+      component: () => import("@/pages/ReceiptRecognitionSettingsPage/ReceiptRecognitionSettingsPage.vue"),
+      name: "receiptRecognitionSettings",
+      path: "/profile/receipt-recognition",
+    },
+    {
       name: "settleUp",
       path: "/group/:groupId/settle-up",
       redirect: (to) => `/group/${to.params.groupId as string}/settle-up/select-transactions`,

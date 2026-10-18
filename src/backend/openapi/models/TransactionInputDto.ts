@@ -78,6 +78,10 @@ export interface TransactionInputDto {
      * 
      */
     balances?: Array<TransactionBalanceInputDto>;
+    /**
+     * Receipt to link to this expense, if one was recognized.
+     */
+    receiptId?: string | null;
 }
 
 /**
@@ -116,6 +120,7 @@ export function TransactionInputDtoFromJSONTyped(json: any, ignoreDiscriminator:
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionBalanceInputDtoFromJSON)),
+        'receiptId': json['receiptId'] === undefined ? undefined : json['receiptId'] === null ? null : json['receiptId'],
     };
 }
 
@@ -141,6 +146,7 @@ export function TransactionInputDtoToJSONTyped(value?: TransactionInputDto | nul
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         'geoCoordinate': value['geoCoordinate'],
         'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(TransactionBalanceInputDtoToJSON)),
+        'receiptId': value['receiptId'],
     };
 }
 
