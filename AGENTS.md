@@ -17,3 +17,5 @@
 - Add animations where appropriate. Check `ui-animation` skill.
 
 - Run format and test after code changes.
+
+- When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.

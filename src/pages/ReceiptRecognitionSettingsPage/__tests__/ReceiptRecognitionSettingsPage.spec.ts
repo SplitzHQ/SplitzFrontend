@@ -56,7 +56,7 @@ describe("ReceiptRecognitionSettingsPage", () => {
     vi.clearAllMocks();
     mocks.refetch.mockResolvedValue(undefined);
     mocks.api.getLLMSettings.mockResolvedValue(storedSettings);
-    mocks.settings = ref({ data: storedSettings, status: "success" }) as typeof mocks.settings;
+    mocks.settings = ref({ data: storedSettings, status: "success" });
   });
 
   it("saves the stored provider again without sending a key when the field is blank", async () => {
@@ -108,7 +108,7 @@ describe("ReceiptRecognitionSettingsPage", () => {
     mocks.settings = ref({
       data: { ...storedSettings, available: false, customProviderAllowed: false },
       status: "success",
-    }) as typeof mocks.settings;
+    });
     const locked = mountPage();
 
     expect(locked.find("form").exists()).toBe(false);

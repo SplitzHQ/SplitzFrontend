@@ -99,7 +99,7 @@ describe("useTransactionStore receipt recognition", () => {
     await store.saveTransaction();
 
     expect(transactionApiMock.addTransaction).toHaveBeenCalledTimes(1);
-    const transactionInputDto = transactionApiMock.addTransaction.mock.calls[0]![0].transactionInputDto!;
+    const transactionInputDto = transactionApiMock.addTransaction.mock.calls[0][0].transactionInputDto!;
     expect(transactionInputDto.receiptId).toBe(recognition.receiptId);
     expect(transactionInputDto.transactionTime).toEqual(recognition.transactionTime);
     expect(transactionInputDto.amount).toBe("12.50");

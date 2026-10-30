@@ -66,7 +66,7 @@ describe("ScanReceiptSheet", () => {
     vi.clearAllMocks();
     mocks.refetch.mockResolvedValue(undefined);
     mocks.api.getReceiptRecognitionCapabilities.mockResolvedValue(availableCapabilities);
-    mocks.capabilities = ref({ data: availableCapabilities, status: "success" }) as typeof mocks.capabilities;
+    mocks.capabilities = ref({ data: availableCapabilities, status: "success" });
     Object.defineProperty(URL, "createObjectURL", { configurable: true, value: vi.fn(() => "blob:preview") });
     Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: vi.fn() });
   });
@@ -102,7 +102,7 @@ describe("ScanReceiptSheet", () => {
     await flushPromises();
 
     expect(mocks.api.recognizeReceipt).toHaveBeenCalledTimes(1);
-    const request = mocks.api.recognizeReceipt.mock.calls[0]![0];
+    const request = mocks.api.recognizeReceipt.mock.calls[0][0];
     expect(request.files).toEqual([first, second]);
     expect(request.categories).toContain("dining_out");
     expect(wrapper.emitted("recognized")).toEqual([[succeeded]]);
@@ -166,7 +166,7 @@ describe("ScanReceiptSheet", () => {
     mocks.capabilities = ref({
       data: { ...availableCapabilities, available: false, customProviderAllowed: false },
       status: "success",
-    }) as typeof mocks.capabilities;
+    });
     const wrapper = mountSheet();
 
     expect(wrapper.get('[data-test="scan-unavailable"]').text()).toContain("new-expense-scan-unavailable-fixed");
@@ -179,7 +179,7 @@ describe("ScanReceiptSheet", () => {
     mocks.capabilities = ref({
       data: { ...availableCapabilities, available: false },
       status: "success",
-    }) as typeof mocks.capabilities;
+    });
     const wrapper = mountSheet();
 
     expect(wrapper.find('[data-test="scan-unavailable"]').exists()).toBe(true);

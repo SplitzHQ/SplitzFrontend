@@ -7,8 +7,9 @@ categories-cafe = Cafe
 categories-takeout_delivery = Takeout & delivery
 categories-meal_kit = Meal kit
 categories-other_food = Other food
-categories-public_transport = Public transport
-categories-taxi_ride_hailing = Taxi / ride hailing
+
+categories-public_transport = Public transit
+categories-taxi_ride_hailing = Taxi & rideshare
 categories-fuel = Fuel
 categories-parking = Parking
 categories-vehicle_maintenance = Vehicle maintenance
@@ -16,6 +17,7 @@ categories-vehicle_purchase = Vehicle purchase
 categories-tolls = Tolls
 categories-bike_share = Bike share
 categories-other_transport = Other transport
+
 categories-movies = Movies
 categories-music = Music
 categories-events_concerts = Events & concerts
@@ -25,104 +27,120 @@ categories-nightlife = Nightlife
 categories-hobbies = Hobbies
 categories-books_media = Books & media
 categories-other_entertainment = Other entertainment
-categories-rent_mortgage = Rent / mortgage
+
+categories-rent_mortgage = Rent & mortgage
 categories-maintenance_repairs = Maintenance & repairs
 categories-furnishings = Furnishings
 categories-cleaning_supplies = Cleaning supplies
 categories-home_improvement = Home improvement
 categories-home_security = Home security
-categories-hoa = HOA dues
+categories-hoa = HOA fees
 categories-other_home = Other home
+
 categories-electricity = Electricity
 categories-water = Water
-categories-gas_utility = Gas (utility)
+categories-gas_utility = Gas
 categories-internet = Internet
 categories-mobile_phone = Mobile phone
 categories-trash_recycling = Trash & recycling
 categories-tv_streaming = TV & streaming
 categories-other_bills = Other bills
+
 categories-flights = Flights
 categories-lodging = Lodging
 categories-local_transport = Local transport
-categories-travel_food = Travel food
+categories-travel_food = Travel dining
 categories-activities_tours = Activities & tours
 categories-travel_insurance = Travel insurance
 categories-visa_fees = Visa fees
 categories-other_travel = Other travel
+
 categories-clothing = Clothing
 categories-electronics = Electronics
 categories-household_goods = Household goods
 categories-appliances = Appliances
 categories-office_supplies = Office supplies
 categories-other_shopping = Other shopping
+
 categories-pharmacy = Pharmacy
 categories-doctor = Doctor
 categories-dentist = Dentist
 categories-hospital = Hospital
-categories-vision = Vision
+categories-vision = Eye care
 categories-mental_health = Mental health
 categories-other_health = Other health
-categories-hair = Hair
+
+categories-hair = Haircut & salon
 categories-spa = Spa
 categories-cosmetics = Cosmetics
 categories-grooming = Grooming
 categories-laundry_dry_cleaning = Laundry & dry cleaning
 categories-other_personal_care = Other personal care
+
 categories-tuition = Tuition
 categories-courses = Courses
 categories-books = Books
 categories-supplies = Supplies
 categories-student_fees = Student fees
 categories-other_education = Other education
+
 categories-gifts = Gifts
 categories-charity = Charity
 categories-celebrations = Celebrations
 categories-other_gifts_donations = Other gifts & donations
+
 categories-childcare = Childcare
 categories-school_supplies = School supplies
 categories-toys = Toys
-categories-clothing_kids = Clothing (kids)
+categories-clothing_kids = Kids' clothing
 categories-activities_lessons = Activities & lessons
 categories-other_kids = Other kids
+
 categories-pet_food = Pet food
 categories-vet = Vet
-categories-grooming_pets = Grooming (pets)
-categories-boarding = Boarding
+categories-grooming_pets = Pet grooming
+categories-boarding = Pet boarding
 categories-pet_supplies = Pet supplies
 categories-other_pets = Other pets
+
 categories-gym = Gym
-categories-sports_equipment = Sports equipment
+categories-sports_equipment = Sports gear
 categories-fitness_classes = Fitness classes
 categories-outdoor_activities = Outdoor activities
 categories-other_sports_fitness = Other sports & fitness
+
 categories-health_insurance = Health insurance
 categories-car_insurance = Car insurance
 categories-home_insurance = Home insurance
 categories-life_insurance = Life insurance
-categories-travel_insurance_premium = Travel insurance premium
+categories-travel_insurance_premium = Travel insurance
 categories-other_insurance = Other insurance
+
 categories-income_tax = Income tax
 categories-property_tax = Property tax
 categories-sales_tax = Sales tax
 categories-other_taxes = Other taxes
+
 categories-bank_fees = Bank fees
 categories-late_fees = Late fees
 categories-service_fees = Service fees
 categories-atm_fees = ATM fees
 categories-platform_fees = Platform fees
 categories-other_fees_charges = Other fees & charges
+
 categories-loan_payment = Loan payment
 categories-credit_card_payment = Credit card payment
 categories-other_debt = Other debt
+
 categories-uncategorized = Uncategorized
-categories-other_misc = Other misc
+categories-other_misc = Other
 
 main_categories = Main categories
-main_categories-food = Food & Drink
+main_categories-food = Food & drink
 main_categories-transport = Transport
 main_categories-entertainment = Entertainment
 main_categories-home = Home
-main_categories-bills = Utilities
+main_categories-bills = Bills & utilities
 main_categories-travel = Travel
 main_categories-shopping = Shopping
 main_categories-health = Health
