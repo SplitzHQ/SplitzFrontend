@@ -100,7 +100,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-primary;
+    @apply border border-base-border-primary bg-base-bg-primary;
   }
 }
 
@@ -168,7 +168,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-error;
+    @apply border border-base-border-error bg-base-bg-primary;
   }
 }
 
@@ -236,7 +236,7 @@ const { color, variant, size, disabled, loading, iconOnly } = defineProps<Button
   }
 
   &.outline {
-    @apply border border-base-border-brand;
+    @apply border border-base-border-brand bg-base-bg-primary;
   }
 }
 
