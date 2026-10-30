@@ -33,7 +33,7 @@ const formattedAmount = computed(() => {
 });
 
 /** Copy the recognized fields into the draft and tell the user to check them. */
-function handleRecognized(recognition: ReceiptDto) {
+function applyReceiptToTxn(recognition: ReceiptDto) {
   transactionStore.applyReceiptRecognition(recognition);
   toast.success($t("new-expense-scan-applied"));
 }
@@ -97,7 +97,7 @@ function handleRecognized(recognition: ReceiptDto) {
             {{ $t("new-expense-actions-next") }}
           </SLinkButton>
         </div>
-        <ScanReceiptSheet v-model="showScanSheet" @recognized="handleRecognized" />
+        <ScanReceiptSheet v-model="showScanSheet" @recognized="applyReceiptToTxn" />
       </div>
     </template>
   </Layout>

@@ -32,7 +32,7 @@ const MAX_FILE_MB = 15;
 const DEFAULT_MAX_IMAGES = 6;
 
 // v-model from parent controls visibility
-const model = defineModel<boolean>({ required: true });
+const isOpen = defineModel<boolean>({ required: true });
 const emit = defineEmits<ScanReceiptSheetEvents>();
 
 const { $t } = useFluent();
@@ -45,11 +45,11 @@ const { state: capabilitiesQuery, refetch: refetchCapabilities } = useQuery({
   query: () => api.getReceiptRecognitionCapabilities(),
 });
 const capabilitiesLoading = computed(() => capabilitiesQuery.value.status === "pending");
-const available = computed(() => capabilitiesQuery.value.data?.available ?? false);
+const recognitionAvailable = computed(() => capabilitiesQuery.value.data?.available ?? false);
 const customProviderAllowed = computed(() => capabilitiesQuery.value.data?.customProviderAllowed ?? false);
 const maxImages = computed(() => capabilitiesQuery.value.data?.maxImages ?? DEFAULT_MAX_IMAGES);
 
-watch(model, (open) => {
+watch(isOpen, (open) => {
   if (open) void refetchCapabilities();
 });
 
@@ -62,7 +62,7 @@ const recognizing = ref(false);
 const cooldown = useRateLimitCooldown();
 const controlsDisabled = computed(() => recognizing.value || cooldown.isActive.value);
 const canAddMore = computed(() => images.value.length < maxImages.value);
-const canRecognize = computed(() => images.value.length > 0 && available.value && !controlsDisabled.value);
+const canRecognize = computed(() => images.value.length > 0 && recognitionAvailable.value && !controlsDisabled.value);
 
 function triggerCamera() {
   cameraInput.value?.click();
@@ -137,7 +137,7 @@ async function recognize() {
 
     emit("recognized", recognition);
     clearImages();
-    model.value = false;
+    isOpen.value = false;
   } catch (error) {
     if (!cooldown.startFromError(error)) {
       reportError("recognizeReceipt", error);
@@ -149,13 +149,13 @@ async function recognize() {
 }
 
 function openSettings() {
-  model.value = false;
+  isOpen.value = false;
   void router.push({ name: "receiptRecognitionSettings" });
 }
 </script>
 
 <template>
-  <Sheet v-model="model" detent="large" show-close-button>
+  <Sheet v-model="isOpen" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
       <div class="flex flex-col gap-1">
         <h2 class="text-lg font-medium text-base-text-primary">{{ $t("new-expense-scan-title") }}</h2>
@@ -167,7 +167,7 @@ function openSettings() {
       </p>
 
       <div
-        v-else-if="!available"
+        v-else-if="!recognitionAvailable"
         class="flex flex-col gap-3 rounded-2xl bg-util-alpha-black-5 p-4"
         data-test="scan-unavailable"
       >
