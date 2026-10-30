@@ -2,7 +2,9 @@ apis/AccountApi.ts
 apis/AccountEmailApi.ts
 apis/GroupApi.ts
 apis/InvoiceApi.ts
+apis/LLMSettingsApi.ts
 apis/NotificationApi.ts
+apis/ReceiptApi.ts
 apis/SplitzBackendApi.ts
 apis/TransactionApi.ts
 apis/TransactionDraftApi.ts
@@ -33,6 +35,9 @@ docs/InvoiceReducedDto.md
 docs/InvoiceSettlementDto.md
 docs/InvoiceSettlementInputDto.md
 docs/InvoiceStatus.md
+docs/LLMSettingsApi.md
+docs/LLMSettingsDto.md
+docs/LLMSettingsInputDto.md
 docs/LoginRequest.md
 docs/NotificationApi.md
 docs/NotificationCategory.md
@@ -43,6 +48,10 @@ docs/NotificationPriority.md
 docs/NotificationSummaryDto.md
 docs/NotificationTypeDto.md
 docs/ProblemDetails.md
+docs/ReceiptApi.md
+docs/ReceiptDto.md
+docs/ReceiptRecognitionCapabilitiesDto.md
+docs/ReceiptRecognitionStatus.md
 docs/RefreshRequest.md
 docs/RegisterRequest.md
 docs/RequestStatus.md
@@ -90,6 +99,8 @@ models/InvoiceReducedDto.ts
 models/InvoiceSettlementDto.ts
 models/InvoiceSettlementInputDto.ts
 models/InvoiceStatus.ts
+models/LLMSettingsDto.ts
+models/LLMSettingsInputDto.ts
 models/LoginRequest.ts
 models/NotificationCategory.ts
 models/NotificationDto.ts
@@ -99,6 +110,9 @@ models/NotificationPriority.ts
 models/NotificationSummaryDto.ts
 models/NotificationTypeDto.ts
 models/ProblemDetails.ts
+models/ReceiptDto.ts
+models/ReceiptRecognitionCapabilitiesDto.ts
+models/ReceiptRecognitionStatus.ts
 models/RefreshRequest.ts
 models/RegisterRequest.ts
 models/RequestStatus.ts

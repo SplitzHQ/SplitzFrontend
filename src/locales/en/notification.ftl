@@ -1,26 +1,28 @@
 ## Bell / panel
 notification-title = Notifications
 notification-open = Open notifications
-notification-unread-count = { $count ->
-    [one] { $count } unread notification
-   *[other] { $count } unread notifications
-}
+notification-unread-count =
+    { $count ->
+        [one] { $count } unread notification
+       *[other] { $count } unread notifications
+    }
 notification-mark-all-read = Mark all read
 notification-clear-all = Clear all
 notification-dismiss = Dismiss
 notification-empty-title = You're all caught up
 notification-empty-hint = Activity from your groups will show up here.
-notification-error = Could not load notifications.
+notification-error = Couldn't load notifications.
 notification-retry = Retry
 notification-settings = Notification settings
 notification-close = Close
 
 ## Requests
 notification-requests-title = Requests
-notification-requests-badge = { $count ->
-    [one] { $count } pending request
-   *[other] { $count } pending requests
-}
+notification-requests-badge =
+    { $count ->
+        [one] { $count } pending request
+       *[other] { $count } pending requests
+    }
 notification-accept = Accept
 notification-ignore = Ignore
 notification-friend-request-title = Friend request
@@ -45,72 +47,74 @@ notification-invoice-created-title = New invoice in { $group }
 notification-invoice-created-body = { $creator } created { $invoice }.
 notification-related-invoice-created-title = You're on a new invoice
 notification-related-invoice-created-body = { $creator } created { $invoice } in { $group }.
-notification-settlement-recorded-title = Settlement recorded in { $group }
-notification-settlement-recorded-body = { $recorder } recorded { $from } paid { $to } { $amount }.
-notification-related-settlement-recorded-title = A payment involving you was recorded
-notification-related-settlement-recorded-body = { $recorder } recorded { $from } paid { $to } { $amount } on { $invoice }.
+notification-settlement-recorded-title = Payment recorded in { $group }
+notification-settlement-recorded-body = { $recorder } recorded that { $from } paid { $to } { $amount }.
+notification-related-settlement-recorded-title = Payment recorded
+notification-related-settlement-recorded-body = { $recorder } recorded that { $from } paid { $to } { $amount } on { $invoice }.
 notification-invoice-settled-title = Invoice settled in { $group }
-notification-invoice-settled-body = { $invoice } is fully settled.
+notification-invoice-settled-body = { $invoice } is settled up.
 notification-related-invoice-settled-title = Your invoice is settled
-notification-related-invoice-settled-body = { $invoice } in { $group } is fully settled.
+notification-related-invoice-settled-body = { $invoice } in { $group } is settled up.
 notification-invoice-unnamed = Untitled invoice
 notification-someone = Someone
 
 ## Settings page
 notification-settings-title = Notifications
 notification-settings-group-title = Group notifications
-notification-settings-intro = Choose which activity you want to hear about. Friend requests and group invites are always delivered.
-notification-settings-group-intro = Settings here override your global settings for { $group } only.
-notification-settings-follow-global = Follows global setting
+notification-settings-intro = Choose which activity you want to hear about. Friend requests and group invites are always sent.
+notification-settings-group-intro = These settings apply only to { $group } and override your global preferences.
+notification-settings-follow-global = Uses global setting
 notification-settings-reset-group = Use global settings
-notification-settings-reset-group-success = Group notifications now follow your global settings
+notification-settings-reset-group-success = Group notifications now use your global settings
 notification-settings-saved = Saved
-notification-settings-error = Could not save. Try again.
+notification-settings-error = Couldn't save changes. Try again.
 notification-settings-loading = Loading…
 
 notification-settings-section-friends = Friends
 notification-settings-section-transactions = Expenses
 notification-settings-section-invoices = Invoices
-notification-settings-section-settlements = Settlements
+notification-settings-section-settlements = Payments
 notification-settings-section-invoice-settled = Settled invoices
 
 notification-type-FriendRequestAccepted = Friend request accepted
 notification-type-FriendRequestAccepted-hint = When someone accepts your friend request
 notification-type-TransactionCreated = Other expenses in my groups
-notification-type-TransactionCreated-hint = Expenses you are not part of
+notification-type-TransactionCreated-hint = Expenses you aren't part of
 notification-type-RelatedTransactionCreated = Expenses I'm part of
-notification-type-RelatedTransactionCreated-hint = Expenses where you paid or owe something
+notification-type-RelatedTransactionCreated-hint = Expenses where you paid or owe a share
 notification-type-InvoiceCreated = Other invoices in my groups
-notification-type-InvoiceCreated-hint = Invoices that do not include you
+notification-type-InvoiceCreated-hint = Invoices that don't include you
 notification-type-RelatedInvoiceCreated = Invoices that include me
 notification-type-RelatedInvoiceCreated-hint = Invoices where you owe or are owed
-notification-type-SettlementRecorded = Other settlements in my groups
+notification-type-SettlementRecorded = Other payments in my groups
 notification-type-SettlementRecorded-hint = Payments between other members
-notification-type-RelatedSettlementRecorded = Settlements involving me
+notification-type-RelatedSettlementRecorded = Payments involving me
 notification-type-RelatedSettlementRecorded-hint = Payments you made or received
 notification-type-InvoiceSettled = Other invoices settled
-notification-type-InvoiceSettled-hint = Invoices that do not include you
+notification-type-InvoiceSettled-hint = Invoices that don't include you
 notification-type-RelatedInvoiceSettled = My invoices settled
 notification-type-RelatedInvoiceSettled-hint = Invoices where you owed or were owed
 
 ## Group settings / invites
 group-settings-title = Group settings
 group-settings-invite = Invite friends
-group-settings-invite-hint = Friends join after they accept
+group-settings-invite-hint = Friends join once they accept
 group-settings-notifications = Notifications
-group-settings-notifications-hint = Choose what this group tells you about
+group-settings-notifications-hint = Choose which updates you get from this group
 group-invite-title = Invite friends
 group-invite-empty = All your friends are already in this group.
 group-invite-no-friends = Add friends from your profile first.
 group-invite-pending = Invited
-group-invite-submit = { $count ->
-    [0] Send invites
-    [one] Send { $count } invite
-   *[other] Send { $count } invites
-}
-group-invite-success = { $count ->
-    [one] Invite sent
-   *[other] { $count } invites sent
-}
-group-invite-error = Could not send invites. Try again.
-group-invite-pending-title = Waiting for a reply
+group-invite-submit =
+    { $count ->
+        [0] Send invites
+        [one] Send { $count } invite
+       *[other] Send { $count } invites
+    }
+group-invite-success =
+    { $count ->
+        [one] Invite sent
+       *[other] { $count } invites sent
+    }
+group-invite-error = Couldn't send invites. Try again.
+group-invite-pending-title = Pending invites
