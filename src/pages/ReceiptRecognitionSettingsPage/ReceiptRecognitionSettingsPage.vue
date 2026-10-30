@@ -25,7 +25,7 @@ const settings = computed(() => settingsQuery.value.data);
 const loading = computed(() => settingsQuery.value.status === "pending");
 
 // Form state. The key field starts empty on purpose: the server never returns the stored key.
-const enabled = ref(false);
+const customProviderEnabled = ref(false);
 const endpoint = ref("");
 const modelName = ref("");
 const apiKey = ref("");
@@ -34,7 +34,7 @@ watch(
   settings,
   (next) => {
     if (!next) return;
-    enabled.value = next.customProviderEnabled;
+    customProviderEnabled.value = next.customProviderEnabled;
     endpoint.value = next.endpoint ?? "";
     modelName.value = next.model ?? "";
     apiKey.value = "";
@@ -48,13 +48,19 @@ const busy = computed(() => saving.value || removing.value);
 
 /** True once anything about a custom provider is stored, so the remove button has something to do. */
 const hasStoredProvider = computed(() => {
-  const current = settings.value;
-  return !!current && (current.customProviderEnabled || !!current.endpoint || !!current.model || current.hasApiKey);
+  const settingsValue = settings.value;
+  return (
+    !!settingsValue &&
+    (settingsValue.customProviderEnabled ||
+      !!settingsValue.endpoint ||
+      !!settingsValue.model ||
+      settingsValue.hasApiKey)
+  );
 });
 
 /** When the provider is on, the endpoint, model and a key (new or stored) are all required. */
 const canSave = computed(() => {
-  if (!enabled.value) return true;
+  if (!customProviderEnabled.value) return true;
   const hasKey = apiKey.value.trim().length > 0 || (settings.value?.hasApiKey ?? false);
   return endpoint.value.trim().length > 0 && modelName.value.trim().length > 0 && hasKey;
 });
@@ -67,7 +73,7 @@ async function save() {
     await api.updateLLMSettings({
       lLMSettingsInputDto: {
         apiKey: apiKey.value.trim() || null,
-        enabled: enabled.value,
+        enabled: customProviderEnabled.value,
         endpoint: endpoint.value.trim() || null,
         model: modelName.value.trim() || null,
       },
@@ -173,7 +179,7 @@ async function remove() {
                   <p class="text-xs text-base-text-quaternary">{{ $t("receipt-recognition-custom-hint") }}</p>
                 </div>
                 <SSwitch
-                  v-model="enabled"
+                  v-model="customProviderEnabled"
                   :disabled="busy"
                   :label="$t('receipt-recognition-custom-toggle')"
                   data-test="custom-toggle"
@@ -181,7 +187,7 @@ async function remove() {
               </div>
 
               <Transition name="fields">
-                <div v-if="enabled" class="flex flex-col gap-4 px-1" data-test="custom-fields">
+                <div v-if="customProviderEnabled" class="flex flex-col gap-4 px-1" data-test="custom-fields">
                   <TextInput
                     id="receipt-endpoint"
                     v-model="endpoint"
