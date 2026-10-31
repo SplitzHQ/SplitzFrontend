@@ -27,6 +27,11 @@ const router = createRouter({
       path: "/group/:groupId/transaction/:transactionId",
     },
     {
+      component: () => import("@/pages/InvoiceDetailPage/InvoiceDetailPage.vue"),
+      name: "invoiceDetail",
+      path: "/group/:groupId/invoice/:invoiceId",
+    },
+    {
       component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue"),
       name: "joinGroup",
       path: "/group/join/:joinLinkId",

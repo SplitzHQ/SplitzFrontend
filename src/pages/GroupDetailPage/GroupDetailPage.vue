@@ -12,6 +12,7 @@ import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMo
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
@@ -54,13 +55,7 @@ const groupInvoices = computed(() => invoicesQuery.value.data ?? []);
 const group = computed(() => groupQuery.value.data);
 const transactions = computed(() => transactionsQuery.value.data ?? []);
 
-const avatarImages = computed(() => {
-  if (!group.value) return [];
-  if (group.value.photo) {
-    return [{ alt: group.value.name, src: group.value.photo }];
-  }
-  return group.value.members.slice(0, 4).map((m) => ({ alt: m.userName, src: m.photo ?? null }));
-});
+const avatarImages = computed(() => getGroupAvatarImages(group.value));
 
 const totalBalance = computed(() => {
   if (!group.value) return 0;

@@ -137,11 +137,19 @@ export function getNotificationRoute(
     case "RelatedInvoiceCreated":
     case "InvoiceSettled":
     case "RelatedInvoiceSettled": {
-      return { name: "groupDetail", params: { groupId: notification.data.groupId } };
+      return {
+        name: "invoiceDetail",
+        params: { groupId: notification.data.groupId, invoiceId: notification.data.invoiceId },
+      };
     }
     case "SettlementRecorded":
     case "RelatedSettlementRecorded": {
-      return notification.data.groupId ? { name: "groupDetail", params: { groupId: notification.data.groupId } } : null;
+      return notification.data.groupId
+        ? {
+            name: "invoiceDetail",
+            params: { groupId: notification.data.groupId, invoiceId: notification.data.invoiceId },
+          }
+        : null;
     }
     case "FriendRequestAccepted": {
       return { name: "profile" };

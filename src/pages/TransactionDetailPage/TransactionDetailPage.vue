@@ -17,6 +17,7 @@ import SIconButton from "@/components/SButton/SIconButton.vue";
 import { resolveAssetUrl } from "@/libs/asset-url";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { formatCurrency } from "@/libs/format-currency";
+import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useUserStore } from "@/stores/user";
 
 import DeleteConfirmSheet from "./DeleteConfirmSheet.vue";
@@ -49,14 +50,7 @@ const group = computed(() => groupQuery.value.data);
 const showDeleteSheet = ref(false);
 const isDeleting = ref(false);
 
-// group avatar images
-const avatarImages = computed(() => {
-  if (!group.value) return [];
-  if (group.value.photo) {
-    return [{ alt: group.value.name, src: group.value.photo }];
-  }
-  return group.value.members.slice(0, 4).map((m) => ({ alt: m.userName, src: m.photo ?? null }));
-});
+const avatarImages = computed(() => getGroupAvatarImages(group.value));
 
 // Category
 const subcategory = computed(() => getCategory(transaction.value?.icon));
