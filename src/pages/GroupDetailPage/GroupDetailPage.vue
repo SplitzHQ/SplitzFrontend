@@ -62,31 +62,20 @@ const avatarImages = computed(() => {
   return group.value.members.slice(0, 4).map((m) => ({ alt: m.userName, src: m.photo ?? null }));
 });
 
-const totalBalance = computed(() => {
-  if (!group.value) return 0;
-  return group.value.balances
-    .filter((b) => b.user.id === userStore.user?.id)
-    .reduce((sum, b) => sum + Number.parseFloat(b.balance), 0);
-});
+const balanceSummaries = computed(() => {
+  const summaries = group.value?.balanceSummaries ?? [];
+  if (summaries.length === 0) return [{ currency: "USD", memberBalances: [], totalBalance: "0" }];
 
-const currency = computed(() => {
-  if (!group.value) return "USD";
-  const myBalance = group.value.balances.find((b) => b.user.id === userStore.user?.id);
-  return myBalance?.currency ?? "USD";
-});
-
-const memberBalances = computed(() => {
-  if (!group.value) return [];
-  // Get all members except the current user, and find their balance
-  return group.value.balances
-    .filter((b) => b.user.id !== userStore.user?.id && b.balance !== "0")
-    .map((b) => ({
-      // Positive balance = creditor (they are owed), negative = debtor (they owe)
-      // From current user's perspective: their positive = you owe them, their negative = they owe you
-      amount: Number.parseFloat(b.balance),
-      currency: b.currency,
-      name: b.user.userName,
-    }));
+  const nicknames = new Map(
+    (userStore.user?.friends ?? []).map((friend) => [friend.friendUser.id, friend.remark?.trim()])
+  );
+  return summaries.map((summary) => ({
+    ...summary,
+    memberBalances: summary.memberBalances.map((member) => ({
+      ...member,
+      name: nicknames.get(member.userId) || member.name,
+    })),
+  }));
 });
 
 const tabs = computed(() => [
@@ -134,13 +123,16 @@ const settleUp = () => {
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 px-2">
         <!-- Balance Card -->
         <div class="flex flex-col gap-3">
-          <BalanceCard
-            v-if="group"
-            :total-balance="totalBalance"
-            :currency="currency"
-            :member-balances="memberBalances"
-            @settle-up="settleUp"
-          />
+          <template v-if="group">
+            <BalanceCard
+              v-for="summary in balanceSummaries"
+              :key="summary.currency"
+              :total-balance="summary.totalBalance"
+              :currency="summary.currency"
+              :member-balances="summary.memberBalances"
+              @settle-up="settleUp"
+            />
+          </template>
 
           <!-- Tab Buttons -->
           <div class="flex gap-2">

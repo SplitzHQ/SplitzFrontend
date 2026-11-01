@@ -19,10 +19,12 @@ docs/FriendRequestDto.md
 docs/FriendRequestListDto.md
 docs/GroupApi.md
 docs/GroupBalanceDto.md
+docs/GroupBalanceSummaryDto.md
 docs/GroupDto.md
 docs/GroupInputDto.md
 docs/GroupInviteDto.md
 docs/GroupJoinLinkDto.md
+docs/GroupMemberTransferDto.md
 docs/GroupReducedDto.md
 docs/HttpValidationProblemDetails.md
 docs/InfoRequest.md
@@ -84,10 +86,12 @@ models/FriendDto.ts
 models/FriendRequestDto.ts
 models/FriendRequestListDto.ts
 models/GroupBalanceDto.ts
+models/GroupBalanceSummaryDto.ts
 models/GroupDto.ts
 models/GroupInputDto.ts
 models/GroupInviteDto.ts
 models/GroupJoinLinkDto.ts
+models/GroupMemberTransferDto.ts
 models/GroupReducedDto.ts
 models/HttpValidationProblemDetails.ts
 models/InfoRequest.ts

@@ -20,6 +20,13 @@ import {
     GroupBalanceDtoToJSON,
     GroupBalanceDtoToJSONTyped,
 } from './GroupBalanceDto';
+import type { GroupBalanceSummaryDto } from './GroupBalanceSummaryDto';
+import {
+    GroupBalanceSummaryDtoFromJSON,
+    GroupBalanceSummaryDtoFromJSONTyped,
+    GroupBalanceSummaryDtoToJSON,
+    GroupBalanceSummaryDtoToJSONTyped,
+} from './GroupBalanceSummaryDto';
 import type { SplitzUserReducedDto } from './SplitzUserReducedDto';
 import {
     SplitzUserReducedDtoFromJSON,
@@ -58,6 +65,10 @@ export interface GroupDto {
      * 
      */
     balances: Array<GroupBalanceDto>;
+    /**
+     * The current user's net balance and suggested payments, separated by currency.
+     */
+    balanceSummaries?: Array<GroupBalanceSummaryDto>;
     /**
      * The number of transactions between the user and their friend.
      * This number is only for searching purposes and may not be accurate if transactions are deleted or modified.
@@ -100,6 +111,7 @@ export function GroupDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'members': ((json['members'] as Array<any>).map(SplitzUserReducedDtoFromJSON)),
         'membersIdHash': json['membersIdHash'],
         'balances': ((json['balances'] as Array<any>).map(GroupBalanceDtoFromJSON)),
+        'balanceSummaries': json['balanceSummaries'] == null ? undefined : ((json['balanceSummaries'] as Array<any>).map(GroupBalanceSummaryDtoFromJSON)),
         'transactionCount': json['transactionCount'],
         'lastActivityTime': (json['lastActivityTime'] == null ? json['lastActivityTime'] : parseDateTime(json['lastActivityTime'])),
     };
@@ -122,6 +134,7 @@ export function GroupDtoToJSONTyped(value?: GroupDto | null, ignoreDiscriminator
         'members': ((value['members'] as Array<any>).map(SplitzUserReducedDtoToJSON)),
         'membersIdHash': value['membersIdHash'],
         'balances': ((value['balances'] as Array<any>).map(GroupBalanceDtoToJSON)),
+        'balanceSummaries': value['balanceSummaries'] == null ? undefined : ((value['balanceSummaries'] as Array<any>).map(GroupBalanceSummaryDtoToJSON)),
         'transactionCount': value['transactionCount'],
         'lastActivityTime': value['lastActivityTime'] == null ? value['lastActivityTime'] : serializeDateTime(value['lastActivityTime']),
     };
