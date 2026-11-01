@@ -31,6 +31,7 @@ auth-register-password-mismatch = 两次输入的密码不一致
 auth-register-success = 注册成功，请登录。
 auth-register-success-email-enabled = 注册成功。请先查收邮件完成验证，然后再登录。
 auth-register-failed = 注册失败，请重试。
+auth-register-email-already-registered = 这个邮箱已注册，请直接登录。
 auth-register-login-link = 返回登录
 auth-register-sign-in-link = 已有账户？去登录
 auth-register-action = 注册
