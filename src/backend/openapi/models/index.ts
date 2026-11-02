@@ -38,7 +38,6 @@ export * from './ProblemDetails';
 export * from './ReceiptDto';
 export * from './ReceiptRecognitionCapabilitiesDto';
 export * from './ReceiptRecognitionStatus';
-export * from './ReceiptStatus';
 export * from './RefreshRequest';
 export * from './RegisterRequest';
 export * from './RequestStatus';

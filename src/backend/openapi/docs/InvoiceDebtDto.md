@@ -1,6 +1,7 @@
 
 # InvoiceDebtDto
 
+An invoice debt with payments in the same direction and the amount still owed.
 
 ## Properties
 
@@ -10,6 +11,8 @@ Name | Type
 `fromUser` | [SplitzUserReducedDto](SplitzUserReducedDto.md)
 `toUser` | [SplitzUserReducedDto](SplitzUserReducedDto.md)
 `amount` | string
+`paid` | string
+`remaining` | string
 
 ## Example
 
@@ -22,6 +25,8 @@ const example = {
   "fromUser": null,
   "toUser": null,
   "amount": null,
+  "paid": null,
+  "remaining": null,
 } satisfies InvoiceDebtDto
 
 console.log(example)

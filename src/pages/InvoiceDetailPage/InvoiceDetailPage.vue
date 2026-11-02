@@ -7,7 +7,7 @@ import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 import { toast } from "vue-sonner";
 
-import { GroupApi, InvoiceApi, InvoiceStatus, type SplitzUserReducedDto } from "@/backend";
+import { GroupApi, InvoiceApi, type InvoiceDebtDto, InvoiceStatus, type SplitzUserReducedDto } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
@@ -20,7 +20,6 @@ import { formatCurrency } from "@/libs/format-currency";
 import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useUserStore } from "@/stores/user";
 
-import { type DebtProgress, getDebtProgress } from "./invoice-debts";
 import MarkPaidSheet, { type PendingPayment } from "./MarkPaidSheet.vue";
 
 const { $t } = useFluent();
@@ -54,16 +53,17 @@ const isSettled = computed(() => invoice.value?.status === InvoiceStatus.Settled
 const formatDate = (date: Date) =>
   new Date(date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 
-const money = (amount: Big | string) => formatCurrency(amount.toString(), invoice.value?.currency ?? "USD");
+/** Format an invoice amount in its currency. */
+const money = (amount: number | string | Big) => formatCurrency(amount.toString(), invoice.value?.currency ?? "USD");
 
 const displayName = (user: SplitzUserReducedDto) =>
   user.id === myId.value ? $t("new-expense-pronoun-you") : user.userName;
 
 const totalAmount = computed(() =>
-  (invoice.value?.transactions ?? []).reduce((sum, tx) => sum.plus(new Big(tx.amount).abs()), new Big(0))
+  (invoice.value?.transactions ?? []).reduce((sum, tx) => sum.plus(Math.abs(Number(tx.amount))), new Big(0))
 );
 
-const debts = computed(() => getDebtProgress(invoice.value?.debts ?? [], invoice.value?.settlements ?? []));
+const debts = computed(() => invoice.value?.debts ?? []);
 
 // Newest payment first, so a payment the user just recorded shows at the top.
 const payments = computed(() =>
@@ -100,10 +100,11 @@ function pairLabel(fromUser: SplitzUserReducedDto, toUser: SplitzUserReducedDto,
   return $t(messages.between, { from: fromUser.userName, to: toUser.userName });
 }
 
-function debtAmountClass(progress: DebtProgress): string {
-  if (progress.remaining.eq(0)) return "text-base-text-quaternary line-through";
-  if (progress.debt.fromUser.id === myId.value) return "text-base-text-error";
-  if (progress.debt.toUser.id === myId.value) return "text-util-color-success-600";
+/** Choose the debt color from its remaining amount and the current user. */
+function debtAmountClass(debt: InvoiceDebtDto): string {
+  if (Number(debt.remaining) === 0) return "text-base-text-quaternary line-through";
+  if (debt.fromUser.id === myId.value) return "text-base-text-error";
+  if (debt.toUser.id === myId.value) return "text-util-color-success-600";
   return "text-base-text-primary";
 }
 
@@ -118,32 +119,34 @@ async function refreshInvoice() {
 // Mark as paid
 const showMarkPaidSheet = ref(false);
 const isMarkingPaid = ref(false);
-const pendingDebt = ref<DebtProgress | null>(null);
+const pendingDebt = ref<InvoiceDebtDto | null>(null);
 
 const pendingPayment = computed<PendingPayment | null>(() => {
   if (!pendingDebt.value) return null;
   return {
     amountLabel: money(pendingDebt.value.remaining),
-    fromUser: pendingDebt.value.debt.fromUser,
-    toUser: pendingDebt.value.debt.toUser,
+    fromUser: pendingDebt.value.fromUser,
+    toUser: pendingDebt.value.toUser,
   };
 });
 
-function openMarkPaid(progress: DebtProgress) {
-  pendingDebt.value = progress;
+/** Open the payment sheet for the selected debt. */
+function openMarkPaid(debt: InvoiceDebtDto) {
+  pendingDebt.value = debt;
   showMarkPaidSheet.value = true;
 }
 
+/** Record a payment for the exact remaining amount from the backend. */
 async function confirmMarkPaid() {
   if (isMarkingPaid.value || !pendingDebt.value) return;
-  const { debt, remaining } = pendingDebt.value;
+  const debt = pendingDebt.value;
   try {
     isMarkingPaid.value = true;
     // Pay the exact remaining amount, so the backend sees this debt as fully covered.
     await invoiceApi.addSettlement({
       id: invoiceId.value,
       invoiceSettlementInputDto: {
-        amount: remaining.toString(),
+        amount: debt.remaining,
         fromUserId: debt.fromUser.id,
         toUserId: debt.toUser.id,
       },
@@ -245,32 +248,29 @@ async function undoPayment(settlementId: string) {
             </p>
             <ul v-else class="flex flex-col gap-1 rounded-2xl bg-base-bg-secondary p-3">
               <li
-                v-for="progress in debts"
-                :key="`${progress.debt.fromUser.id}-${progress.debt.toUser.id}`"
+                v-for="debt in debts"
+                :key="`${debt.fromUser.id}-${debt.toUser.id}`"
                 class="flex items-center gap-3 rounded-xl py-2"
                 data-test="invoice-debt"
               >
-                <Avatar
-                  :images="[{ alt: progress.debt.fromUser.userName, src: progress.debt.fromUser.photo ?? null }]"
-                  size="xs"
-                />
+                <Avatar :images="[{ alt: debt.fromUser.userName, src: debt.fromUser.photo ?? null }]" size="xs" />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p class="truncate text-base font-medium text-base-text-primary">
-                    {{ pairLabel(progress.debt.fromUser, progress.debt.toUser, "debt") }}
+                    {{ pairLabel(debt.fromUser, debt.toUser, "debt") }}
                   </p>
-                  <p class="text-sm tabular-nums" :class="debtAmountClass(progress)">
-                    {{ money(progress.debt.amount) }}
+                  <p class="text-sm tabular-nums" :class="debtAmountClass(debt)">
+                    {{ money(debt.amount) }}
                   </p>
                   <p
-                    v-if="progress.paid.gt(0) && progress.remaining.gt(0)"
+                    v-if="Number(debt.paid) > 0 && Number(debt.remaining) > 0"
                     class="text-xs text-base-text-quaternary tabular-nums"
                   >
-                    {{ $t("invoice-detail-debt-remaining", { amount: money(progress.remaining) }) }}
+                    {{ $t("invoice-detail-debt-remaining", { amount: money(debt.remaining) }) }}
                   </p>
                 </div>
                 <Transition name="swap" mode="out-in">
                   <span
-                    v-if="progress.remaining.eq(0)"
+                    v-if="Number(debt.remaining) === 0"
                     key="paid"
                     class="flex shrink-0 items-center gap-1 rounded-full bg-util-color-success-50 px-2.5 py-1 text-xs font-medium text-util-color-success-700"
                   >
@@ -285,7 +285,7 @@ async function undoPayment(settlementId: string) {
                     size="sm"
                     class="shrink-0"
                     data-test="mark-paid"
-                    @click="openMarkPaid(progress)"
+                    @click="openMarkPaid(debt)"
                   >
                     {{ $t("invoice-detail-mark-paid") }}
                   </SButton>
