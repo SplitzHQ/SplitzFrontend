@@ -9,6 +9,8 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
+import { prototypes } from "./vite.config.prototypes";
+
 const isStorybookOrTestProcess =
   process.env.npm_lifecycle_event === "storybook" ||
   process.env.npm_lifecycle_event === "build-storybook" ||
@@ -21,6 +23,8 @@ export default defineConfig({
     // incompatible with Storybook for now
     // https://github.com/storybookjs/storybook/issues/32462
     !isStorybookOrTestProcess && vueDevTools(),
+    // dev-only prototype pages in src/prototypes
+    prototypes(),
     {
       name: "copy-redirects",
       writeBundle() {

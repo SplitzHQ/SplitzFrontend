@@ -1,0 +1,8 @@
+/*
+ * The style sheet of every prototype page. `src/assets/base.css` tells Tailwind to skip `src/prototypes`,
+ * so classes that only prototypes use stay out of the app's CSS. This file adds the folder back for the
+ * prototype pages only.
+ */
+@import "../../assets/base.css";
+
+@source "..";
