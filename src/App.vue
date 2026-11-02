@@ -5,6 +5,7 @@ import "vue-sonner/style.css";
 
 import ReloadPrompt from "@/components/ReloadPrompt/ReloadPrompt.vue";
 import Sonner from "@/components/Sonner/Sonner.vue";
+import { DebugPanel } from "@/debug/gate";
 import { useNotificationStore } from "@/stores/notification";
 import { useUserStore } from "@/stores/user";
 
@@ -26,4 +27,6 @@ watch(
   <RouterView />
   <Sonner position="top-center" close-button />
   <ReloadPrompt />
+  <!-- Dev server, or a build with VITE_SPLITZ_DEBUG_TOOLS=true (src/debug/gate.ts). -->
+  <component :is="DebugPanel" v-if="DebugPanel" />
 </template>

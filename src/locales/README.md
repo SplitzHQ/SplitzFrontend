@@ -6,6 +6,7 @@ This folder contains the Fluent (`.ftl`) translation files for Splitz across sup
 
 - **Key parity**: Every `.ftl` file in `en/` must have a matching file in `zh-cn/` with the exact same message IDs in the same order.
 - **No duplicate keys**: All `.ftl` files in a locale are loaded into a single `FluentBundle` in [`src/main.ts`](../main.ts). Every message ID must be globally unique across all files in that locale.
+- **Debug-only strings**: `<locale>/debug/*.ftl` holds the debug panel strings (`debug-panel-*`). `main.ts` skips subfolders; `src/debug/messages.ts` loads these files only in builds that include the panel. The parity and naming rules still apply.
 - **Naming pattern**: Prefix every key with the file/feature namespace in kebab-case:
   - `<feature>-<section>-<element>` (for example, `new-expense-split-title`, `profile-add-friend-submit`, `notification-empty-title`).
   - Category keys use `categories-<subcategory>` and `main_categories-<main_category>` with snake_case category identifiers to match backend/store values.
