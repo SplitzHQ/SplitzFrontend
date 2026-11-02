@@ -5,6 +5,7 @@ import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 
+import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
@@ -59,11 +60,28 @@ async function handleRegister() {
   } catch (error) {
     console.error(error);
     if (!registrationCooldown.startFromError(error)) {
-      toast.error($t("auth-register-failed"));
+      toast.error($t(await getRegistrationErrorMessageKey(error)));
     }
   } finally {
     loading.value = false;
   }
+}
+
+/** Select the registered-email message only for explicit Identity duplicate errors. */
+async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
+  if (error instanceof ResponseError && error.response.status === 400) {
+    try {
+      const body = (await error.response.clone().json()) as HttpValidationProblemDetails | null;
+      const errorCodes = Object.keys(body?.errors ?? {});
+      if (errorCodes.includes("DuplicateEmail") || errorCodes.includes("DuplicateUserName")) {
+        return "auth-register-email-already-registered";
+      }
+    } catch {
+      return "auth-register-failed";
+    }
+  }
+
+  return "auth-register-failed";
 }
 </script>
 

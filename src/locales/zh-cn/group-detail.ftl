@@ -1,4 +1,5 @@
 group-detail-total-balance = 总结余
+group-detail-suggested-payments = 待结算金额
 group-detail-settle-up = 结算
 group-detail-owes-you = { $name } 欠你
 group-detail-you-owe = 你欠 { $name }

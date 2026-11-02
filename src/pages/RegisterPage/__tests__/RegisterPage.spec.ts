@@ -115,6 +115,51 @@ describe("RegisterPage", () => {
     expect(userStoreMock.register).toHaveBeenCalledTimes(2);
   });
 
+  it.each(["DuplicateEmail", "DuplicateUserName"])(
+    "explains that the email is registered for %s without consuming the response",
+    async (errorCode) => {
+      const response = new Response(JSON.stringify({ errors: { [errorCode]: ["Already taken."] } }), {
+        headers: { "Content-Type": "application/problem+json" },
+        status: 400,
+      });
+      userStoreMock.register.mockRejectedValue(new ResponseError(response));
+      const wrapper = mount(RegisterPage);
+
+      await wrapper.find('input[name="email"]').setValue("person@example.com");
+      await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+      await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+      await wrapper.find("form").trigger("submit");
+      await flushPromises();
+
+      expect(toastMock.error).toHaveBeenCalledExactlyOnceWith("auth-register-email-already-registered");
+      expect(toastMock.success).not.toHaveBeenCalled();
+      expect(userStoreMock.fetchEmailCapabilities).not.toHaveBeenCalled();
+      expect(routerMock.push).not.toHaveBeenCalled();
+      expect(response.bodyUsed).toBe(false);
+      expect(wrapper.get('[data-test="register-submit"]').attributes("disabled")).toBeUndefined();
+    }
+  );
+
+  it.each([
+    [400, JSON.stringify({ errors: { PasswordTooShort: ["Too short."] } })],
+    [400, "not json"],
+    [400, "null"],
+    [400, "{}"],
+    [500, JSON.stringify({ errors: { DuplicateEmail: ["Already taken."] } })],
+  ])("keeps the generic error for HTTP %s with body %s", async (status, body) => {
+    userStoreMock.register.mockRejectedValue(new ResponseError(new Response(body, { status })));
+    const wrapper = mount(RegisterPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(toastMock.error).toHaveBeenCalledExactlyOnceWith("auth-register-failed");
+    expect(toastMock.success).not.toHaveBeenCalled();
+  });
+
   it("ignores duplicate button and form submissions while registration is pending", async () => {
     let resolveRegistration!: () => void;
     userStoreMock.register.mockReturnValue(

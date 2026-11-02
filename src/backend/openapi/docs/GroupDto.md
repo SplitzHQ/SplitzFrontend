@@ -12,6 +12,7 @@ Name | Type
 `members` | [Array&lt;SplitzUserReducedDto&gt;](SplitzUserReducedDto.md)
 `membersIdHash` | string
 `balances` | [Array&lt;GroupBalanceDto&gt;](GroupBalanceDto.md)
+`balanceSummaries` | [Array&lt;GroupBalanceSummaryDto&gt;](GroupBalanceSummaryDto.md)
 `transactionCount` | number
 `lastActivityTime` | Date
 
@@ -28,6 +29,7 @@ const example = {
   "members": null,
   "membersIdHash": null,
   "balances": null,
+  "balanceSummaries": null,
   "transactionCount": null,
   "lastActivityTime": null,
 } satisfies GroupDto

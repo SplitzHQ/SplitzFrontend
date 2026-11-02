@@ -1,4 +1,5 @@
 group-detail-total-balance = Total balance
+group-detail-suggested-payments = Unpaid amounts
 group-detail-settle-up = Settle up
 group-detail-owes-you = { $name } owes you
 group-detail-you-owe = You owe { $name }

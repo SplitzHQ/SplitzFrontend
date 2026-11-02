@@ -31,6 +31,7 @@ auth-register-password-mismatch = Passwords do not match
 auth-register-success = Account created. Please sign in.
 auth-register-success-email-enabled = Account created. Check your email to confirm your account before signing in.
 auth-register-failed = Couldn't create your account. Try again.
+auth-register-email-already-registered = This email is already registered. Please sign in directly.
 auth-register-login-link = Return to sign in
 auth-register-sign-in-link = Already have an account? Sign in
 auth-register-action = Register
