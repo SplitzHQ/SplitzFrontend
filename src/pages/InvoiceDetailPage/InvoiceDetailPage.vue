@@ -20,7 +20,7 @@ import { formatCurrency } from "@/libs/format-currency";
 import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useUserStore } from "@/stores/user";
 
-import MarkPaidSheet, { type PendingPayment } from "./MarkPaidSheet.vue";
+import MarkPaidSheet from "./MarkPaidSheet.vue";
 
 const { $t } = useFluent();
 const route = useRoute();
@@ -55,9 +55,6 @@ const formatDate = (date: Date) =>
 
 /** Format an invoice amount in its currency. */
 const money = (amount: number | string | Big) => formatCurrency(amount.toString(), invoice.value?.currency ?? "USD");
-
-const displayName = (user: SplitzUserReducedDto) =>
-  user.id === myId.value ? $t("new-expense-pronoun-you") : user.userName;
 
 const totalAmount = computed(() =>
   (invoice.value?.transactions ?? []).reduce((sum, tx) => sum.plus(Math.abs(Number(tx.amount))), new Big(0))
@@ -116,49 +113,13 @@ async function refreshInvoice() {
   ]);
 }
 
-// Mark as paid
 const showMarkPaidSheet = ref(false);
-const isMarkingPaid = ref(false);
 const pendingDebt = ref<InvoiceDebtDto | null>(null);
-
-const pendingPayment = computed<PendingPayment | null>(() => {
-  if (!pendingDebt.value) return null;
-  return {
-    amountLabel: money(pendingDebt.value.remaining),
-    fromUser: pendingDebt.value.fromUser,
-    toUser: pendingDebt.value.toUser,
-  };
-});
 
 /** Open the payment sheet for the selected debt. */
 function openMarkPaid(debt: InvoiceDebtDto) {
   pendingDebt.value = debt;
   showMarkPaidSheet.value = true;
-}
-
-/** Record a payment for the exact remaining amount from the backend. */
-async function confirmMarkPaid() {
-  if (isMarkingPaid.value || !pendingDebt.value) return;
-  const debt = pendingDebt.value;
-  try {
-    isMarkingPaid.value = true;
-    // Pay the exact remaining amount, so the backend sees this debt as fully covered.
-    await invoiceApi.addSettlement({
-      id: invoiceId.value,
-      invoiceSettlementInputDto: {
-        amount: debt.remaining,
-        fromUserId: debt.fromUser.id,
-        toUserId: debt.toUser.id,
-      },
-    });
-    await refreshInvoice();
-    showMarkPaidSheet.value = false;
-  } catch (error) {
-    console.error("Error marking debt as paid:", error);
-    toast.error($t("invoice-detail-mark-paid-error"));
-  } finally {
-    isMarkingPaid.value = false;
-  }
 }
 
 // Undo payment
@@ -346,13 +307,7 @@ async function undoPayment(settlementId: string) {
         </template>
       </div>
 
-      <MarkPaidSheet
-        v-model="showMarkPaidSheet"
-        :payment="pendingPayment"
-        :is-submitting="isMarkingPaid"
-        :display-name="displayName"
-        @confirm="confirmMarkPaid"
-      />
+      <MarkPaidSheet v-model="showMarkPaidSheet" :pendingDebt="pendingDebt" />
     </template>
   </Layout>
 </template>
