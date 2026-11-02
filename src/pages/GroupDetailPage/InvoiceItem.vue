@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { PhFileText } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
+import { RouterLink } from "vue-router";
 
 import type { InvoiceReducedDto } from "@/backend";
 import { InvoiceStatus } from "@/backend";
+import InvoiceStatusPill from "@/components/InvoiceStatusPill/InvoiceStatusPill.vue";
 
 const props = defineProps<{
   invoice: InvoiceReducedDto;
@@ -19,7 +21,10 @@ const isSettled = props.invoice.status === InvoiceStatus.Settled;
 </script>
 
 <template>
-  <a class="flex items-center gap-3 rounded-2xl py-2 transition-colors active:bg-base-bg-secondary">
+  <RouterLink
+    :to="{ name: 'invoiceDetail', params: { groupId: invoice.groupId, invoiceId: invoice.invoiceId } }"
+    class="flex items-center gap-3 rounded-2xl py-2 transition-colors active:bg-base-bg-secondary"
+  >
     <div
       class="flex size-12 shrink-0 items-center justify-center rounded-05xl"
       :class="isSettled ? 'bg-util-color-success-50' : 'bg-util-color-yellow-50'"
@@ -36,16 +41,7 @@ const isSettled = props.invoice.status === InvoiceStatus.Settled;
       </p>
     </div>
     <div class="flex shrink-0 flex-col items-end gap-0.5">
-      <span
-        class="rounded-full px-2 py-0.5 text-xs font-medium"
-        :class="
-          isSettled
-            ? 'bg-util-color-success-50 text-util-color-success-700'
-            : 'bg-util-color-yellow-50 text-util-color-yellow-700'
-        "
-      >
-        {{ isSettled ? $t("group-detail-invoice-settled") : $t("group-detail-invoice-open") }}
-      </span>
+      <InvoiceStatusPill :status="invoice.status" />
     </div>
-  </a>
+  </RouterLink>
 </template>

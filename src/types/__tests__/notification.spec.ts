@@ -37,9 +37,14 @@ describe("getNotificationRoute", () => {
     });
   });
 
-  it("deep links invoice events to the group page", () => {
+  it("deep links invoice events to the invoice detail page", () => {
     const n = asTypedNotification(raw("InvoiceSettled", { groupId: "g1", invoiceId: "i1" }))!;
-    expect(getNotificationRoute(n)).toEqual({ name: "groupDetail", params: { groupId: "g1" } });
+    expect(getNotificationRoute(n)).toEqual({ name: "invoiceDetail", params: { groupId: "g1", invoiceId: "i1" } });
+  });
+
+  it("deep links payments to the invoice detail page", () => {
+    const n = asTypedNotification(raw("RelatedSettlementRecorded", { groupId: "g1", invoiceId: "i1" }))!;
+    expect(getNotificationRoute(n)).toEqual({ name: "invoiceDetail", params: { groupId: "g1", invoiceId: "i1" } });
   });
 
   it("does not navigate for requests", () => {

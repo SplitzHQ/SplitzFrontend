@@ -22,7 +22,7 @@ import {
 } from './SplitzUserReducedDto';
 
 /**
- * 
+ * An invoice debt with payments in the same direction and the amount still owed.
  * @export
  * @interface InvoiceDebtDto
  */
@@ -43,6 +43,14 @@ export interface InvoiceDebtDto {
      * 
      */
     amount: string;
+    /**
+     * Total payments from this debtor to this creditor, including any excess payment.
+     */
+    paid: string;
+    /**
+     * Amount still owed. This value is never less than zero.
+     */
+    remaining: string;
 }
 
 /**
@@ -53,6 +61,8 @@ export function instanceOfInvoiceDebtDto(value: object): value is InvoiceDebtDto
     if (!('fromUser' in value) || value['fromUser'] === undefined) return false;
     if (!('toUser' in value) || value['toUser'] === undefined) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('paid' in value) || value['paid'] === undefined) return false;
+    if (!('remaining' in value) || value['remaining'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +80,8 @@ export function InvoiceDebtDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'fromUser': SplitzUserReducedDtoFromJSON(json['fromUser']),
         'toUser': SplitzUserReducedDtoFromJSON(json['toUser']),
         'amount': json['amount'],
+        'paid': json['paid'],
+        'remaining': json['remaining'],
     };
 }
 
@@ -88,6 +100,8 @@ export function InvoiceDebtDtoToJSONTyped(value?: InvoiceDebtDto | null, ignoreD
         'fromUser': SplitzUserReducedDtoToJSON(value['fromUser']),
         'toUser': SplitzUserReducedDtoToJSON(value['toUser']),
         'amount': value['amount'],
+        'paid': value['paid'],
+        'remaining': value['remaining'],
     };
 }
 
