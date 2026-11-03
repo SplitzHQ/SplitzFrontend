@@ -5,6 +5,9 @@
 
 @config "../../tailwind.config.js";
 
+/* Dev-only prototype pages. They add the folder back in src/prototypes/kit/prototypes.css. */
+@source not "../prototypes";
+
 @utility skeleton {
   @apply animate-pulse rounded-md bg-base-bg-secondary;
 }
