@@ -48,8 +48,8 @@ const picked = computed(() => options.find((option) => option.value === model.va
       mode="out-in"
       enter-from-class="opacity-0 blur-[2px]"
       leave-to-class="opacity-0"
-      enter-active-class="transition-[opacity,filter] duration-200 ease-out"
-      leave-active-class="transition-opacity duration-100 ease-in"
+      enter-active-class="transition-[opacity,filter] duration-(--motion-duration-state) ease-(--motion-easing-enter)"
+      leave-active-class="transition-opacity duration-(--motion-duration-hover-in) ease-(--motion-easing-exit)"
     >
       <p v-if="picked?.note" :key="picked.value" class="max-w-prose text-sm text-base-text-tertiary">
         {{ picked.note }}

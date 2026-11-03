@@ -65,7 +65,7 @@ function actionName(action: DebugAction): string {
       <DebugTip v-for="choice in choices" :key="choice.id" :text="$t(choice.tip)">
         <RadioGroupItem
           :value="choice.id"
-          class="flex items-center gap-1.5 rounded-full border border-base-border-secondary px-2.5 py-1 text-xs font-medium text-base-text-secondary transition-[background-color,border-color,color] duration-150 hover:bg-base-bg-secondary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none data-[state=checked]:border-base-border-brand data-[state=checked]:bg-base-bg-brand data-[state=checked]:text-base-text-brand"
+          class="flex items-center gap-1.5 rounded-full border border-base-border-secondary px-2.5 py-1 text-xs font-medium text-base-text-secondary transition-[background-color,border-color,color] duration-(--motion-duration-feedback) hover:bg-base-bg-secondary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none data-[state=checked]:border-base-border-brand data-[state=checked]:bg-base-bg-brand data-[state=checked]:text-base-text-brand"
         >
           <span
             aria-hidden="true"
@@ -85,7 +85,7 @@ function actionName(action: DebugAction): string {
           :aria-label="actionName(action)"
           :disabled="action.disabled?.()"
           :class="[
-            'flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-[background-color,border-color,color,transform] duration-150 focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50',
+            'flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-[background-color,border-color,color,transform] duration-(--motion-duration-feedback) focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50',
             action.change
               ? 'border-base-border-error text-base-text-error hover:bg-base-bg-error'
               : 'border-base-border-secondary text-base-text-primary hover:bg-base-bg-secondary',
@@ -102,7 +102,7 @@ function actionName(action: DebugAction): string {
 
 <style scoped>
 .debug-radio-dot[data-state="checked"] {
-  animation: debug-radio-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: debug-radio-in var(--motion-duration-feedback) var(--motion-easing-enter);
 }
 
 @keyframes debug-radio-in {

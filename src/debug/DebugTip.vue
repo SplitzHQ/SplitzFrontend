@@ -29,7 +29,7 @@ defineProps<{
 <style scoped>
 /* Tooltips enter at once and leave with a short fade (high-frequency UI). */
 .debug-tip[data-state="closed"] {
-  animation: debug-tip-out 120ms ease-out;
+  animation: debug-tip-out var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 @keyframes debug-tip-out {

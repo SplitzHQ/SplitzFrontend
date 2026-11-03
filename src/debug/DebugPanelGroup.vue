@@ -23,7 +23,7 @@ const emit = defineEmits<{ toggle: [] }>();
     >
       <PhCaretDown
         aria-hidden="true"
-        class="size-3.5 transition-transform duration-200 group-data-[state=closed]:-rotate-90 motion-reduce:transition-none"
+        class="size-3.5 transition-transform duration-(--motion-duration-state) group-data-[state=closed]:-rotate-90 motion-reduce:transition-none"
       />
       {{ $t(group.title) }}
     </CollapsibleTrigger>
@@ -38,11 +38,11 @@ const emit = defineEmits<{ toggle: [] }>();
 <style scoped>
 /* reka-ui sets --reka-collapsible-content-height to the measured height of the content. */
 .debug-collapsible[data-state="open"] {
-  animation: debug-collapse-down 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: debug-collapse-down var(--motion-duration-state) var(--motion-easing-enter);
 }
 
 .debug-collapsible[data-state="closed"] {
-  animation: debug-collapse-up 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: debug-collapse-up var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 @keyframes debug-collapse-down {

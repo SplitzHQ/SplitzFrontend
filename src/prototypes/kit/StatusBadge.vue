@@ -37,8 +37,8 @@ async function onExport() {
   <Transition
     enter-from-class="opacity-0 -translate-y-2"
     leave-to-class="opacity-0 -translate-y-2"
-    enter-active-class="transition-[opacity,translate] duration-200 ease-out"
-    leave-active-class="transition-[opacity,translate] duration-150 ease-in"
+    enter-active-class="transition-[opacity,translate] duration-(--motion-duration-state) ease-(--motion-easing-enter)"
+    leave-active-class="transition-[opacity,translate] duration-(--motion-duration-exit) ease-(--motion-easing-exit)"
     appear
   >
     <button
@@ -54,7 +54,7 @@ async function onExport() {
   </Transition>
   <Transition
     enter-from-class="opacity-0 translate-y-2"
-    enter-active-class="transition-[opacity,translate] duration-200 ease-out"
+    enter-active-class="transition-[opacity,translate] duration-(--motion-duration-state) ease-(--motion-easing-enter)"
   >
     <button
       v-if="canExport"

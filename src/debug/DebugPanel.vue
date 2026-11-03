@@ -185,7 +185,7 @@ function onSearchKeydown(event: KeyboardEvent) {
           :aria-expanded="prefs.open"
           :title="$t('debug-panel-toggle-tip')"
           :class="[
-            'flex size-10 items-center justify-center rounded-full border shadow-lg transition-[background-color,border-color,transform] duration-150 focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none active:scale-95',
+            'flex size-10 items-center justify-center rounded-full border shadow-lg transition-[background-color,border-color,transform] duration-(--motion-duration-feedback) focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none active:scale-95',
             prefs.open
               ? 'border-base-border-brand bg-base-bg-brand text-base-fg-brand'
               : 'border-base-border-secondary bg-base-bg-primary text-base-fg-secondary hover:bg-base-bg-secondary',
@@ -200,34 +200,25 @@ function onSearchKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-/* The panel grows out of the bug button (origin bottom right). It enters a little slower than it leaves. */
+/*
+ * The panel grows out of the bug button (origin bottom right). It enters a little slower than it leaves.
+ * Under reduced motion the duration tokens are 0ms, so the panel shows and hides at once.
+ */
 .debug-panel-enter-active {
   transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-duration-state) var(--motion-easing-enter),
+    opacity var(--motion-duration-state) var(--motion-easing-enter);
 }
 
 .debug-panel-leave-active {
   transition:
-    transform 140ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 140ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-duration-exit) var(--motion-easing-exit),
+    opacity var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 .debug-panel-enter-from,
 .debug-panel-leave-to {
   transform: translateY(8px) scale(0.96);
   opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .debug-panel-enter-active,
-  .debug-panel-leave-active {
-    transition: opacity 120ms linear;
-  }
-
-  .debug-panel-enter-from,
-  .debug-panel-leave-to {
-    transform: none;
-  }
 }
 </style>

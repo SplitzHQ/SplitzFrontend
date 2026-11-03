@@ -73,33 +73,22 @@ function undoAll() {
 </template>
 
 <style scoped>
+/* Under reduced motion the duration tokens are 0ms, so the strip shows and hides at once. */
 .debug-strip-enter-active {
   transition:
-    transform 220ms cubic-bezier(0.25, 1, 0.5, 1),
-    opacity 220ms cubic-bezier(0.25, 1, 0.5, 1);
+    transform var(--motion-duration-state) var(--motion-easing-enter),
+    opacity var(--motion-duration-state) var(--motion-easing-enter);
 }
 
 .debug-strip-leave-active {
   transition:
-    transform 150ms cubic-bezier(0.25, 1, 0.5, 1),
-    opacity 150ms cubic-bezier(0.25, 1, 0.5, 1);
+    transform var(--motion-duration-exit) var(--motion-easing-exit),
+    opacity var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 .debug-strip-enter-from,
 .debug-strip-leave-to {
   transform: translateY(-100%);
   opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .debug-strip-enter-active,
-  .debug-strip-leave-active {
-    transition: opacity 150ms linear;
-  }
-
-  .debug-strip-enter-from,
-  .debug-strip-leave-to {
-    transform: none;
-  }
 }
 </style>
