@@ -1,0 +1,186 @@
+/* The backlog page. Plain CSS on the app's color tokens (src/assets/color.css). base.css gives the font, the reset
+   and the color transitions. */
+
+#root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  color: var(--base-text-primary);
+  font-family: Manrope, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.bl-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.bl-head time,
+td:first-child,
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.bl-head time {
+  color: var(--base-text-tertiary);
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
+}
+
+/* The space above a group comes from padding: the column gap alone does not separate the groups enough. */
+h2 {
+  padding-top: 28px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+h3 {
+  padding-top: 12px;
+  font-weight: 600;
+}
+
+/* The entry counts: quieter than the heading, by color only. */
+:is(h1, h2, h3) span {
+  color: var(--base-text-quaternary);
+}
+
+p {
+  color: var(--base-text-secondary);
+  text-wrap: pretty;
+}
+
+b {
+  font-weight: 600;
+}
+
+code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--base-bg-neutral);
+  overflow-wrap: anywhere;
+}
+
+/* A table row and a list item look the same: a rule above, the id in mono, the entry, then its note. */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 0 16px 8px 0;
+  color: var(--base-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+td {
+  padding: 12px 16px 12px 0;
+  border-top: 1px solid var(--base-border-secondary);
+  vertical-align: baseline;
+  text-wrap: pretty;
+}
+
+td:last-child,
+th:last-child {
+  padding-right: 0;
+}
+
+td:first-child {
+  color: var(--base-text-tertiary);
+  white-space: nowrap;
+}
+
+td:nth-child(2) {
+  width: 30%;
+  font-weight: 600;
+}
+
+td:nth-child(n + 3) {
+  color: var(--base-text-secondary);
+}
+
+/* The row that the URL names. */
+tr:target td {
+  background: var(--base-bg-secondary);
+}
+
+/* The copy button: quiet until hover. Negative margins put the hover background outside the text. */
+td.bl-copy {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.bl-copy button {
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--base-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.bl-copy button:hover,
+.bl-copy button:focus-visible {
+  background: var(--base-bg-tertiary);
+  color: var(--base-text-primary);
+}
+
+.bl-copy button[data-done] {
+  color: var(--base-text-brand);
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  padding: 12px 0;
+  border-top: 1px solid var(--base-border-secondary);
+  text-wrap: pretty;
+}
+
+/* A phone: each table row stacks. The id and the entry share one line, and the note goes under them. */
+@media (max-width: 600px) {
+  thead {
+    display: none;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--base-border-secondary);
+  }
+
+  td {
+    padding: 0;
+    border: 0;
+  }
+
+  td:nth-child(2) {
+    width: auto;
+  }
+
+  td:nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  td.bl-copy {
+    width: auto;
+  }
+}
