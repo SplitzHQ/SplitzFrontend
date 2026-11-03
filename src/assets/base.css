@@ -7,6 +7,8 @@
 
 /* Dev-only prototype pages. They add the folder back in src/prototypes/kit/prototypes.css. */
 @source not "../prototypes";
+/* Dev-only dashboard. It adds the folder back in src/dev/dev.css. */
+@source not "../dev";
 
 @utility skeleton {
   @apply animate-pulse rounded-md bg-base-bg-secondary;

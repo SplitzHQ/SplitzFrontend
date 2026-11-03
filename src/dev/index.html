@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- The dev dashboard. The dev server serves it at /dev (see vite.config.dev.ts). The build does not include it. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Splitz Dev</title>
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
+    <script>
+      // The same theme key as the design-system page, so the two pages agree.
+      try {
+        if (localStorage.getItem("splitz:design-system-theme") === "dark")
+          document.documentElement.classList.add("dark");
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+/*
+ * The style sheet of the dev dashboard. `src/assets/base.css` tells Tailwind to skip `src/dev`, so classes that only
+ * the dashboard uses stay out of the app's CSS. This file adds the folder back for the dashboard page only. The
+ * dashboard also shows `StatusMark` from the prototype kit, so that folder comes back too.
+ */
+@import "../assets/base.css";
+
+@source ".";
+@source "../prototypes/kit";
+
+@layer components {
+  .dev-nav-item {
+    @apply flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-base-text-secondary transition-colors duration-(--motion-duration-hover-in) hover:bg-base-bg-secondary hover:text-base-text-primary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none aria-[current=page]:bg-base-bg-secondary aria-[current=page]:font-medium aria-[current=page]:text-base-text-primary max-md:justify-center;
+  }
+
+  .dev-section-head {
+    @apply flex items-center justify-between gap-4 border-b border-base-border-tertiary pb-3;
+
+    & h2 {
+      @apply text-base font-semibold text-base-text-primary;
+    }
+
+    & span {
+      @apply text-xs text-base-text-quinary tabular-nums;
+    }
+  }
+
+  .dev-row {
+    @apply -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-lg px-2 py-3 text-left transition-colors duration-(--motion-duration-hover-in) hover:bg-base-bg-secondary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none;
+  }
+
+  .dev-row-icon {
+    @apply grid size-8 shrink-0 place-items-center text-lg text-base-text-tertiary;
+  }
+
+  .dev-row-arrow {
+    @apply shrink-0 text-base-text-quinary transition-colors duration-(--motion-duration-hover-in);
+
+    .dev-row:hover & {
+      @apply text-base-text-primary;
+    }
+  }
+
+  .dev-link {
+    @apply inline-flex items-center gap-1.5 text-sm font-medium text-base-text-secondary transition-colors duration-(--motion-duration-hover-in) hover:text-base-text-primary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none;
+  }
+
+  .dev-stat {
+    @apply flex items-center justify-between gap-4 border-b border-base-border-tertiary py-2.5 text-sm;
+
+    & dt {
+      @apply text-base-text-tertiary;
+    }
+
+    & dd {
+      @apply font-medium text-base-text-primary tabular-nums;
+    }
+  }
+
+  .dev-icon-button {
+    @apply grid size-8 shrink-0 place-items-center rounded-lg text-base-text-tertiary transition-colors duration-(--motion-duration-hover-in) hover:bg-base-bg-secondary hover:text-base-text-primary focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none;
+  }
+
+  .dev-kbd {
+    @apply rounded border border-base-border-secondary px-1 font-mono text-[10px] text-base-text-quaternary;
+  }
+}

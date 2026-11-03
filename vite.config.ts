@@ -9,6 +9,7 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
+import { devDashboard } from "./vite.config.dev";
 import { prototypes } from "./vite.config.prototypes";
 
 const isStorybookOrTestProcess =
@@ -25,6 +26,8 @@ export default defineConfig({
     !isStorybookOrTestProcess && vueDevTools(),
     // dev-only prototype pages in src/prototypes
     prototypes(),
+    // dev-only dashboard in src/dev that links all dev tools
+    devDashboard(),
     {
       name: "copy-redirects",
       writeBundle() {

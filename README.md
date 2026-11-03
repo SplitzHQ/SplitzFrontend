@@ -31,6 +31,12 @@ bun run dev
 
 The Vite server listens on port `5173`. Open the app at `http://localhost:5173`.
 
+### Dev tools
+
+The dev server also serves a dashboard at `http://localhost:5173/dev`. The terminal shows this URL when the server starts. The dashboard links the dev tools: the app with the debug panel, Vue DevTools, the design system, Storybook, the prototypes and the backlog. These pages exist only on the dev server. The production build does not include them.
+
+To add a tool to the dashboard, add an entry to [src/dev/tools.ts](src/dev/tools.ts).
+
 ## Scripts
 
 | Command                       | Purpose                                              |
