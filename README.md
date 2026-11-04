@@ -31,6 +31,10 @@ bun run dev
 
 The Vite server listens on port `5173`. Open the app at `http://localhost:5173`.
 
+### Dev tools
+
+Team members can clone the private dev tools into `devtools/`. This repository ignores that folder, and the app runs normally without it. With the folder, the dev server also shows a dashboard at `http://localhost:5173/dev`.
+
 ## Scripts
 
 | Command                       | Purpose                                              |

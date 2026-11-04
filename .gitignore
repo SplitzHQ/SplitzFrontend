@@ -15,6 +15,9 @@ dev-dist
 coverage
 *.local
 
+# Private dev tools. This folder is a separate repository.
+/devtools/
+
 /cypress/videos/
 /cypress/screenshots/
 
