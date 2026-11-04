@@ -86,6 +86,14 @@ export interface InvoiceDto {
     /**
      * 
      */
+    isArchived: boolean;
+    /**
+     * 
+     */
+    archiveTime?: Date | null;
+    /**
+     * 
+     */
     transactions?: Array<TransactionDto>;
     /**
      * 
@@ -109,6 +117,7 @@ export function instanceOfInvoiceDto(value: object): value is InvoiceDto {
     if (!('createdBy' in value) || value['createdBy'] === undefined) return false;
     if (!('createTime' in value) || value['createTime'] === undefined) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('isArchived' in value) || value['isArchived'] === undefined) return false;
     return true;
 }
 
@@ -129,6 +138,8 @@ export function InvoiceDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'createdBy': SplitzUserReducedDtoFromJSON(json['createdBy']),
         'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
         'status': InvoiceStatusFromJSON(json['status']),
+        'isArchived': json['isArchived'],
+        'archiveTime': json['archiveTime'] === undefined ? undefined : json['archiveTime'] === null ? null : (parseDateTime(json['archiveTime'])),
         'transactions': json['transactions'] == null ? undefined : ((json['transactions'] as Array<any>).map(TransactionDtoFromJSON)),
         'debts': json['debts'] == null ? undefined : ((json['debts'] as Array<any>).map(InvoiceDebtDtoFromJSON)),
         'settlements': json['settlements'] == null ? undefined : ((json['settlements'] as Array<any>).map(InvoiceSettlementDtoFromJSON)),
@@ -153,6 +164,8 @@ export function InvoiceDtoToJSONTyped(value?: InvoiceDto | null, ignoreDiscrimin
         'createdBy': SplitzUserReducedDtoToJSON(value['createdBy']),
         'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
         'status': InvoiceStatusToJSON(value['status']),
+        'isArchived': value['isArchived'],
+        'archiveTime': value['archiveTime'] == null ? value['archiveTime'] : serializeDateTime(value['archiveTime']),
         'transactions': value['transactions'] == null ? undefined : ((value['transactions'] as Array<any>).map(TransactionDtoToJSON)),
         'debts': value['debts'] == null ? undefined : ((value['debts'] as Array<any>).map(InvoiceDebtDtoToJSON)),
         'settlements': value['settlements'] == null ? undefined : ((value['settlements'] as Array<any>).map(InvoiceSettlementDtoToJSON)),

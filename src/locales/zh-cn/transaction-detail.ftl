@@ -15,3 +15,5 @@ transaction-detail-delete-confirm-message = 删除后将从群组中移除，且
 transaction-detail-delete-confirm-yes = 删除
 transaction-detail-delete-confirm-cancel = 取消
 transaction-detail-delete-error = 删除支出失败，请重试。
+transaction-detail-archived = 这笔支出所在的结算单已归档，不能再修改。
+transaction-detail-group-archived = 这个群组已归档，支出不能再修改。

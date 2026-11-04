@@ -66,6 +66,13 @@ export interface AcceptGroupInviteRequest {
     inviteId: string;
 }
 
+export interface ArchiveGroupRequest {
+    /**
+     * 
+     */
+    groupId: string;
+}
+
 export interface CreateGroupRequest {
     /**
      * 
@@ -113,6 +120,10 @@ export interface GetGroupInvoicesRequest {
      * 
      */
     groupId: string;
+    /**
+     * Include archived invoices. Archived invoices are hidden by default.
+     */
+    includeArchived?: boolean;
 }
 
 export interface GetGroupTransactionsRequest {
@@ -120,6 +131,17 @@ export interface GetGroupTransactionsRequest {
      * 
      */
     groupId: string;
+    /**
+     * Include archived expenses. Archived expenses are hidden by default.
+     */
+    includeArchived?: boolean;
+}
+
+export interface GetGroupsRequest {
+    /**
+     * Include archived groups. Archived groups are hidden by default.
+     */
+    includeArchived?: boolean;
 }
 
 export interface IgnoreGroupInviteRequest {
@@ -145,6 +167,13 @@ export interface JoinGroupByLinkRequest {
      * join link id
      */
     joinLinkId: string;
+}
+
+export interface UnarchiveGroupRequest {
+    /**
+     * 
+     */
+    groupId: string;
 }
 
 export interface UpdateGroupRequest {
@@ -225,6 +254,58 @@ export class GroupApi extends runtime.BaseAPI {
     async acceptGroupInvite(requestParameters: AcceptGroupInviteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupDto> {
         const response = await this.acceptGroupInviteRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for archiveGroup without sending the request
+     */
+    async archiveGroupRequestOpts(requestParameters: ArchiveGroupRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling archiveGroup().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/{groupId}/archive`;
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Archive a group. The group must have no unpaid expenses, so every expense must be in a settled invoice.  Archived groups are hidden from the group list by default and do not accept new expenses or invoices.
+     */
+    async archiveGroupRaw(requestParameters: ArchiveGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.archiveGroupRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Archive a group. The group must have no unpaid expenses, so every expense must be in a settled invoice.  Archived groups are hidden from the group list by default and do not accept new expenses or invoices.
+     */
+    async archiveGroup(requestParameters: ArchiveGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.archiveGroupRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -552,6 +633,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters['includeArchived'] != null) {
+            queryParameters['includeArchived'] = requestParameters['includeArchived'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -605,6 +690,10 @@ export class GroupApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters['includeArchived'] != null) {
+            queryParameters['includeArchived'] = requestParameters['includeArchived'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -648,8 +737,12 @@ export class GroupApi extends runtime.BaseAPI {
     /**
      * Creates request options for getGroups without sending the request
      */
-    async getGroupsRequestOpts(): Promise<runtime.RequestOpts> {
+    async getGroupsRequestOpts(requestParameters: GetGroupsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['includeArchived'] != null) {
+            queryParameters['includeArchived'] = requestParameters['includeArchived'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -675,8 +768,8 @@ export class GroupApi extends runtime.BaseAPI {
     /**
      * Get the current user\'s groups
      */
-    async getGroupsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroupDto>>> {
-        const requestOptions = await this.getGroupsRequestOpts();
+    async getGroupsRaw(requestParameters: GetGroupsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroupDto>>> {
+        const requestOptions = await this.getGroupsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroupDtoFromJSON));
@@ -685,8 +778,8 @@ export class GroupApi extends runtime.BaseAPI {
     /**
      * Get the current user\'s groups
      */
-    async getGroups(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupDto>> {
-        const response = await this.getGroupsRaw(initOverrides);
+    async getGroups(requestParameters: GetGroupsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroupDto>> {
+        const response = await this.getGroupsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -894,6 +987,58 @@ export class GroupApi extends runtime.BaseAPI {
     async joinGroupByLink(requestParameters: JoinGroupByLinkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroupDto> {
         const response = await this.joinGroupByLinkRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for unarchiveGroup without sending the request
+     */
+    async unarchiveGroupRequestOpts(requestParameters: UnarchiveGroupRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['groupId'] == null) {
+            throw new runtime.RequiredError(
+                'groupId',
+                'Required parameter "groupId" was null or undefined when calling unarchiveGroup().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/group/{groupId}/unarchive`;
+        urlPath = urlPath.replace('{groupId}', encodeURIComponent(String(requestParameters['groupId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Unarchive a group.
+     */
+    async unarchiveGroupRaw(requestParameters: UnarchiveGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.unarchiveGroupRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Unarchive a group.
+     */
+    async unarchiveGroup(requestParameters: UnarchiveGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.unarchiveGroupRaw(requestParameters, initOverrides);
     }
 
     /**

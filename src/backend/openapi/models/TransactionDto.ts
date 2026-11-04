@@ -81,6 +81,10 @@ export interface TransactionDto {
     /**
      * 
      */
+    isArchived: boolean;
+    /**
+     * 
+     */
     photo?: string | null;
     /**
      * 
@@ -100,6 +104,7 @@ export function instanceOfTransactionDto(value: object): value is TransactionDto
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('currency' in value) || value['currency'] === undefined) return false;
     if (!('tags' in value) || value['tags'] === undefined) return false;
+    if (!('isArchived' in value) || value['isArchived'] === undefined) return false;
     return true;
 }
 
@@ -124,6 +129,7 @@ export function TransactionDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'geoCoordinate': json['geoCoordinate'] === undefined ? undefined : json['geoCoordinate'] === null ? null : json['geoCoordinate'],
         'invoiceId': json['invoiceId'] === undefined ? undefined : json['invoiceId'] === null ? null : json['invoiceId'],
+        'isArchived': json['isArchived'],
         'photo': json['photo'] === undefined ? undefined : json['photo'] === null ? null : json['photo'],
         'balances': json['balances'] == null ? undefined : ((json['balances'] as Array<any>).map(TransactionBalanceDtoFromJSON)),
     };
@@ -151,6 +157,7 @@ export function TransactionDtoToJSONTyped(value?: TransactionDto | null, ignoreD
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         'geoCoordinate': value['geoCoordinate'],
         'invoiceId': value['invoiceId'],
+        'isArchived': value['isArchived'],
         'photo': value['photo'],
         'balances': value['balances'] == null ? undefined : ((value['balances'] as Array<any>).map(TransactionBalanceDtoToJSON)),
     };

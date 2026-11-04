@@ -56,6 +56,7 @@ Use consistent terms across every screen and notification:
 | Invoice (settlement batch)  | invoice                         | 结算单                      | Avoid `账单` (collides with utility bills)                                    |
 | Settlement / Payment        | payment / settle up             | 还款 / 结算                 | Avoid literal `记录了一笔结算` when referring to a payment                    |
 | Receipt                     | receipt                         | 小票                        | Avoid formal `收据`                                                           |
+| Archive / Unarchive         | archive / unarchive             | 归档 / 取消归档             | Avoid `存档` or `隐藏` for the action                                         |
 | Nickname / Remark           | nickname                        | 备注名                      | Consistent across add/edit friend sheets                                      |
 | Positive balance (creditor) | You are owed / is owed          | 你应收 / 应收               | Avoid `You lent` / `你借出` (inaccurate for multi-way splits)                 |
 | Negative balance (debtor)   | You owe / owes                  | 你应还 / 应还 (or 欠)       | Avoid `borrowed` / `借入`                                                     |

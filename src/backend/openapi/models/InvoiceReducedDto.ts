@@ -62,6 +62,14 @@ export interface InvoiceReducedDto {
      * 
      */
     status: InvoiceStatus;
+    /**
+     * 
+     */
+    isArchived: boolean;
+    /**
+     * 
+     */
+    archiveTime?: Date | null;
 }
 
 
@@ -76,6 +84,7 @@ export function instanceOfInvoiceReducedDto(value: object): value is InvoiceRedu
     if (!('createdBy' in value) || value['createdBy'] === undefined) return false;
     if (!('createTime' in value) || value['createTime'] === undefined) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
+    if (!('isArchived' in value) || value['isArchived'] === undefined) return false;
     return true;
 }
 
@@ -96,6 +105,8 @@ export function InvoiceReducedDtoFromJSONTyped(json: any, ignoreDiscriminator: b
         'createdBy': SplitzUserReducedDtoFromJSON(json['createdBy']),
         'createTime': (json['createTime'] == null ? json['createTime'] : parseDateTime(json['createTime'])),
         'status': InvoiceStatusFromJSON(json['status']),
+        'isArchived': json['isArchived'],
+        'archiveTime': json['archiveTime'] === undefined ? undefined : json['archiveTime'] === null ? null : (parseDateTime(json['archiveTime'])),
     };
 }
 
@@ -117,6 +128,8 @@ export function InvoiceReducedDtoToJSONTyped(value?: InvoiceReducedDto | null, i
         'createdBy': SplitzUserReducedDtoToJSON(value['createdBy']),
         'createTime': value['createTime'] == null ? value['createTime'] : serializeDateTime(value['createTime']),
         'status': InvoiceStatusToJSON(value['status']),
+        'isArchived': value['isArchived'],
+        'archiveTime': value['archiveTime'] == null ? value['archiveTime'] : serializeDateTime(value['archiveTime']),
     };
 }
 

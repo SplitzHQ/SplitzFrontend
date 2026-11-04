@@ -79,6 +79,14 @@ export interface GroupDto {
      * This is only for searching purposes and may not be accurate if transactions are deleted or modified.
      */
     lastActivityTime: Date;
+    /**
+     * 
+     */
+    isArchived: boolean;
+    /**
+     * 
+     */
+    archiveTime?: Date | null;
 }
 
 /**
@@ -92,6 +100,7 @@ export function instanceOfGroupDto(value: object): value is GroupDto {
     if (!('balances' in value) || value['balances'] === undefined) return false;
     if (!('transactionCount' in value) || value['transactionCount'] === undefined) return false;
     if (!('lastActivityTime' in value) || value['lastActivityTime'] === undefined) return false;
+    if (!('isArchived' in value) || value['isArchived'] === undefined) return false;
     return true;
 }
 
@@ -114,6 +123,8 @@ export function GroupDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'balanceSummaries': json['balanceSummaries'] == null ? undefined : ((json['balanceSummaries'] as Array<any>).map(GroupBalanceSummaryDtoFromJSON)),
         'transactionCount': json['transactionCount'],
         'lastActivityTime': (json['lastActivityTime'] == null ? json['lastActivityTime'] : parseDateTime(json['lastActivityTime'])),
+        'isArchived': json['isArchived'],
+        'archiveTime': json['archiveTime'] === undefined ? undefined : json['archiveTime'] === null ? null : (parseDateTime(json['archiveTime'])),
     };
 }
 
@@ -137,6 +148,8 @@ export function GroupDtoToJSONTyped(value?: GroupDto | null, ignoreDiscriminator
         'balanceSummaries': value['balanceSummaries'] == null ? undefined : ((value['balanceSummaries'] as Array<any>).map(GroupBalanceSummaryDtoToJSON)),
         'transactionCount': value['transactionCount'],
         'lastActivityTime': value['lastActivityTime'] == null ? value['lastActivityTime'] : serializeDateTime(value['lastActivityTime']),
+        'isArchived': value['isArchived'],
+        'archiveTime': value['archiveTime'] == null ? value['archiveTime'] : serializeDateTime(value['archiveTime']),
     };
 }
 

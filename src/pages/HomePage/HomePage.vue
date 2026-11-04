@@ -5,17 +5,19 @@ import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { GroupApi } from "@/backend";
+import { type GroupDto, GroupApi } from "@/backend";
 import config from "@/backend/config";
-import Avatar from "@/components/Avatar/Avatar.vue";
+import ArchivedSection from "@/components/ArchivedSection/ArchivedSection.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import { partitionArchived } from "@/libs/archive";
 import { formatCurrency } from "@/libs/format-currency";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
+import GroupListItem from "./GroupListItem.vue";
 import HomeEmptyState from "./HomeEmptyState.vue";
 import HomeSearchBar from "./HomeSearchBar.vue";
 
@@ -28,37 +30,26 @@ const userStore = useUserStore();
 const searchKeyword = ref("");
 
 const groupApi = new GroupApi(config);
-const { state: groupsQuery } = useQuery({ key: ["getGroups"], query: () => groupApi.getGroups() });
-
-const groups = computed(() => {
-  return groupsQuery.value.data ?? [];
+// Archived groups load too, so the page can show how many are hidden. The key keeps the
+// ["getGroups"] prefix, so existing invalidations also refresh this query.
+const { state: groupsQuery } = useQuery({
+  key: ["getGroups", { includeArchived: true }],
+  query: () => groupApi.getGroups({ includeArchived: true }),
 });
 
-const groupWithExtraInfo = computed(() => {
-  return groups.value.map((group) => {
-    const myBalances = group.balances
-      .filter((b) => b.user.id === userStore.user?.id)
-      .map((b) => ({
-        ...b,
-        amount: Number.parseFloat(b.balance),
-      }));
-    const myBalanceNegative = myBalances.filter((b) => b.amount < 0);
-    const myBalancePositive = myBalances.filter((b) => b.amount > 0);
-    const myBalanceSettled = myBalances.every((b) => b.amount === 0);
-    const groupSettled = group.balances.every((b) => b.balance === "0");
-    return { ...group, groupSettled, myBalanceNegative, myBalancePositive, myBalanceSettled, myBalances };
-  });
-});
+const groups = computed(() => partitionArchived(groupsQuery.value.data ?? []));
 
-const visibleGroups = computed(() => {
+/** Keep groups that match the search keyword, most recently active first. */
+function filterAndSort(list: GroupDto[]): GroupDto[] {
   const keyword = searchKeyword.value.trim().toLowerCase();
-  const filtered = keyword
-    ? groupWithExtraInfo.value.filter((g) => g.name.toLowerCase().includes(keyword))
-    : groupWithExtraInfo.value;
+  const filtered = keyword ? list.filter((g) => g.name.toLowerCase().includes(keyword)) : list;
   return [...filtered].sort((a, b) => b.lastActivityTime.getTime() - a.lastActivityTime.getTime());
-});
+}
 
-const hasGroups = computed(() => visibleGroups.value.length > 0);
+const visibleGroups = computed(() => filterAndSort(groups.value.active));
+const visibleArchivedGroups = computed(() => filterAndSort(groups.value.archived));
+
+const hasGroups = computed(() => visibleGroups.value.length > 0 || visibleArchivedGroups.value.length > 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
 const showErrorState = computed(() => groupsQuery.value.status === "error");
@@ -154,55 +145,7 @@ const userBalances = computed(() => {
 
           <!-- Group List -->
           <div class="flex flex-col">
-            <button
-              v-for="group in visibleGroups"
-              :key="group.groupId"
-              type="button"
-              class="flex w-full items-center gap-3 py-2 text-left"
-              @click="router.push({ name: 'groupDetail', params: { groupId: group.groupId } })"
-            >
-              <Avatar v-if="group.photo" size="lg" :images="[{ src: group.photo, alt: group.name }]" />
-              <Avatar
-                v-else
-                size="lg"
-                :images="group.members.slice(0, 4).map((m) => ({ src: m.photo ?? null, alt: m.userName }))"
-              />
-
-              <div class="min-w-0 flex-1">
-                <p class="truncate text-base font-semibold text-base-text-primary">
-                  {{ group.name }}
-                </p>
-
-                <div class="mt-1 flex items-center gap-1 text-sm font-medium">
-                  <template v-if="group.myBalancePositive.length > 0">
-                    <span class="text-base-text-quinary">{{ $t("home-you-lent") }}</span>
-                    <span
-                      v-for="balance in group.myBalancePositive"
-                      :key="balance.currency"
-                      class="text-util-color-success-600"
-                    >
-                      {{ formatCurrency(balance.amount, balance.currency) }}
-                    </span>
-                  </template>
-                  <template v-if="group.myBalanceNegative.length > 0">
-                    <span class="text-base-text-quinary">{{ $t("home-you-owe") }}</span>
-                    <span
-                      v-for="balance in group.myBalanceNegative"
-                      :key="balance.currency"
-                      class="text-base-text-error"
-                    >
-                      {{ formatCurrency(balance.amount, balance.currency) }}
-                    </span>
-                  </template>
-                  <span v-if="group.groupSettled" class="text-core-alpha-brand-80">
-                    {{ $t("home-all-settled-up") }}
-                  </span>
-                  <span v-else-if="group.myBalanceSettled" class="text-core-alpha-brand-80">
-                    {{ $t("home-you-are-settled-up") }}
-                  </span>
-                </div>
-              </div>
-            </button>
+            <GroupListItem v-for="group in visibleGroups" :key="group.groupId" :group="group" />
 
             <!-- Create Group row. Keeps group creation reachable when the user already has groups. -->
             <button
@@ -226,6 +169,16 @@ const userBalances = computed(() => {
               </div>
             </button>
           </div>
+
+          <!-- Archived groups, hidden until the user opens them -->
+          <ArchivedSection :count="visibleArchivedGroups.length">
+            <div class="flex flex-col gap-1">
+              <p class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("home-archived-groups") }}</p>
+              <div class="flex flex-col">
+                <GroupListItem v-for="group in visibleArchivedGroups" :key="group.groupId" :group="group" />
+              </div>
+            </div>
+          </ArchivedSection>
         </div>
 
         <template v-else-if="showEmptyState">

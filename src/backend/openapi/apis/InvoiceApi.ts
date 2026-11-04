@@ -55,6 +55,13 @@ export interface AddSettlementRequest {
     invoiceSettlementInputDto?: InvoiceSettlementInputDto;
 }
 
+export interface ArchiveInvoiceRequest {
+    /**
+     * 
+     */
+    id: string;
+}
+
 export interface CreateInvoiceRequest {
     /**
      * 
@@ -81,6 +88,20 @@ export interface DeleteSettlementRequest {
 }
 
 export interface GetInvoiceRequest {
+    /**
+     * 
+     */
+    id: string;
+}
+
+export interface GetInvoicesRequest {
+    /**
+     * Include archived invoices. Archived invoices are hidden by default.
+     */
+    includeArchived?: boolean;
+}
+
+export interface UnarchiveInvoiceRequest {
     /**
      * 
      */
@@ -157,6 +178,58 @@ export class InvoiceApi extends runtime.BaseAPI {
     async addSettlement(requestParameters: AddSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<InvoiceSettlementDto> {
         const response = await this.addSettlementRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for archiveInvoice without sending the request
+     */
+    async archiveInvoiceRequestOpts(requestParameters: ArchiveInvoiceRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling archiveInvoice().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/invoice/{id}/archive`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Archive a fully paid invoice. Its expenses are archived with it.  Archived invoices are read-only and hidden from invoice lists by default.
+     */
+    async archiveInvoiceRaw(requestParameters: ArchiveInvoiceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.archiveInvoiceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Archive a fully paid invoice. Its expenses are archived with it.  Archived invoices are read-only and hidden from invoice lists by default.
+     */
+    async archiveInvoice(requestParameters: ArchiveInvoiceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.archiveInvoiceRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -375,8 +448,12 @@ export class InvoiceApi extends runtime.BaseAPI {
     /**
      * Creates request options for getInvoices without sending the request
      */
-    async getInvoicesRequestOpts(): Promise<runtime.RequestOpts> {
+    async getInvoicesRequestOpts(requestParameters: GetInvoicesRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
+
+        if (requestParameters['includeArchived'] != null) {
+            queryParameters['includeArchived'] = requestParameters['includeArchived'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -402,8 +479,8 @@ export class InvoiceApi extends runtime.BaseAPI {
     /**
      * List invoices for the current user\'s groups
      */
-    async getInvoicesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<InvoiceReducedDto>>> {
-        const requestOptions = await this.getInvoicesRequestOpts();
+    async getInvoicesRaw(requestParameters: GetInvoicesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<InvoiceReducedDto>>> {
+        const requestOptions = await this.getInvoicesRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(InvoiceReducedDtoFromJSON));
@@ -412,9 +489,61 @@ export class InvoiceApi extends runtime.BaseAPI {
     /**
      * List invoices for the current user\'s groups
      */
-    async getInvoices(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<InvoiceReducedDto>> {
-        const response = await this.getInvoicesRaw(initOverrides);
+    async getInvoices(requestParameters: GetInvoicesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<InvoiceReducedDto>> {
+        const response = await this.getInvoicesRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for unarchiveInvoice without sending the request
+     */
+    async unarchiveInvoiceRequestOpts(requestParameters: UnarchiveInvoiceRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling unarchiveInvoice().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/invoice/{id}/unarchive`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Unarchive an invoice. Its expenses are unarchived with it.
+     */
+    async unarchiveInvoiceRaw(requestParameters: UnarchiveInvoiceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.unarchiveInvoiceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Unarchive an invoice. Its expenses are unarchived with it.
+     */
+    async unarchiveInvoice(requestParameters: UnarchiveInvoiceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.unarchiveInvoiceRaw(requestParameters, initOverrides);
     }
 
     /**

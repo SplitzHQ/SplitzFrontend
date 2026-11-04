@@ -17,6 +17,7 @@ Name | Type
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `geoCoordinate` | string
 `invoiceId` | string
+`isArchived` | boolean
 `photo` | string
 `balances` | [Array&lt;TransactionBalanceDto&gt;](TransactionBalanceDto.md)
 
@@ -38,6 +39,7 @@ const example = {
   "tags": null,
   "geoCoordinate": null,
   "invoiceId": null,
+  "isArchived": null,
   "photo": null,
   "balances": null,
 } satisfies TransactionDto

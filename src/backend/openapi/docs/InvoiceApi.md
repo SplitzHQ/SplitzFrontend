@@ -5,11 +5,13 @@ All URIs are relative to *http://localhost*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**addSettlement**](InvoiceApi.md#addsettlement) | **POST** /invoice/{id}/settlement | Record a settlement for an invoice |
+| [**archiveInvoice**](InvoiceApi.md#archiveinvoice) | **POST** /invoice/{id}/archive | Archive a fully paid invoice. Its expenses are archived with it.  Archived invoices are read-only and hidden from invoice lists by default. |
 | [**createInvoice**](InvoiceApi.md#createinvoice) | **POST** /invoice | Create an invoice from selected transactions in a group |
 | [**deleteInvoice**](InvoiceApi.md#deleteinvoice) | **DELETE** /invoice/{id} | Delete an invoice. Only the creator can delete. |
 | [**deleteSettlement**](InvoiceApi.md#deletesettlement) | **DELETE** /invoice/{id}/settlement/{settlementId} | Remove a settlement from an invoice |
 | [**getInvoice**](InvoiceApi.md#getinvoice) | **GET** /invoice/{id} | Get invoice by id with debts, settlements, and transactions |
 | [**getInvoices**](InvoiceApi.md#getinvoices) | **GET** /invoice | List invoices for the current user\&#39;s groups |
+| [**unarchiveInvoice**](InvoiceApi.md#unarchiveinvoice) | **POST** /invoice/{id}/unarchive | Unarchive an invoice. Its expenses are unarchived with it. |
 | [**updateInvoice**](InvoiceApi.md#updateinvoice) | **PUT** /invoice/{id} | Update invoice transactions (add/remove). Recalculates debts. |
 
 
@@ -85,6 +87,78 @@ example().catch(console.error);
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
 | **201** | Created |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## archiveInvoice
+
+> archiveInvoice(id)
+
+Archive a fully paid invoice. Its expenses are archived with it.  Archived invoices are read-only and hidden from invoice lists by default.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  InvoiceApi,
+} from '';
+import type { ArchiveInvoiceRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new InvoiceApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies ArchiveInvoiceRequest;
+
+  try {
+    const data = await api.archiveInvoice(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -380,7 +454,7 @@ example().catch(console.error);
 
 ## getInvoices
 
-> Array&lt;InvoiceReducedDto&gt; getInvoices()
+> Array&lt;InvoiceReducedDto&gt; getInvoices(includeArchived)
 
 List invoices for the current user\&#39;s groups
 
@@ -401,8 +475,13 @@ async function example() {
   });
   const api = new InvoiceApi(config);
 
+  const body = {
+    // boolean | Include archived invoices. Archived invoices are hidden by default. (optional)
+    includeArchived: true,
+  } satisfies GetInvoicesRequest;
+
   try {
-    const data = await api.getInvoices();
+    const data = await api.getInvoices(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -415,7 +494,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **includeArchived** | `boolean` | Include archived invoices. Archived invoices are hidden by default. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -436,6 +518,77 @@ This endpoint does not need any parameter.
 |-------------|-------------|------------------|
 | **401** | Unauthorized |  -  |
 | **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## unarchiveInvoice
+
+> unarchiveInvoice(id)
+
+Unarchive an invoice. Its expenses are unarchived with it.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  InvoiceApi,
+} from '';
+import type { UnarchiveInvoiceRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new InvoiceApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies UnarchiveInvoiceRequest;
+
+  try {
+    const data = await api.unarchiveInvoice(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

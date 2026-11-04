@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhGearSix, PhPlus } from "@phosphor-icons/vue";
+import { PhArchive, PhGearSix, PhPlus } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -7,11 +7,14 @@ import { useRoute, useRouter } from "vue-router";
 
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
+import ArchivedSection from "@/components/ArchivedSection/ArchivedSection.vue";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import { partitionArchived } from "@/libs/archive";
 import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
@@ -40,20 +43,24 @@ const { state: groupQuery } = useQuery({
   query: () => groupApi.getGroup({ groupId: groupId.value }),
 });
 
+// Archived items load too, so the page can show how many are hidden. The key keeps the default
+// ["getGroupTransactions", groupId] prefix, so existing invalidations also refresh this query.
 const { state: transactionsQuery } = useQuery({
-  key: () => ["getGroupTransactions", groupId.value],
-  query: () => groupApi.getGroupTransactions({ groupId: groupId.value }),
+  key: () => ["getGroupTransactions", groupId.value, { includeArchived: true }],
+  query: () => groupApi.getGroupTransactions({ groupId: groupId.value, includeArchived: true }),
 });
 
 const { state: invoicesQuery } = useQuery({
-  key: () => ["getGroupInvoices", groupId.value],
-  query: () => groupApi.getGroupInvoices({ groupId: groupId.value }),
+  key: () => ["getGroupInvoices", groupId.value, { includeArchived: true }],
+  query: () => groupApi.getGroupInvoices({ groupId: groupId.value, includeArchived: true }),
 });
 
-const groupInvoices = computed(() => invoicesQuery.value.data ?? []);
+const invoices = computed(() => partitionArchived(invoicesQuery.value.data ?? []));
+const transactions = computed(() => partitionArchived(transactionsQuery.value.data ?? []));
+const archivedCount = computed(() => invoices.value.archived.length + transactions.value.archived.length);
 
 const group = computed(() => groupQuery.value.data);
-const transactions = computed(() => transactionsQuery.value.data ?? []);
+const isArchived = computed(() => group.value?.isArchived ?? false);
 
 const avatarImages = computed(() => getGroupAvatarImages(group.value));
 
@@ -116,6 +123,11 @@ const settleUp = () => {
 
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 px-2">
+        <Notice v-if="isArchived" :title="$t('group-detail-archived-title')" data-test="group-archived-notice">
+          <template #icon><PhArchive /></template>
+          {{ $t("group-detail-archived-message") }}
+        </Notice>
+
         <!-- Balance Card -->
         <div class="flex flex-col gap-3">
           <template v-if="group">
@@ -138,10 +150,16 @@ const settleUp = () => {
         </div>
 
         <!-- Invoices -->
-        <InvoiceList :invoices="groupInvoices" />
+        <InvoiceList :invoices="invoices.active" />
 
         <!-- Transaction List -->
-        <TransactionList :transactions="transactions" />
+        <TransactionList :transactions="transactions.active" />
+
+        <!-- Archived invoices and their expenses, hidden until the user opens them -->
+        <ArchivedSection :count="archivedCount">
+          <InvoiceList :invoices="invoices.archived" />
+          <TransactionList :transactions="transactions.archived" />
+        </ArchivedSection>
 
         <!-- Loading State -->
         <div v-if="groupQuery.status === 'pending'" class="px-4 pt-6 text-base text-base-text-tertiary">
@@ -153,8 +171,9 @@ const settleUp = () => {
           {{ $t("group-detail-error") }}
         </div>
 
-        <!-- FAB -->
+        <!-- FAB. An archived group takes no new expenses. -->
         <SIconButton
+          v-if="!isArchived"
           variant="primary"
           color="brand"
           size="xxl"
@@ -167,6 +186,11 @@ const settleUp = () => {
     </template>
   </Layout>
 
-  <GroupSettingsSheet v-model="showSettings" :group-id="groupId" @invite="showInvite = true" />
+  <GroupSettingsSheet
+    v-model="showSettings"
+    :group-id="groupId"
+    :is-archived="isArchived"
+    @invite="showInvite = true"
+  />
   <InviteFriendsSheet v-if="group" v-model="showInvite" :group="group" />
 </template>
