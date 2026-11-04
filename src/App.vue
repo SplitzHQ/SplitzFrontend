@@ -5,6 +5,7 @@ import "vue-sonner/style.css";
 
 import ReloadPrompt from "@/components/ReloadPrompt/ReloadPrompt.vue";
 import Sonner from "@/components/Sonner/Sonner.vue";
+import { DebugPanel } from "@/libs/devtools";
 import { useNotificationStore } from "@/stores/notification";
 import { useUserStore } from "@/stores/user";
 
@@ -26,4 +27,5 @@ watch(
   <RouterView />
   <Sonner position="top-center" close-button />
   <ReloadPrompt />
+  <component :is="DebugPanel" v-if="DebugPanel" />
 </template>

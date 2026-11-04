@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 
 import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, runnerImport, type ViteDevServer } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
@@ -14,6 +14,25 @@ const isStorybookOrTestProcess =
   process.env.npm_lifecycle_event === "build-storybook" ||
   process.env.VITEST === "true";
 
+/**
+ * Starts the server code of the private dev tools. The tools are in `devtools/`, which is a separate repository that
+ * this repository ignores. Without that folder, the plugin does nothing and the app runs normally.
+ *
+ * The plugin loads the file at run time, because a static import fails when the folder does not exist.
+ */
+function optionalDevtools(): Plugin {
+  const entry = fileURLToPath(new URL("devtools/vite-plugin.ts", import.meta.url));
+  return {
+    apply: "serve",
+    async configureServer(server) {
+      if (!fs.existsSync(entry)) return;
+      const { module } = await runnerImport<{ configureDevtools(devServer: ViteDevServer): void }>(entry);
+      module.configureDevtools(server);
+    },
+    name: "splitz-optional-devtools",
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -21,6 +40,8 @@ export default defineConfig({
     // incompatible with Storybook for now
     // https://github.com/storybookjs/storybook/issues/32462
     !isStorybookOrTestProcess && vueDevTools(),
+    // The tools write files, so tests and Storybook must not start them.
+    !isStorybookOrTestProcess && optionalDevtools(),
     {
       name: "copy-redirects",
       writeBundle() {
@@ -120,6 +141,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("src", import.meta.url)),
+      // Code in devtools/ uses this path. The app does not.
+      "@devtools": fileURLToPath(new URL("devtools", import.meta.url)),
     },
   },
   server: {
