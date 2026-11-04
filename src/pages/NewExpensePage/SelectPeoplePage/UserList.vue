@@ -2,6 +2,7 @@
 import { PhCaretRight, PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
+import SButtonBase from "@/components/SButton/SButtonBase.vue";
 
 import type { UserListItem } from "./types";
 
@@ -61,26 +62,23 @@ defineEmits<{
             </div>
           </div>
         </div>
-        <!-- The row is the button. These icons only show its state, because a button cannot hold a button. -->
-        <span
-          v-if="item.__typename === 'UserListItemFriend'"
-          class="relative size-8 shrink-0 text-lg text-base-fg-primary"
-        >
-          <Transition name="fade">
-            <PhCheckCircle
-              v-if="selectedItemsId.some((id) => item.id === id)"
-              weight="fill"
-              class="absolute inset-0 m-auto text-base-fg-brand"
-            />
-            <PhCircle v-else class="absolute inset-0 m-auto" />
-          </Transition>
-        </span>
-        <span
-          v-else-if="item.__typename === 'UserListItemGroup'"
-          class="flex size-8 shrink-0 items-center justify-center text-lg text-base-fg-primary"
-        >
-          <PhCaretRight />
-        </span>
+        <SButtonBase v-if="item.__typename === 'UserListItemFriend'" size="sm" variant="ghost" icon-only>
+          <template #icon-left>
+            <Transition name="fade">
+              <PhCheckCircle
+                v-if="selectedItemsId.some((id) => item.id === id)"
+                weight="fill"
+                class="absolute inset-0 size-full text-base-fg-brand"
+              />
+              <PhCircle v-else class="absolute inset-0" />
+            </Transition>
+          </template>
+        </SButtonBase>
+        <SButtonBase v-else-if="item.__typename === 'UserListItemGroup'" size="sm" variant="ghost" icon-only>
+          <template #icon-left>
+            <PhCaretRight />
+          </template>
+        </SButtonBase>
       </button>
     </div>
   </div>
