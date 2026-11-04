@@ -8,6 +8,10 @@
 
 - When working with ui code, check `vue`, `vue-testing-best-practices`, `vue-router-best-practices` and `web-design-guidelines` skills for guidelines.
 
+- Before any UI change in `src/` or `devtools/`, follow `.claude/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
+
+- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file and an entry in `src/components/component-index.ts`.
+
 - Use `@/` import paths for files under `src` unless they are in the same folder.
 
 - When you need components, check shadcn-vue online.
@@ -20,4 +24,4 @@
 
 - When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.
 
-- This repository is public. The private dev tools are in `devtools/`, which is a separate repository that this repository ignores. Commit tool changes there. Do not move tool files, tool docs or backlog notes into this repository. A clone without `devtools/` must build and run.
+- This repository is public. The private dev tools are in `devtools/`, which is a separate repository that this repository ignores. Commit tool changes there. Do not move tool files, tool docs or backlog notes into this repository. Component usage files are not tool docs: they stay next to the component in this repository. A clone without `devtools/` must build and run.

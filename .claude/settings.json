@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun .claude/hooks/component-usage-reminder.ts",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
