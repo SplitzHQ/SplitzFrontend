@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import type { ButtonSize, ButtonVariant } from "./button";
+import { BUTTON_ROOT_CLASS, type ButtonSize, type ButtonVariant } from "./button";
 import SButtonBase from "./SButtonBase.vue";
 
 /**
@@ -33,19 +33,18 @@ function clickHandler(e: MouseEvent) {
 </script>
 
 <template>
-  <SButtonBase
-    as="button"
+  <button
     type="button"
-    :variant="variant"
-    :size="size"
+    :class="BUTTON_ROOT_CLASS"
     :disabled="disabled"
-    :loading="loading"
     :aria-disabled="loading ? 'true' : undefined"
-    icon-only
+    :aria-busy="loading ? 'true' : undefined"
     @click="clickHandler"
   >
-    <template #icon-left>
-      <slot />
-    </template>
-  </SButtonBase>
+    <SButtonBase :variant="variant" :size="size" :disabled="disabled" :loading="loading" icon-only>
+      <template #icon-left>
+        <slot />
+      </template>
+    </SButtonBase>
+  </button>
 </template>

@@ -12,7 +12,7 @@
 
 - Before any UI change in `src/` or `devtools/`, follow `.agents/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
 
-- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file and an entry in `src/components/component-index.ts`.
+- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file.
 
 - Use tailwindcss classes for styling. Use scss for custom styles only when using tailwindcss makes it too complex or impossible.
 

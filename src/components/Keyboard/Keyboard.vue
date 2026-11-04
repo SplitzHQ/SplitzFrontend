@@ -2,7 +2,7 @@
 import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from "@phosphor-icons/vue";
 import { computed, onMounted, watch } from "vue";
 
-import SButton from "@/components/SButton/SButtonBase.vue";
+import SButton from "@/components/SButton/SButton.vue";
 
 import useCalculator, { type CalculatorInput, type Operator } from "./UseCalculator";
 
@@ -83,7 +83,13 @@ const input = (value: CalculatorInput | Operator | "." | "backspace") => {
       <SButton variant="ghost" size="xl" @click="input(1)">1</SButton>
       <SButton variant="ghost" size="xl" @click="input(2)">2</SButton>
       <SButton variant="ghost" size="xl" @click="input(3)">3</SButton>
-      <SButton class="hide-when-calculator-disabled" variant="ghost" size="xl" @click="input('+')">
+      <SButton
+        class="hide-when-calculator-disabled"
+        variant="ghost"
+        size="xl"
+        :aria-label="$t('keyboard-plus')"
+        @click="input('+')"
+      >
         <template #icon-left>
           <PhPlus />
         </template>
@@ -91,7 +97,13 @@ const input = (value: CalculatorInput | Operator | "." | "backspace") => {
       <SButton variant="ghost" size="xl" @click="input(4)">4</SButton>
       <SButton variant="ghost" size="xl" @click="input(5)">5</SButton>
       <SButton variant="ghost" size="xl" @click="input(6)">6</SButton>
-      <SButton class="hide-when-calculator-disabled" variant="ghost" size="xl" @click="input('-')">
+      <SButton
+        class="hide-when-calculator-disabled"
+        variant="ghost"
+        size="xl"
+        :aria-label="$t('keyboard-minus')"
+        @click="input('-')"
+      >
         <template #icon-left>
           <PhMinus />
         </template>
@@ -99,19 +111,31 @@ const input = (value: CalculatorInput | Operator | "." | "backspace") => {
       <SButton variant="ghost" size="xl" @click="input(7)">7</SButton>
       <SButton variant="ghost" size="xl" @click="input(8)">8</SButton>
       <SButton variant="ghost" size="xl" @click="input(9)">9</SButton>
-      <SButton class="hide-when-calculator-disabled" variant="ghost" size="xl" @click="input('×')">
+      <SButton
+        class="hide-when-calculator-disabled"
+        variant="ghost"
+        size="xl"
+        :aria-label="$t('keyboard-times')"
+        @click="input('×')"
+      >
         <template #icon-left>
           <PhX />
         </template>
       </SButton>
       <SButton variant="ghost" size="xl" @click="input('.')">.</SButton>
       <SButton variant="ghost" size="xl" @click="input(0)">0</SButton>
-      <SButton variant="ghost" size="xl" @click="input('backspace')">
+      <SButton variant="ghost" size="xl" :aria-label="$t('keyboard-delete')" @click="input('backspace')">
         <template #icon-left>
           <PhBackspace />
         </template>
       </SButton>
-      <SButton class="hide-when-calculator-disabled" variant="ghost" size="xl" @click="input('÷')">
+      <SButton
+        class="hide-when-calculator-disabled"
+        variant="ghost"
+        size="xl"
+        :aria-label="$t('keyboard-divide')"
+        @click="input('÷')"
+      >
         <template #icon-left>
           <PhDivide />
         </template>

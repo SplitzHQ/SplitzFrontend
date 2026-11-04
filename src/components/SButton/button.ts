@@ -15,6 +15,12 @@ export const BUTTON_SIZES = ["sm", "md", "xl"] as const;
 export type ButtonSize = (typeof BUTTON_SIZES)[number];
 
 /**
+ * The layout classes of the root element of SButton, SIconButton and SLinkButton. SButtonBase fills the root and draws
+ * the button. It also draws the focus ring, so the root has no native outline.
+ */
+export const BUTTON_ROOT_CLASS = "inline-flex max-w-full shrink-0 outline-none";
+
+/**
  * Interaction states that the design-system page can show without a pointer.
  * Set one on a button with the `data-force-state` attribute. App code must not use it.
  */

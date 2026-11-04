@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// The prompt for a new app version. The app has one instance. Do not add another.
 import { useRegisterSW } from "virtual:pwa-register/vue";
 import { watch } from "vue";
 import { toast } from "vue-sonner";

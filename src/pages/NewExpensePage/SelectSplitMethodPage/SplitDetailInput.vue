@@ -72,7 +72,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     </div>
   </button>
 
-  <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex items-center justify-end gap-1">
+  <!-- The tap box of a 32px icon button extends 6px past each side. The 8px gap keeps it off the count editor. -->
+  <div v-else-if="transactionStore.splitMethod === 'shares'" class="flex items-center justify-end gap-2">
     <SIconButton
       aria-label="Decrease share"
       size="sm"

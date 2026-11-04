@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import type { ButtonSize, ButtonVariant } from "./button";
+import { BUTTON_ROOT_CLASS, type ButtonSize, type ButtonVariant } from "./button";
 import SButtonBase from "./SButtonBase.vue";
 
 /** A button with a text label and optional icons. See `button.usage.ts` for when to use each variant and size. */
@@ -33,24 +33,24 @@ function clickHandler(e: MouseEvent) {
 </script>
 
 <template>
-  <SButtonBase
-    as="button"
+  <button
     :type="type"
-    :variant="variant"
-    :size="size"
+    :class="BUTTON_ROOT_CLASS"
     :disabled="disabled"
-    :loading="loading"
     :aria-disabled="loading ? 'true' : undefined"
+    :aria-busy="loading ? 'true' : undefined"
     @click="clickHandler"
   >
-    <template v-if="$slots['icon-left']" #icon-left>
-      <slot name="icon-left" />
-    </template>
-    <template v-if="$slots.default" #default>
-      <slot />
-    </template>
-    <template v-if="$slots['icon-right']" #icon-right>
-      <slot name="icon-right" />
-    </template>
-  </SButtonBase>
+    <SButtonBase :variant="variant" :size="size" :disabled="disabled" :loading="loading">
+      <template v-if="$slots['icon-left']" #icon-left>
+        <slot name="icon-left" />
+      </template>
+      <template v-if="$slots.default" #default>
+        <slot />
+      </template>
+      <template v-if="$slots['icon-right']" #icon-right>
+        <slot name="icon-right" />
+      </template>
+    </SButtonBase>
+  </button>
 </template>

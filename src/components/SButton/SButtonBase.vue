@@ -1,26 +1,22 @@
 <script setup lang="ts">
 import { PhCircleNotch } from "@phosphor-icons/vue";
-import { computed, useSlots, type Component } from "vue";
+import { computed, useSlots } from "vue";
 
 import type { ButtonSize, ButtonVariant } from "./button";
 
 /**
- * The look of every button in the app. SButton, SIconButton and SLinkButton wrap it and add the behavior.
- * Use it directly only inside an element that is already interactive, for example a list row that is a `<button>`.
- *
- * Each size step reads its metrics from CSS custom properties with fallbacks, for example `--s-button-height-md`.
- * The design-system page sets these properties to compare other size scales. App code must not set them.
+ * The look of every button in the app. Only SButton, SIconButton and SLinkButton use it.
+ * They render the real `<button>` or link around it and add the behavior. Pages must not import it.
  */
 export interface ButtonBaseProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   /** Makes the button a circle that holds only the `icon-left` slot. */
   iconOnly?: boolean;
+  /** Turns the button grey. The wrapper blocks the tap. */
   disabled?: boolean;
   /** Shows a spinner. The spinner replaces the left icon. Without a left icon, it covers the label. */
   loading?: boolean;
-  /** The root element or component, for example "button" or RouterLink. */
-  as?: string | Component;
 }
 
 const {
@@ -29,18 +25,15 @@ const {
   iconOnly = false,
   disabled = false,
   loading = false,
-  as = "span",
 } = defineProps<ButtonBaseProps>();
 
 const slots = useSlots();
 
 const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"] === undefined);
-const isNativeButton = computed(() => as === "button");
 </script>
 
 <template>
-  <component
-    :is="as"
+  <span
     :class="[
       's-button',
       `variant-${variant}`,
@@ -51,9 +44,6 @@ const isNativeButton = computed(() => as === "button");
         'is-loading': loading,
       },
     ]"
-    :disabled="isNativeButton ? disabled : undefined"
-    :aria-disabled="!isNativeButton && disabled ? 'true' : undefined"
-    :aria-busy="loading ? 'true' : undefined"
   >
     <span v-if="$slots['icon-left']" class="icon">
       <Transition name="s-button-swap" mode="out-in">
@@ -72,44 +62,44 @@ const isNativeButton = computed(() => as === "button");
         <PhCircleNotch class="icon animate-spin" aria-hidden="true" />
       </span>
     </Transition>
-  </component>
+  </span>
 </template>
 
 <style lang="scss" scoped>
 // Hover applies only on devices that can hover, so a tap on a phone does not leave a stuck hover color.
 // `data-force-state` lets the design-system page show a state without a pointer.
 // A disabled or loading button does not react to hover or press.
+// The states come from the parent, because the parent is the real <button> or link. It takes focus and attributes.
 @mixin hover {
   @media (hover: hover) {
-    &:not(.is-disabled, .is-loading):hover {
+    :hover > &:not(.is-disabled, .is-loading) {
       @content;
     }
   }
 
-  &:not(.is-disabled, .is-loading)[data-force-state="hover"] {
+  [data-force-state="hover"] > &:not(.is-disabled, .is-loading) {
     @content;
   }
 }
 
 @mixin pressed {
-  &:not(.is-disabled, .is-loading):active,
-  &:not(.is-disabled, .is-loading)[data-force-state="pressed"] {
+  :active > &:not(.is-disabled, .is-loading),
+  [data-force-state="pressed"] > &:not(.is-disabled, .is-loading) {
     @content;
   }
 }
 
-// The rules sit in the Tailwind `components` layer, so utility classes on a button (fixed, w-full) override them.
+// The parent takes layout classes such as w-full or fixed (see BUTTON_ROOT_CLASS). This element fills the parent.
 @layer components {
   .s-button {
     position: relative;
-    display: inline-flex;
-    flex-shrink: 0;
+    display: flex;
+    flex: 1 1 auto;
     align-items: center;
     justify-content: center;
     gap: var(--_gap);
     height: var(--_height);
     min-width: 0;
-    max-width: 100%;
     padding-inline: var(--_padding);
     border: 1px solid transparent;
     border-radius: 9999px;
@@ -117,7 +107,7 @@ const isNativeButton = computed(() => as === "button");
     color: var(--_text);
     font-size: var(--_font);
     line-height: var(--_line);
-    font-weight: var(--s-button-weight, 600);
+    font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
@@ -146,8 +136,8 @@ const isNativeButton = computed(() => as === "button");
     }
 
     // The ring shows only for keyboard focus. A tap does not show it.
-    &:focus-visible,
-    &[data-force-state="focus"] {
+    :focus-visible > &,
+    [data-force-state="focus"] > & {
       outline: 2px solid var(--_ring, var(--base-border-brand-solid));
       outline-offset: 2px;
     }
@@ -164,35 +154,35 @@ const isNativeButton = computed(() => as === "button");
     --_press-scale: 1;
   }
 
-  // Size steps. Each metric reads a custom property first, so the design-system page can try other scales.
+  // Size steps.
   .size-sm {
-    --_height: var(--s-button-height-sm, 32px);
-    --_padding: var(--s-button-padding-sm, 12px);
-    --_font: var(--s-button-font-sm, 14px);
-    --_line: var(--s-button-line-sm, 20px);
-    --_icon: var(--s-button-icon-sm, 16px);
-    --_icon-only: var(--s-button-icon-only-sm, 18px);
-    --_gap: var(--s-button-gap-sm, 4px);
+    --_height: 32px;
+    --_padding: 12px;
+    --_font: 14px;
+    --_line: 20px;
+    --_icon: 16px;
+    --_icon-only: 18px;
+    --_gap: 4px;
   }
 
   .size-md {
-    --_height: var(--s-button-height-md, 40px);
-    --_padding: var(--s-button-padding-md, 16px);
-    --_font: var(--s-button-font-md, 15px);
-    --_line: var(--s-button-line-md, 20px);
-    --_icon: var(--s-button-icon-md, 18px);
-    --_icon-only: var(--s-button-icon-only-md, 20px);
-    --_gap: var(--s-button-gap-md, 6px);
+    --_height: 40px;
+    --_padding: 16px;
+    --_font: 15px;
+    --_line: 20px;
+    --_icon: 18px;
+    --_icon-only: 20px;
+    --_gap: 6px;
   }
 
   .size-xl {
-    --_height: var(--s-button-height-xl, 52px);
-    --_padding: var(--s-button-padding-xl, 24px);
-    --_font: var(--s-button-font-xl, 17px);
-    --_line: var(--s-button-line-xl, 24px);
-    --_icon: var(--s-button-icon-xl, 20px);
-    --_icon-only: var(--s-button-icon-only-xl, 24px);
-    --_gap: var(--s-button-gap-xl, 8px);
+    --_height: 52px;
+    --_padding: 24px;
+    --_font: 17px;
+    --_line: 24px;
+    --_icon: 20px;
+    --_icon-only: 24px;
+    --_gap: 8px;
   }
 
   .icon-only {

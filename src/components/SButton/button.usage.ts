@@ -32,7 +32,7 @@ export const COMPONENT_GUIDE = [
   },
   {
     component: "SButtonBase",
-    use: "The look of every button. Use it directly only inside an element that is already interactive, for example a list row that is a <button>.",
+    use: "The look of every button. Only SButton, SIconButton and SLinkButton use it. Do not import it in a page or in another component.",
   },
 ];
 
@@ -45,7 +45,7 @@ export interface NotAButtonRule {
 export const NOT_A_BUTTON: NotAButtonRule[] = [
   { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
   { use: "SSwitch", when: "The user turns a setting on or off." },
-  { use: "A <button> row with SButtonBase inside", when: "The user can tap the full row." },
+  { use: "A <button> row with a plain icon inside", when: "The user can tap the full row." },
   { use: "An empty <div> with a fixed size", when: "A layout needs a space. Do not use an invisible button." },
 ];
 

@@ -1,7 +1,7 @@
 import { PhBackspace } from "@phosphor-icons/vue";
 import type { Meta, StoryFn } from "@storybook/vue3-vite";
 
-import SButton from "@/components/SButton/SButtonBase.vue";
+import SButton from "@/components/SButton/SButton.vue";
 
 import Keyboard from "./Keyboard.vue";
 

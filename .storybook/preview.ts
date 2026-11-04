@@ -1,8 +1,14 @@
 import { withThemeByClassName } from "@storybook/addon-themes";
-import type { Preview } from "@storybook/vue3-vite";
+import { setup, type Preview } from "@storybook/vue3-vite";
 
+import { createAppFluent } from "@/libs/fluent";
 import "@/assets/base.css";
 import "@/assets/color.css";
+
+// Components read their strings through fluent, so stories install the same plugin as the app.
+setup((app) => {
+  app.use(createAppFluent());
+});
 
 const preview: Preview = {
   parameters: {
