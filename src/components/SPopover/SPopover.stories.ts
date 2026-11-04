@@ -16,7 +16,7 @@ const meta = {
     template: `
       <SPopover v-bind="args">
         <template #trigger>
-          <SIconButton variant="ghost" color="neutral" size="lg" aria-label="Open notifications">
+          <SIconButton variant="ghost" size="md" aria-label="Open notifications">
             <span aria-hidden="true">•••</span>
           </SIconButton>
         </template>

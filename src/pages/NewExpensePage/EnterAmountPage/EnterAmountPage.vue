@@ -59,15 +59,15 @@ function applyReceiptToTxn(recognition: ReceiptDto) {
             <NumberFlow :value="transaction.amount!" :format="formatOptions" />
           </div>
           <div class="flex flex-wrap items-center justify-center gap-2">
-            <SButton color="brand" variant="secondary" size="sm">
+            <SButton variant="secondary" size="sm">
               <template #icon-left><PhCurrencyDollar /></template>
               {{ transaction.currency ?? "USD" }}
             </SButton>
-            <SButton color="brand" variant="secondary" size="sm">
+            <SButton variant="secondary" size="sm">
               <template #icon-left><PhArrowUpRight /></template>
               {{ $t("new-expense-frequency-one-time") }}
             </SButton>
-            <SButton color="brand" variant="secondary" size="sm" data-test="scan-receipt" @click="showScanSheet = true">
+            <SButton variant="secondary" size="sm" data-test="scan-receipt" @click="showScanSheet = true">
               <template #icon-left><PhScan /></template>
               {{ $t("new-expense-scan-button") }}
             </SButton>
@@ -92,8 +92,8 @@ function applyReceiptToTxn(recognition: ReceiptDto) {
         </div>
         <Keyboard v-model="transaction.amount" variant="ghost" :enable-calculator="true" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
-          <SButton color="brand" variant="outline" size="xxl">{{ $t("new-expense-actions-skip") }}</SButton>
-          <SLinkButton color="brand" variant="primary" size="xxl" href="/new-expense/select-people">
+          <SButton variant="secondary" size="xl">{{ $t("new-expense-actions-skip") }}</SButton>
+          <SLinkButton variant="primary" size="xl" href="/new-expense/select-people">
             {{ $t("new-expense-actions-next") }}
           </SLinkButton>
         </div>

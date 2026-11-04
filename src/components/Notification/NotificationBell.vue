@@ -44,8 +44,7 @@ watch(open, (active) => {
       <template #trigger>
         <SIconButton
           variant="ghost"
-          color="neutral"
-          size="lg"
+          size="md"
           :aria-label="label"
           :aria-expanded="open"
           aria-haspopup="dialog"

@@ -196,9 +196,8 @@ function getSingleQueryValue(value: unknown): string | undefined {
 
       <SButton
         type="submit"
-        color="brand"
         variant="primary"
-        size="xxl"
+        size="xl"
         :disabled="resetCooldown.isActive.value"
         :loading="loading"
         class="w-full"

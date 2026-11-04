@@ -28,14 +28,14 @@ const emit = defineEmits<{
     </div>
 
     <div class="flex w-full flex-col items-start gap-3 px-3 py-0">
-      <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="emit('addExpense')">
+      <SButton variant="primary" size="xl" class="w-full" @click="emit('addExpense')">
         <template #icon-left>
           <PhPlus />
         </template>
         {{ $t("home-button-record-expense") }}
       </SButton>
 
-      <SButton variant="outline" color="neutral" size="xxl" class="w-full" @click="emit('createGroup')">
+      <SButton variant="secondary" size="xl" class="w-full" @click="emit('createGroup')">
         <template #icon-left>
           <PhUsers />
         </template>

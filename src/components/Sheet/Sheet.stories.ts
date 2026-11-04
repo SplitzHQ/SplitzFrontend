@@ -303,32 +303,32 @@ export const InFrontOfOtherComponents: Story = {
       <div class="text-base-text-primary">
         <div role="group" aria-label="Dropdown layer"
           class="fixed top-0 left-0 z-dropdown flex h-1/2 w-1/2 items-center justify-center bg-base-bg-primary">
-          <SButton color="brand" variant="primary" size="md" @click="isOpen = true">
+          <SButton variant="primary" size="md" @click="isOpen = true">
             Open layering sheet
           </SButton>
         </div>
         <div role="group" aria-label="Sticky layer"
           class="fixed top-0 right-0 z-sticky flex h-1/2 w-1/2 items-center justify-center bg-base-bg-secondary">
-          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+          <SButton variant="secondary" size="md" @click="pageClicks++">
             Sticky action
           </SButton>
         </div>
         <div role="group" aria-label="Fixed layer"
           class="fixed bottom-0 left-0 z-fixed flex h-1/2 w-1/2 items-center justify-center bg-base-bg-secondary">
-          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+          <SButton variant="secondary" size="md" @click="pageClicks++">
             Fixed action
           </SButton>
         </div>
         <div role="group" aria-label="Offcanvas layer"
           class="fixed right-0 bottom-0 z-offcanvas flex h-1/2 w-1/2 items-center justify-center bg-base-bg-primary">
-          <SButton color="neutral" variant="secondary" size="md" @click="pageClicks++">
+          <SButton variant="secondary" size="md" @click="pageClicks++">
             Offcanvas action
           </SButton>
         </div>
         <Sheet v-model="isOpen" v-bind="args">
           <div class="flex flex-col gap-4">
             <h2 class="text-xl font-semibold">Sheet layering</h2>
-            <SButton color="brand" variant="primary" size="md" @click="sheetClicks++">
+            <SButton variant="primary" size="md" @click="sheetClicks++">
               Sheet action
             </SButton>
             <p role="status">Sheet clicks: {{ sheetClicks }}. Page clicks: {{ pageClicks }}.</p>

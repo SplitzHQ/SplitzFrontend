@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhMapPin, PhPencil, PhTrash, PhX } from "@phosphor-icons/vue";
+import { PhMapPin, PhPencil, PhTrash } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -13,7 +13,6 @@ import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
-import SIconButton from "@/components/SButton/SIconButton.vue";
 import { resolveAssetUrl } from "@/libs/asset-url";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { formatCurrency } from "@/libs/format-currency";
@@ -128,11 +127,9 @@ async function handleDelete() {
           <Avatar :images="avatarImages" size="xs" />
           <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
         </div>
-        <!-- Add an invisible close button to make sure the header layout remains consistent -->
+        <!-- An empty box as wide as the back button keeps the title in the center. -->
         <template #right>
-          <SIconButton variant="ghost" color="neutral" size="lg" class="pointer-events-none">
-            <PhX class="text-transparent" />
-          </SIconButton>
+          <div class="size-10 shrink-0" />
         </template>
       </HeaderMobileSecondary>
     </template>
@@ -237,19 +234,18 @@ async function handleDelete() {
             >
               {{ lockedMessage }}
             </p>
-            <SButton variant="secondary" color="neutral" size="xxl" disabled>
-              <PhPencil class="mr-2" />
+            <SButton variant="secondary" color="neutral" size="xl" disabled>
+              <template #icon-left><PhPencil /></template>
               {{ $t("transaction-detail-edit") }}
             </SButton>
             <SButton
-              variant="secondary"
-              color="error"
-              size="xxl"
+              variant="destructive-soft"
+              size="xl"
               :disabled="!!lockedMessage"
               :aria-describedby="lockedMessage ? 'transaction-locked-message' : undefined"
               @click="showDeleteSheet = true"
             >
-              <PhTrash class="mr-2" />
+              <template #icon-left><PhTrash /></template>
               {{ $t("transaction-detail-delete") }}
             </SButton>
           </div>

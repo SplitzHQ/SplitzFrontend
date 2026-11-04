@@ -106,10 +106,9 @@ async function ignore() {
       <div class="flex gap-2">
         <SButton
           variant="primary"
-          color="brand"
-          :size="compact ? 'sm' : 'md'"
+          size="sm"
           :loading="pending === 'accept'"
-          :disabled="pending !== null"
+          :disabled="pending === 'ignore'"
           data-test="request-accept"
           @click="accept"
         >
@@ -117,10 +116,9 @@ async function ignore() {
         </SButton>
         <SButton
           variant="ghost"
-          color="neutral"
-          :size="compact ? 'sm' : 'md'"
+          size="sm"
           :loading="pending === 'ignore'"
-          :disabled="pending !== null"
+          :disabled="pending === 'accept'"
           data-test="request-ignore"
           @click="ignore"
         >

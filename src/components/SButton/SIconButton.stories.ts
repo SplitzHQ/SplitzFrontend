@@ -2,8 +2,10 @@ import { PhAirplaneTakeoff } from "@phosphor-icons/vue";
 import type { Meta, StoryFn } from "@storybook/vue3-vite";
 import { fn } from "storybook/test";
 
+import { BUTTON_SIZES, BUTTON_VARIANTS } from "./button";
 import SIconButton from "./SIconButton.vue";
 
+// The full docs live on the design-system page (/devtools/design-system.html#/components/button).
 export default {
   title: "Components/IconButton",
   component: SIconButton,
@@ -11,18 +13,8 @@ export default {
     onClick: fn(),
   },
   argTypes: {
-    color: {
-      control: { type: "select" },
-      options: ["neutral", "error", "brand"],
-    },
-    variant: {
-      control: { type: "select" },
-      options: ["primary", "secondary", "outline", "ghost"],
-    },
-    size: {
-      control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl", "xxl"],
-    },
+    variant: { control: { type: "select" }, options: BUTTON_VARIANTS },
+    size: { control: { type: "select" }, options: BUTTON_SIZES },
     disabled: { control: "boolean" },
     loading: { control: "boolean" },
   },
@@ -33,31 +25,12 @@ const Template: StoryFn<typeof SIconButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SIconButton v-bind="args" aria-label="Airplane Takeoff"><PhAirplaneTakeoff /></SIconButton>',
+  template: '<SIconButton v-bind="args" aria-label="Take off"><PhAirplaneTakeoff /></SIconButton>',
 });
 
-export const Brand = Template.bind({});
-Brand.args = {
-  color: "brand",
-  variant: "primary",
-  size: "md",
-  disabled: false,
-  loading: false,
-};
-
-export const Neutral = Template.bind({});
-Neutral.args = {
-  color: "neutral",
-  variant: "primary",
-  size: "md",
-  disabled: false,
-  loading: false,
-};
-
-export const Error = Template.bind({});
-Error.args = {
-  color: "error",
-  variant: "primary",
+export const Playground = Template.bind({});
+Playground.args = {
+  variant: "ghost",
   size: "md",
   disabled: false,
   loading: false,

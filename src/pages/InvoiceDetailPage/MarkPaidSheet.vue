@@ -120,22 +120,14 @@ async function markDebtPaid() {
       <div class="flex flex-col gap-2">
         <SButton
           variant="primary"
-          color="brand"
-          size="xxl"
+          size="xl"
           :loading="isSubmitting"
-          :disabled="isSubmitting"
           data-test="mark-paid-confirm"
           @click="markDebtPaid"
         >
           {{ $t("invoice-detail-mark-paid") }}
         </SButton>
-        <SButton
-          variant="secondary"
-          color="neutral"
-          size="xxl"
-          :disabled="isSubmitting"
-          @click="emit('update:modelValue', false)"
-        >
+        <SButton variant="secondary" size="xl" :disabled="isSubmitting" @click="emit('update:modelValue', false)">
           {{ $t("invoice-detail-cancel") }}
         </SButton>
       </div>

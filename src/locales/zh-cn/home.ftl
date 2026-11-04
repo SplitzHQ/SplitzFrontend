@@ -14,4 +14,6 @@ home-button-record-expense = 记一笔
 home-button-create-group = 创建群组
 home-create-group-hint = 新建群组，和朋友分摊日常支出
 home-archived-groups = 已归档群组
+home-menu = 菜单
+home-filter = 筛选
 

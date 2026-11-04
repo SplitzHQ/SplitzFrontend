@@ -14,4 +14,6 @@ home-button-record-expense = Record new expense
 home-button-create-group = Create group
 home-create-group-hint = Start a group to split expenses with others
 home-archived-groups = Archived groups
+home-menu = Menu
+home-filter = Filter
 

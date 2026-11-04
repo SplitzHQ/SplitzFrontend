@@ -12,6 +12,7 @@ import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SLinkButton from "@/components/SButton/SLinkButton.vue";
 import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 
 const { $t } = useFluent();
@@ -116,21 +117,13 @@ async function join() {
         </div>
 
         <div class="fixed inset-x-3 bottom-4">
-          <SButton
-            v-if="isUnavailable"
-            variant="outline"
-            color="neutral"
-            size="xxl"
-            class="w-full"
-            @click="router.push({ name: 'home' })"
-          >
+          <SLinkButton v-if="isUnavailable" variant="secondary" size="xl" class="w-full" href="/">
             {{ $t("join-group-back-home") }}
-          </SButton>
+          </SLinkButton>
           <SButton
             v-else
             variant="primary"
-            color="brand"
-            size="xxl"
+            size="xl"
             class="w-full"
             :loading="joining"
             :disabled="isLoading"

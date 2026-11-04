@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// The host of the toasts. The app has one instance. To show a toast, call `toast` from `vue-sonner`.
 import { PhCheckCircle, PhCircleNotch, PhInfo, PhWarning, PhX, PhXCircle } from "@phosphor-icons/vue";
 import { type ToasterProps, Toaster as Sonner } from "vue-sonner";
 

@@ -25,13 +25,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
 </script>
 
 <template>
-  <SButton
-    v-if="transactionStore.splitMethod === 'equally'"
-    size="sm"
-    variant="secondary"
-    color="brand"
-    @click="showSheet = true"
-  >
+  <SButton v-if="transactionStore.splitMethod === 'equally'" size="sm" variant="secondary" @click="showSheet = true">
     {{ $t("new-expense-split-types-equally") }}
     <template #icon-left>
       <PhEquals />
@@ -41,7 +35,6 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     v-else-if="transactionStore.splitMethod === 'shares'"
     size="sm"
     variant="secondary"
-    color="brand"
     @click="showSheet = true"
   >
     {{ $t("new-expense-split-types-shares") }}
@@ -53,7 +46,6 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     v-else-if="transactionStore.splitMethod === 'percentage'"
     size="sm"
     variant="secondary"
-    color="brand"
     @click="showSheet = true"
   >
     {{ $t("new-expense-split-types-percentage") }}
@@ -65,7 +57,6 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     v-else-if="transactionStore.splitMethod === 'adjustment'"
     size="sm"
     variant="secondary"
-    color="brand"
     @click="showSheet = true"
   >
     {{ $t("new-expense-split-types-adjustment") }}
@@ -77,7 +68,6 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     v-else-if="transactionStore.splitMethod === 'custom'"
     size="sm"
     variant="secondary"
-    color="brand"
     @click="showSheet = true"
   >
     {{ $t("new-expense-split-types-custom") }}

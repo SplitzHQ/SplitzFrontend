@@ -1,0 +1,47 @@
+/*
+ * Motion tokens. Each token names a role, not a speed. The values come from the transitions the app already uses.
+ * src/libs/motion.ts mirrors the durations and curves for script code. The design-system tests check that the two
+ * agree. See the Motion tab of the design-system page (/devtools/design-system.html) for the rules and live demos.
+ *
+ * Use them in Tailwind as `duration-(--motion-duration-state) ease-(--motion-easing-enter)`.
+ */
+:root {
+  /* Slow-motion factor for debugging. 1 is normal speed. */
+  --motion-slow: 1;
+  --motion-duration-hover-in: calc(100ms * var(--motion-slow));
+  --motion-duration-exit: calc(150ms * var(--motion-slow));
+  --motion-duration-feedback: calc(150ms * var(--motion-slow));
+  --motion-duration-state: calc(200ms * var(--motion-slow));
+  --motion-duration-container: calc(250ms * var(--motion-slow));
+  --motion-duration-sheet: calc(300ms * var(--motion-slow));
+  --motion-easing-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --motion-easing-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-easing-exit: cubic-bezier(0.32, 0, 0.67, 0);
+  --motion-easing-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-easing-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*
+ * Reduced motion: every duration is 0, so each change happens at once. The second block is the same rule for
+ * <html data-reduce-motion>, which lets a developer test reduced motion without a system setting. Keep the two
+ * blocks identical. The motion tests check this.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-hover-in: 0ms;
+    --motion-duration-exit: 0ms;
+    --motion-duration-feedback: 0ms;
+    --motion-duration-state: 0ms;
+    --motion-duration-container: 0ms;
+    --motion-duration-sheet: 0ms;
+  }
+}
+
+:root[data-reduce-motion] {
+  --motion-duration-hover-in: 0ms;
+  --motion-duration-exit: 0ms;
+  --motion-duration-feedback: 0ms;
+  --motion-duration-state: 0ms;
+  --motion-duration-container: 0ms;
+  --motion-duration-sheet: 0ms;
+}

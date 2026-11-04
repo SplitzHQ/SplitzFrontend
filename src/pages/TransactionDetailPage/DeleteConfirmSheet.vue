@@ -29,23 +29,10 @@ const { $t } = useFluent();
         </p>
       </div>
       <div class="flex flex-col gap-2">
-        <SButton
-          variant="primary"
-          color="error"
-          size="xxl"
-          :loading="isDeleting"
-          :disabled="isDeleting"
-          @click="emit('confirm')"
-        >
+        <SButton variant="destructive" size="xl" :loading="isDeleting" @click="emit('confirm')">
           {{ $t("transaction-detail-delete-confirm-yes") }}
         </SButton>
-        <SButton
-          variant="secondary"
-          color="neutral"
-          size="xxl"
-          :disabled="isDeleting"
-          @click="emit('update:modelValue', false)"
-        >
+        <SButton variant="secondary" size="xl" :disabled="isDeleting" @click="emit('update:modelValue', false)">
           {{ $t("transaction-detail-delete-confirm-cancel") }}
         </SButton>
       </div>

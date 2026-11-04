@@ -12,8 +12,8 @@ import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import Notice from "@/components/Notice/Notice.vue";
-import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import SSegmentControl from "@/components/SSegmentControl/SSegmentControl.vue";
 import { partitionArchived } from "@/libs/archive";
 import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -80,6 +80,8 @@ const balanceSummaries = computed(() => {
   }));
 });
 
+/** The selected tab. The tabs do not change the content yet. */
+const activeTab = ref(0);
 const tabs = computed(() => [
   $t("group-detail-tab-balances"),
   $t("group-detail-tab-trend"),
@@ -109,8 +111,7 @@ const settleUp = () => {
         <template #right>
           <SIconButton
             variant="ghost"
-            color="neutral"
-            size="lg"
+            size="md"
             :aria-label="$t('group-settings-title')"
             data-test="group-settings"
             @click="showSettings = true"
@@ -141,12 +142,12 @@ const settleUp = () => {
             />
           </template>
 
-          <!-- Tab Buttons -->
-          <div class="flex gap-2">
-            <SButton v-for="tab in tabs" :key="tab" variant="secondary" color="brand" size="xl">
-              {{ tab }}
-            </SButton>
-          </div>
+          <!-- Tabs -->
+          <SSegmentControl v-model="activeTab" size="sm" :items="tabs" class="self-start">
+            <template #default="{ item }">
+              <span class="px-2 py-1 text-sm whitespace-nowrap">{{ item }}</span>
+            </template>
+          </SSegmentControl>
         </div>
 
         <!-- Invoices -->
@@ -175,9 +176,9 @@ const settleUp = () => {
         <SIconButton
           v-if="!isArchived"
           variant="primary"
-          color="brand"
-          size="xxl"
+          size="xl"
           class="fixed right-5 bottom-12 z-10"
+          :aria-label="$t('new-expense-title')"
           @click="addExpense"
         >
           <PhPlus />

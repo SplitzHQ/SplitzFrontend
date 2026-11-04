@@ -88,7 +88,7 @@ const userBalances = computed(() => {
         <!-- Header -->
         <div class="flex w-full items-center justify-between">
           <div class="flex items-center gap-2.5">
-            <SIconButton variant="ghost" color="neutral" size="lg">
+            <SIconButton variant="ghost" size="md" :aria-label="$t('home-menu')">
               <PhList class="text-util-color-brand-700" />
             </SIconButton>
             <h1 class="text-lg font-bold text-util-color-brand-700">Splitz</h1>
@@ -102,8 +102,8 @@ const userBalances = computed(() => {
         <!-- Search Bar -->
         <div class="flex w-full items-start gap-2.5">
           <HomeSearchBar v-model="searchKeyword" class="flex-1" />
-          <SIconButton variant="secondary" color="neutral" size="lg">
-            <PhSlidersHorizontal class="size-5 text-base-text-primary" />
+          <SIconButton variant="secondary" size="md" :aria-label="$t('home-filter')">
+            <PhSlidersHorizontal />
           </SIconButton>
         </div>
       </div>
@@ -114,9 +114,9 @@ const userBalances = computed(() => {
         <!-- Floating Action Button -->
         <SIconButton
           variant="primary"
-          color="brand"
-          size="xxl"
+          size="xl"
           class="fixed right-5 bottom-12 z-10"
+          :aria-label="$t('home-button-record-expense')"
           @click="addExpense"
         >
           <PhPlus />

@@ -7,6 +7,7 @@ create-group-error-user-not-ready = Still loading your account. Try again in a m
 create-group-error-submit-failed = Couldn't create group. Try again.
 create-group-share-link-label = Invite link
 create-group-share-link-hint = Anyone with this link can join the group.
+create-group-copy-link = Copy link
 create-group-copy-success = Link copied
 create-group-copy-failed = Couldn't copy link.
 create-group-created-hint = Share the link above to invite others.

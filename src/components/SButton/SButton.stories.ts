@@ -2,8 +2,10 @@ import { PhAirplaneTakeoff } from "@phosphor-icons/vue";
 import type { Meta, StoryFn } from "@storybook/vue3-vite";
 import { fn } from "storybook/test";
 
+import { BUTTON_SIZES, BUTTON_VARIANTS } from "./button";
 import SButton from "./SButton.vue";
 
+// The full docs live on the design-system page (/devtools/design-system.html#/components/button).
 export default {
   title: "Components/Button",
   component: SButton,
@@ -11,18 +13,8 @@ export default {
     onClick: fn(),
   },
   argTypes: {
-    color: {
-      control: { type: "select" },
-      options: ["neutral", "error", "brand"],
-    },
-    variant: {
-      control: { type: "select" },
-      options: ["primary", "secondary", "outline", "ghost"],
-    },
-    size: {
-      control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl", "xxl"],
-    },
+    variant: { control: { type: "select" }, options: BUTTON_VARIANTS },
+    size: { control: { type: "select" }, options: BUTTON_SIZES },
     disabled: { control: "boolean" },
     loading: { control: "boolean" },
   },
@@ -33,30 +25,11 @@ const Template: StoryFn<typeof SButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SButton v-bind="args">click me</SButton>',
+  template: '<SButton v-bind="args">Save changes</SButton>',
 });
 
-export const Brand = Template.bind({});
-Brand.args = {
-  color: "brand",
-  variant: "primary",
-  size: "md",
-  disabled: false,
-  loading: false,
-};
-
-export const Neutral = Template.bind({});
-Neutral.args = {
-  color: "neutral",
-  variant: "primary",
-  size: "md",
-  disabled: false,
-  loading: false,
-};
-
-export const Error = Template.bind({});
-Error.args = {
-  color: "error",
+export const Playground = Template.bind({});
+Playground.args = {
   variant: "primary",
   size: "md",
   disabled: false,
@@ -68,12 +41,11 @@ const TemplateWithIcon: StoryFn<typeof SButton> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SButton v-bind="args"><template #icon-left><PhAirplaneTakeoff /></template>take off</SButton>',
+  template: '<SButton v-bind="args"><template #icon-left><PhAirplaneTakeoff /></template>Take off</SButton>',
 });
 
 export const WithIcon = TemplateWithIcon.bind({});
 WithIcon.args = {
-  color: "brand",
   variant: "primary",
   size: "md",
   disabled: false,

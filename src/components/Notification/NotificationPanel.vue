@@ -45,19 +45,13 @@ function openSettings() {
     <div class="flex items-center justify-between gap-2">
       <h2 class="text-lg font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
       <div class="flex items-center gap-1">
-        <SButton v-if="hasUnread" variant="ghost" color="brand" size="sm" @click="store.markAllRead('Activity')">
+        <SButton v-if="hasUnread" variant="ghost" size="sm" @click="store.markAllRead('Activity')">
           {{ $t("notification-mark-all-read") }}
         </SButton>
-        <SButton v-if="items.length > 0" variant="ghost" color="neutral" size="sm" @click="store.dismissAllActivity">
+        <SButton v-if="items.length > 0" variant="ghost" size="sm" @click="store.dismissAllActivity">
           {{ $t("notification-clear-all") }}
         </SButton>
-        <SIconButton
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          :aria-label="$t('notification-settings')"
-          @click="openSettings"
-        >
+        <SIconButton variant="ghost" size="sm" :aria-label="$t('notification-settings')" @click="openSettings">
           <PhGearSix />
         </SIconButton>
       </div>
@@ -65,7 +59,7 @@ function openSettings() {
 
     <div v-if="store.error && items.length === 0" class="flex flex-col items-center gap-2 py-8 text-center">
       <p class="text-sm text-base-text-error">{{ $t("notification-error") }}</p>
-      <SButton variant="secondary" color="neutral" size="sm" :loading="store.loading" @click="store.fetch">
+      <SButton variant="secondary" size="md" :loading="store.loading" @click="store.fetch">
         {{ $t("notification-retry") }}
       </SButton>
     </div>

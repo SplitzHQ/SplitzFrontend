@@ -159,8 +159,7 @@ const handleNext = () => {
             <!-- Next Button -->
             <SButton
               variant="primary"
-              color="brand"
-              size="xl"
+              size="md"
               :disabled="invoiceStore.selectedTransactionsCount === 0"
               @click="handleNext"
             >
