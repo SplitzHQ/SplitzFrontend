@@ -12,6 +12,8 @@
 
 - When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file and an entry in `src/components/component-index.ts`.
 
+- Use tailwindcss classes for styling. Use scss for custom styles only when using tailwindcss makes it too complex or impossible.
+
 - Use `@/` import paths for files under `src` unless they are in the same folder.
 
 - When you need components, check shadcn-vue online.
