@@ -18,7 +18,8 @@ export default mergeConfig(
           extends: true,
           test: {
             environment: "jsdom",
-            exclude: [...configDefaults.exclude, "e2e/**"],
+            // Each worktree in .claude/ has a copy of src/. Do not collect those copies as tests.
+            exclude: [...configDefaults.exclude, "e2e/**", ".claude/**"],
             root: fileURLToPath(new URL("./", import.meta.url)),
           },
         },
