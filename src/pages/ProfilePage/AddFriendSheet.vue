@@ -77,8 +77,7 @@ async function describeAddFriendError(error: unknown): Promise<string> {
 
       <SButton
         variant="primary"
-        color="brand"
-        size="xxl"
+        size="xl"
         class="w-full"
         :disabled="!friendId.trim()"
         :loading="loading"

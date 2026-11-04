@@ -108,7 +108,7 @@ async function copyJoinLink() {
         <div v-if="joinUrl" class="flex flex-col gap-2 rounded-2xl bg-base-bg-secondary_alt p-4">
           <div class="flex items-center justify-between gap-3">
             <div class="text-sm font-semibold text-base-text-primary">{{ $t("create-group-share-link-label") }}</div>
-            <SIconButton variant="ghost" color="neutral" size="md" @click="copyJoinLink">
+            <SIconButton variant="ghost" size="sm" :aria-label="$t('create-group-copy-link')" @click="copyJoinLink">
               <PhCopy />
             </SIconButton>
           </div>
@@ -126,8 +126,7 @@ async function copyJoinLink() {
           <SButton
             v-if="!joinUrl"
             variant="primary"
-            color="brand"
-            size="xxl"
+            size="xl"
             class="w-full"
             :disabled="!canSubmit"
             :loading="loading"
@@ -139,8 +138,7 @@ async function copyJoinLink() {
           <SButton
             v-else
             variant="primary"
-            color="brand"
-            size="xxl"
+            size="xl"
             class="w-full"
             @click="() => routerHistoryStore.restoreSnapshot()"
           >

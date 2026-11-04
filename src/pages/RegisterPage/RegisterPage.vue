@@ -9,6 +9,7 @@ import { ResponseError, type HttpValidationProblemDetails } from "@/backend/open
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SLinkButton from "@/components/SButton/SLinkButton.vue";
 import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
@@ -100,9 +101,9 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
       </div>
     </template>
 
-    <SButton color="brand" variant="primary" size="xxl" class="w-full" @click="router.push({ name: 'login' })">
+    <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
       {{ $t("auth-register-login-link") }}
-    </SButton>
+    </SLinkButton>
   </AuthShell>
 
   <AuthShell v-else :title="$t('auth-register-title')" :subtitle="$t('auth-register-subtitle')">
@@ -163,9 +164,8 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
 
       <SButton
         type="submit"
-        color="brand"
         variant="primary"
-        size="xxl"
+        size="xl"
         :disabled="registrationCooldown.isActive.value"
         :loading="loading"
         class="w-full"

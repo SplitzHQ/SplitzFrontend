@@ -30,7 +30,7 @@ const { $t } = useFluent();
           {{ formatCurrency(totalBalance, currency, false) }}
         </p>
       </div>
-      <SButton variant="primary" color="brand" size="xl" @click="emit('settleUp')">
+      <SButton variant="primary" size="md" @click="emit('settleUp')">
         {{ $t("group-detail-settle-up") }}
       </SButton>
     </div>

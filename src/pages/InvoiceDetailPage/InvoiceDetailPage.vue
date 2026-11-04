@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowCounterClockwise, PhCheck, PhFileText, PhX } from "@phosphor-icons/vue";
+import { PhArrowCounterClockwise, PhCheck, PhFileText } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { Big } from "big.js";
 import { useFluent } from "fluent-vue";
@@ -148,11 +148,9 @@ async function undoPayment(settlementId: string) {
           <Avatar :images="avatarImages" size="xs" />
           <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
         </div>
-        <!-- Add an invisible close button to make sure the header layout remains consistent -->
+        <!-- An empty box as wide as the back button keeps the title in the center. -->
         <template #right>
-          <SIconButton variant="ghost" color="neutral" size="lg" class="pointer-events-none">
-            <PhX class="text-transparent" />
-          </SIconButton>
+          <div class="size-10 shrink-0" />
         </template>
       </HeaderMobileSecondary>
     </template>
@@ -241,8 +239,7 @@ async function undoPayment(settlementId: string) {
                   <SButton
                     v-else
                     key="mark"
-                    variant="secondary"
-                    color="brand"
+                    variant="outline"
                     size="sm"
                     class="shrink-0"
                     data-test="mark-paid"
@@ -284,10 +281,9 @@ async function undoPayment(settlementId: string) {
                 </p>
                 <SIconButton
                   variant="ghost"
-                  color="neutral"
                   size="sm"
                   :loading="undoingPaymentId === payment.invoiceSettlementId"
-                  :disabled="undoingPaymentId !== null"
+                  :disabled="undoingPaymentId !== null && undoingPaymentId !== payment.invoiceSettlementId"
                   :aria-label="$t('invoice-detail-undo')"
                   :title="$t('invoice-detail-undo')"
                   data-test="undo-payment"

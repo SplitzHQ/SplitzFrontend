@@ -62,31 +62,19 @@ defineEmits<{
             </div>
           </div>
         </div>
-        <SButtonBase
-          v-if="item.__typename === 'UserListItemFriend'"
-          :color="selectedItemsId.some((id) => item.id === id) ? 'brand' : 'neutral'"
-          size="sm"
-          variant="ghost"
-          icon-only
-        >
+        <SButtonBase v-if="item.__typename === 'UserListItemFriend'" size="sm" variant="ghost" icon-only>
           <template #icon-left>
             <Transition name="fade">
               <PhCheckCircle
                 v-if="selectedItemsId.some((id) => item.id === id)"
                 weight="fill"
-                class="absolute inset-0"
+                class="absolute inset-0 size-full text-base-fg-brand"
               />
               <PhCircle v-else class="absolute inset-0" />
             </Transition>
           </template>
         </SButtonBase>
-        <SButtonBase
-          v-else-if="item.__typename === 'UserListItemGroup'"
-          color="neutral"
-          size="sm"
-          variant="ghost"
-          icon-only
-        >
+        <SButtonBase v-else-if="item.__typename === 'UserListItemGroup'" size="sm" variant="ghost" icon-only>
           <template #icon-left>
             <PhCaretRight />
           </template>

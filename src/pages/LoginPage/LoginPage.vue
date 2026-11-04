@@ -169,32 +169,31 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         <template #icon>
           <PhPaperPlaneTilt />
         </template>
-        <p>{{ $t("auth-login-resend-confirmation") }}</p>
-        <RateLimitCountdown
-          :seconds="resendCooldown.remainingSeconds.value"
-          message-key="auth-rate-limit-countdown"
-          class="mt-1"
-          data-test="resend-rate-limit"
-        />
-        <SButton
-          color="brand"
-          variant="secondary"
-          size="md"
-          :disabled="resendCooldown.isActive.value"
-          :loading="resendLoading"
-          class="mt-2 self-start"
-          data-test="resend-confirmation"
-          @click="handleResendConfirmation"
-        >
-          {{ $t("auth-resend-confirmation-action") }}
-        </SButton>
+        <div class="flex flex-col gap-2">
+          <p>{{ $t("auth-login-resend-confirmation") }}</p>
+          <RateLimitCountdown
+            :seconds="resendCooldown.remainingSeconds.value"
+            message-key="auth-rate-limit-countdown"
+            data-test="resend-rate-limit"
+          />
+          <SButton
+            variant="outline"
+            size="md"
+            :disabled="resendCooldown.isActive.value"
+            :loading="resendLoading"
+            class="self-start"
+            data-test="resend-confirmation"
+            @click="handleResendConfirmation"
+          >
+            {{ $t("auth-resend-confirmation-action") }}
+          </SButton>
+        </div>
       </Notice>
 
       <SButton
         type="submit"
-        color="brand"
         variant="primary"
-        size="xxl"
+        size="xl"
         :disabled="loginCooldown.isActive.value"
         :loading="loading"
         class="w-full"

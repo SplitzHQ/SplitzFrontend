@@ -59,7 +59,7 @@ const setPaidBy = (memberId: string) => {
 </script>
 
 <template>
-  <SButton size="sm" variant="secondary" color="brand" @click="showSheet = true">
+  <SButton size="sm" variant="secondary" @click="showSheet = true">
     {{ $t("new-expense-split-paid-by", { username: paidByUsername }) }}
     <template #icon-right>
       <PhCaretDown />

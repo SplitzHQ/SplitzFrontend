@@ -1,29 +1,47 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
+import { BUTTON_ROOT_CLASS, type ButtonSize, type ButtonVariant } from "./button";
 import SButtonBase from "./SButtonBase.vue";
 
-export interface ButtonProps {
-  color: "neutral" | "error" | "brand";
-  variant: "primary" | "secondary" | "outline" | "ghost";
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+/**
+ * A circular button that holds one icon in the default slot.
+ * It has no visible text, so always give it an `aria-label` that names the action.
+ */
+export interface IconButtonProps {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   disabled?: boolean;
+  /** Replaces the icon with a spinner and blocks clicks. */
   loading?: boolean;
 }
 interface ButtonEvents {
   click: [e: MouseEvent];
 }
 
-const { color, variant, size, disabled, loading } = defineProps<ButtonProps>();
+const { variant = "ghost", size = "md", disabled, loading } = defineProps<IconButtonProps>();
 const emit = defineEmits<ButtonEvents>();
+const isDisabled = computed(() => disabled === true || loading === true);
 
 function clickHandler(e: MouseEvent) {
-  if (disabled) return;
+  if (isDisabled.value) {
+    e.preventDefault();
+    return;
+  }
   emit("click", e);
 }
 </script>
 
 <template>
-  <button type="button" :disabled="disabled" @click="clickHandler">
-    <SButtonBase :color="color" :variant="variant" :size="size" :disabled="disabled" :loading="loading" icon-only>
+  <button
+    type="button"
+    :class="BUTTON_ROOT_CLASS"
+    :disabled="disabled"
+    :aria-disabled="loading ? 'true' : undefined"
+    :aria-busy="loading ? 'true' : undefined"
+    @click="clickHandler"
+  >
+    <SButtonBase :variant="variant" :size="size" :disabled="disabled" :loading="loading" icon-only>
       <template #icon-left>
         <slot />
       </template>

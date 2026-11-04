@@ -75,10 +75,10 @@ async function handleComplete() {
           <TransactionInfoCard />
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
-              <SButton variant="primary" size="xxl" color="brand" :disabled="isSubmitting" @click="handleComplete">
+              <SButton variant="primary" size="xl" :disabled="isSubmitting" @click="handleComplete">
                 {{ $t("new-expense-review-actions-done") }}
               </SButton>
-              <SButton variant="secondary" size="xxl" color="brand" @click="showDetailsSheet = true">
+              <SButton variant="secondary" size="xl" @click="showDetailsSheet = true">
                 {{ $t("new-expense-review-actions-add-details") }}
               </SButton>
             </div>

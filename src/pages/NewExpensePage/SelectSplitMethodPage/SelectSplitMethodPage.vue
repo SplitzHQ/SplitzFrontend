@@ -112,9 +112,8 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
           <div class="sticky bottom-4 z-sticky">
             <SLinkButton
               :disabled="!transactionStore.isUserInputValid"
-              color="brand"
               variant="primary"
-              size="xxl"
+              size="xl"
               class="w-full"
               href="/new-expense/review-and-complete"
               @click="transactionStore.saveTransaction"

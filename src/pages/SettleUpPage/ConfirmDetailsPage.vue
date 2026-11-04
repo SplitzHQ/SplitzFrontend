@@ -102,15 +102,7 @@ async function handleCreate() {
 
         <!-- Create Button -->
         <div class="pb-safe pb-4">
-          <SButton
-            variant="primary"
-            color="brand"
-            size="xxl"
-            class="w-full"
-            :disabled="isSubmitting"
-            :loading="isSubmitting"
-            @click="handleCreate"
-          >
+          <SButton variant="primary" size="xl" class="w-full" :loading="isSubmitting" @click="handleCreate">
             {{ $t("settle-up-create-invoice") }}
           </SButton>
         </div>

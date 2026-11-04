@@ -1,2 +1,9 @@
 text-input-show-password = Show password
 text-input-hide-password = Hide password
+header-back = Back
+header-close = Close
+keyboard-plus = Plus
+keyboard-minus = Minus
+keyboard-times = Times
+keyboard-divide = Divided by
+keyboard-delete = Delete

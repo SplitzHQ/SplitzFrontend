@@ -259,8 +259,7 @@ onMounted(() => {
                   </code>
                   <SIconButton
                     variant="ghost"
-                    color="neutral"
-                    size="md"
+                    size="sm"
                     :aria-label="$t('two-factor-copy-key')"
                     @click="copyText(sharedKey)"
                   >
@@ -300,7 +299,7 @@ onMounted(() => {
                     <PhShieldCheck />
                   </template>
                 </TextInput>
-                <SButton type="submit" color="brand" variant="primary" size="xxl" class="w-full" :loading="enabling">
+                <SButton type="submit" variant="primary" size="md" class="w-full" :loading="enabling">
                   {{ $t("two-factor-enable-action") }}
                 </SButton>
               </form>
@@ -327,13 +326,7 @@ onMounted(() => {
                     {{ code }}
                   </li>
                 </ul>
-                <SButton
-                  variant="secondary"
-                  color="neutral"
-                  size="lg"
-                  class="w-full"
-                  @click="copyText(recoveryCodes.join('\n'))"
-                >
+                <SButton variant="outline" size="md" class="self-start" @click="copyText(recoveryCodes.join('\n'))">
                   <template #icon-left>
                     <PhCopy />
                   </template>
@@ -344,9 +337,8 @@ onMounted(() => {
               <p class="text-xs text-base-text-quaternary">{{ $t("two-factor-recovery-codes-hint") }}</p>
               <SButton
                 variant="outline"
-                color="neutral"
-                size="lg"
-                class="w-full"
+                size="md"
+                class="self-start"
                 :loading="generatingCodes"
                 @click="generateRecoveryCodes"
               >
@@ -354,7 +346,7 @@ onMounted(() => {
               </SButton>
             </section>
 
-            <SButton variant="outline" color="error" size="xxl" class="w-full" @click="showDisableConfirm = true">
+            <SButton variant="destructive-soft" size="xl" class="w-full" @click="showDisableConfirm = true">
               {{ $t("two-factor-disable-action") }}
             </SButton>
           </template>
@@ -370,16 +362,10 @@ onMounted(() => {
         <p class="text-sm text-base-text-secondary">{{ $t("two-factor-disable-confirm-body") }}</p>
       </div>
       <div class="flex flex-col gap-2">
-        <SButton variant="primary" color="error" size="xxl" :loading="disabling" @click="disableTwoFactor">
+        <SButton variant="destructive" size="xl" :loading="disabling" @click="disableTwoFactor">
           {{ $t("two-factor-disable-confirm-yes") }}
         </SButton>
-        <SButton
-          variant="secondary"
-          color="neutral"
-          size="xxl"
-          :disabled="disabling"
-          @click="showDisableConfirm = false"
-        >
+        <SButton variant="secondary" size="xl" :disabled="disabling" @click="showDisableConfirm = false">
           {{ $t("two-factor-disable-confirm-cancel") }}
         </SButton>
       </div>
