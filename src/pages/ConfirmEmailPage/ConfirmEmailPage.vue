@@ -7,6 +7,7 @@ import { RouterLink, useRoute } from "vue-router";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SLinkButton from "@/components/SButton/SLinkButton.vue";
 import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
@@ -101,11 +102,9 @@ function getSingleQueryValue(value: unknown): string | undefined {
     </template>
 
     <div v-if="state === 'success'" class="flex flex-col items-stretch">
-      <RouterLink :to="{ name: 'login' }" class="flex">
-        <SButton color="brand" variant="primary" size="xxl" class="w-full">
-          {{ $t("auth-confirm-email-login-link") }}
-        </SButton>
-      </RouterLink>
+      <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
+        {{ $t("auth-confirm-email-login-link") }}
+      </SLinkButton>
     </div>
 
     <div v-else-if="state === 'rateLimited'" class="flex flex-col items-center gap-4">
@@ -115,9 +114,8 @@ function getSingleQueryValue(value: unknown): string | undefined {
         data-test="confirmation-rate-limit"
       />
       <SButton
-        color="brand"
         variant="primary"
-        size="xxl"
+        size="xl"
         class="w-full"
         :disabled="confirmationCooldown.isActive.value"
         :loading="requestPending"

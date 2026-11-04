@@ -126,9 +126,8 @@ async function handleForgotPassword() {
 
       <SButton
         type="submit"
-        color="brand"
         variant="primary"
-        size="xxl"
+        size="xl"
         :disabled="submitDisabled"
         :loading="loading"
         class="w-full"

@@ -119,8 +119,7 @@ async function send() {
 
       <SButton
         variant="primary"
-        color="brand"
-        size="xxl"
+        size="xl"
         class="w-full"
         :disabled="selected.size === 0"
         :loading="sending"

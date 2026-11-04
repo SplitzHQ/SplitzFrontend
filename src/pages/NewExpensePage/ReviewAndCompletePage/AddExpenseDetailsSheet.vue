@@ -317,8 +317,7 @@ function getLocation() {
             data-test="save-details"
             class="flex-1"
             variant="primary"
-            size="lg"
-            color="brand"
+            size="xl"
             @click="saveDetails"
           >
             {{

@@ -198,8 +198,7 @@ const onSelectedUsersSubmitted = async () => {
         <div class="fixed inset-x-3 bottom-4">
           <SButton
             variant="primary"
-            color="brand"
-            size="xxl"
+            size="xl"
             :disabled="selectedItemsId.length === 0"
             class="w-full"
             :loading="onSelectedUsersSubmittedLoading"

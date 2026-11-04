@@ -230,7 +230,6 @@ async function remove() {
                 <SButton
                   type="submit"
                   variant="primary"
-                  color="brand"
                   size="xl"
                   class="w-full"
                   :loading="saving"
@@ -241,8 +240,7 @@ async function remove() {
                 </SButton>
                 <SButton
                   v-if="hasStoredProvider"
-                  variant="outline"
-                  color="error"
+                  variant="destructive-soft"
                   size="xl"
                   class="w-full"
                   :loading="removing"

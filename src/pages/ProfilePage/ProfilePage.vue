@@ -274,8 +274,7 @@ function logout() {
                 <SIconButton
                   v-if="!isEditingUsername"
                   variant="ghost"
-                  color="neutral"
-                  size="md"
+                  size="sm"
                   :aria-label="$t('profile-edit-username')"
                   @click="startEditingUsername"
                 >
@@ -291,20 +290,13 @@ function logout() {
                   :placeholder="$t('profile-username-placeholder')"
                 />
                 <div class="flex justify-end gap-2">
-                  <SButton
-                    variant="ghost"
-                    color="neutral"
-                    size="lg"
-                    :disabled="savingUsername"
-                    @click="cancelEditingUsername"
-                  >
+                  <SButton variant="ghost" size="md" :disabled="savingUsername" @click="cancelEditingUsername">
                     {{ $t("profile-cancel") }}
                   </SButton>
                   <SButton
                     type="submit"
                     variant="primary"
-                    color="brand"
-                    size="lg"
+                    size="md"
                     :loading="savingUsername"
                     :disabled="!editedUsername.trim()"
                   >
@@ -336,8 +328,7 @@ function logout() {
               </div>
               <SIconButton
                 variant="ghost"
-                color="neutral"
-                size="md"
+                size="sm"
                 :aria-label="$t('profile-copy-user-id')"
                 :disabled="!userStore.user?.id"
                 @click="copyUserId"
@@ -412,8 +403,7 @@ function logout() {
             <h2 class="text-sm font-semibold text-base-text-quaternary">{{ $t("profile-friends-label") }}</h2>
             <SIconButton
               variant="secondary"
-              color="brand"
-              size="md"
+              size="sm"
               :aria-label="$t('profile-add-friend')"
               @click="showAddFriend = true"
             >
@@ -448,17 +438,15 @@ function logout() {
               </div>
               <SIconButton
                 variant="ghost"
-                color="neutral"
-                size="md"
+                size="sm"
                 :aria-label="$t('profile-edit-nickname-title')"
                 @click="startEditNickname(friend.friendUser.id, friend.friendUser.userName, friend.remark)"
               >
                 <PhPencilSimple />
               </SIconButton>
               <SIconButton
-                variant="ghost"
-                color="error"
-                size="md"
+                variant="destructive-soft"
+                size="sm"
                 :aria-label="$t('profile-remove-friend')"
                 @click="removeFriend(friend.friendUser.id)"
               >
@@ -485,8 +473,7 @@ function logout() {
                 </div>
                 <SIconButton
                   variant="ghost"
-                  color="neutral"
-                  size="md"
+                  size="sm"
                   :aria-label="$t('profile-friend-request-cancel')"
                   @click="cancelFriendRequest(request.friendRequestId)"
                 >
@@ -499,7 +486,7 @@ function logout() {
 
         <!-- Logout -->
         <div class="fixed inset-x-3 bottom-4">
-          <SButton variant="outline" color="error" size="xxl" class="w-full" @click="logout">
+          <SButton variant="destructive-soft" size="xl" class="w-full" @click="logout">
             {{ $t("profile-logout") }}
           </SButton>
         </div>

@@ -67,7 +67,7 @@ async function save() {
         :placeholder="$t('profile-edit-nickname-placeholder')"
       />
 
-      <SButton variant="primary" color="brand" size="xxl" class="w-full" :loading="loading" @click="save">
+      <SButton variant="primary" size="xl" class="w-full" :loading="loading" @click="save">
         {{ $t("profile-edit-nickname-save") }}
       </SButton>
     </div>

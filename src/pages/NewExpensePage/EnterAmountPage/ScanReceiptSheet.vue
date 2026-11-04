@@ -176,9 +176,9 @@ function openSettings() {
         </p>
         <SButton
           v-if="customProviderAllowed"
-          variant="secondary"
-          color="brand"
-          size="lg"
+          variant="outline"
+          size="md"
+          class="self-start"
           data-test="scan-open-settings"
           @click="openSettings"
         >
@@ -265,8 +265,7 @@ function openSettings() {
 
         <SButton
           variant="primary"
-          color="brand"
-          size="xxl"
+          size="xl"
           class="w-full"
           :loading="recognizing"
           :disabled="!canRecognize"

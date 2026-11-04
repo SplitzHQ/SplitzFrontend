@@ -13,4 +13,6 @@ home-empty-state-description = 记下第一笔支出，或者建个群组和朋�
 home-button-record-expense = 记一笔
 home-button-create-group = 创建群组
 home-create-group-hint = 新建群组，和朋友分摊日常支出
+home-menu = 菜单
+home-filter = 筛选
 

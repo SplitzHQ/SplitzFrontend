@@ -7,6 +7,7 @@ create-group-error-user-not-ready = 正在加载账户信息，请稍后再试�
 create-group-error-submit-failed = 创建群组失败，请重试。
 create-group-share-link-label = 邀请链接
 create-group-share-link-hint = 把链接发给朋友，对方打开即可加入群组。
+create-group-copy-link = 复制链接
 create-group-copy-success = 链接已复制
 create-group-copy-failed = 复制链接失败。
 create-group-created-hint = 你可以通过上方的链接邀请其他人。

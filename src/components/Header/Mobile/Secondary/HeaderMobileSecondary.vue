@@ -26,13 +26,13 @@ const close = () => {
 
 <template>
   <header class="sticky top-0 z-sticky flex items-center gap-2.5 bg-base-bg-primary p-4">
-    <SIconButton v-if="enableBackButton" variant="ghost" color="neutral" size="lg" @click="goBack">
+    <SIconButton v-if="enableBackButton" variant="ghost" size="md" :aria-label="$t('header-back')" @click="goBack">
       <PhArrowLeft />
     </SIconButton>
     <div class="grow">
       <slot />
     </div>
-    <SIconButton v-if="enableCloseButton" variant="ghost" color="neutral" size="lg" @click="close">
+    <SIconButton v-if="enableCloseButton" variant="ghost" size="md" :aria-label="$t('header-close')" @click="close">
       <PhX />
     </SIconButton>
     <slot name="right" />

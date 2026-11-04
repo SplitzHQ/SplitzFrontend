@@ -1,41 +1,56 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import type { ButtonSize, ButtonVariant } from "./button";
 import SButtonBase from "./SButtonBase.vue";
 
+/** A button with a text label and optional icons. See `button.usage.ts` for when to use each variant and size. */
 export interface ButtonProps {
-  color: "neutral" | "error" | "brand";
-  variant: "primary" | "secondary" | "outline" | "ghost";
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   disabled?: boolean;
+  /** Shows a spinner and blocks clicks. The label stays, so write it as the action ("Save"), not the progress. */
   loading?: boolean;
-  /** Native button type; "submit" lets a surrounding form handle Enter key submission. */
+  /** Native button type. "submit" lets a surrounding form handle Enter key submission. */
   type?: "button" | "submit";
 }
 interface ButtonEvents {
   click: [e: MouseEvent];
 }
 
-const { color, variant, size, disabled, loading, type = "button" } = defineProps<ButtonProps>();
+const { variant = "primary", size = "md", disabled, loading, type = "button" } = defineProps<ButtonProps>();
 const emit = defineEmits<ButtonEvents>();
 const isDisabled = computed(() => disabled === true || loading === true);
 
+// A loading button is not natively disabled, so it keeps its colors and focus. preventDefault stops a form submit.
 function clickHandler(e: MouseEvent) {
-  if (isDisabled.value) return;
+  if (isDisabled.value) {
+    e.preventDefault();
+    return;
+  }
   emit("click", e);
 }
 </script>
 
 <template>
-  <button :type="type" :disabled="isDisabled" @click="clickHandler">
-    <SButtonBase :color="color" :variant="variant" :size="size" :disabled="isDisabled" :loading="loading">
+  <SButtonBase
+    as="button"
+    :type="type"
+    :variant="variant"
+    :size="size"
+    :disabled="disabled"
+    :loading="loading"
+    :aria-disabled="loading ? 'true' : undefined"
+    @click="clickHandler"
+  >
+    <template v-if="$slots['icon-left']" #icon-left>
+      <slot name="icon-left" />
+    </template>
+    <template v-if="$slots.default" #default>
       <slot />
-      <template #icon-left>
-        <slot name="icon-left" />
-      </template>
-      <template #icon-right>
-        <slot name="icon-right" />
-      </template>
-    </SButtonBase>
-  </button>
+    </template>
+    <template v-if="$slots['icon-right']" #icon-right>
+      <slot name="icon-right" />
+    </template>
+  </SButtonBase>
 </template>

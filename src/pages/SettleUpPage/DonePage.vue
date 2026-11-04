@@ -97,7 +97,7 @@ function handleDone() {
 
         <!-- Done Button -->
         <div class="pb-safe w-full pb-4">
-          <SButton variant="primary" color="brand" size="xxl" class="w-full" @click="handleDone">
+          <SButton variant="primary" size="xl" class="w-full" @click="handleDone">
             {{ $t("settle-up-done-button") }}
           </SButton>
         </div>

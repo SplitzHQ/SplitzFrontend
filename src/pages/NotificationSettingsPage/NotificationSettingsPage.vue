@@ -195,8 +195,7 @@ async function resetGroupNotificationPreferences() {
 
           <SButton
             v-if="isGroupScope && hasGroupOverrides"
-            variant="outline"
-            color="neutral"
+            variant="secondary"
             size="xl"
             class="w-full"
             :loading="resetting"
