@@ -19,3 +19,5 @@
 - Run format and test after code changes.
 
 - When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.
+
+- This repository is public. The private dev tools are in `devtools/`, which is a separate repository that this repository ignores. Commit tool changes there. Do not move tool files, tool docs or backlog notes into this repository. A clone without `devtools/` must build and run.

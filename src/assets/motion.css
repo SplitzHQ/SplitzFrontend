@@ -1,7 +1,7 @@
 /*
  * Motion tokens. Each token names a role, not a speed. The values come from the transitions the app already uses.
  * src/libs/motion.ts mirrors the durations and curves for script code. The design-system tests check that the two
- * agree. See the Motion tab of the design-system page (/design-system.html) for the rules and live demos.
+ * agree. See the Motion tab of the design-system page (/devtools/design-system.html) for the rules and live demos.
  *
  * Use them in Tailwind as `duration-(--motion-duration-state) ease-(--motion-easing-enter)`.
  */
