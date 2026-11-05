@@ -1,16 +1,28 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { BRAND_GLYPH } from "./brand-glyph";
-import { WORDMARK_FONT_SIZE, WORDMARK_LAYOUT, WORDMARK_WORD, type WordmarkSize } from "./brand-wordmark";
+import {
+  WORDMARK_FONT_SIZE,
+  WORDMARK_LAYOUT,
+  WORDMARK_LETTERS,
+  WORDMARK_TITTLE,
+  WORDMARK_WORD,
+  type WordmarkSize,
+} from "./brand-wordmark";
 
-/** The horizontal Splitz logo: the glyph and the word. The rules are in `brand-wordmark.usage.ts`. */
+/**
+ * The Splitz logo: the word as outlines, with the diamond of the glyph on the i. The rules are in
+ * `brand-wordmark.usage.ts`.
+ *
+ * The default slot draws in the same SVG, under the word. `BrandTapLogo` puts the mark there. Each letter and the diamond
+ * have a `data-part`, so the steps in `brand-motion.ts` can move them.
+ */
 const { size } = defineProps<{
   /** The surface that shows the logo. */
   size: WordmarkSize;
 }>();
 
-const { box, emUnits, font, glyph, textX } = WORDMARK_LAYOUT;
+const { box, emUnits } = WORDMARK_LAYOUT;
 
 const viewBox = `0 ${box.y} ${box.width} ${box.height}`;
 
@@ -19,7 +31,7 @@ const scale = computed(() => WORDMARK_FONT_SIZE[size] / emUnits);
 </script>
 
 <template>
-  <!-- `overflow-visible` keeps the word whole if the fallback font is wider than Manrope. -->
+  <!-- `overflow-visible` keeps the tip of the diamond, which goes above the box. -->
   <svg
     :viewBox="viewBox"
     :width="box.width * scale"
@@ -30,21 +42,16 @@ const scale = computed(() => WORDMARK_FONT_SIZE[size] / emUnits);
     role="img"
     :aria-label="WORDMARK_WORD"
   >
-    <svg :y="glyph.y" :width="glyph.size" :height="glyph.size" viewBox="150 150 300 300">
-      <circle :cx="BRAND_GLYPH.dot.cx" :cy="BRAND_GLYPH.dot.cy" :r="BRAND_GLYPH.dot.r" />
-      <path :d="BRAND_GLYPH.bar" />
-      <path :d="BRAND_GLYPH.diamond" />
-    </svg>
-    <text
-      :x="textX"
-      y="0"
-      :font-family="font.family"
-      :font-size="emUnits"
-      :font-weight="font.weight"
-      :letter-spacing="font.letterSpacing"
-      text-rendering="geometricPrecision"
-    >
-      {{ WORDMARK_WORD }}
-    </text>
+    <slot />
+    <path v-for="(letter, index) in WORDMARK_LETTERS" :key="index" :data-part="`letter-${index}`" :d="letter" />
+    <path data-part="tittle" :d="WORDMARK_TITTLE" />
   </svg>
 </template>
+
+<style scoped>
+/* Each part scales and moves around its own center. */
+[data-part] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+</style>

@@ -1,14 +1,14 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import AuthShell, { type AuthShellProps } from "../AuthShell.vue";
 
 /** Mounts the shell. The logo is not part of these tests. */
-function mountShell(props: Partial<AuthShellProps> = {}, footer?: string) {
+function mountShell(props: Partial<AuthShellProps> = {}, footer?: string, slots: Record<string, string> = {}) {
   return mount(AuthShell, {
-    global: { stubs: { BrandWordmark: true } },
+    global: { stubs: { BrandTapMark: true } },
     props: { title: "Sign in", ...props },
-    slots: footer ? { footer } : {},
+    slots: footer ? { footer, ...slots } : slots,
   });
 }
 
@@ -22,13 +22,54 @@ describe("AuthShell", () => {
     expect(wrapper.text()).toContain("Welcome back");
   });
 
-  it("reads a change of the title aloud only on a centered status page", () => {
+  it("reads a change of the title aloud only on a status page", () => {
     expect(mountShell().find("[aria-live]").exists()).toBe(false);
 
-    const live = mountShell({ centered: true }).get("[aria-live]");
+    const live = mountShell({ status: true }).get("[aria-live]");
 
     expect(live.attributes("aria-live")).toBe("polite");
     expect(live.find("h1").exists()).toBe(true);
+  });
+
+  it("shows the logo only on a page that is not a status page", () => {
+    expect(mountShell().find("header").exists()).toBe(true);
+    expect(mountShell({ status: true }).find("header").exists()).toBe(false);
+  });
+
+  it("shows the highlighted part of the subtitle in its own element, with the spaces of the text", () => {
+    const wrapper = mountShell({ highlight: "a@b.co", subtitle: "We sent a link to a@b.co. Open it." });
+
+    expect(wrapper.get("p").text()).toBe("We sent a link to a@b.co. Open it.");
+    expect(wrapper.get("p span").text()).toBe("a@b.co");
+  });
+
+  it("shows a subtitle without the highlight as it is", () => {
+    const wrapper = mountShell({ highlight: "a@b.co", subtitle: "Check your email." });
+
+    expect(wrapper.get("p").text()).toBe("Check your email.");
+    expect(wrapper.find("p span").exists()).toBe(false);
+  });
+
+  it("makes the content and the actions one form when the page handles submit", async () => {
+    const onSubmit = vi.fn();
+    const wrapper = mountShell({ onSubmit }, undefined, {
+      actions: "<button type='submit'>Go</button>",
+      default: "<input />",
+    });
+
+    const form = wrapper.get("form");
+    expect(form.find("input").exists()).toBe(true);
+    expect(form.find("button").exists()).toBe(true);
+
+    await form.trigger("submit");
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("has no form on a page with no submit", () => {
+    const wrapper = mountShell({}, undefined, { actions: "<a href='/login'>Sign in</a>" });
+
+    expect(wrapper.find("form").exists()).toBe(false);
+    expect(wrapper.find("a").exists()).toBe(true);
   });
 
   it("renders a footer only when the page gives one", () => {
