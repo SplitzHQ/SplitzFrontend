@@ -18,7 +18,7 @@ export const RULE_SCOPE: RuleScope = {
 /** When to use a badge. */
 export const WHEN_TO_USE: UsageRule[] = [
   {
-    rule: "The full screen shows one result or one state, and a heading gives the result in text. All callers do this: the `hero` slot of AuthShell, or the card of JoinGroupPage.",
+    rule: "The full screen shows one result or one state, and a heading gives the result in text. The caller is the card of JoinGroupPage. AuthShell uses the smaller `AuthStatusIcon`.",
     title: "A result screen",
   },
 ];
@@ -39,9 +39,9 @@ export interface ToneRule {
 
 /** A Record makes the type check fail when a new tone has no rule. */
 export const TONE_GUIDE: Record<StatusBadgeProps["tone"], ToneRule> = {
-  brand: { example: "ConfirmEmailPage, loading", meaning: "The result is not known yet." },
+  brand: { example: "No caller now", meaning: "The result is not known yet." },
   error: {
-    example: "ConfirmEmailPage, ResetPasswordPage and JoinGroupPage, a link that does not work",
+    example: "JoinGroupPage, a link that does not work",
     meaning: "The action failed, or the link does not work.",
   },
   success: {

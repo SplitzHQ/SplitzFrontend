@@ -73,7 +73,7 @@ test.describe("auth email flows", () => {
 
     await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
     await expect(page.getByText("Password recovery is unavailable")).toBeVisible();
-    await expect(page.getByPlaceholder("Email address")).toBeDisabled();
+    await expect(page.getByLabel("Email address")).toBeDisabled();
     await expect(page.getByRole("button", { name: "Send reset email" })).toBeDisabled();
   });
 
@@ -84,13 +84,12 @@ test.describe("auth email flows", () => {
     });
 
     await page.goto("/forgot-password");
-    await page.getByPlaceholder("Email address").fill("person@example.com");
+    await page.getByLabel("Email address").fill("person@example.com");
     await page.getByRole("button", { name: "Send reset email" }).click();
 
     await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
-    await expect(
-      page.getByText("If an account exists for that email, a password reset message will be sent.").first()
-    ).toBeVisible();
+    await expect(page.getByText("person@example.com", { exact: true })).toBeVisible();
+    await expect(page.getByText("has an account, we sent it a reset link.")).toBeVisible();
   });
 
   test("recovery rate limit stays on the form and requires manual retry", async ({ page }) => {
@@ -116,11 +115,11 @@ test.describe("auth email flows", () => {
     });
 
     await page.goto("/forgot-password");
-    await page.getByPlaceholder("Email address").fill("person@example.com");
+    await page.getByLabel("Email address").fill("person@example.com");
     await page.getByRole("button", { name: "Send reset email" }).click();
 
     await expect(page.getByRole("status")).toContainText("2");
-    await expect(page.getByPlaceholder("Email address")).toBeEnabled();
+    await expect(page.getByLabel("Email address")).toBeEnabled();
     await expect(page.getByRole("button", { name: "Send reset email" })).toBeDisabled();
     await expect(page.getByRole("heading", { name: "Reset your password" })).toBeVisible();
 
@@ -145,24 +144,14 @@ test.describe("auth email flows", () => {
     });
 
     await page.goto("/reset-password?email=person%40example.com&resetCode=reset-code");
-    await page.getByPlaceholder("New password").fill("Password1234");
-    await page.getByPlaceholder("Confirm password").fill("Different1!");
-    await page.getByRole("button", { name: "Reset password" }).click();
-
-    await expect(page.getByText("Passwords do not match")).toBeVisible();
-
-    await page.getByPlaceholder("Confirm password").clear();
-    await page.getByPlaceholder("Confirm password").fill("short1");
-    await page.getByPlaceholder("New password").fill("short1");
+    await page.getByLabel("New password").fill("short1");
     await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(
       page.getByText("Password must be at least 12 characters and include a lowercase letter and a number.")
     ).toBeVisible();
 
-    await page.getByPlaceholder("New password").fill("Password1234");
-    await page.getByPlaceholder("Confirm password").fill("Password1234");
-    await expect(page.getByText("Passwords do not match")).toBeHidden();
+    await page.getByLabel("New password").fill("Password1234");
     await page.getByRole("button", { name: "Reset password" }).click();
 
     await expect(page).toHaveURL(/\/login\?passwordReset=success$/);
