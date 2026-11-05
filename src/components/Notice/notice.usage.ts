@@ -25,6 +25,10 @@ export const WHEN_TO_USE: UsageRule[] = [
     title: "A failed submit",
   },
   {
+    rule: "A request that loads the page fails and the page has no data to show. Put the notice in the place of the data, with a retry button. During the retry, the notice stays and the button shows `loading`, so the focus stays on the button. HomePage and GroupDetailPage do this. A failed refresh with old data keeps the old data and shows no notice.",
+    title: "A failed load",
+  },
+  {
     rule: "The message is part of the page. It stays in the page flow until the state of the page changes.",
     title: "A message that stays",
   },
@@ -52,7 +56,7 @@ export interface ToneRule {
 export const TONE_GUIDE: Record<NoticeTone, ToneRule> = {
   error: {
     example:
-      "LoginPage, MarkPaidSheet and other forms and sheets, after a submit fails. TwoFactorSetupPage, with a retry button, after a load fails",
+      "LoginPage, MarkPaidSheet and other forms and sheets, after a submit fails. HomePage, GroupDetailPage and TwoFactorSetupPage, with a retry button, after a load fails",
     meaning:
       "A request failed, and the user can correct it. When the value of one field is wrong, use the `error` prop of TextInput.",
   },

@@ -1,7 +1,7 @@
 import { mount, RouterLinkStub } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 
 import HomePage from "../HomePage.vue";
 
@@ -11,6 +11,8 @@ const refetchGroups = vi.fn(() => Promise.resolve());
 
 const NEW_USER_TITLE = "home-empty-state-title";
 const NO_RESULTS_CLEAR = '[data-testid="home-no-results-clear"]';
+const LOAD_ERROR = '[data-testid="home-load-error"]';
+const SKELETON = '[data-testid="home-groups-skeleton"]';
 
 vi.mock("@pinia/colada", () => ({
   useQuery: () => ({ asyncStatus: groupsAsyncStatus, refetch: refetchGroups, state: groupsState }),
@@ -113,5 +115,56 @@ describe("HomePage search states", () => {
 
     expect(wrapper.text()).toContain(NEW_USER_TITLE);
     expect(wrapper.find(NO_RESULTS_CLEAR).exists()).toBe(false);
+  });
+});
+
+describe("HomePage load states", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    groupsAsyncStatus.value = "idle";
+    refetchGroups.mockClear();
+  });
+
+  it("shows a skeleton that a screen reader skips, and reads the loading text, during the first load", async () => {
+    groupsState.value = { data: undefined, status: "pending" };
+    const wrapper = mountPage();
+    await nextTick();
+
+    expect(wrapper.get(SKELETON).attributes("aria-hidden")).toBe("true");
+    expect(wrapper.text()).toContain("home-status-loading");
+  });
+
+  it("shows a notice with a retry button when the first load fails", async () => {
+    groupsState.value = { data: undefined, status: "error" };
+    const wrapper = mountPage();
+
+    const notice = wrapper.get(LOAD_ERROR);
+
+    expect(notice.attributes("role")).toBe("alert");
+    expect(notice.text()).toContain("home-error-loading-groups");
+    expect(wrapper.find(SKELETON).exists()).toBe(false);
+
+    await notice.get("button").trigger("click");
+
+    expect(refetchGroups).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the notice and shows the loading button during a retry", async () => {
+    groupsState.value = { data: undefined, status: "error" };
+    const wrapper = mountPage();
+
+    groupsAsyncStatus.value = "loading";
+    await nextTick();
+
+    expect(wrapper.get(`${LOAD_ERROR} button`).attributes("aria-busy")).toBe("true");
+    expect(wrapper.text()).toContain("home-status-loading");
+  });
+
+  it("keeps the old list and shows no notice when a refresh fails", () => {
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "error" };
+    const wrapper = mountPage();
+
+    expect(wrapper.find(LOAD_ERROR).exists()).toBe(false);
+    expect(wrapper.text()).toContain("Paris trip");
   });
 });
