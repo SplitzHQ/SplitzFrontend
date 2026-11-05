@@ -57,7 +57,7 @@ const emit = defineEmits<ButtonEvents>();
 }
 
 .ghost {
-  @apply text-base-text-quaternary;
+  @apply text-base-text-secondary;
 
   @media (hover: hover) {
     &:hover {
