@@ -159,7 +159,7 @@ export interface SizeGuide {
 // A Record makes the type check fail when a new size has no rule.
 const SIZE_RULES: Record<ButtonSize, string> = {
   md: "The default. A header icon button, the action of a single card, and a form submit button in a card.",
-  sm: "A chip, an action in a dense row, and the action of each card in a group of cards.",
+  sm: "A chip, an action in a dense row, the action of each card in a group of cards, and an `outline` action in a Notice.",
   xl: "The action area of a screen or a sheet, number keys and floating buttons.",
 };
 
@@ -192,6 +192,7 @@ export const SIZE_DECISION: { steps: SizeDecisionStep[]; limit: string } = {
       when: "The button is in the header of the screen, or in a search row that belongs to the header.",
     },
     { size: "sm", when: "The button is a chip." },
+    { size: "sm", when: "The button is an `outline` action in a Notice. See `notice.usage.ts`." },
     {
       size: "sm",
       when: "The button shares a row with text, data or a control that is not a button. Another button in the same group does not count.",

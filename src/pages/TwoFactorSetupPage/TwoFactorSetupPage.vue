@@ -208,12 +208,12 @@ onMounted(() => {
         </template>
 
         <Notice v-else-if="loadFailed" tone="error" announce data-test="two-factor-load-error">
-          <div class="flex flex-col gap-2">
-            <p>{{ $t("two-factor-load-failed") }}</p>
-            <SButton variant="outline" size="md" class="self-start" @click="loadTwoFactorStatus">
+          <p>{{ $t("two-factor-load-failed") }}</p>
+          <template #action>
+            <SButton variant="outline" size="sm" @click="loadTwoFactorStatus">
               {{ $t("two-factor-load-retry") }}
             </SButton>
-          </div>
+          </template>
         </Notice>
 
         <template v-else>
