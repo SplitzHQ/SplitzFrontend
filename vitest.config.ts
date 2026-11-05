@@ -12,6 +12,18 @@ const dirname = typeof __dirname === "undefined" ? path.dirname(fileURLToPath(im
 export default mergeConfig(
   viteConfig,
   defineConfig({
+    plugins: [
+      {
+        // Vite expands `import.meta.glob` in the transform, and the cache key does not include the files that match.
+        // A cached transform keeps the old file list, so a spec can pass and not see a new file.
+        // Vitest 5.0.5 skips the cache only for `import.meta.glob(`. This misses `import.meta.glob<string>(`.
+        // Vitest 5.1.0 has the fix (vitest-dev/vitest#11666). Remove this plugin after the upgrade.
+        configureVitest({ defineCacheKeyGenerator }) {
+          defineCacheKeyGenerator(({ sourceCode }) => (sourceCode.includes("import.meta.glob") ? false : undefined));
+        },
+        name: "splitz-skip-glob-module-cache",
+      },
+    ],
     test: {
       projects: [
         {
