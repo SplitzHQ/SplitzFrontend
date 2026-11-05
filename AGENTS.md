@@ -36,3 +36,5 @@
 - Before a design or UI task, decide if the task needs a prototype first. Follow `devtools/.claude/skills/spz-prototype-build/SKILL.md`. If `devtools/` does not exist, ask the user.
 
 - When you add a backlog card, follow the category rule in `devtools/AGENTS.md`. Ask the user before you add a category.
+
+- After you open a PR, follow "Link a PR" in `devtools/.claude/skills/spz-card-work/SKILL.md`, if `devtools/` exists.
