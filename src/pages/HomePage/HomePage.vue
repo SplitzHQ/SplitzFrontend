@@ -8,7 +8,8 @@ import { useRouter } from "vue-router";
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
-import BrandWordmark from "@/components/BrandWordmark/BrandWordmark.vue";
+import BrandOpening from "@/components/BrandWordmark/BrandOpening.vue";
+import BrandTapLogo from "@/components/BrandWordmark/BrandTapLogo.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
@@ -102,7 +103,8 @@ const userBalances = computed(() => {
       >
         <!-- Header -->
         <div class="flex w-full items-center justify-between">
-          <h1><BrandWordmark size="header" /></h1>
+          <BrandOpening />
+          <h1><BrandTapLogo /></h1>
           <div class="flex items-center gap-1">
             <NotificationBell />
             <!-- The slot has the width of the bell, so the 32px avatar has the same space on each side. -->
