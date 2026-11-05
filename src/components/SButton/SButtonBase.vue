@@ -20,7 +20,7 @@ export interface ButtonBaseProps {
 }
 
 const {
-  variant = "primary",
+  variant = "secondary",
   size = "md",
   iconOnly = false,
   disabled = false,
@@ -29,7 +29,8 @@ const {
 
 const slots = useSlots();
 
-const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"] === undefined);
+/** The spinner takes the place of the left icon when the button has one, so the width does not change. */
+const hasIconBox = computed(() => iconOnly || slots["icon-left"] !== undefined);
 </script>
 
 <template>
@@ -42,23 +43,22 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
         'icon-only': iconOnly,
         'is-disabled': disabled,
         'is-loading': loading,
+        'spinner-covers-label': loading && !hasIconBox,
       },
     ]"
   >
-    <span v-if="$slots['icon-left']" class="icon">
+    <span v-if="hasIconBox" class="icon">
       <Transition name="s-button-swap" mode="out-in">
         <PhCircleNotch v-if="loading" key="spinner" class="animate-spin" aria-hidden="true" />
-        <slot key="icon" v-else name="icon-left" class="icon-slot" />
+        <span v-else key="icon" class="icon-slot"><slot name="icon-left" /></span>
       </Transition>
     </span>
-    <span v-if="$slots.default" :class="['label', loading && shouldSpinnerCoverContent ? 'opacity-0' : '']">
-      <slot />
-    </span>
-    <span v-if="$slots['icon-right']" :class="['icon', loading && shouldSpinnerCoverContent ? 'opacity-0' : '']">
-      <slot name="icon-right" class="icon-slot" />
+    <span v-if="$slots.default && !iconOnly" class="label"><slot /></span>
+    <span v-if="$slots['icon-right'] && !iconOnly" class="icon">
+      <span class="icon-slot"><slot name="icon-right" /></span>
     </span>
     <Transition name="s-button-fade">
-      <span v-if="loading && shouldSpinnerCoverContent" class="spinner-overlay">
+      <span v-if="loading && !hasIconBox" class="spinner-overlay">
         <PhCircleNotch class="icon animate-spin" aria-hidden="true" />
       </span>
     </Transition>
@@ -207,17 +207,18 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     }
   }
 
+  // A translucent fill takes the hue of the surface, and the disabled fill stays lighter than it in both themes.
   .variant-secondary {
-    --_bg: var(--base-bg-neutral);
+    --_bg: var(--core-alpha-brand-20);
     --_text: var(--base-text-primary);
     --_icon-color: var(--base-fg-primary);
 
     @include hover {
-      --_bg: var(--base-bg-neutral_hover);
+      --_bg: var(--core-alpha-brand-30);
     }
 
     @include pressed {
-      --_bg: var(--base-bg-neutral_pressed);
+      --_bg: var(--core-alpha-brand-40);
     }
   }
 
@@ -249,9 +250,10 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     --_outline-disabled-text: var(--core-alpha-white-40);
   }
 
+  // A parent can set `--s-button-ghost-icon` to change the icon color. See `ICON_RULES` in `button.usage.ts`.
   .variant-ghost {
     --_text: var(--base-text-primary);
-    --_icon-color: var(--base-fg-primary);
+    --_icon-color: var(--s-button-ghost-icon, var(--base-fg-primary));
 
     @include hover {
       --_bg: var(--base-bg-neutral);
@@ -302,7 +304,7 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     &.variant-secondary,
     &.variant-destructive,
     &.variant-destructive-soft {
-      --_bg: var(--base-bg-disabled);
+      --_bg: var(--base-bg-disabled_subtle);
     }
 
     // A fixed grey label gets lost on a tinted surface, so outline uses a translucent label.
@@ -322,6 +324,7 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     min-width: 0;
     overflow: hidden;
     padding-inline: 2px;
+    // A safety net for user data. Fixed copy must fit. See `LABEL_FIT_RULES` in `button.usage.ts`.
     text-overflow: ellipsis;
     transition: opacity var(--motion-duration-feedback) var(--motion-easing-standard);
   }
@@ -352,6 +355,11 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .spinner-covers-label > .label,
+  .spinner-covers-label > .icon {
+    opacity: 0;
   }
 
   .s-button-swap-enter-active,

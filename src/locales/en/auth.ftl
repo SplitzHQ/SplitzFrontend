@@ -12,7 +12,11 @@ auth-login-unconfirmed-title = Confirm your email first
 auth-password-hint = At least 12 characters, with a lowercase letter and a number.
 auth-login-success = Signed in
 auth-login-failed = Couldn't sign in. Check your email and password.
-auth-rate-limit-countdown = Too many requests. Try again in { $seconds } seconds.
+auth-rate-limit-countdown =
+    { $seconds ->
+        [one] Too many requests. Try again in { $seconds } second.
+       *[other] Too many requests. Try again in { $seconds } seconds.
+    }
 auth-login-resend-confirmation = Click the confirmation link we emailed you to finish setting up your account.
 auth-resend-confirmation-action = Resend confirmation email
 auth-resend-confirmation-success = If an account exists for that email, we'll send a confirmation link.

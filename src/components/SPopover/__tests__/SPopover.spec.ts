@@ -65,6 +65,15 @@ describe("SPopover", () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
+  it("moves focus to the first control of the panel when it opens", async () => {
+    const trigger = mountPopover();
+    (trigger.element as HTMLElement).focus();
+    await trigger.trigger("click");
+    await flushPromises();
+
+    expect(document.activeElement?.textContent).toBe("Close requests");
+  });
+
   it("closes on Escape and returns focus to the trigger", async () => {
     const trigger = mountPopover();
     await trigger.trigger("click");

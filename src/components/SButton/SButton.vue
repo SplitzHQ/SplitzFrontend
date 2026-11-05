@@ -18,7 +18,7 @@ interface ButtonEvents {
   click: [e: MouseEvent];
 }
 
-const { variant = "primary", size = "md", disabled, loading, type = "button" } = defineProps<ButtonProps>();
+const { variant = "secondary", size = "md", disabled, loading, type = "button" } = defineProps<ButtonProps>();
 const emit = defineEmits<ButtonEvents>();
 const isDisabled = computed(() => disabled === true || loading === true);
 
