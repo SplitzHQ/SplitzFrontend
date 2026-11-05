@@ -5,7 +5,7 @@ import { colorAtContrast, hexToOklch, oklchToHex } from "./color-math";
 /**
  * The color scales of the app. Each scale has 12 steps for each theme, and each step has one job in both themes.
  * Each value stays on the curve of the `core-color-*` family, so a family keeps its hue. The position on the curve comes
- * from a target contrast on the page. The design decisions are in the prototype "Color token review" (SPZ-8).
+ * from a target contrast on the page. The design decisions are in the prototype "Color token review".
  */
 
 export const THEMES = ["light", "dark"] as const;
@@ -27,7 +27,7 @@ export type ScaleName = keyof typeof SCALE_FAMILIES;
 /**
  * The target contrast of each neutral step on the page.
  * Step 8 holds the placeholder and the disabled text. Step 9 holds text-muted, step 10 holds text-secondary and step 12
- * holds text-primary. Step 9 is below the 4.5:1 of WCAG AA. This is a decision of SPZ-8.
+ * holds text-primary. Step 9 is below the 4.5:1 of WCAG AA. This is a design decision.
  */
 const NEUTRAL_TARGETS: Record<Theme, readonly number[]> = {
   dark: [1, 1.16, 1.28, 1.4, 1.55, 1.7, 1.9, 3.3, 4.7, 8.4, 10.5, 16.6],
@@ -95,7 +95,7 @@ export function colorScale(family: string, theme: Theme, source: ScaleSource): s
   return COLOR_TARGETS[theme].map((target, index) => {
     const dangerTarget = family === "error" ? DANGER_ON_INVERSE[index] : undefined;
     if (dangerTarget !== undefined) return colorAtContrast(inverseCurve, inverse, dangerTarget);
-    // The primary button in the dark theme keeps its color (SPZ-8).
+    // The primary button in the dark theme keeps its color.
     if (isBrand && theme === "dark" && index === 11) return source.ramp(family)[CORE_STEPS.indexOf("300")] as string;
     if (index === 8) return colorAtContrast(solidCurve, "#ffffff", isBrand ? BRAND_SOLID_ON_WHITE : SOLID_ON_WHITE);
     if (index === 9) {
@@ -137,11 +137,11 @@ function neutralAlpha(opacity: number): Record<Theme, TokenRef> {
 
 /**
  * The value of each old `base-*` token. These values keep the look of the app until the components move to the new
- * semantic tokens (SPZ-56 to SPZ-59). The app has three levels of reading text, so two old names of one level use one
+ * semantic tokens. The app has three levels of reading text, so two old names of one level use one
  * step: secondary and tertiary use step 10, and quaternary and quinary use step 9.
  *
  * The `util-color-*` tokens do not move here. The category colors and the avatar colors use their steps 50, 100, 500 and
- * 600, and those values must not change (SPZ-35).
+ * 600, and those values must not change.
  */
 export const BASE_STEPS: Record<string, ThemedRef> = {
   "base-bg-brand": "B3",
@@ -224,9 +224,9 @@ export interface SemanticDefinition {
 }
 
 /**
- * The semantic tokens, from the list "three" in section 7 of the prototype "Color token review" (SPZ-8). The rules for
+ * The semantic tokens, from the list "three" in section 7 of the prototype "Color token review". The rules for
  * each token are in `src/assets/color.usage.ts`. The hover fill and the active fill use the opacities of the outline
- * button (SPZ-12), and the subtle fill keeps the value of `util-alpha-black-5`.
+ * button, and the subtle fill keeps the value of `util-alpha-black-5`.
  */
 export const SEMANTIC_TOKENS: Record<SemanticToken, SemanticDefinition> = {
   "base-bg-active": { replaces: ["base-bg-neutral_pressed"], value: neutralAlpha(10) },
@@ -291,7 +291,7 @@ export const SEMANTIC_TOKENS: Record<SemanticToken, SemanticDefinition> = {
 /** The old names whose value is not a step of a scale. Each one has the color of its semantic token in both themes. */
 export const ALPHA_ALIASES: Record<string, SemanticToken> = { "base-bg-overlay": "base-bg-scrim" };
 
-/** The color families of the main categories. Each family has a fill at step 50 and an icon at step 600 (SPZ-35). */
+/** The color families of the main categories. Each family has a fill at step 50 and an icon at step 600. */
 const PALETTE_FAMILIES = [
   "brand",
   "clearblue",
@@ -420,7 +420,7 @@ export function newSemanticTokens(): SemanticToken[] {
 
 /**
  * Returns the semantic token that an old name can point at. An old name is an alias only when the color is the same in
- * both themes. Other old names keep their own value, and SPZ-59 deletes them after the components move.
+ * both themes. Other old names keep their own value, and a later change deletes them after the components move.
  */
 export function aliasOf(oldToken: string): SemanticToken | undefined {
   const tokens = Object.keys(SEMANTIC_TOKENS) as SemanticToken[];

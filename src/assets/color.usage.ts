@@ -1,6 +1,6 @@
 /**
  * The usage rules of the color tokens. This file is the one place for these rules.
- * Agents read them before a UI change, and the migration cards SPZ-56, SPZ-57 and SPZ-58 use them to choose a token.
+ * Agents read them before a UI change, and the later migration of the components uses them to choose a token.
  * The app does not import this file, so the rules do not go into the app bundle.
  * The generator `scripts/color-scales/` writes the values. A test checks that each token here has a value and a rule.
  */
@@ -54,7 +54,7 @@ export const PRIMITIVE_EXCEPTIONS: string[] = [
   "Artwork and the brand mark, for example EmptyStateBackground and the decoration of AuthShell.",
 ];
 
-/** The semantic tokens, in the order of the prototype "Color token review" (SPZ-8). */
+/** The semantic tokens, in the order of the prototype "Color token review". */
 export const SEMANTIC_TOKENS = [
   "base-text-primary",
   "base-text-secondary",
@@ -299,12 +299,12 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
   buttonOutline: {
     avoid: "Do not use it outside SButtonBase.",
     pattern: /^comp-button-outline-/,
-    use: "The translucent line and fills of the outline button (SPZ-12). They stay visible on all tinted surfaces.",
+    use: "The translucent line and fills of the outline button. They stay visible on all tinted surfaces.",
   },
   buttonSecondary: {
     avoid: "Do not use it outside SButtonBase.",
     pattern: /^comp-button-secondary-/,
-    use: "The translucent fill of the secondary button (SPZ-12). It takes the hue of the surface.",
+    use: "The translucent fill of the secondary button. It takes the hue of the surface.",
   },
   palette: {
     avoid: "Do not use it for a status. The color shows which item it is, and not a state.",
@@ -314,7 +314,7 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
   segment: {
     avoid: "Do not use it outside SSegmentControl.",
     pattern: /^comp-segment-/,
-    use: "The track, the hover and the selected fill of the segment control. SPZ-47 decides the look.",
+    use: "The track, the hover and the selected fill of the segment control. A later decision sets the look.",
   },
   sheet: {
     avoid: "Do not use it outside a sheet.",
@@ -336,7 +336,7 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
 /** The rules for the old `base-*` names during the migration. */
 export const OLD_NAME_RULES: UsageRule[] = [
   {
-    rule: "New code uses only the tokens in `SEMANTIC_TOKENS`. The migration cards replace the other `base-*` names, and SPZ-59 deletes them.",
+    rule: "New code uses only the tokens in `SEMANTIC_TOKENS`. Later migration work replaces the other `base-*` names and then deletes them.",
     title: "Do not add a use of an old name",
   },
   {
