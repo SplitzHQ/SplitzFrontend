@@ -326,6 +326,7 @@
 --comp-switch-track-off-disabled: var(--base-bg-disabled);
 --comp-switch-track-on: var(--util-color-brand-700);
 --comp-switch-track-on-disabled: var(--core-alpha-brand-40);
+--comp-user-tag-border: var(--core-alpha-white-10);
 --comp-status-badge-brand-core: var(--core-alpha-brand-10);
 --comp-status-badge-brand-halo: var(--core-alpha-brand-5);
 --comp-status-badge-brand-icon: var(--util-color-brand-600);

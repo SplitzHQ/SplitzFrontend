@@ -173,7 +173,7 @@ const onSelectedUsersSubmitted = async () => {
     </template>
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col gap-4 pb-28">
-        <SearchBar v-model="searchKeyword" :selected-users="selectedUsers" />
+        <SearchBar v-model="searchKeyword" :selected-users="selectedUsers" @remove="onItemSelected" />
         <FrequentSelectionList @select="onItemSelected" />
         <UserList
           v-if="groupsInUserListItem.length > 0"
