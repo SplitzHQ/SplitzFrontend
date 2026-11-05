@@ -190,7 +190,7 @@ export const SEMANTIC_RULES: Record<SemanticToken, TokenRule> = {
   },
   "base-border-brand-subtle": {
     avoid: "Do not use it to show a selected item. Use `base-border-brand`.",
-    typical: "The border of a brand notice, the border of a selected-person tag.",
+    typical: "The border of a brand notice.",
     use: "The border of a light brand fill.",
   },
   "base-border-danger": {
@@ -330,6 +330,11 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
     avoid: "Do not use it outside SSwitch.",
     pattern: /^comp-switch-/,
     use: "The track of the switch in each state.",
+  },
+  userTag: {
+    avoid: "Do not use it outside the row of selected people on SelectPeoplePage.",
+    pattern: /^comp-user-tag-/,
+    use: "The translucent line of the tag of a selected person and of its `+N` button. It stays visible on the tinted fill of the tag.",
   },
 };
 
