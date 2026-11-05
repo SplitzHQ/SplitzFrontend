@@ -38,7 +38,7 @@ export const LAYOUT_RULES: UsageRule[] = [
   },
   { rule: "Do not add a size class. The switch has one size.", title: "One size" },
   {
-    rule: "Set `busy` while a change of this switch saves. The switch keeps its color and the keyboard focus, shows a spinner on the thumb and ignores taps, so the user cannot send a second change.",
+    rule: "Set `busy` while a change of this switch saves. The switch keeps the keyboard focus and ignores taps, so the user cannot send a second change. After 300ms it fades to 60% and shows an arc on the thumb, so a fast save shows nothing. The thumb and the track show the new value at once.",
     title: "Saving",
   },
   {
@@ -70,7 +70,7 @@ export const COPY_RULES: CopyRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The track is 28px high. An invisible box makes the tap area 44px high. Leave 8px of free space above and below the switch, or the tap areas of two rows overlap.",
+    text: "The track is 24px high. An invisible box makes the tap area 44px high. Leave 10px of free space above and below the switch, or the tap areas of two rows overlap.",
     title: "Tap area",
   },
   {
@@ -86,7 +86,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Focus ring",
   },
   {
-    text: "The color and the movement of the thumb use the motion tokens, so they turn off when the system asks for reduced motion.",
+    text: "The color and the movement of the thumb use the motion tokens, so they turn off when the system asks for reduced motion. The arc of a saving switch then stays still.",
     title: "Reduced motion",
   },
   {
@@ -96,6 +96,10 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
     text: "The off track has a contrast of about 1.6:1 with the page in light mode and 1.9:1 in dark mode. This is less than the 3:1 of WCAG 1.4.11. The thumb and the shape also show the state.",
     title: "Off track",
+  },
+  {
+    text: "A saving switch has 60% opacity. In light mode the on track has a contrast of about 2.5:1 with its row, and the thumb has about 2.7:1 with the track. This is less than the 3:1 of WCAG 1.4.11. The state is short, `aria-busy` tells a screen reader, and the arc also shows it. The focus ring fades with the switch.",
+    title: "While it saves",
   },
 ];
 

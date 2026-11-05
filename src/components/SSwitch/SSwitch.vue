@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { PhCircleNotch } from "@phosphor-icons/vue";
-
 /**
  * A setting that is on or off. See `switch.usage.ts` for when to use it.
- * The track is 28px high. An invisible box around it makes the tap area 44px high.
+ * The track is 24px high. An invisible box around it makes the tap area 44px high.
  */
 export interface SSwitchProps {
   /** The name for a screen reader. Use the text of the visible label of the row. */
   label: string;
   /** Blocks the switch because another action is in progress. A disabled switch loses the keyboard focus. */
   disabled?: boolean;
-  /** Shows that a change of this switch saves. The switch keeps its color and the keyboard focus, and ignores taps. */
+  /**
+   * Shows that a change of this switch saves. The switch keeps the keyboard focus and ignores taps. After a short delay
+   * it fades and shows an arc on the thumb, so a fast save shows nothing.
+   */
   busy?: boolean;
   /** Shows that the value comes from a parent setting and is not set here. */
   inherited?: boolean;
@@ -36,32 +37,70 @@ function toggle() {
     :aria-disabled="busy ? 'true' : undefined"
     :disabled="disabled"
     :class="[
-      'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors duration-(--motion-duration-state) ease-(--motion-easing-standard)',
+      'switch-track relative inline-flex h-6 w-12 shrink-0 items-center rounded-full p-0.5',
       'after:absolute after:top-1/2 after:left-0 after:h-11 after:w-full after:-translate-y-1/2',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid disabled:cursor-not-allowed',
       model
         ? 'bg-util-color-brand-700 disabled:bg-core-alpha-brand-40'
         : 'bg-util-alpha-black-20 disabled:bg-base-bg-disabled',
       inherited ? 'ring-1 ring-base-border-tertiary ring-inset enabled:opacity-70' : '',
-      busy ? 'cursor-default' : '',
+      busy ? 'is-busy cursor-default' : '',
     ]"
     @click="toggle"
   >
     <span
       aria-hidden="true"
       :class="[
-        'switch-thumb flex size-6 items-center justify-center rounded-full bg-base-bg-primary shadow-sm',
-        model ? 'translate-x-5' : 'translate-x-0',
+        'switch-thumb relative h-5 w-7 rounded-full bg-base-bg-primary shadow-sm',
+        model ? 'translate-x-4' : 'translate-x-0',
       ]"
     >
-      <Transition name="switch-spinner">
-        <PhCircleNotch v-if="busy" class="size-4 animate-spin text-base-fg-brand" aria-hidden="true" />
+      <Transition name="switch-arc">
+        <!-- The arc sits inside the edge. On the edge it has the color of the track and looks like a bite in the thumb. -->
+        <svg
+          v-if="busy"
+          class="switch-arc absolute inset-0 size-full text-base-fg-brand"
+          viewBox="0 0 28 20"
+          fill="none"
+        >
+          <rect
+            x="2.5"
+            y="2.5"
+            width="23"
+            height="15"
+            rx="7.5"
+            pathLength="100"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-dasharray="26 74"
+          />
+        </svg>
       </Transition>
     </span>
   </button>
 </template>
 
 <style scoped>
+.switch-track {
+  /* A save that ends sooner than this delay shows no fade and no arc. It is not a motion token: only this wait uses it. */
+  --switch-busy-delay: calc(300ms * var(--motion-slow));
+
+  transition:
+    background-color var(--motion-duration-state) var(--motion-easing-standard),
+    outline-color var(--motion-duration-state) var(--motion-easing-standard),
+    opacity var(--motion-duration-exit) var(--motion-easing-standard);
+}
+
+/* Only the fade waits. A tap must show the new track and the new thumb position at once. */
+.switch-track.is-busy {
+  opacity: 0.6;
+  transition:
+    background-color var(--motion-duration-state) var(--motion-easing-standard),
+    outline-color var(--motion-duration-state) var(--motion-easing-standard),
+    opacity var(--motion-duration-state) var(--motion-easing-standard) var(--switch-busy-delay);
+}
+
 /* The thumb moves with the pop easing. Its color uses the standard easing, because a color must not overshoot. */
 .switch-thumb {
   transition:
@@ -74,13 +113,27 @@ function toggle() {
   background-color: var(--base-fg-disabled);
 }
 
-.switch-spinner-enter-active,
-.switch-spinner-leave-active {
-  transition: opacity var(--motion-duration-state) var(--motion-easing-standard);
+.switch-arc-enter-active {
+  transition: opacity var(--motion-duration-state) var(--motion-easing-standard) var(--switch-busy-delay);
 }
 
-.switch-spinner-enter-from,
-.switch-spinner-leave-to {
+.switch-arc-leave-active {
+  transition: opacity var(--motion-duration-exit) var(--motion-easing-standard);
+}
+
+.switch-arc-enter-from,
+.switch-arc-leave-to {
   opacity: 0;
+}
+
+/* The dash moves along the edge of the thumb. A negative offset moves it clockwise. With reduced motion, the loop token is 0, so the arc stays still. */
+.switch-arc rect {
+  animation: switch-arc-run var(--motion-duration-loop) var(--motion-easing-loop) infinite;
+}
+
+@keyframes switch-arc-run {
+  to {
+    stroke-dashoffset: -100;
+  }
 }
 </style>

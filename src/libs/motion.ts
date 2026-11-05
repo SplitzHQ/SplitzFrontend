@@ -9,6 +9,7 @@ export const MOTION_DURATION_MS = {
   exit: 150,
   feedback: 150,
   hoverIn: 100,
+  loop: 1200,
   sheet: 500,
   state: 200,
 } as const;
@@ -17,6 +18,7 @@ export const MOTION_DURATION_MS = {
 export const MOTION_EASING = {
   enter: "cubic-bezier(0.22, 1, 0.36, 1)",
   exit: "cubic-bezier(0.32, 0, 0.67, 0)",
+  loop: "cubic-bezier(0, 0, 1, 1)",
   pop: "cubic-bezier(0.34, 1.56, 0.64, 1)",
   sheet: "cubic-bezier(0.32, 0.72, 0, 1)",
   standard: "cubic-bezier(0.25, 0.1, 0.25, 1)",
@@ -36,7 +38,7 @@ export function prefersReducedMotion(): boolean {
 }
 
 /** Reads the `--motion-slow` factor from the root element. Returns 1 when it is not set. */
-function motionSlow(): number {
+export function motionSlow(): number {
   if (typeof document === "undefined") return 1;
   const value = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--motion-slow"));
   return Number.isFinite(value) && value > 0 ? value : 1;

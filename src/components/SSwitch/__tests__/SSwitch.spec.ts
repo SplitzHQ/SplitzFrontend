@@ -45,14 +45,16 @@ describe("SSwitch", () => {
     expect(button.attributes("aria-busy")).toBe("true");
     expect(button.attributes("aria-disabled")).toBe("true");
     expect(wrapper.find("svg").exists()).toBe(true);
+    expect(button.classes()).toContain("is-busy");
     expect(wrapper.emitted("update:modelValue")).toBeUndefined();
   });
 
-  it("shows no spinner and no busy state when it is not busy", () => {
+  it("shows no arc and no busy state when it is not busy", () => {
     const wrapper = mountSwitch(false);
 
     expect(wrapper.get("button").attributes("aria-busy")).toBeUndefined();
     expect(wrapper.get("button").attributes("aria-disabled")).toBeUndefined();
     expect(wrapper.find("svg").exists()).toBe(false);
+    expect(wrapper.get("button").classes()).not.toContain("is-busy");
   });
 });

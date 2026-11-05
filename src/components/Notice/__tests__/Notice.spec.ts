@@ -41,6 +41,21 @@ describe("Notice", () => {
     expect(wrapper.findComponent(NOTICE_ICONS.info).exists()).toBe(false);
   });
 
+  it("puts the action slot on the right, outside the text block", () => {
+    const wrapper = mount(Notice, {
+      props: { tone: "error" },
+      slots: { action: '<button data-test="action">Try again</button>', default: "<p>Message</p>" },
+    });
+
+    const row = wrapper.get('[data-test="action"]').element.parentElement;
+    expect(row?.classList.contains("justify-end")).toBe(true);
+    expect(row?.closest(".text-util-color-error-900")).toBeNull();
+  });
+
+  it("has no action row without the action slot", () => {
+    expect(mountNotice().find(".justify-end").exists()).toBe(false);
+  });
+
   it("uses the 900 token for the info text", () => {
     expect(mountNotice({ tone: "info" }).find(".text-util-color-brand-900").exists()).toBe(true);
   });

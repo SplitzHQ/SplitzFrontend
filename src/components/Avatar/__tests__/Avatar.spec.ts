@@ -46,6 +46,16 @@ describe("Avatar", () => {
     expect(wrapper.text()).toBe("A");
   });
 
+  it("puts the line on a photo and not on a tile with an initial", () => {
+    const wrapper = mountAvatar([
+      { alt: "Alex", src: "/alex.png" },
+      { alt: "Bo", src: null },
+    ]);
+
+    expect(wrapper.get("img").classes()).toContain("picture-line");
+    expect(wrapper.findAll(".picture-line")).toHaveLength(1);
+  });
+
   it("gives the same name the same color", () => {
     expect(tileStyle("Alex")).toBe(tileStyle("Alex"));
     expect(tileStyle("Alex")).toContain("-500)");
