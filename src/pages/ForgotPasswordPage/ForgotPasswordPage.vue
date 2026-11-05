@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { PhEnvelopeSimple, PhPaperPlaneTilt, PhWarningCircle } from "@phosphor-icons/vue";
+import { PhEnvelopeSimple, PhPaperPlaneTilt } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { toast } from "vue-sonner";
 
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
 import Notice from "@/components/Notice/Notice.vue";
@@ -49,12 +48,10 @@ async function handleForgotPassword() {
   try {
     await userStore.forgotPassword(email.value);
     state.value = "submitted";
-    toast.success($t("auth-forgot-password-success-toast"));
   } catch (error) {
     console.error(error);
     if (!recoveryCooldown.startFromError(error)) {
       errorMessageKey.value = "auth-forgot-password-error";
-      toast.error($t("auth-forgot-password-error"));
     }
   } finally {
     loading.value = false;
@@ -86,10 +83,12 @@ async function handleForgotPassword() {
 
   <AuthShell v-else :title="$t('auth-forgot-password-title')" :subtitle="$t('auth-forgot-password-body')">
     <form class="flex flex-col gap-5" @submit.prevent="handleForgotPassword">
-      <Notice v-if="state === 'unavailable'" tone="warning" :title="$t('auth-forgot-password-unavailable-title')">
-        <template #icon>
-          <PhWarningCircle />
-        </template>
+      <Notice
+        v-if="state === 'unavailable'"
+        tone="warning"
+        :title="$t('auth-forgot-password-unavailable-title')"
+        announce
+      >
         <p>{{ $t("auth-forgot-password-unavailable-body") }}</p>
       </Notice>
 
@@ -103,6 +102,7 @@ async function handleForgotPassword() {
         required
         :disabled="inputDisabled"
         :invalid="errorMessageKey !== null"
+        :described-by="errorMessageKey ? 'forgot-password-error' : undefined"
         :label="$t('auth-email-label')"
         :placeholder="$t('auth-email-placeholder')"
       >
@@ -111,10 +111,7 @@ async function handleForgotPassword() {
         </template>
       </TextInput>
 
-      <Notice v-if="errorMessageKey" tone="error">
-        <template #icon>
-          <PhWarningCircle />
-        </template>
+      <Notice v-if="errorMessageKey" id="forgot-password-error" tone="error" announce>
         <p>{{ $t(errorMessageKey) }}</p>
       </Notice>
 

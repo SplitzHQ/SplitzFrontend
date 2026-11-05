@@ -58,7 +58,7 @@ test.describe("auth email flows", () => {
     await page.getByRole("button", { name: "Sign in" }).click({ force: true });
     expect(loginRequests).toBe(1);
 
-    await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
+    await expect(page.getByRole("status")).toContainText("You can try again now.", { timeout: 5000 });
     await expect(page.getByRole("button", { name: "Sign in" })).toBeEnabled();
     expect(loginRequests).toBe(1);
 
@@ -127,7 +127,7 @@ test.describe("auth email flows", () => {
     await page.getByRole("button", { name: "Send reset email" }).click({ force: true });
     expect(recoveryRequests).toBe(1);
 
-    await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
+    await expect(page.getByRole("status")).toContainText("You can try again now.", { timeout: 5000 });
     expect(recoveryRequests).toBe(1);
 
     await page.getByRole("button", { name: "Send reset email" }).click();
@@ -183,7 +183,7 @@ test.describe("auth email flows", () => {
     await page.goto("/confirm-email?userId=user-1&code=confirm-code");
 
     await expect(page.getByRole("heading", { name: "Email confirmed" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Go to sign in" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Go to sign in" })).toBeVisible();
   });
 
   test("confirm-email shows an expired-link state after backend failure", async ({ page }) => {
@@ -232,7 +232,7 @@ test.describe("auth email flows", () => {
     await page.getByRole("button", { name: "Try confirmation again" }).click({ force: true });
     expect(confirmationRequests).toBe(1);
 
-    await expect(page.getByRole("status")).toBeHidden({ timeout: 5000 });
+    await expect(page.getByRole("status")).toContainText("You can try again now.", { timeout: 5000 });
     expect(confirmationRequests).toBe(1);
 
     await page.getByRole("button", { name: "Try confirmation again" }).click();

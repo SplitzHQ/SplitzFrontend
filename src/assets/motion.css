@@ -13,7 +13,8 @@
   --motion-duration-feedback: calc(150ms * var(--motion-slow));
   --motion-duration-state: calc(200ms * var(--motion-slow));
   --motion-duration-container: calc(250ms * var(--motion-slow));
-  --motion-duration-sheet: calc(300ms * var(--motion-slow));
+  --motion-duration-sheet: calc(500ms * var(--motion-slow));
+  --motion-scale-sheet-back: 0.98;
   --motion-easing-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --motion-easing-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-easing-exit: cubic-bezier(0.32, 0, 0.67, 0);

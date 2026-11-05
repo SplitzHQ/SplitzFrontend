@@ -7,6 +7,7 @@ import { toast } from "vue-sonner";
 
 import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
@@ -40,6 +41,7 @@ const receiptPreview = ref<string | undefined>(previewPhotoBase64.value);
 const receiptUploadPending = ref(false);
 const receiptCooldown = useRateLimitCooldown();
 const saveDetailsLoading = ref(false);
+const saveFailed = ref(false);
 const receiptControlsDisabled = computed(() => saveDetailsLoading.value || receiptCooldown.isActive.value);
 const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
@@ -97,6 +99,7 @@ async function saveDetails() {
 
   try {
     saveDetailsLoading.value = true;
+    saveFailed.value = false;
     transaction.value.name = localName.value.trim() || undefined;
     transaction.value.icon = localCategory.value;
     transaction.value.geoCoordinate = localLocation.value.trim() || undefined;
@@ -118,7 +121,7 @@ async function saveDetails() {
     receiptUploadPending.value = false;
     model.value = false;
   } catch (error) {
-    toast.error($t("new-expense-review-error-saving-transaction"));
+    saveFailed.value = true;
     reportError("saveTransaction", error);
   } finally {
     saveDetailsLoading.value = false;
@@ -171,162 +174,161 @@ function getLocation() {
 </script>
 
 <template>
-  <Sheet v-model="model" detent="large" show-close-button>
-    <div class="flex flex-col gap-5">
-      <div class="text-lg font-medium text-base-text-primary">{{ $t("new-expense-review-actions-add-details") }}</div>
-      <div class="flex flex-col gap-4">
-        <!-- Name -->
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-base-text-secondary" for="name">
-            {{ $t("new-expense-review-fields-name-label") }}
-          </label>
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Open categories selection"
-              :class="[categoryColorMap[getMainCategory(localCategory)], 'rounded-05xl p-3 icon-6']"
-              @click="showCategorySheet = true"
-            >
-              <CategoryIcon :category="localCategory" />
-            </button>
-            <TextInput
-              id="name"
-              v-model="localName"
-              :placeholder="$t('new-expense-review-fields-name-placeholder')"
-              class="grow"
-            />
-          </div>
-        </div>
-
-        <!-- Location -->
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-base-text-secondary" for="location">
-            {{ $t("new-expense-review-fields-location") }}
-          </label>
-          <div class="flex items-stretch gap-2">
-            <button
-              type="button"
-              aria-label="Get current location"
-              class="flex cursor-pointer items-center justify-center rounded-xl p-3.5 outline -outline-offset-1 outline-base-border-primary"
-              @click="getLocation"
-            >
-              <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
-              <PhCircleNotch v-else class="animate-spin icon-5 text-base-fg-primary" />
-            </button>
-            <TextInput
-              id="location"
-              v-model="localLocation"
-              :placeholder="$t('new-expense-review-fields-location-placeholder')"
-              class="grow"
-            />
-          </div>
-          <span class="text-xs text-base-text-quaternary">
-            {{ $t("new-expense-review-fields-location-disclaimer") }}
-          </span>
-        </div>
-
-        <!-- Receipt -->
-        <div class="flex flex-col gap-2">
-          <!-- The following inputs are triggered programmatically via refs, so they should not be related to a label -->
-          <!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
-          <label class="text-sm font-semibold text-base-text-secondary">
-            {{ $t("new-expense-review-fields-receipt") }}
-          </label>
-          <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-          <input
-            ref="cameraInput"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            class="hidden"
-            :disabled="receiptControlsDisabled"
-            @change="handleFileChange"
-          />
-          <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-          <input
-            ref="galleryInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            :disabled="receiptControlsDisabled"
-            @change="handleFileChange"
-          />
-
-          <div v-if="receiptPreview" class="relative w-fit">
-            <img
-              :src="receiptPreview"
-              alt="Receipt preview"
-              class="h-24 w-24 rounded-lg border border-base-border-primary object-cover"
-            />
-            <button
-              type="button"
-              aria-label="Remove receipt"
-              class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
-              :disabled="receiptControlsDisabled"
-              @click="removeReceipt"
-            >
-              <PhTrash class="icon-4 text-base-fg-error" />
-            </button>
-          </div>
-          <div v-else class="flex gap-2">
-            <button
-              type="button"
-              aria-label="Select image from camera"
-              class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
-              :disabled="receiptControlsDisabled"
-              @click="triggerCamera"
-            >
-              <PhCamera class="icon-8 text-base-fg-brand" />
-            </button>
-            <button
-              type="button"
-              aria-label="Select image from gallery"
-              class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
-              :disabled="receiptControlsDisabled"
-              @click="triggerGallery"
-            >
-              <PhPlus class="icon-8 text-base-fg-brand" />
-            </button>
-          </div>
-          <RateLimitCountdown
-            :seconds="receiptCooldown.remainingSeconds.value"
-            message-key="new-expense-review-receipt-rate-limit"
-            data-test="receipt-rate-limit"
-          />
-        </div>
-
-        <!-- Notes -->
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-base-text-secondary" for="notes">
-            {{ $t("new-expense-review-fields-notes-label") }}
-          </label>
-          <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
-            <textarea
-              id="notes"
-              rows="3"
-              :placeholder="$t('new-expense-review-fields-notes-placeholder')"
-              class="w-full bg-transparent text-base font-normal text-base-text-primary placeholder:text-base placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
-            />
-          </div>
-        </div>
-
-        <div class="flex gap-3">
-          <SButton
-            :loading="saveDetailsLoading"
-            :disabled="receiptControlsDisabled"
-            data-test="save-details"
-            class="flex-1"
-            variant="primary"
-            size="xl"
-            @click="saveDetails"
+  <Sheet v-model="model" :title="$t('new-expense-review-actions-add-details')" detent="large" show-close-button>
+    <div class="flex flex-col gap-4">
+      <!-- Name -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-base-text-secondary" for="name">
+          {{ $t("new-expense-review-fields-name-label") }}
+        </label>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            :aria-label="$t('new-expense-review-fields-category-button')"
+            :class="[categoryColorMap[getMainCategory(localCategory)], 'rounded-xl p-3 icon-6']"
+            @click="showCategorySheet = true"
           >
-            {{
-              $t(receiptUploadPending ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done")
-            }}
-          </SButton>
+            <CategoryIcon :category="localCategory" />
+          </button>
+          <TextInput
+            id="name"
+            v-model="localName"
+            :placeholder="$t('new-expense-review-fields-name-placeholder')"
+            class="grow"
+          />
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-base-text-secondary" for="location">
+          {{ $t("new-expense-review-fields-location") }}
+        </label>
+        <div class="flex items-stretch gap-2">
+          <button
+            type="button"
+            aria-label="Get current location"
+            class="flex cursor-pointer items-center justify-center rounded-xl p-3.5 outline -outline-offset-1 outline-base-border-primary"
+            @click="getLocation"
+          >
+            <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
+            <PhCircleNotch v-else class="animate-spin icon-5 text-base-fg-primary" />
+          </button>
+          <TextInput
+            id="location"
+            v-model="localLocation"
+            described-by="location-disclaimer"
+            :placeholder="$t('new-expense-review-fields-location-placeholder')"
+            class="grow"
+          />
+        </div>
+        <span id="location-disclaimer" class="text-xs text-base-text-quaternary">
+          {{ $t("new-expense-review-fields-location-disclaimer") }}
+        </span>
+      </div>
+
+      <!-- Receipt -->
+      <div class="flex flex-col gap-2">
+        <!-- The following inputs are triggered programmatically via refs, so they should not be related to a label -->
+        <!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
+        <label class="text-sm font-semibold text-base-text-secondary">
+          {{ $t("new-expense-review-fields-receipt") }}
+        </label>
+        <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+        <input
+          ref="cameraInput"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          class="hidden"
+          :disabled="receiptControlsDisabled"
+          @change="handleFileChange"
+        />
+        <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+        <input
+          ref="galleryInput"
+          type="file"
+          accept="image/*"
+          class="hidden"
+          :disabled="receiptControlsDisabled"
+          @change="handleFileChange"
+        />
+
+        <div v-if="receiptPreview" class="relative w-fit">
+          <img
+            :src="receiptPreview"
+            alt="Receipt preview"
+            class="h-24 w-24 rounded-lg border border-base-border-primary object-cover"
+          />
+          <button
+            type="button"
+            aria-label="Remove receipt"
+            class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
+            :disabled="receiptControlsDisabled"
+            @click="removeReceipt"
+          >
+            <PhTrash class="icon-4 text-base-fg-error" />
+          </button>
+        </div>
+        <div v-else class="flex gap-2">
+          <button
+            type="button"
+            aria-label="Select image from camera"
+            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+            :disabled="receiptControlsDisabled"
+            @click="triggerCamera"
+          >
+            <PhCamera class="icon-8 text-base-fg-brand" />
+          </button>
+          <button
+            type="button"
+            aria-label="Select image from gallery"
+            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+            :disabled="receiptControlsDisabled"
+            @click="triggerGallery"
+          >
+            <PhPlus class="icon-8 text-base-fg-brand" />
+          </button>
+        </div>
+        <RateLimitCountdown
+          :seconds="receiptCooldown.remainingSeconds.value"
+          message-key="new-expense-review-receipt-rate-limit"
+          data-test="receipt-rate-limit"
+        />
+      </div>
+
+      <!-- Notes -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-base-text-secondary" for="notes">
+          {{ $t("new-expense-review-fields-notes-label") }}
+        </label>
+        <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
+          <textarea
+            id="notes"
+            rows="3"
+            :placeholder="$t('new-expense-review-fields-notes-placeholder')"
+            class="w-full bg-transparent text-base font-normal text-base-text-primary placeholder:text-base placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
+          />
         </div>
       </div>
     </div>
+
+    <template #actions>
+      <Notice v-if="saveFailed" tone="error" announce data-test="save-details-error">
+        <p>{{ $t("new-expense-review-error-saving-transaction") }}</p>
+      </Notice>
+
+      <SButton
+        :loading="saveDetailsLoading"
+        :disabled="receiptControlsDisabled"
+        data-test="save-details"
+        variant="primary"
+        size="xl"
+        @click="saveDetails"
+      >
+        {{ $t(receiptUploadPending ? "new-expense-review-actions-retry-receipt" : "new-expense-review-actions-done") }}
+      </SButton>
+    </template>
   </Sheet>
 
   <SelectCategorySheet v-model="showCategorySheet" v-model:category="localCategory" />

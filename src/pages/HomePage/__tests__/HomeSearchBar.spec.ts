@@ -24,6 +24,13 @@ describe("HomeSearchBar", () => {
     expect(wrapper.get("input").attributes("placeholder")).toBe("Find a group");
   });
 
+  it("shows the action outside the label", () => {
+    const wrapper = mount(HomeSearchBar, { slots: { action: '<button type="button">Filter</button>' } });
+
+    expect(wrapper.get("button").text()).toBe("Filter");
+    expect(wrapper.find("label button").exists()).toBe(false);
+  });
+
   it("updates the model when the user types", async () => {
     const wrapper = mount(HomeSearchBar, { props: { modelValue: "" } });
 

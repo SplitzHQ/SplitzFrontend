@@ -12,7 +12,7 @@ const COMPONENTS_FOLDER = resolve(process.cwd(), "src/components");
  * The folders that had no usage file when these rules started. Remove a folder when its usage file exists.
  * Do not add a folder: a new component must have a usage file from the start.
  */
-const FOLDERS_WITHOUT_USAGE = ["Notification", "Sheet", "SSegmentControl"];
+const FOLDERS_WITHOUT_USAGE: string[] = [];
 
 describe("component usage files", () => {
   it("allows no usage file only for the folders that had none at the start", () => {

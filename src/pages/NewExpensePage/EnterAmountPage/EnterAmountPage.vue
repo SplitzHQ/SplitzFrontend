@@ -32,7 +32,7 @@ const formattedAmount = computed(() => {
   return amount === null || amount === undefined ? "" : amount.toLocaleString(undefined, formatOptions.value);
 });
 
-/** Copy the recognized fields into the draft and tell the user to check them. */
+/** Copies the recognized fields into the draft. The review page asks the user to check them. */
 function applyReceiptToTxn(recognition: ReceiptDto) {
   transactionStore.applyReceiptRecognition(recognition);
   toast.success($t("new-expense-scan-applied"));
@@ -42,7 +42,7 @@ function applyReceiptToTxn(recognition: ReceiptDto) {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
+      <HeaderMobileSecondary :enable-close-button="true">
         {{ $t("new-expense-title") }}
       </HeaderMobileSecondary>
     </template>
@@ -90,7 +90,7 @@ function applyReceiptToTxn(recognition: ReceiptDto) {
             </div>
           </Transition>
         </div>
-        <Keyboard v-model="transaction.amount" variant="ghost" :enable-calculator="true" />
+        <Keyboard v-model="transaction.amount" variant="ghost" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
           <SButton variant="secondary" size="xl">{{ $t("new-expense-actions-skip") }}</SButton>
           <SLinkButton variant="primary" size="xl" href="/new-expense/select-people">

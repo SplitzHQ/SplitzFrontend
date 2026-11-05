@@ -9,6 +9,7 @@ import config from "@/backend/config";
 import { SplitzBackendApi, type TwoFactorResponse } from "@/backend/openapi";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
@@ -30,9 +31,22 @@ const enabling = ref(false);
 const disabling = ref(false);
 const generatingCodes = ref(false);
 const showDisableConfirm = ref(false);
+const loadFailed = ref(false);
+const enableFailed = ref(false);
+const disableFailed = ref(false);
+/** An error about the entered code. It shows under the field. */
+const codeErrorKey = ref<"two-factor-code-required" | "two-factor-enable-invalid" | null>(null);
+
+watch(verificationCode, () => {
+  codeErrorKey.value = null;
+});
+watch(showDisableConfirm, (open) => {
+  if (open) disableFailed.value = false;
+});
 
 async function loadTwoFactorStatus() {
   isLoading.value = true;
+  loadFailed.value = false;
   try {
     const response = await api.accountManage2faPost({ twoFactorRequest: {} });
     updateState(response);
@@ -46,7 +60,7 @@ async function loadTwoFactorStatus() {
     }
   } catch (error) {
     console.error("Failed to load 2FA status", error);
-    toast.error($t("two-factor-load-failed"));
+    loadFailed.value = true;
   } finally {
     isLoading.value = false;
   }
@@ -86,11 +100,12 @@ async function enableTwoFactor() {
   if (enabling.value) return;
 
   if (!verificationCode.value.trim()) {
-    toast.error($t("two-factor-code-required"));
+    codeErrorKey.value = "two-factor-code-required";
     return;
   }
 
   enabling.value = true;
+  enableFailed.value = false;
   try {
     const response = await api.accountManage2faPost({
       twoFactorRequest: {
@@ -104,11 +119,11 @@ async function enableTwoFactor() {
       updateState(response);
       verificationCode.value = "";
     } else {
-      toast.error($t("two-factor-enable-invalid"));
+      codeErrorKey.value = "two-factor-enable-invalid";
     }
   } catch (error) {
     console.error("Failed to enable 2FA", error);
-    toast.error($t("two-factor-enable-failed"));
+    enableFailed.value = true;
   } finally {
     enabling.value = false;
   }
@@ -118,6 +133,7 @@ async function disableTwoFactor() {
   if (disabling.value) return;
 
   disabling.value = true;
+  disableFailed.value = false;
   try {
     const response = await api.accountManage2faPost({
       twoFactorRequest: {
@@ -135,7 +151,7 @@ async function disableTwoFactor() {
     updateState(setupResponse);
   } catch (error) {
     console.error("Failed to disable 2FA", error);
-    toast.error($t("two-factor-disable-failed"));
+    disableFailed.value = true;
   } finally {
     disabling.value = false;
   }
@@ -177,19 +193,28 @@ onMounted(() => {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
-        <span class="text-base font-medium text-base-text-primary">{{ $t("two-factor-title") }}</span>
+      <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'profile' }">
+        {{ $t("two-factor-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-4 px-4 pt-2 pb-10">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-4 pt-2 pb-10">
         <!-- Loading skeleton -->
         <template v-if="isLoading">
           <div class="h-24 skeleton rounded-3xl" />
           <div class="h-80 skeleton rounded-3xl" />
           <div class="h-40 skeleton rounded-3xl" />
         </template>
+
+        <Notice v-else-if="loadFailed" tone="error" announce data-test="two-factor-load-error">
+          <div class="flex flex-col gap-2">
+            <p>{{ $t("two-factor-load-failed") }}</p>
+            <SButton variant="outline" size="md" class="self-start" @click="loadTwoFactorStatus">
+              {{ $t("two-factor-load-retry") }}
+            </SButton>
+          </div>
+        </Notice>
 
         <template v-else>
           <!-- Status card -->
@@ -294,11 +319,15 @@ onMounted(() => {
                   autocomplete="one-time-code"
                   :label="$t('two-factor-code-label')"
                   :placeholder="$t('two-factor-code-placeholder')"
+                  :error="codeErrorKey ? $t(codeErrorKey) : undefined"
                 >
                   <template #icon>
                     <PhShieldCheck />
                   </template>
                 </TextInput>
+                <Notice v-if="enableFailed" tone="error" announce data-test="two-factor-enable-error">
+                  <p>{{ $t("two-factor-enable-failed") }}</p>
+                </Notice>
                 <SButton type="submit" variant="primary" size="md" class="w-full" :loading="enabling">
                   {{ $t("two-factor-enable-action") }}
                 </SButton>
@@ -355,20 +384,19 @@ onMounted(() => {
     </template>
   </Layout>
 
-  <Sheet v-model="showDisableConfirm" detent="medium">
-    <div class="flex flex-col gap-6 p-6">
-      <div class="flex flex-col gap-2">
-        <p class="text-lg font-semibold text-base-text-primary">{{ $t("two-factor-disable-confirm-title") }}</p>
-        <p class="text-sm text-base-text-secondary">{{ $t("two-factor-disable-confirm-body") }}</p>
-      </div>
-      <div class="flex flex-col gap-2">
-        <SButton variant="destructive" size="xl" :loading="disabling" @click="disableTwoFactor">
-          {{ $t("two-factor-disable-confirm-yes") }}
-        </SButton>
-        <SButton variant="secondary" size="xl" :disabled="disabling" @click="showDisableConfirm = false">
-          {{ $t("two-factor-disable-confirm-cancel") }}
-        </SButton>
-      </div>
-    </div>
+  <Sheet v-model="showDisableConfirm" :title="$t('two-factor-disable-confirm-title')" detent="medium">
+    <p class="text-sm text-base-text-secondary">{{ $t("two-factor-disable-confirm-body") }}</p>
+
+    <template #actions>
+      <Notice v-if="disableFailed" tone="error" announce data-test="two-factor-disable-error">
+        <p>{{ $t("two-factor-disable-failed") }}</p>
+      </Notice>
+      <SButton variant="destructive" size="xl" :loading="disabling" @click="disableTwoFactor">
+        {{ $t("two-factor-disable-confirm-yes") }}
+      </SButton>
+      <SButton variant="secondary" size="xl" :disabled="disabling" @click="showDisableConfirm = false">
+        {{ $t("two-factor-disable-confirm-cancel") }}
+      </SButton>
+    </template>
   </Sheet>
 </template>

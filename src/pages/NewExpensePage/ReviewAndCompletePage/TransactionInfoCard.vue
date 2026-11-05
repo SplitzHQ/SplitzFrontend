@@ -30,7 +30,7 @@ const amountOwed = computed(() => {
     class="flex flex-col justify-center gap-3 rounded-2xl bg-util-color-brand-50 p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid"
   >
     <div class="flex items-center gap-3">
-      <div class="flex items-center justify-center rounded-05xl bg-util-color-brand-100 p-2.5">
+      <div class="flex items-center justify-center rounded-xl bg-util-color-brand-100 p-2.5">
         <PhFiles class="text-[28px] text-util-color-brand-500" />
       </div>
       <div class="flex flex-1 flex-col justify-center">

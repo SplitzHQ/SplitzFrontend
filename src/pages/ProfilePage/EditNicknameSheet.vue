@@ -5,6 +5,7 @@ import { toast } from "vue-sonner";
 
 import { AccountApi } from "@/backend";
 import config from "@/backend/config";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
@@ -24,18 +25,21 @@ const userStore = useUserStore();
 
 const remark = ref("");
 const loading = ref(false);
+const saveFailed = ref(false);
 
 watch(
   () => model.value,
   (visible) => {
     if (visible) {
       remark.value = props.currentRemark;
+      saveFailed.value = false;
     }
   }
 );
 
 async function save() {
   loading.value = true;
+  saveFailed.value = false;
   try {
     await accountApi.updateFriendRemark({
       id: props.friendId,
@@ -45,7 +49,7 @@ async function save() {
     model.value = false;
     toast.success($t("profile-edit-nickname-success"));
   } catch {
-    toast.error($t("profile-edit-nickname-error"));
+    saveFailed.value = true;
   } finally {
     loading.value = false;
   }
@@ -53,11 +57,8 @@ async function save() {
 </script>
 
 <template>
-  <Sheet v-model="model" detent="medium" :show-close-button="true">
-    <div class="flex flex-col gap-4 px-4 pt-2 pb-6">
-      <h2 class="text-lg font-semibold text-base-text-primary">
-        {{ $t("profile-edit-nickname-title") }}
-      </h2>
+  <Sheet v-model="model" :title="$t('profile-edit-nickname-title')" detent="medium" :show-close-button="true">
+    <div class="flex flex-col gap-4">
       <p class="text-sm text-base-text-tertiary">{{ friendName }}</p>
 
       <TextInput
@@ -66,10 +67,16 @@ async function save() {
         :label="$t('profile-edit-nickname-label')"
         :placeholder="$t('profile-edit-nickname-placeholder')"
       />
+    </div>
 
-      <SButton variant="primary" size="xl" class="w-full" :loading="loading" @click="save">
+    <template #actions>
+      <Notice v-if="saveFailed" tone="error" announce data-test="edit-nickname-error">
+        <p>{{ $t("profile-edit-nickname-error") }}</p>
+      </Notice>
+
+      <SButton variant="primary" size="xl" :loading="loading" @click="save">
         {{ $t("profile-edit-nickname-save") }}
       </SButton>
-    </div>
+    </template>
   </Sheet>
 </template>

@@ -43,6 +43,7 @@ new-expense-split-actions-complete = Continue
 
 new-expense-review-title = Review expense
 new-expense-review-expense-added-to = Adding to
+new-expense-review-receipt-check = These details came from your receipt. Check them before you finish.
 new-expense-review-you-owe = You owe
 new-expense-review-you-are-owed = You are owed
 new-expense-review-actions-add-details = Add details
@@ -52,6 +53,7 @@ new-expense-review-button-location = Location
 new-expense-review-button-receipt = Receipt
 new-expense-review-fields-name-label = Category & name
 new-expense-review-fields-name-placeholder = What was this for?
+new-expense-review-fields-category-button = Choose a category
 new-expense-review-fields-location = Location
 new-expense-review-fields-location-placeholder = Enter a place or address
 new-expense-review-fields-location-disclaimer = Using the location button sends your coordinates to OpenStreetMap Nominatim to look up the address.
@@ -61,7 +63,11 @@ new-expense-review-fields-notes-placeholder = Add a note…
 new-expense-review-actions-done = Save
 new-expense-review-actions-retry-receipt = Retry receipt upload
 new-expense-review-error-saving-transaction = Couldn't save expense. Please try again.
-new-expense-review-receipt-rate-limit = Too many uploads. Try again in { $seconds } seconds.
+new-expense-review-receipt-rate-limit =
+    { $seconds ->
+        [one] Too many uploads. Try again in { $seconds } second.
+       *[other] Too many uploads. Try again in { $seconds } seconds.
+    }
 new-expense-review-error-receipt-not-image = Please choose an image file.
 new-expense-review-error-receipt-too-large = Image must be under { $maxMb } MB.
 new-expense-review-actions-select-category = Choose category
@@ -78,11 +84,15 @@ new-expense-scan-count = { $count } of { $max } photos
 new-expense-scan-too-many = You can add up to { $max } photos.
 new-expense-scan-recognize = Scan receipt
 new-expense-scan-recognizing = Reading receipt…
-new-expense-scan-applied = Details filled in from your receipt. Double-check before saving.
+new-expense-scan-applied = Receipt details filled in
 new-expense-scan-from-receipt = From receipt: { $name }
 new-expense-scan-failed = Couldn't read the receipt. Try a clearer photo.
 new-expense-scan-error = Something went wrong while reading the receipt. Try again.
-new-expense-scan-rate-limit = Too many scans. Try again in { $seconds } seconds.
+new-expense-scan-rate-limit =
+    { $seconds ->
+        [one] Too many scans. Try again in { $seconds } second.
+       *[other] Too many scans. Try again in { $seconds } seconds.
+    }
 new-expense-scan-unavailable = Receipt scanning isn't set up yet. Add a model provider in your profile to use it.
 new-expense-scan-unavailable-fixed = Receipt scanning isn't available on this server.
 new-expense-scan-open-settings = Set up model provider

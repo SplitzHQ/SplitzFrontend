@@ -83,7 +83,9 @@ describe("LoginPage", () => {
     await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
 
     expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledWith("person@example.com");
-    expect(toastMock.success).toHaveBeenCalledWith("auth-resend-confirmation-success");
+    await flushPromises();
+    expect(wrapper.text()).toContain("auth-resend-confirmation-success");
+    expect(wrapper.text()).not.toContain("auth-login-resend-confirmation");
   });
 
   it("does not offer confirmation resend after ordinary login errors", async () => {
@@ -97,6 +99,7 @@ describe("LoginPage", () => {
     await flushPromises();
 
     expect(wrapper.find('[data-test="resend-confirmation"]').exists()).toBe(false);
+    expect(wrapper.get('[data-test="login-error"]').text()).toContain("auth-login-failed");
   });
 
   it("shows an independent resend cooldown and retries only after a manual click", async () => {
@@ -118,7 +121,7 @@ describe("LoginPage", () => {
     expect(wrapper.get('[data-test="resend-rate-limit"]').text()).toContain("2");
     expect(wrapper.get('[data-test="resend-confirmation"]').attributes("disabled")).toBeDefined();
     expect(wrapper.get('[data-test="login-submit"]').attributes("disabled")).toBeUndefined();
-    expect(toastMock.error).not.toHaveBeenCalledWith("auth-resend-confirmation-failed");
+    expect(wrapper.text()).not.toContain("auth-resend-confirmation-failed");
 
     await wrapper.get('[data-test="resend-confirmation"]').trigger("click");
     expect(userStoreMock.resendConfirmationEmail).toHaveBeenCalledTimes(1);

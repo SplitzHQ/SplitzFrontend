@@ -9,7 +9,7 @@ export const MOTION_DURATION_MS = {
   exit: 150,
   feedback: 150,
   hoverIn: 100,
-  sheet: 300,
+  sheet: 500,
   state: 200,
 } as const;
 

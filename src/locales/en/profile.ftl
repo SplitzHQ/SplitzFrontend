@@ -9,7 +9,11 @@ profile-avatar-change = Change avatar
 profile-avatar-upload-success = Avatar updated
 profile-avatar-upload-error = Couldn't upload avatar
 profile-avatar-too-large = Image must be under 10 MB
-profile-avatar-rate-limit = Too many uploads. Try again in { $seconds } seconds.
+profile-avatar-rate-limit =
+    { $seconds ->
+        [one] Too many uploads. Try again in { $seconds } second.
+       *[other] Too many uploads. Try again in { $seconds } seconds.
+    }
 profile-friends-label = Friends
 profile-friends-empty = No friends yet
 profile-add-friend = Add friend
@@ -35,6 +39,9 @@ profile-preferences-label = Preferences
 profile-remove-friend = Remove
 profile-remove-friend-success = Friend removed
 profile-remove-friend-error = Couldn't remove friend
+profile-remove-friend-confirm-title = Remove { $name }?
+profile-remove-friend-confirm-body = To add this friend again, you'll need to send a new friend request.
+profile-remove-friend-confirm-yes = Remove friend
 profile-edit-nickname-title = Edit nickname
 profile-edit-nickname-label = Nickname
 profile-edit-nickname-placeholder = Add a nickname

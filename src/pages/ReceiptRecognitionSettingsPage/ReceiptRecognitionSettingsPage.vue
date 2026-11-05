@@ -9,10 +9,13 @@ import { LLMSettingsApi, ResponseError } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SSwitch from "@/components/SSwitch/SSwitch.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import reportError from "@/libs/report-error";
+
+import RemoveProviderSheet from "./RemoveProviderSheet.vue";
 
 const { $t } = useFluent();
 const api = new LLMSettingsApi(config);
@@ -44,7 +47,26 @@ watch(
 
 const saving = ref(false);
 const removing = ref(false);
+const showRemoveConfirm = ref(false);
+const removeFailed = ref(false);
 const busy = computed(() => saving.value || removing.value);
+const saveErrorKey = ref<string | null>(null);
+
+/** The errors about one field. The fields show only when the custom provider is on. */
+const FIELD_ERRORS = new Set([
+  "receipt-recognition-error-endpoint",
+  "receipt-recognition-error-model",
+  "receipt-recognition-error-key",
+]);
+const noticeErrorKey = computed(() => {
+  const key = saveErrorKey.value;
+  return key && customProviderEnabled.value && FIELD_ERRORS.has(key) ? null : key;
+});
+
+/** Returns the text of a field error, or nothing when the save error is about something else. */
+function fieldError(key: string): string | undefined {
+  return saveErrorKey.value === key ? $t(key) : undefined;
+}
 
 /** True once anything about a custom provider is stored, so the remove button has something to do. */
 const hasStoredProvider = computed(() => {
@@ -69,6 +91,7 @@ async function save() {
   if (busy.value || !canSave.value) return;
 
   saving.value = true;
+  saveErrorKey.value = null;
   try {
     await api.updateLLMSettings({
       lLMSettingsInputDto: {
@@ -82,7 +105,7 @@ async function save() {
     toast.success($t("receipt-recognition-saved"));
   } catch (error) {
     reportError("receiptRecognition.save", error);
-    toast.error($t(await describeSaveError(error)));
+    saveErrorKey.value = await describeSaveError(error);
   } finally {
     saving.value = false;
   }
@@ -100,17 +123,28 @@ async function describeSaveError(error: unknown): Promise<string> {
   return "receipt-recognition-error-save";
 }
 
+function openRemoveConfirm() {
+  removeFailed.value = false;
+  showRemoveConfirm.value = true;
+}
+
 async function remove() {
   if (busy.value) return;
 
   removing.value = true;
+  removeFailed.value = false;
   try {
     await api.clearLLMSettings();
     await refetch();
+    showRemoveConfirm.value = false;
+    // The removed fields are gone, so an old save error no longer applies.
+    saveErrorKey.value = null;
     toast.success($t("receipt-recognition-removed"));
   } catch (error) {
     reportError("receiptRecognition.remove", error);
-    toast.error($t("receipt-recognition-error-save"));
+    removeFailed.value = true;
+    // A tap on the backdrop can close the sheet during the request. Then the sheet cannot show the error.
+    if (!showRemoveConfirm.value) toast.error($t("receipt-recognition-remove-error"));
   } finally {
     removing.value = false;
   }
@@ -120,13 +154,13 @@ async function remove() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
-        <span class="text-base font-medium text-base-text-primary">{{ $t("receipt-recognition-title") }}</span>
+      <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'profile' }">
+        {{ $t("receipt-recognition-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-6 px-4 pt-2 pb-10">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-6 pt-2 pb-10">
         <p class="px-1 text-sm text-base-text-tertiary">{{ $t("receipt-recognition-intro") }}</p>
 
         <p v-if="loading || !settings" class="px-1 text-sm text-base-text-quaternary">
@@ -194,6 +228,7 @@ async function remove() {
                     :label="$t('receipt-recognition-endpoint-label')"
                     :placeholder="$t('receipt-recognition-endpoint-placeholder')"
                     :hint="$t('receipt-recognition-endpoint-hint')"
+                    :error="fieldError('receipt-recognition-error-endpoint')"
                     autocomplete="off"
                     :disabled="busy"
                   />
@@ -202,6 +237,7 @@ async function remove() {
                     v-model="modelName"
                     :label="$t('receipt-recognition-model-label')"
                     :placeholder="$t('receipt-recognition-model-placeholder')"
+                    :error="fieldError('receipt-recognition-error-model')"
                     autocomplete="off"
                     :disabled="busy"
                   />
@@ -220,11 +256,16 @@ async function remove() {
                         ? $t('receipt-recognition-key-hint')
                         : $t('receipt-recognition-key-missing-hint')
                     "
+                    :error="fieldError('receipt-recognition-error-key')"
                     autocomplete="off"
                     :disabled="busy"
                   />
                 </div>
               </Transition>
+
+              <Notice v-if="noticeErrorKey" tone="error" announce data-test="save-settings-error">
+                <p>{{ $t(noticeErrorKey) }}</p>
+              </Notice>
 
               <div class="flex flex-col gap-2">
                 <SButton
@@ -246,7 +287,7 @@ async function remove() {
                   :loading="removing"
                   :disabled="saving"
                   data-test="remove-settings"
-                  @click="remove"
+                  @click="openRemoveConfirm"
                 >
                   {{ $t("receipt-recognition-remove") }}
                 </SButton>
@@ -261,6 +302,8 @@ async function remove() {
       </div>
     </template>
   </Layout>
+
+  <RemoveProviderSheet v-model="showRemoveConfirm" :removing="removing" :failed="removeFailed" @confirm="remove" />
 </template>
 
 <style scoped>

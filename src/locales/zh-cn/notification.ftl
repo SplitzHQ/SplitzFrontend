@@ -5,12 +5,14 @@ notification-unread-count = { $count } 条未读通知
 notification-mark-all-read = 全部标为已读
 notification-clear-all = 清空
 notification-dismiss = 忽略
+notification-unread = 未读
+notification-loading = 正在加载通知…
 notification-empty-title = 暂无新通知
 notification-empty-hint = 群组里的动态会显示在这里。
 notification-error = 无法加载通知。
 notification-retry = 重试
 notification-settings = 通知设置
-notification-close = 关闭
+notification-more = 更多选项
 
 ## Requests
 notification-requests-title = 请求
@@ -19,10 +21,9 @@ notification-accept = 接受
 notification-ignore = 忽略
 notification-friend-request-title = 好友请求
 notification-friend-request-body = { $name } 想加你为好友。
+notification-request-remark = 「{ $remark }」
 notification-group-invite-title = 群组邀请
 notification-group-invite-body = { $inviter } 邀请你加入 { $group }。
-notification-request-accepted = 已接受
-notification-request-ignored = 已忽略
 notification-request-error = 操作失败，请重试。
 notification-friend-request-accepted-toast = 你和 { $name } 已成为好友
 notification-group-invite-accepted-toast = 已加入 { $group }

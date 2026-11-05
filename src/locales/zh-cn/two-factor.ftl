@@ -1,5 +1,6 @@
 two-factor-title = 两步验证
 two-factor-load-failed = 无法加载两步验证状态
+two-factor-load-retry = 重试
 two-factor-enabled-title = 两步验证已开启
 two-factor-enabled-body = 每次登录时都需要输入验证器应用中的动态验证码。
 two-factor-disabled-title = 两步验证未开启

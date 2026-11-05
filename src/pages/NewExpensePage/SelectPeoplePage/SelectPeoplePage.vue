@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { useTransactionStore } from "@/stores/transaction";
@@ -171,7 +172,7 @@ const onSelectedUsersSubmitted = async () => {
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-4 pb-16">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-4 pb-28">
         <SearchBar v-model="searchKeyword" :selected-users="selectedUsers" />
         <FrequentSelectionList @select="onItemSelected" />
         <UserList
@@ -195,7 +196,7 @@ const onSelectedUsersSubmitted = async () => {
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
-        <div class="fixed inset-x-3 bottom-4">
+        <BottomAction>
           <SButton
             variant="primary"
             size="xl"
@@ -206,7 +207,7 @@ const onSelectedUsersSubmitted = async () => {
           >
             {{ $t("new-expense-actions-next") }}
           </SButton>
-        </div>
+        </BottomAction>
       </div>
     </template>
   </Layout>

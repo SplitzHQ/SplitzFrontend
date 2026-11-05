@@ -133,7 +133,8 @@ describe("ScanReceiptSheet", () => {
     await wrapper.get('[data-test="scan-recognize"]').trigger("click");
     await flushPromises();
 
-    expect(mocks.toast.error).toHaveBeenCalledWith("new-expense-scan-failed");
+    expect(mocks.toast.error).not.toHaveBeenCalled();
+    expect(wrapper.find('[data-test="scan-error"]').exists()).toBe(true);
     expect(mocks.reportError).toHaveBeenCalledWith("recognizeReceipt", "not JSON");
     expect(wrapper.emitted("recognized")).toBeUndefined();
     expect(wrapper.findAll('[data-test="scan-image"]')).toHaveLength(1);
@@ -211,7 +212,7 @@ function mountSheet() {
         },
         Sheet: {
           props: ["modelValue"],
-          template: "<div><slot /></div>",
+          template: '<div><slot /><slot name="actions" /></div>',
         },
         TransitionGroup: false,
       },

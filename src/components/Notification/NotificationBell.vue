@@ -4,14 +4,18 @@ import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 
 import SIconButton from "@/components/SButton/SIconButton.vue";
-import Sheet from "@/components/Sheet/Sheet.vue";
 import SPopover from "@/components/SPopover/SPopover.vue";
 import { useIsDesktop } from "@/libs/use-media-query";
 import { useNotificationStore } from "@/stores/notification";
 
 import NotificationBadge from "./NotificationBadge.vue";
 import NotificationPanel from "./NotificationPanel.vue";
+import NotificationSheet from "./NotificationSheet.vue";
 
+/**
+ * The bell in the home header. It opens the activity list, in a popover on a desktop and in a sheet on a phone.
+ * Its name has the unread count. See `notification.usage.ts`.
+ */
 const { $t } = useFluent();
 const store = useNotificationStore();
 const isDesktop = useIsDesktop();
@@ -59,9 +63,7 @@ watch(open, (active) => {
     <NotificationBadge :count="count" class="top-0.5 right-0.5" />
 
     <!-- Mobile: bottom sheet -->
-    <Sheet v-if="!isDesktop" v-model="open" detent="large" :show-close-button="true">
-      <NotificationPanel @navigate="close" />
-    </Sheet>
+    <NotificationSheet v-if="!isDesktop" v-model="open" />
   </div>
 </template>
 
@@ -91,9 +93,14 @@ watch(open, (active) => {
   animation: bell-ring 0.8s ease-in-out 1;
 }
 
+/* The second rule is the same for <html data-reduce-motion>. See motion.css. */
 @media (prefers-reduced-motion: reduce) {
   .bell-ring {
     animation: none;
   }
+}
+
+:root[data-reduce-motion] .bell-ring {
+  animation: none;
 }
 </style>
