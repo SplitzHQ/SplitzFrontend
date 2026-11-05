@@ -283,7 +283,7 @@ async function undoPayment(settlementId: string) {
                   variant="ghost"
                   size="sm"
                   :loading="undoingPaymentId === payment.invoiceSettlementId"
-                  :disabled="undoingPaymentId !== null && undoingPaymentId !== payment.invoiceSettlementId"
+                  :disabled="undoingPaymentId !== null"
                   :aria-label="$t('invoice-detail-undo')"
                   :title="$t('invoice-detail-undo')"
                   data-test="undo-payment"

@@ -216,10 +216,14 @@ export const ICON_RULES: UsageRule[] = [
 ];
 
 export const LOADING_RULES: UsageRule[] = [
-  { rule: "Set only loading on the button that does the work. The button then blocks taps.", title: "Loading" },
+  { rule: "Set loading on the button that does the work. The button then blocks taps.", title: "Loading" },
   {
     rule: "Do not set disabled and loading for the same work. A disabled button turns grey, so the loading button loses its colors.",
     title: "Not both",
+  },
+  {
+    rule: "In a list where all rows share one busy state, set disabled on all rows with that one check. Do not add a condition to exclude the row that shows the spinner.",
+    title: "List rows",
   },
   { rule: "Set disabled on the other buttons of the group while the work runs.", title: "Other buttons" },
 ];
@@ -296,7 +300,7 @@ export const ACCESSIBILITY_NOTES = [
     title: "Icon buttons",
   },
   {
-    text: "A loading button keeps focus and sets aria-busy, so a screen reader does not lose its place.",
+    text: "A loading button that is not disabled keeps focus and sets aria-busy, so a screen reader does not lose its place.",
     title: "Loading",
   },
   {
