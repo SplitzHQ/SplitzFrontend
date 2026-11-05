@@ -1,30 +1,10 @@
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { type Component, defineComponent, h, ref } from "vue";
+import { type Component, defineComponent, h, nextTick, ref } from "vue";
 
 import SSegmentControl, { type SegmentControlProps } from "../SSegmentControl.vue";
 
 const ITEMS = ["One", "Two", "Three"];
-
-/** Shows the layout id of a segment as an attribute, so the test can read it. */
-const SegmentStub = defineComponent({
-  props: { layoutId: { required: true, type: String } },
-  setup: (props) => () => h("i", { "data-layout-id": props.layoutId }),
-});
-
-/** Two controls on one page. */
-const TwoControls = defineComponent({
-  render: () =>
-    ["a", "b"].map((key) =>
-      h(SSegmentControl as Component, { items: ITEMS, key, label: "Choice", modelValue: 0, size: "sm" }, () => "Item")
-    ),
-});
-
-/** Returns the layout id of each segment, in page order. */
-function layoutIds(): (string | undefined)[] {
-  const wrapper = mount(TwoControls, { global: { stubs: { SSegment: SegmentStub } } });
-  return wrapper.findAll("[data-layout-id]").map((segment) => segment.attributes("data-layout-id"));
-}
 
 /** Mounts a control in the document with a model that follows each change. Only an element in the document can take the focus. */
 function mountControl(start = 0, props: Partial<SegmentControlProps> = {}) {
@@ -46,21 +26,19 @@ function mountControl(start = 0, props: Partial<SegmentControlProps> = {}) {
   return { model, radios: () => wrapper.findAll("[role='radio']"), wrapper };
 }
 
+/** Returns the radio group of a new control with these props. */
+function radioGroup(props: Partial<SegmentControlProps>) {
+  return mountControl(0, props).wrapper.get("[role='radiogroup']");
+}
+
+/** Returns true while the track shows a press. */
+function isPressed(wrapper: ReturnType<typeof mountControl>["wrapper"]): boolean {
+  return wrapper.get(".track").attributes("data-pressed") !== undefined;
+}
+
 describe("SSegmentControl", () => {
   afterEach(() => {
     document.body.innerHTML = "";
-  });
-
-  it("gives all segments of one control the same layout id, so the background slides between them", () => {
-    const ids = layoutIds();
-
-    expect(ids[0]).toBe(ids[1]);
-  });
-
-  it("gives each control its own layout id, so each control shows its selected background", () => {
-    const ids = layoutIds();
-
-    expect(ids[0]).not.toBe(ids[ITEMS.length]);
   });
 
   it("is a named radio group, and each segment tells if it is selected", () => {
@@ -126,5 +104,65 @@ describe("SSegmentControl", () => {
     const { radios } = mountControl();
 
     expect(radios()[1].text()).toBe("Two");
+  });
+
+  it("shows one selected background, and none when the index is outside the list", () => {
+    expect(mountControl(1).wrapper.findAll("[data-segment-selection]")).toHaveLength(1);
+    expect(mountControl(-1).wrapper.findAll("[data-segment-selection]")).toHaveLength(0);
+  });
+
+  it("does not put a mask on a control that fits", () => {
+    const { wrapper } = mountControl();
+
+    expect(wrapper.get<HTMLElement>("[role='radiogroup']").element.style.maskImage).toBe("");
+  });
+
+  it("wraps the segments only with the wrap prop", () => {
+    expect(radioGroup({}).classes()).toContain("overflow-x-auto");
+    expect(radioGroup({ wrap: true }).classes()).not.toContain("overflow-x-auto");
+  });
+
+  describe("press", () => {
+    it("keeps the press during a touch pan and ends it when the finger lifts", async () => {
+      const { radios, wrapper } = mountControl();
+      const group = wrapper.get("[role='radiogroup']");
+
+      await radios()[1].trigger("pointerdown", { pointerType: "touch" });
+      expect(isPressed(wrapper)).toBe(true);
+
+      await group.trigger("pointercancel", { pointerType: "touch" });
+      await group.trigger("pointerleave", { pointerType: "touch" });
+      expect(isPressed(wrapper)).toBe(true);
+
+      await group.trigger("touchend");
+      expect(isPressed(wrapper)).toBe(false);
+    });
+
+    it("ends the press when the browser cancels the touch", async () => {
+      const { radios, wrapper } = mountControl();
+
+      await radios()[1].trigger("pointerdown", { pointerType: "touch" });
+      await wrapper.get("[role='radiogroup']").trigger("touchcancel");
+
+      expect(isPressed(wrapper)).toBe(false);
+    });
+
+    it("ends the press when a mouse leaves the track", async () => {
+      const { radios, wrapper } = mountControl();
+
+      await radios()[1].trigger("pointerdown", { pointerType: "mouse" });
+      await wrapper.get("[role='radiogroup']").trigger("pointerleave", { pointerType: "mouse" });
+
+      expect(isPressed(wrapper)).toBe(false);
+    });
+
+    it("ignores a button other than the main button", async () => {
+      const { radios, wrapper } = mountControl();
+
+      radios()[1].element.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, button: 2 }));
+      await nextTick();
+
+      expect(isPressed(wrapper)).toBe(false);
+    });
   });
 });

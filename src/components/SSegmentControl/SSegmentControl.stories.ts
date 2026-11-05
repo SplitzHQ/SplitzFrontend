@@ -33,3 +33,18 @@ Default.args = {
   size: "md",
   modelValue: 0,
 };
+
+/** The segments do not fit, so the track scrolls and fades at the edge that has more segments. */
+export const Overflow: StoryFn<typeof SSegmentControl> = (args) => ({
+  components: { SSegmentControl },
+  setup() {
+    return { args };
+  },
+  template: '<div class="w-[343px]"><SSegmentControl v-bind="args" /></div>',
+});
+Overflow.args = {
+  items: ["Balances", "Trend", "History", "Members", "Receipts", "Export"],
+  label: "Sample choice",
+  size: "md",
+  modelValue: 0,
+};
