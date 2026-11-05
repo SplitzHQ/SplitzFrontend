@@ -107,6 +107,10 @@ export const CLOSE_RULES: UsageRule[] = [
 /** How to place a sheet and its content. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
+    rule: "The sheet dims the status bar area through `useStatusBarDim` in `src/libs/status-bar-color.ts`. Do not set a status bar color in a screen. A new overlay with a backdrop calls the same function.",
+    title: "Status bar",
+  },
+  {
     rule: "Set `title`, and Sheet draws the title: an h2 with size lg and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
     title: "Title",
   },

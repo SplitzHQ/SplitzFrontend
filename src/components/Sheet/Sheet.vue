@@ -5,6 +5,7 @@ import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from "reka-ui";
 import { computed, nextTick, ref, useTemplateRef, watch, watchEffect } from "vue";
 
 import BlurBand from "@/components/BlurBand/BlurBand.vue";
+import { useStatusBarDim } from "@/libs/status-bar-color";
 
 import { lockPageScroll } from "./sheet-scroll-lock";
 import { useSheetStack } from "./sheet-stack";
@@ -59,6 +60,8 @@ const open = defineModel<boolean>({ required: true });
 const { $t } = useFluent();
 
 const { isBehind } = useSheetStack(open);
+
+useStatusBarDim(open);
 
 /** A touch or a mouse press on these elements does not start a drag, because they use the movement themselves. */
 const NO_DRAG = "input, textarea, select, [contenteditable='true'], [role='slider']";
@@ -160,6 +163,21 @@ const heightStyle = computed(() => {
   if (settlingHeight.value !== null) return { height: `${settlingHeight.value}px`, maxHeight: "none" };
   return detentStyle.value;
 });
+
+/**
+ * Makes the backdrop absolute for its way out, in the same place. iOS 27 holds the color of the status bar while a
+ * full-screen fixed layer stays, and an absolute layer lets the bar return when the way out starts.
+ * This reads the place, because the parent of the layer is the page in the app and a phone frame in the dev tools.
+ */
+function releaseStatusBarHold(element: Element) {
+  const backdrop = element as HTMLElement;
+  const { height, top } = backdrop.getBoundingClientRect();
+  backdrop.style.position = "absolute";
+  backdrop.style.bottom = "auto";
+  backdrop.style.height = `${height}px`;
+  backdrop.style.top = "0";
+  backdrop.style.top = `${top - backdrop.getBoundingClientRect().top}px`;
+}
 
 /** Closes the sheet. */
 function dismiss() {
@@ -268,7 +286,7 @@ watchEffect((onCleanup) => {
 <template>
   <DialogRoot v-model:open="open">
     <DialogPortal>
-      <Transition name="sheet-backdrop">
+      <Transition name="sheet-backdrop" @before-leave="releaseStatusBarHold">
         <!-- The backdrop is a plain element. The DialogOverlay of Reka UI sets `pointer-events: none` on the body, and that stops a tap on a toast. -->
         <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
         <div v-if="open" class="fixed inset-0 z-modalBackdrop bg-base-bg-overlay" @click="dismiss">
