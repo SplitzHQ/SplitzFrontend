@@ -10,7 +10,9 @@ import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SLinkButton from "@/components/SButton/SLinkButton.vue";
 import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
@@ -34,10 +36,12 @@ const isLoading = computed(() => groupInfo.value.status === "pending");
 const isUnavailable = computed(() => !joinLinkId.value || groupInfo.value.status === "error");
 
 const joining = ref(false);
+const joinFailed = ref(false);
 
 async function join() {
   if (!joinLinkId.value) return;
   joining.value = true;
+  joinFailed.value = false;
   try {
     await groupApi.joinGroupByLink({ joinLinkId: joinLinkId.value });
     queryCache.invalidateQueries({ key: ["getGroups"] });
@@ -45,7 +49,7 @@ async function join() {
     await router.push("/");
   } catch (error) {
     console.error(error);
-    toast.error($t("join-group-error-join-failed"));
+    joinFailed.value = true;
   } finally {
     joining.value = false;
   }
@@ -56,12 +60,12 @@ async function join() {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
-        <span class="text-base font-medium text-base-text-primary">{{ $t("join-group-title") }}</span>
+        {{ $t("join-group-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col px-4 pt-2 pb-28">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-4 pt-2 pb-28">
         <!-- Invite card -->
         <div
           class="relative flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-core-alpha-brand-10 px-6 pt-10 pb-8 text-center"
@@ -98,7 +102,12 @@ async function join() {
           <!-- Invite -->
           <template v-else-if="group">
             <div class="relative rounded-3xl p-1 ring-4 ring-core-alpha-brand-20">
-              <Avatar v-if="group.photo" size="lg" :images="[{ src: group.photo, alt: group.name }]" />
+              <Avatar
+                aria-hidden="true"
+                v-if="group.photo"
+                size="lg"
+                :images="[{ src: group.photo, alt: group.name }]"
+              />
               <div
                 v-else
                 class="flex size-16 items-center justify-center rounded-2xl bg-util-color-brand-100 text-util-color-brand-700"
@@ -116,7 +125,11 @@ async function join() {
           </template>
         </div>
 
-        <div class="fixed inset-x-3 bottom-4">
+        <Notice v-if="joinFailed" tone="error" announce data-test="join-group-error">
+          <p>{{ $t("join-group-error-join-failed") }}</p>
+        </Notice>
+
+        <BottomAction>
           <SLinkButton v-if="isUnavailable" variant="secondary" size="xl" class="w-full" href="/">
             {{ $t("join-group-back-home") }}
           </SLinkButton>
@@ -131,7 +144,7 @@ async function join() {
           >
             {{ $t("join-group-join") }}
           </SButton>
-        </div>
+        </BottomAction>
       </div>
     </template>
   </Layout>

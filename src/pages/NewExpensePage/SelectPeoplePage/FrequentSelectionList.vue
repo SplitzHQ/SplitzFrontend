@@ -44,7 +44,11 @@ const emit = defineEmits<{
         class="flex cursor-pointer flex-col items-center gap-1"
         @click="() => emit('select', group.groupId)"
       >
-        <Avatar :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))" size="lg" />
+        <Avatar
+          aria-hidden="true"
+          :images="group.members.map((member) => ({ src: member.photo, alt: member.userName }))"
+          size="lg"
+        />
         <div class="text-center text-xs font-medium text-base-text-primary">{{ group.name }}</div>
       </button>
     </div>

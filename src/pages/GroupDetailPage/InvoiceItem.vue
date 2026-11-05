@@ -6,6 +6,7 @@ import { RouterLink } from "vue-router";
 import type { InvoiceReducedDto } from "@/backend";
 import { InvoiceStatus } from "@/backend";
 import InvoiceStatusPill from "@/components/InvoiceStatusPill/InvoiceStatusPill.vue";
+import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
 
 const props = defineProps<{
   invoice: InvoiceReducedDto;
@@ -23,10 +24,10 @@ const isSettled = props.invoice.status === InvoiceStatus.Settled;
 <template>
   <RouterLink
     :to="{ name: 'invoiceDetail', params: { groupId: invoice.groupId, invoiceId: invoice.invoiceId } }"
-    class="flex items-center gap-3 rounded-2xl py-2 transition-colors active:bg-base-bg-secondary"
+    :class="[TRANSACTION_ROW_CLASS, 'focus-visible:outline-offset-2']"
   >
     <div
-      class="flex size-12 shrink-0 items-center justify-center rounded-05xl"
+      class="flex size-12 shrink-0 items-center justify-center rounded-xl"
       :class="isSettled ? 'bg-util-color-success-50' : 'bg-util-color-yellow-50'"
     >
       <PhFileText class="icon-7" :class="isSettled ? 'text-util-color-success-600' : 'text-util-color-yellow-600'" />

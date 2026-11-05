@@ -24,7 +24,9 @@ import { AccountApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RequestCard, { type RequestNotification } from "@/components/Notification/RequestCard.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
@@ -37,6 +39,7 @@ import { useUserStore } from "@/stores/user";
 
 import AddFriendSheet from "./AddFriendSheet.vue";
 import EditNicknameSheet from "./EditNicknameSheet.vue";
+import RemoveFriendSheet from "./RemoveFriendSheet.vue";
 
 const { $t } = useFluent();
 const router = useRouter();
@@ -66,9 +69,11 @@ async function cancelFriendRequest(requestId: string) {
 const isEditingUsername = ref(false);
 const editedUsername = ref("");
 const savingUsername = ref(false);
+const usernameSaveFailed = ref(false);
 
 function startEditingUsername() {
   editedUsername.value = userStore.user?.userName ?? "";
+  usernameSaveFailed.value = false;
   isEditingUsername.value = true;
 }
 
@@ -81,6 +86,7 @@ async function saveUsername() {
   if (!name) return;
 
   savingUsername.value = true;
+  usernameSaveFailed.value = false;
   try {
     await accountApi.updateUserInfo({
       splitzUserUpdateViewModel: { userName: name },
@@ -89,7 +95,7 @@ async function saveUsername() {
     isEditingUsername.value = false;
     toast.success($t("profile-save-username-success"));
   } catch {
-    toast.error($t("profile-save-username-error"));
+    usernameSaveFailed.value = true;
   } finally {
     savingUsername.value = false;
   }
@@ -157,14 +163,14 @@ const friends = computed(() => userStore.user?.friends ?? []);
 const showAddFriend = ref(false);
 
 // Remove friend
-async function removeFriend(friendId: string) {
-  try {
-    await accountApi.removeFriend({ id: friendId });
-    await userStore.fetchUserInfo();
-    toast.success($t("profile-remove-friend-success"));
-  } catch {
-    toast.error($t("profile-remove-friend-error"));
-  }
+const showRemoveFriend = ref(false);
+const removingFriendId = ref("");
+const removingFriendName = ref("");
+
+function startRemoveFriend(friendId: string, name: string) {
+  removingFriendId.value = friendId;
+  removingFriendName.value = name;
+  showRemoveFriend.value = true;
 }
 
 // Edit nickname sheet
@@ -191,12 +197,12 @@ function logout() {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
-        <span class="text-base font-medium text-base-text-primary">{{ $t("profile-title") }}</span>
+        {{ $t("profile-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-6 px-4 pt-2 pb-28">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-6 pt-2 pb-28">
         <!-- Pending requests (friend requests and group invites) -->
         <Transition name="section">
           <section v-if="incomingRequests.length > 0" class="flex flex-col gap-2" data-test="requests-section">
@@ -225,6 +231,7 @@ function logout() {
           <div class="relative">
             <div class="rounded-3xl p-1 ring-4 ring-core-alpha-brand-20">
               <Avatar
+                aria-hidden="true"
                 :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]"
                 size="lg"
               />
@@ -289,6 +296,9 @@ function logout() {
                   :label="$t('profile-username-label')"
                   :placeholder="$t('profile-username-placeholder')"
                 />
+                <Notice v-if="usernameSaveFailed" tone="error" announce data-test="username-error">
+                  <p>{{ $t("profile-save-username-error") }}</p>
+                </Notice>
                 <div class="flex justify-end gap-2">
                   <SButton variant="ghost" size="md" :disabled="savingUsername" @click="cancelEditingUsername">
                     {{ $t("profile-cancel") }}
@@ -427,7 +437,11 @@ function logout() {
             class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5"
           >
             <div v-for="friend in friends" :key="friend.friendUser.id" class="flex items-center gap-3 px-4 py-3">
-              <Avatar :images="[{ src: friend.friendUser.photo ?? null, alt: friend.friendUser.userName }]" size="xs" />
+              <Avatar
+                aria-hidden="true"
+                :images="[{ src: friend.friendUser.photo ?? null, alt: friend.friendUser.userName }]"
+                size="xs"
+              />
               <div class="flex min-w-0 flex-1 flex-col">
                 <p class="truncate text-base font-medium text-base-text-primary">
                   {{ friend.remark || friend.friendUser.userName }}
@@ -448,7 +462,8 @@ function logout() {
                 variant="destructive-soft"
                 size="sm"
                 :aria-label="$t('profile-remove-friend')"
-                @click="removeFriend(friend.friendUser.id)"
+                data-test="remove-friend"
+                @click="startRemoveFriend(friend.friendUser.id, friend.remark || friend.friendUser.userName)"
               >
                 <PhTrash />
               </SIconButton>
@@ -466,7 +481,11 @@ function logout() {
                 :key="request.friendRequestId"
                 class="flex items-center gap-3 px-4 py-3"
               >
-                <Avatar :images="[{ src: request.toUser.photo ?? null, alt: request.toUser.userName }]" size="xs" />
+                <Avatar
+                  aria-hidden="true"
+                  :images="[{ src: request.toUser.photo ?? null, alt: request.toUser.userName }]"
+                  size="xs"
+                />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p class="truncate text-base font-medium text-base-text-primary">{{ request.toUser.userName }}</p>
                   <p class="text-sm text-base-text-quaternary">{{ $t("profile-friend-request-pending") }}</p>
@@ -485,11 +504,11 @@ function logout() {
         </section>
 
         <!-- Logout -->
-        <div class="fixed inset-x-3 bottom-4">
+        <BottomAction>
           <SButton variant="destructive-soft" size="xl" class="w-full" @click="logout">
             {{ $t("profile-logout") }}
           </SButton>
-        </div>
+        </BottomAction>
       </div>
     </template>
   </Layout>
@@ -515,6 +534,8 @@ function logout() {
     :friend-name="editingFriendName"
     :current-remark="editingFriendRemark"
   />
+
+  <RemoveFriendSheet v-model="showRemoveFriend" :friend-id="removingFriendId" :friend-name="removingFriendName" />
 </template>
 
 <style scoped>

@@ -2,10 +2,10 @@
 import { useFluent } from "fluent-vue";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { toast } from "vue-sonner";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import { formatCurrency } from "@/libs/format-currency";
@@ -18,16 +18,18 @@ const invoiceStore = useInvoiceStore();
 
 const groupId = route.params.groupId as string;
 const isSubmitting = ref(false);
+const createFailed = ref(false);
 
 async function handleCreate() {
   if (isSubmitting.value) return;
   try {
     isSubmitting.value = true;
+    createFailed.value = false;
     await invoiceStore.saveInvoice();
     void router.push({ name: "settleUpDone", params: { groupId } });
   } catch (error) {
     console.error("Error creating invoice:", error);
-    toast.error($t("settle-up-error-creating"));
+    createFailed.value = true;
   } finally {
     isSubmitting.value = false;
   }
@@ -37,18 +39,22 @@ async function handleCreate() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        <div class="flex items-center justify-between">
-          <span class="text-base font-medium text-base-text-primary">{{ $t("settle-up-title") }}</span>
-          <span class="text-sm text-base-text-quaternary">{{
+      <HeaderMobileSecondary
+        :enable-back-button="true"
+        :enable-close-button="true"
+        :fallback="{ name: 'groupDetail', params: { groupId } }"
+      >
+        <span class="flex items-center justify-between">
+          <span>{{ $t("settle-up-title") }}</span>
+          <span class="text-sm font-normal text-base-text-quaternary">{{
             $t("settle-up-step", { current: "2", total: "2" })
           }}</span>
-        </div>
+        </span>
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-6 px-4">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-6">
         <!-- Invoice Name -->
         <TextInput
           id="invoice-name"
@@ -62,19 +68,21 @@ async function handleCreate() {
           <h3 class="text-sm font-medium text-base-text-secondary">{{ $t("settle-up-summary") }}</h3>
           <div class="flex flex-col gap-2 rounded-xl bg-base-bg-secondary px-4 py-3">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-base-text-quaternary">{{ $t("settle-up-transactions-count") }}</span>
+              <span class="text-sm font-normal text-base-text-quaternary">{{
+                $t("settle-up-transactions-count")
+              }}</span>
               <span class="text-sm font-medium text-base-text-primary">{{
                 invoiceStore.selectedTransactionsCount
               }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-base-text-quaternary">{{ $t("settle-up-total-amount") }}</span>
+              <span class="text-sm font-normal text-base-text-quaternary">{{ $t("settle-up-total-amount") }}</span>
               <span class="text-sm font-medium text-base-text-primary">
                 {{ formatCurrency(invoiceStore.selectedTransactionsTotalAmount, invoiceStore.invoice.currency) }}
               </span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-base-text-quaternary">{{ $t("settle-up-currency-label") }}</span>
+              <span class="text-sm font-normal text-base-text-quaternary">{{ $t("settle-up-currency-label") }}</span>
               <span class="text-sm font-medium text-base-text-primary">{{ invoiceStore.invoice.currency }}</span>
             </div>
           </div>
@@ -101,7 +109,10 @@ async function handleCreate() {
         <div class="flex-1" />
 
         <!-- Create Button -->
-        <div class="pb-safe pb-4">
+        <div class="flex flex-col gap-3 pb-4">
+          <Notice v-if="createFailed" tone="error" announce data-test="create-invoice-error">
+            <p>{{ $t("settle-up-error-creating") }}</p>
+          </Notice>
           <SButton variant="primary" size="xl" class="w-full" :loading="isSubmitting" @click="handleCreate">
             {{ $t("settle-up-create-invoice") }}
           </SButton>

@@ -3,7 +3,6 @@ create-group-name-label = Group name
 create-group-name-placeholder = e.g. Trip to Tokyo
 create-group-submit = Create
 create-group-success = Group created
-create-group-error-user-not-ready = Still loading your account. Try again in a moment.
 create-group-error-submit-failed = Couldn't create group. Try again.
 create-group-share-link-label = Invite link
 create-group-share-link-hint = Anyone with this link can join the group.

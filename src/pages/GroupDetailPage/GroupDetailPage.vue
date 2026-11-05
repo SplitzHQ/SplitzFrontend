@@ -97,10 +97,10 @@ const settleUp = () => {
   <Layout>
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
-        <div v-if="group" class="flex items-center justify-center gap-2">
-          <Avatar :images="avatarImages" size="xs" />
-          <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
-        </div>
+        <span v-if="group" class="flex items-center gap-2">
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <span class="min-w-0">{{ group.name }}</span>
+        </span>
         <template #right>
           <SIconButton
             variant="ghost"
@@ -116,7 +116,7 @@ const settleUp = () => {
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 px-2">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5">
         <!-- Balance Card -->
         <div class="flex flex-col gap-3">
           <template v-if="group">
@@ -131,11 +131,13 @@ const settleUp = () => {
           </template>
 
           <!-- Tabs -->
-          <SSegmentControl v-model="activeTab" size="sm" :items="tabs" class="self-start">
-            <template #default="{ item }">
-              <span class="px-2 py-1 text-sm whitespace-nowrap">{{ item }}</span>
-            </template>
-          </SSegmentControl>
+          <SSegmentControl
+            v-model="activeTab"
+            size="md"
+            :label="$t('group-detail-tabs-label')"
+            :items="tabs"
+            class="self-start"
+          />
         </div>
 
         <!-- Invoices -->
@@ -158,7 +160,7 @@ const settleUp = () => {
         <SIconButton
           variant="primary"
           size="xl"
-          class="fixed right-5 bottom-12 z-10"
+          class="fixed right-safe-5 bottom-safe-12 z-10"
           :aria-label="$t('new-expense-title')"
           @click="addExpense"
         >

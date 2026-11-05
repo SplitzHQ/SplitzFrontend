@@ -101,7 +101,7 @@ function pairLabel(fromUser: SplitzUserReducedDto, toUser: SplitzUserReducedDto,
 function debtAmountClass(debt: InvoiceDebtDto): string {
   if (Number(debt.remaining) === 0) return "text-base-text-quaternary line-through";
   if (debt.fromUser.id === myId.value) return "text-base-text-error";
-  if (debt.toUser.id === myId.value) return "text-util-color-success-600";
+  if (debt.toUser.id === myId.value) return "text-base-text-success";
   return "text-base-text-primary";
 }
 
@@ -143,20 +143,16 @@ async function undoPayment(settlementId: string) {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
-        <div v-if="group" class="flex items-center justify-center gap-2">
-          <Avatar :images="avatarImages" size="xs" />
-          <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
-        </div>
-        <!-- An empty box as wide as the back button keeps the title in the center. -->
-        <template #right>
-          <div class="size-10 shrink-0" />
-        </template>
+      <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'groupDetail', params: { groupId } }">
+        <span v-if="group" class="flex items-center gap-2">
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <span class="min-w-0">{{ group.name }}</span>
+        </span>
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 px-4 pb-8">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 pb-8">
         <!-- Loading -->
         <div v-if="invoiceQuery.status === 'pending'" class="pt-6 text-base text-base-text-tertiary">
           {{ $t("invoice-detail-loading") }}
@@ -180,11 +176,11 @@ async function undoPayment(settlementId: string) {
                 :class="isSettled ? 'text-util-color-success-600' : 'text-util-color-yellow-600'"
               />
             </div>
-            <p class="text-2xl text-center font-semibold text-base-text-primary">
+            <p class="text-center text-display-sm font-semibold text-base-text-primary">
               {{ invoice.name || $t("group-detail-invoice-unnamed") }}
             </p>
             <InvoiceStatusPill :status="invoice.status" />
-            <p class="text-3xl font-bold text-base-text-primary tabular-nums">{{ money(totalAmount) }}</p>
+            <p class="text-display-md font-bold text-base-text-primary tabular-nums">{{ money(totalAmount) }}</p>
             <p class="text-sm text-base-text-quaternary">
               {{
                 $t("invoice-detail-created-by", {
@@ -212,7 +208,11 @@ async function undoPayment(settlementId: string) {
                 class="flex items-center gap-3 rounded-xl py-2"
                 data-test="invoice-debt"
               >
-                <Avatar :images="[{ alt: debt.fromUser.userName, src: debt.fromUser.photo ?? null }]" size="xs" />
+                <Avatar
+                  aria-hidden="true"
+                  :images="[{ alt: debt.fromUser.userName, src: debt.fromUser.photo ?? null }]"
+                  size="xs"
+                />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p class="truncate text-base font-medium text-base-text-primary">
                     {{ pairLabel(debt.fromUser, debt.toUser, "debt") }}

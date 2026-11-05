@@ -4,11 +4,15 @@ import { ref } from "vue";
 
 import SButton from "@/components/SButton/SButton.vue";
 
-import Sheet from "./Sheet.vue";
+import Sheet, { type SheetProps } from "./Sheet.vue";
 
-const meta: Meta<typeof Sheet> = {
+/** The props in one flat type. Storybook cannot read the union of `title` and `label`. */
+type SheetArgs = Omit<SheetProps, "label" | "title"> & { label?: string; title?: string };
+
+const meta: Meta<SheetArgs> = {
   title: "Components/Sheet",
   component: Sheet,
+  args: { label: "Sheet" },
   argTypes: {
     detent: {
       control: "radio",
@@ -20,9 +24,6 @@ const meta: Meta<typeof Sheet> = {
     showCloseButton: {
       control: "boolean",
     },
-    dismissOnBackdrop: {
-      control: "boolean",
-    },
     dismissOnDrag: {
       control: "boolean",
     },
@@ -30,7 +31,7 @@ const meta: Meta<typeof Sheet> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<SheetArgs>;
 
 export const Large: Story = {
   render: (args) => ({
@@ -53,11 +54,11 @@ export const Large: Story = {
             <h2 class="text-xl font-semibold">Large Sheet</h2>
             <p>
               This is a large sheet that takes up about 90% of the screen height.
-              It includes a drag handle at the top and can be dismissed by dragging down,
+              It includes a drag handle at the top. Drag it to change the height, or drag down to dismiss it,
               tapping the backdrop, or pressing the Escape key.
             </p>
             <div class="space-y-2">
-              <p>• Drag the handle to dismiss</p>
+              <p>• Drag the handle to change the height</p>
               <p>• Tap outside to close</p>
               <p>• Press Escape to close</p>
               <p>• Smooth iOS-like animations</p>
@@ -77,7 +78,6 @@ export const Large: Story = {
     detent: "large",
     showHandle: true,
     showCloseButton: false,
-    dismissOnBackdrop: true,
     dismissOnDrag: true,
   },
 };
@@ -120,7 +120,6 @@ export const Medium: Story = {
     detent: "medium",
     showHandle: true,
     showCloseButton: false,
-    dismissOnBackdrop: true,
     dismissOnDrag: true,
   },
 };
@@ -145,14 +144,14 @@ export const WithCloseButton: Story = {
           <div class="space-y-4 text-base-text-primary">
             <h2 class="text-xl font-semibold">Sheet with Close Button</h2>
             <p>
-              This sheet includes both a drag handle and a close button in the top-right corner.
-              This gives users multiple ways to dismiss the sheet.
+              This sheet has a drag handle and a close button. Press Tab to see the close button.
+              A finger does not need it, and a screen reader can always find it.
             </p>
             <div class="space-y-4">
               <div class="p-4 rounded-lg">
                 <h3 class="font-medium">Information</h3>
                 <p class="text-sm mt-1">
-                  You can close this sheet using the X button, drag handle, backdrop tap, or Escape key.
+                  You can close this sheet with the close button, a drag down, a backdrop tap, or the Escape key.
                 </p>
               </div>
               <div class="p-4 rounded-lg">
@@ -171,8 +170,42 @@ export const WithCloseButton: Story = {
     detent: "large",
     showHandle: true,
     showCloseButton: true,
-    dismissOnBackdrop: true,
     dismissOnDrag: true,
+  },
+};
+
+export const TitleAndActions: Story = {
+  render: (args) => ({
+    components: { SButton, Sheet },
+    setup() {
+      const isOpen = ref(false);
+      return { args, isOpen };
+    },
+    template: `
+      <div class="p-4 text-base-text-primary">
+        <button
+          @click="isOpen = true"
+          class="px-4 py-2 rounded-lg transition-colors"
+        >
+          Open Sheet with Title and Actions
+        </button>
+
+        <Sheet v-model="isOpen" v-bind="args">
+          <div class="flex flex-col gap-4 text-base-text-primary">
+            <p v-for="row in 30" :key="row">Row {{ row }}. The content scrolls, and the button stays.</p>
+          </div>
+          <template #actions>
+            <SButton variant="primary" size="xl" @click="isOpen = false">Save</SButton>
+          </template>
+        </Sheet>
+      </div>
+    `,
+  }),
+  args: {
+    detent: "medium",
+    label: undefined,
+    showCloseButton: true,
+    title: "Add friend",
   },
 };
 
@@ -218,56 +251,6 @@ export const NoHandle: Story = {
     detent: "medium",
     showHandle: false,
     showCloseButton: true,
-    dismissOnBackdrop: true,
-    dismissOnDrag: false,
-  },
-};
-
-export const NonDismissible: Story = {
-  render: (args) => ({
-    components: { Sheet },
-    setup() {
-      const isOpen = ref(false);
-      return { args, isOpen };
-    },
-    template: `
-      <div class="p-4 text-base-text-primary">
-        <button
-          @click="isOpen = true"
-          class="px-4 py-2 rounded-lg transition-colors"
-        >
-          Open Non-Dismissible Sheet
-        </button>
-
-        <Sheet v-model="isOpen" v-bind="args">
-          <div class="space-y-4 text-base-text-primary">
-            <h2 class="text-xl font-semibold">Non-Dismissible Sheet</h2>
-            <p>
-              This sheet can't be dismissed by dragging or tapping the backdrop.
-              You must use the close button to dismiss it.
-            </p>
-            <div class="p-4 rounded-lg">
-              <h3 class="font-medium">Important Notice</h3>
-              <p class="text-red-700 dark:text-red-300 text-sm mt-1">
-                This type of sheet is useful for critical actions that require user attention.
-              </p>
-            </div>
-            <button
-              @click="isOpen = false"
-              class="w-full p-3 rounded-lg transition-colors"
-            >
-              Close Sheet
-            </button>
-          </div>
-        </Sheet>
-      </div>
-    `,
-  }),
-  args: {
-    detent: "medium",
-    showHandle: true,
-    showCloseButton: true,
-    dismissOnBackdrop: false,
     dismissOnDrag: false,
   },
 };
@@ -288,7 +271,6 @@ export const InFrontOfOtherComponents: Story = {
     detentSizing: "height",
     showHandle: false,
     showCloseButton: true,
-    dismissOnBackdrop: true,
     dismissOnDrag: false,
   },
   render: (args) => ({

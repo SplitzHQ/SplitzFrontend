@@ -9,12 +9,14 @@ notification-unread-count =
 notification-mark-all-read = Mark all read
 notification-clear-all = Clear all
 notification-dismiss = Dismiss
+notification-unread = Unread
+notification-loading = Loading notifications…
 notification-empty-title = You're all caught up
 notification-empty-hint = Activity from your groups will show up here.
 notification-error = Couldn't load notifications.
 notification-retry = Retry
 notification-settings = Notification settings
-notification-close = Close
+notification-more = More options
 
 ## Requests
 notification-requests-title = Requests
@@ -27,10 +29,9 @@ notification-accept = Accept
 notification-ignore = Ignore
 notification-friend-request-title = Friend request
 notification-friend-request-body = { $name } wants to be your friend.
+notification-request-remark = “{ $remark }”
 notification-group-invite-title = Group invite
 notification-group-invite-body = { $inviter } invited you to join { $group }.
-notification-request-accepted = Accepted
-notification-request-ignored = Ignored
 notification-request-error = Something went wrong. Try again.
 notification-friend-request-accepted-toast = You and { $name } are now friends
 notification-group-invite-accepted-toast = You joined { $group }

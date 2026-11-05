@@ -3,10 +3,10 @@ import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
-import { toast } from "vue-sonner";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import { getCategory } from "@/libs/categories";
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -23,10 +23,11 @@ const { $t } = useFluent();
 const routerHistoryStore = useRouterHistoryStore();
 
 const transactionStore = useTransactionStore();
-const { transaction } = storeToRefs(transactionStore);
+const { receiptId, transaction } = storeToRefs(transactionStore);
 const showDetailsSheet = ref(false);
 const showCategorySheet = ref(false);
 const isSubmitting = ref(false);
+const saveFailed = ref(false);
 const bgUrl = `url("${BackgroundCheckCircle}")`;
 
 const selectedCategory = computed({
@@ -41,6 +42,7 @@ async function handleComplete() {
 
   try {
     isSubmitting.value = true;
+    saveFailed.value = false;
     await transactionStore.saveTransaction();
     // clean up transaction store after saving
     transactionStore.resetTransactionStore();
@@ -48,7 +50,7 @@ async function handleComplete() {
     routerHistoryStore.restoreSnapshot();
   } catch (error) {
     console.error("Error saving transaction:", error);
-    toast.error($t("new-expense-review-error-saving-transaction"));
+    saveFailed.value = true;
   } finally {
     isSubmitting.value = false;
   }
@@ -58,7 +60,7 @@ async function handleComplete() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
+      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
         {{ $t("new-expense-review-title") }}
       </HeaderMobileSecondary>
     </template>
@@ -72,9 +74,17 @@ async function handleComplete() {
           <GroupCard v-if="transaction.groupId" />
         </div>
         <div class="flex flex-col gap-10">
-          <TransactionInfoCard />
+          <div class="flex flex-col gap-4">
+            <Notice v-if="receiptId" tone="info" data-test="receipt-check">
+              <p>{{ $t("new-expense-review-receipt-check") }}</p>
+            </Notice>
+            <TransactionInfoCard />
+          </div>
           <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-2">
+              <Notice v-if="saveFailed" tone="error" announce data-test="save-expense-error">
+                <p>{{ $t("new-expense-review-error-saving-transaction") }}</p>
+              </Notice>
               <SButton variant="primary" size="xl" :disabled="isSubmitting" @click="handleComplete">
                 {{ $t("new-expense-review-actions-done") }}
               </SButton>

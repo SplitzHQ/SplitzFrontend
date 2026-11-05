@@ -91,7 +91,9 @@ describe("ReceiptRecognitionSettingsPage", () => {
     await wrapper.get("form").trigger("submit");
     await flushPromises();
 
-    expect(mocks.toast.error).toHaveBeenCalledWith("receipt-recognition-error-endpoint");
+    expect(mocks.toast.error).not.toHaveBeenCalled();
+    expect(wrapper.get("#receipt-endpoint").attributes("error")).toBe("receipt-recognition-error-endpoint");
+    expect(wrapper.find('[data-test="save-settings-error"]').exists()).toBe(false);
     expect(mocks.refetch).not.toHaveBeenCalled();
   });
 
@@ -102,8 +104,14 @@ describe("ReceiptRecognitionSettingsPage", () => {
     await wrapper.get('[data-test="remove-settings"]').trigger("click");
     await flushPromises();
 
+    expect(mocks.api.clearLLMSettings).not.toHaveBeenCalled();
+
+    await wrapper.get('[data-test="remove-settings-confirm"]').trigger("click");
+    await flushPromises();
+
     expect(mocks.api.clearLLMSettings).toHaveBeenCalledTimes(1);
     expect(mocks.toast.success).toHaveBeenCalledWith("receipt-recognition-removed");
+    expect(wrapper.find('[data-test="remove-settings-confirm"]').exists()).toBe(false);
 
     mocks.settings = ref({
       data: { ...storedSettings, available: false, customProviderAllowed: false },
@@ -115,6 +123,66 @@ describe("ReceiptRecognitionSettingsPage", () => {
     expect(locked.text()).toContain("receipt-recognition-custom-not-allowed");
     expect(locked.get('[data-test="overall-status"]').text()).toBe("receipt-recognition-status-off");
   });
+
+  it("keeps the provider when the user cancels the confirm step", async () => {
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="remove-settings"]').trigger("click");
+    await wrapper.get('[data-test="remove-settings-cancel"]').trigger("click");
+    await flushPromises();
+
+    expect(mocks.api.clearLLMSettings).not.toHaveBeenCalled();
+    expect(wrapper.find('[data-test="remove-settings-confirm"]').exists()).toBe(false);
+  });
+
+  it("keeps the sheet open with an error when the removal fails, and clears the error on reopen", async () => {
+    mocks.api.clearLLMSettings.mockRejectedValue(new Error("network"));
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="remove-settings"]').trigger("click");
+    await wrapper.get('[data-test="remove-settings-confirm"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find('[data-test="remove-settings-error"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="remove-settings-confirm"]').exists()).toBe(true);
+    expect(mocks.toast.error).not.toHaveBeenCalled();
+    expect(mocks.toast.success).not.toHaveBeenCalled();
+
+    await wrapper.get('[data-test="remove-settings-cancel"]').trigger("click");
+    await wrapper.get('[data-test="remove-settings"]').trigger("click");
+
+    expect(wrapper.find('[data-test="remove-settings-error"]').exists()).toBe(false);
+  });
+
+  it("shows a toast when the removal fails after the sheet was closed", async () => {
+    const wrapper = mountPage();
+    mocks.api.clearLLMSettings.mockImplementation(async () => {
+      await wrapper.get('[data-test="sheet-backdrop"]').trigger("click");
+      throw new Error("network");
+    });
+
+    await wrapper.get('[data-test="remove-settings"]').trigger("click");
+    await wrapper.get('[data-test="remove-settings-confirm"]').trigger("click");
+    await flushPromises();
+
+    expect(mocks.toast.error).toHaveBeenCalledWith("receipt-recognition-remove-error");
+  });
+
+  it("clears an old save error after the provider is removed", async () => {
+    mocks.api.updateLLMSettings.mockRejectedValue(new Error("network"));
+    mocks.api.clearLLMSettings.mockResolvedValue(undefined);
+    const wrapper = mountPage();
+
+    await wrapper.get("form").trigger("submit");
+    await flushPromises();
+    expect(wrapper.find('[data-test="save-settings-error"]').exists()).toBe(true);
+
+    await wrapper.get('[data-test="remove-settings"]').trigger("click");
+    await wrapper.get('[data-test="remove-settings-confirm"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find('[data-test="save-settings-error"]').exists()).toBe(false);
+  });
 });
 
 function mountPage() {
@@ -125,6 +193,7 @@ function mountPage() {
         Layout: {
           template: '<div><slot name="header" /><slot /></div>',
         },
+        RemoveProviderSheet: false,
         SButton: {
           emits: ["click"],
           props: ["disabled", "loading", "type"],
@@ -132,6 +201,15 @@ function mountPage() {
             '<button :type="type ?? \'button\'" :disabled="disabled || loading" @click="$emit(\'click\', $event)"><slot /></button>',
         },
         SSwitch: true,
+        // Shows the content only while the sheet is open, without the portal of the real sheet.
+        Sheet: {
+          emits: ["update:modelValue"],
+          props: ["modelValue"],
+          template: `<div v-if="modelValue">
+            <button data-test="sheet-backdrop" @click="$emit('update:modelValue', false)" />
+            <slot /><slot name="actions" />
+          </div>`,
+        },
         TextInput: true,
         Transition: false,
       },

@@ -7,6 +7,7 @@ import { toast } from "vue-sonner";
 
 import { ResponseError, type HttpValidationProblemDetails } from "@/backend/openapi";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SLinkButton from "@/components/SButton/SLinkButton.vue";
@@ -25,18 +26,20 @@ const confirmPassword = ref("");
 const loading = ref(false);
 const registrationComplete = ref(false);
 const registrationCooldown = useRateLimitCooldown();
+const errorKey = ref<string | null>(null);
 
 async function handleRegister() {
   if (loading.value || registrationCooldown.isActive.value) {
     return;
   }
 
+  // The confirm field already shows the error text, so a toast would repeat it.
   if (password.value !== confirmPassword.value) {
-    toast.error($t("auth-register-password-mismatch"));
     return;
   }
 
   loading.value = true;
+  errorKey.value = null;
   try {
     await userStore.register({
       email: email.value,
@@ -52,7 +55,6 @@ async function handleRegister() {
 
     if (emailEnabled) {
       registrationComplete.value = true;
-      toast.success($t("auth-register-success-email-enabled"));
       return;
     }
 
@@ -61,7 +63,7 @@ async function handleRegister() {
   } catch (error) {
     console.error(error);
     if (!registrationCooldown.startFromError(error)) {
-      toast.error($t(await getRegistrationErrorMessageKey(error)));
+      errorKey.value = await getRegistrationErrorMessageKey(error);
     }
   } finally {
     loading.value = false;
@@ -149,7 +151,9 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
         required
         :label="$t('auth-confirm-password-label')"
         :placeholder="$t('auth-confirm-password-placeholder')"
-        :invalid="confirmPassword.length > 0 && confirmPassword !== password"
+        :error="
+          confirmPassword.length > 0 && confirmPassword !== password ? $t('auth-register-password-mismatch') : undefined
+        "
       >
         <template #icon>
           <PhLockSimple />
@@ -161,6 +165,10 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
         message-key="auth-rate-limit-countdown"
         data-test="register-rate-limit"
       />
+
+      <Notice v-if="errorKey" tone="error" announce data-test="register-error">
+        <p>{{ $t(errorKey) }}</p>
+      </Notice>
 
       <SButton
         type="submit"

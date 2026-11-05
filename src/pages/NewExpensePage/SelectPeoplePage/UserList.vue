@@ -32,11 +32,13 @@ defineEmits<{
         <div class="flex flex-1 items-center gap-3">
           <Avatar
             v-if="item.__typename === 'UserListItemGroup'"
+            aria-hidden="true"
             :images="item.members.map((member) => ({ src: member.photo, alt: member.userName }))"
             size="xs"
           />
           <Avatar
             v-else-if="item.__typename === 'UserListItemFriend'"
+            aria-hidden="true"
             :images="[{ src: item.friendUser.photo, alt: item.friendUser.userName }]"
             size="xs"
           />

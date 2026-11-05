@@ -10,7 +10,6 @@ auth-login-title = Sign in to your account
 auth-login-subtitle = Welcome back. Pick up where you left off.
 auth-login-unconfirmed-title = Confirm your email first
 auth-password-hint = At least 12 characters, with a lowercase letter and a number.
-auth-login-success = Signed in
 auth-login-failed = Couldn't sign in. Check your email and password.
 auth-rate-limit-countdown =
     { $seconds ->
@@ -60,7 +59,6 @@ auth-forgot-password-unavailable-title = Password recovery is unavailable
 auth-forgot-password-unavailable-body = Email isn't set up on this server, so we can't send recovery emails right now.
 auth-forgot-password-success-title = Check your email
 auth-forgot-password-success-body = If an account exists for that email, a password reset message will be sent.
-auth-forgot-password-success-toast = If an account exists for that email, a password reset message will be sent.
 auth-forgot-password-error = Couldn't send a password reset email right now.
 auth-forgot-password-login-link = Return to sign in
 auth-reset-password-title = Choose a new password

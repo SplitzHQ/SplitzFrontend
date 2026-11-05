@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { PhEnvelopeSimple, PhLockSimple, PhPaperPlaneTilt, PhShieldCheck } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
-import { toast } from "vue-sonner";
 
 import { ResponseError, type ProblemDetails } from "@/backend/openapi";
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
@@ -27,6 +26,17 @@ const loading = ref(false);
 const resendLoading = ref(false);
 const loginCooldown = useRateLimitCooldown();
 const resendCooldown = useRateLimitCooldown();
+const loginFailed = ref(false);
+/** The result of the last resend. Null means that the user has not sent the email again. */
+const resendResult = ref<"sent" | "failed" | null>(null);
+
+const RESEND_MESSAGE_KEYS = {
+  failed: "auth-resend-confirmation-failed",
+  sent: "auth-resend-confirmation-success",
+};
+const resendMessageKey = computed(() =>
+  resendResult.value ? RESEND_MESSAGE_KEYS[resendResult.value] : "auth-login-resend-confirmation"
+);
 
 async function handleLogin() {
   if (loading.value || loginCooldown.isActive.value) {
@@ -35,13 +45,14 @@ async function handleLogin() {
 
   loading.value = true;
   showResendConfirmation.value = false;
+  loginFailed.value = false;
+  resendResult.value = null;
   try {
     await userStore.login({
       email: email.value,
       password: password.value,
       twoFactorCode: showTwoFactor.value ? twoFactorCode.value : undefined,
     });
-    toast.success($t("auth-login-success"));
     await router.push("/");
   } catch (error) {
     console.error(error);
@@ -53,7 +64,7 @@ async function handleLogin() {
       // user account is not confirmed, allow them to resend confirmation email
       showResendConfirmation.value = true;
     } else {
-      toast.error($t("auth-login-failed"));
+      loginFailed.value = true;
     }
   } finally {
     loading.value = false;
@@ -66,14 +77,15 @@ async function handleResendConfirmation() {
   }
 
   resendLoading.value = true;
+  resendResult.value = null;
   try {
     await userStore.resendConfirmationEmail(email.value);
     // Keep the response generic so this flow cannot confirm whether an account exists.
-    toast.success($t("auth-resend-confirmation-success"));
+    resendResult.value = "sent";
   } catch (error) {
     console.error(error);
     if (!resendCooldown.startFromError(error)) {
-      toast.error($t("auth-resend-confirmation-failed"));
+      resendResult.value = "failed";
     }
   } finally {
     resendLoading.value = false;
@@ -101,6 +113,8 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         id="email-address"
         v-model="email"
         name="email"
+        autocomplete="email"
+        inputmode="email"
         required
         :label="$t('auth-email-label')"
         :placeholder="$t('auth-email-placeholder')"
@@ -141,7 +155,10 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         </template>
       </TextInput>
 
-      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm font-medium">
+      <!-- An invisible box around each action makes the tap area 44px high. The form gap holds the box. -->
+      <div
+        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm font-medium *:relative *:after:absolute *:after:top-1/2 *:after:left-0 *:after:h-11 *:after:w-full *:after:-translate-y-1/2"
+      >
         <button
           type="button"
           class="text-base-text-brand hover:text-base-text-brand_hover"
@@ -165,12 +182,16 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         data-test="login-rate-limit"
       />
 
-      <Notice v-if="showResendConfirmation" tone="info" :title="$t('auth-login-unconfirmed-title')">
+      <Notice v-if="loginFailed" tone="error" announce data-test="login-error">
+        <p>{{ $t("auth-login-failed") }}</p>
+      </Notice>
+
+      <Notice v-if="showResendConfirmation" tone="info" :title="$t('auth-login-unconfirmed-title')" announce>
         <template #icon>
           <PhPaperPlaneTilt />
         </template>
         <div class="flex flex-col gap-2">
-          <p>{{ $t("auth-login-resend-confirmation") }}</p>
+          <p>{{ $t(resendMessageKey) }}</p>
           <RateLimitCountdown
             :seconds="resendCooldown.remainingSeconds.value"
             message-key="auth-rate-limit-countdown"

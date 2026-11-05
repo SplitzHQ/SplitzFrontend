@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhList, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
+import { PhArrowsDownUp, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -8,6 +8,7 @@ import { useRouter } from "vue-router";
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import BrandWordmark from "@/components/BrandWordmark/BrandWordmark.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
@@ -93,28 +94,29 @@ const userBalances = computed(() => {
 <template>
   <Layout>
     <template #header>
-      <div class="flex flex-col gap-3 border-b border-base-border-quaternary bg-base-bg-secondary_alt px-4 pt-4 pb-4">
+      <div
+        class="flex flex-col gap-3 border-b border-base-border-quaternary bg-base-bg-secondary_alt px-4 pt-safe-4 pb-4"
+      >
         <!-- Header -->
         <div class="flex w-full items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <SIconButton variant="ghost" size="md" :aria-label="$t('home-menu')">
-              <PhList class="text-util-color-brand-700" />
-            </SIconButton>
-            <h1 class="text-lg font-bold text-util-color-brand-700">Splitz</h1>
-          </div>
-          <div class="flex items-center gap-2.5">
+          <h1><BrandWordmark size="header" /></h1>
+          <div class="flex items-center gap-1">
             <NotificationBell />
-            <AvatarMenu />
+            <!-- The slot has the width of the bell, so the 32px avatar has the same space on each side. -->
+            <div class="flex size-10 items-center justify-center">
+              <AvatarMenu />
+            </div>
           </div>
         </div>
 
         <!-- Search Bar -->
-        <div class="flex w-full items-start gap-2.5">
-          <HomeSearchBar v-model="searchKeyword" class="flex-1" />
-          <SIconButton variant="secondary" size="md" :aria-label="$t('home-filter')">
-            <PhSlidersHorizontal />
-          </SIconButton>
-        </div>
+        <HomeSearchBar v-model="searchKeyword">
+          <template #action>
+            <SIconButton variant="ghost" size="sm" :aria-label="$t('home-filter')">
+              <PhSlidersHorizontal />
+            </SIconButton>
+          </template>
+        </HomeSearchBar>
       </div>
     </template>
 
@@ -124,7 +126,7 @@ const userBalances = computed(() => {
         <SIconButton
           variant="primary"
           size="xl"
-          class="fixed right-5 bottom-12 z-10"
+          class="fixed right-safe-5 bottom-safe-12 z-10"
           :aria-label="$t('home-button-record-expense')"
           @click="addExpense"
         >
@@ -139,7 +141,7 @@ const userBalances = computed(() => {
               <PhArrowsDownUp class="icon-4 text-base-text-quinary" />
               <span class="text-base-text-quinary">{{ $t("home-total-balance") }}</span>
               <template v-for="userBalance in userBalances" :key="userBalance.currency">
-                <span v-if="userBalance.amount > 0" class="text-util-color-success-600">
+                <span v-if="userBalance.amount > 0" class="text-base-text-success">
                   {{ formatCurrency(userBalance.amount, userBalance.currency) }}
                 </span>
                 <span v-else-if="userBalance.amount < 0" class="text-base-text-error">
@@ -161,11 +163,17 @@ const userBalances = computed(() => {
               class="flex w-full items-center gap-3 py-2 text-left"
               @click="router.push({ name: 'groupDetail', params: { groupId: group.groupId } })"
             >
-              <Avatar v-if="group.photo" size="lg" :images="[{ src: group.photo, alt: group.name }]" />
+              <Avatar
+                v-if="group.photo"
+                size="lg"
+                :images="[{ src: group.photo, alt: group.name }]"
+                aria-hidden="true"
+              />
               <Avatar
                 v-else
                 size="lg"
                 :images="group.members.slice(0, 4).map((m) => ({ src: m.photo ?? null, alt: m.userName }))"
+                aria-hidden="true"
               />
 
               <div class="min-w-0 flex-1">
@@ -179,7 +187,7 @@ const userBalances = computed(() => {
                     <span
                       v-for="balance in group.myBalancePositive"
                       :key="balance.currency"
-                      class="text-util-color-success-600"
+                      class="text-base-text-success"
                     >
                       {{ formatCurrency(balance.amount, balance.currency) }}
                     </span>

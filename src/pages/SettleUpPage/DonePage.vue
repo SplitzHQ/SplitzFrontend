@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useFluent } from "fluent-vue";
+import { useRoute } from "vue-router";
 
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -16,22 +17,25 @@ const invoiceStore = useInvoiceStore();
 
 const invoice = invoiceStore.createdInvoice;
 
+/** The page that opens when the history has no place to return to, for example after a reload. */
+const groupRoute = { name: "groupDetail", params: { groupId: useRoute().params.groupId as string } };
+
 function handleDone() {
   invoiceStore.reset();
-  routerHistoryStore.restoreSnapshot();
+  routerHistoryStore.restoreSnapshot(groupRoute);
 }
 </script>
 
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        <span class="text-base font-medium text-base-text-primary">{{ $t("settle-up-title") }}</span>
+      <HeaderMobileSecondary :enable-close-button="true" :fallback="groupRoute">
+        {{ $t("settle-up-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col items-center px-4">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col items-center">
         <!-- Success Animation -->
         <div class="w-full max-w-xs py-4">
           <BackgroundCheckCircle />
@@ -96,7 +100,7 @@ function handleDone() {
         <div class="flex-1" />
 
         <!-- Done Button -->
-        <div class="pb-safe w-full pb-4">
+        <div class="w-full pb-4">
           <SButton variant="primary" size="xl" class="w-full" @click="handleDone">
             {{ $t("settle-up-done-button") }}
           </SButton>

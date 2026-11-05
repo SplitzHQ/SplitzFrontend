@@ -135,7 +135,7 @@ describe("AddExpenseDetailsSheet receipt upload", () => {
     await flushPromises();
 
     expect(uploadReceipt).not.toHaveBeenCalled();
-    expect(toastMock.error).toHaveBeenCalledWith("new-expense-review-error-saving-transaction");
+    expect(wrapper.find('[data-test="save-details-error"]').exists()).toBe(true);
     expect(reportErrorMock).toHaveBeenCalledWith("saveTransaction", error);
     expect(wrapper.find('[data-test="receipt-rate-limit"]').exists()).toBe(false);
     expect(wrapper.emitted("update:modelValue")).toBeUndefined();
@@ -182,7 +182,7 @@ describe("AddExpenseDetailsSheet receipt upload", () => {
     expect(saveTransaction).toHaveBeenCalledTimes(1);
     expect(uploadReceipt).toHaveBeenCalledTimes(1);
     expect(uploadReceipt).toHaveBeenCalledWith(receipt);
-    expect(toastMock.error).toHaveBeenCalledWith("new-expense-review-error-saving-transaction");
+    expect(wrapper.find('[data-test="save-details-error"]').exists()).toBe(true);
     expect(reportErrorMock).toHaveBeenCalledWith("saveTransaction", error);
     expect(wrapper.find('[data-test="receipt-rate-limit"]').exists()).toBe(false);
     expect(wrapper.emitted("update:modelValue")).toBeUndefined();
@@ -212,7 +212,7 @@ function mountSheet() {
         SelectCategorySheet: true,
         Sheet: {
           props: ["modelValue"],
-          template: "<div><slot /></div>",
+          template: '<div><slot /><slot name="actions" /></div>',
         },
         TextInput: true,
       },

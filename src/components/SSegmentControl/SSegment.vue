@@ -1,56 +1,57 @@
 <script setup lang="ts">
 import { motion } from "motion-v";
 
-interface SegmentProps {
-  size: "xs" | "sm" | "md" | "lg" | "xl";
-  active: boolean;
-}
-type ButtonEvents = (e: "click") => void;
+import { easingPoints, motionSeconds } from "@/libs/motion";
 
-const { size, active } = defineProps<SegmentProps>();
-const emit = defineEmits<ButtonEvents>();
+import type { SegmentSize } from "./segment";
+
+/** One radio of SSegmentControl. Only SSegmentControl uses this component. */
+export interface SegmentProps {
+  /** The size of the segment. */
+  size: SegmentSize;
+  /** True for the selected segment. */
+  active: boolean;
+  /** True for the one segment of the control that is in the tab order. */
+  tabbable: boolean;
+  /** The shared name of the selected background. Each control needs its own, or motion shows only one background. */
+  layoutId: string;
+}
+type SegmentEvents = (e: "click") => void;
+
+const { size, active, tabbable, layoutId } = defineProps<SegmentProps>();
+const emit = defineEmits<SegmentEvents>();
 </script>
 
 <template>
-  <button type="button" class="relative" @click="emit('click')">
-    <motion.div v-if="active" class="absolute inset-0 rounded-full bg-core-alpha-brand-20" layout-id="segment-bg" />
-    <div
+  <!-- An invisible box after the button makes the tap area at least 44px high and 44px wide. -->
+  <button
+    type="button"
+    role="radio"
+    :aria-checked="active"
+    :tabindex="tabbable ? 0 : -1"
+    class="relative rounded-full after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
+    @click="emit('click')"
+  >
+    <motion.span
+      v-if="active"
+      class="absolute inset-0 rounded-full bg-core-alpha-brand-20"
+      :layout-id="layoutId"
+      :transition="{ duration: motionSeconds('state'), ease: easingPoints('standard') }"
+    />
+    <span
       :class="[
         size,
         active ? 'secondary' : 'ghost',
-        'relative z-10 flex cursor-pointer items-center gap-1.5 rounded-full',
+        'relative z-10 flex cursor-pointer items-center gap-1.5 rounded-full text-sm font-semibold whitespace-nowrap',
       ]"
     >
-      <div v-if="$slots['icon-left']" class="icon shrink-0">
-        <slot name="icon-left" />
-      </div>
       <slot />
-      <div v-if="$slots['icon-right']" class="icon shrink-0">
-        <slot name="icon-right" />
-      </div>
-    </div>
+    </span>
   </button>
 </template>
 
 <style lang="scss" scoped>
 @reference '../../assets/base.css';
-
-.secondary,
-.ghost {
-  .icon {
-    @apply text-base-fg-brand;
-
-    @media (hover: hover) {
-      &:hover {
-        @apply text-base-fg-brand_hover;
-      }
-    }
-
-    &:active {
-      @apply text-base-fg-brand_pressed;
-    }
-  }
-}
 
 .secondary {
   @apply text-base-text-brand;
@@ -70,38 +71,11 @@ const emit = defineEmits<ButtonEvents>();
   }
 }
 
-.xs,
-.sm,
-.md {
-  @apply text-sm font-semibold;
-}
-
-.lg,
-.xl {
-  @apply text-base font-semibold;
-}
-
-.xs {
-  @apply px-1.5 py-1;
-}
-
 .sm {
-  @apply px-2 py-1.5;
+  @apply px-3 py-1.5;
 }
 
 .md {
-  @apply px-2 py-2;
-}
-
-.lg {
-  @apply px-3 py-2;
-}
-
-.xl {
-  @apply px-3 py-2.5;
-}
-
-.icon {
-  @apply text-xl;
+  @apply px-4 py-2.5;
 }
 </style>

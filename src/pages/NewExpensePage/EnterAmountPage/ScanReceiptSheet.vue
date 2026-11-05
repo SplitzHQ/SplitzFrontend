@@ -8,6 +8,7 @@ import { toast } from "vue-sonner";
 
 import { ReceiptApi, ReceiptStatus, type ReceiptDto } from "@/backend";
 import config from "@/backend/config";
+import Notice from "@/components/Notice/Notice.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
@@ -50,7 +51,9 @@ const customProviderAllowed = computed(() => capabilitiesQuery.value.data?.custo
 const maxImages = computed(() => capabilitiesQuery.value.data?.maxImages ?? DEFAULT_MAX_IMAGES);
 
 watch(isOpen, (open) => {
-  if (open) void refetchCapabilities();
+  if (!open) return;
+  recognizeErrorKey.value = null;
+  void refetchCapabilities();
 });
 
 const images = ref<PendingImage[]>([]);
@@ -59,6 +62,7 @@ const cameraInput = useTemplateRef("cameraInput");
 const galleryInput = useTemplateRef("galleryInput");
 
 const recognizing = ref(false);
+const recognizeErrorKey = ref<"new-expense-scan-failed" | "new-expense-scan-error" | null>(null);
 const cooldown = useRateLimitCooldown();
 const controlsDisabled = computed(() => recognizing.value || cooldown.isActive.value);
 const canAddMore = computed(() => images.value.length < maxImages.value);
@@ -123,6 +127,7 @@ async function recognize() {
   if (!canRecognize.value) return;
 
   recognizing.value = true;
+  recognizeErrorKey.value = null;
   try {
     const recognition = await api.recognizeReceipt({
       categories: [...subcategories],
@@ -131,7 +136,7 @@ async function recognize() {
 
     if (recognition.status !== ReceiptStatus.Succeeded) {
       reportError("recognizeReceipt", recognition.error);
-      toast.error($t("new-expense-scan-failed"));
+      recognizeErrorKey.value = "new-expense-scan-failed";
       return;
     }
 
@@ -141,7 +146,7 @@ async function recognize() {
   } catch (error) {
     if (!cooldown.startFromError(error)) {
       reportError("recognizeReceipt", error);
-      toast.error($t("new-expense-scan-error"));
+      recognizeErrorKey.value = "new-expense-scan-error";
     }
   } finally {
     recognizing.value = false;
@@ -155,12 +160,9 @@ function openSettings() {
 </script>
 
 <template>
-  <Sheet v-model="isOpen" detent="large" show-close-button>
+  <Sheet v-model="isOpen" :title="$t('new-expense-scan-title')" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
-      <div class="flex flex-col gap-1">
-        <h2 class="text-lg font-medium text-base-text-primary">{{ $t("new-expense-scan-title") }}</h2>
-        <p class="text-sm text-base-text-tertiary">{{ $t("new-expense-scan-intro") }}</p>
-      </div>
+      <p class="text-sm text-base-text-tertiary">{{ $t("new-expense-scan-intro") }}</p>
 
       <p v-if="capabilitiesLoading" class="text-sm text-base-text-quaternary">
         {{ $t("new-expense-scan-loading") }}
@@ -257,28 +259,33 @@ function openSettings() {
           {{ $t("new-expense-scan-count", { count: images.length, max: maxImages }) }}
         </p>
 
-        <RateLimitCountdown
-          :seconds="cooldown.remainingSeconds.value"
-          message-key="new-expense-scan-rate-limit"
-          data-test="scan-rate-limit"
-        />
-
-        <SButton
-          variant="primary"
-          size="xl"
-          class="w-full"
-          :loading="recognizing"
-          :disabled="!canRecognize"
-          data-test="scan-recognize"
-          @click="recognize"
-        >
-          <template #icon-left><PhScan /></template>
-          {{ $t(recognizing ? "new-expense-scan-recognizing" : "new-expense-scan-recognize") }}
-        </SButton>
-
         <p class="text-xs text-base-text-quaternary">{{ $t("new-expense-scan-privacy") }}</p>
       </template>
     </div>
+
+    <template v-if="!capabilitiesLoading && recognitionAvailable" #actions>
+      <RateLimitCountdown
+        :seconds="cooldown.remainingSeconds.value"
+        message-key="new-expense-scan-rate-limit"
+        data-test="scan-rate-limit"
+      />
+
+      <Notice v-if="recognizeErrorKey" tone="error" announce data-test="scan-error">
+        <p>{{ $t(recognizeErrorKey) }}</p>
+      </Notice>
+
+      <SButton
+        variant="primary"
+        size="xl"
+        :loading="recognizing"
+        :disabled="!canRecognize"
+        data-test="scan-recognize"
+        @click="recognize"
+      >
+        <template #icon-left><PhScan /></template>
+        {{ $t(recognizing ? "new-expense-scan-recognizing" : "new-expense-scan-recognize") }}
+      </SButton>
+    </template>
   </Sheet>
 </template>
 

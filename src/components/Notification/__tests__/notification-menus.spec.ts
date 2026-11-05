@@ -57,6 +57,7 @@ function mountMenu(menu: "avatar" | "bell") {
 beforeEach(() => {
   mocks.desktop = ref(true);
   mocks.store = reactive({
+    activity: [],
     fetch: vi.fn().mockResolvedValue(undefined),
     markAllRead: vi.fn().mockResolvedValue(undefined),
     pendingRequestCount: 1,

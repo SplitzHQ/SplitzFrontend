@@ -76,7 +76,7 @@ const setSplitMethod = (splitMethod: SplitMethod) => {
     </template>
   </SButton>
 
-  <Sheet v-model="showSheet" detent="medium">
+  <Sheet v-model="showSheet" :title="$t('new-expense-split-title')" detent="medium">
     <div class="flex flex-col gap-4">
       <button class="flex items-center gap-2" @click="setSplitMethod('equally')">
         <PhEquals />

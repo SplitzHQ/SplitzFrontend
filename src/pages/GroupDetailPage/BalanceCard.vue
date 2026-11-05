@@ -25,7 +25,7 @@ const { $t } = useFluent();
         <p class="text-sm text-base-text-quaternary">{{ $t("group-detail-total-balance") }}</p>
         <p
           class="text-display-lg font-medium"
-          :class="Number(totalBalance) >= 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
+          :class="Number(totalBalance) >= 0 ? 'text-base-text-success' : 'text-base-text-error'"
         >
           {{ formatCurrency(totalBalance, currency, false) }}
         </p>
@@ -42,7 +42,7 @@ const { $t } = useFluent();
         <span v-else class="text-base-text-quinary">
           {{ $t("group-detail-you-owe", { name: member.name }) }}
         </span>
-        <span :class="Number(member.amount) < 0 ? 'text-util-color-success-600' : 'text-base-text-error'">
+        <span :class="Number(member.amount) < 0 ? 'text-base-text-success' : 'text-base-text-error'">
           {{ formatCurrency(member.amount, member.currency) }}
         </span>
       </div>

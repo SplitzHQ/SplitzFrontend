@@ -8,7 +8,9 @@ import { toast } from "vue-sonner";
 import { GroupApi, type GroupDto, type GroupJoinLinkDto } from "@/backend";
 import config from "@/backend/config";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
+import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
@@ -27,6 +29,7 @@ const groupName = ref("");
 const loading = ref(false);
 
 const createdGroup = ref<GroupDto | null>(null);
+const submitFailed = ref(false);
 const joinLink = ref<GroupJoinLinkDto | null>(null);
 
 const joinUrl = computed(() => {
@@ -43,15 +46,14 @@ const canSubmit = computed(() => {
 });
 
 async function submit() {
-  if (!userStore.user) {
-    toast.error($t("create-group-error-user-not-ready"));
-    return;
-  }
+  // `canSubmit` keeps the button disabled until the user loads.
+  if (!userStore.user) return;
 
   const name = groupName.value.trim();
   if (!name) return;
 
   loading.value = true;
+  submitFailed.value = false;
   try {
     const group = await groupApi.createGroup({
       groupInputDto: {
@@ -69,7 +71,7 @@ async function submit() {
     toast.success($t("create-group-success"));
   } catch (error) {
     console.error(error);
-    toast.error($t("create-group-error-submit-failed"));
+    submitFailed.value = true;
   } finally {
     loading.value = false;
   }
@@ -91,13 +93,13 @@ async function copyJoinLink() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
+      <HeaderMobileSecondary :enable-close-button="true">
         {{ $t("create-group-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-4 px-4 pt-4 pb-28">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-4 pt-4 pb-28">
         <TextInput
           id="group-name"
           v-model="groupName"
@@ -122,7 +124,11 @@ async function copyJoinLink() {
           {{ $t("create-group-created-hint") }}
         </div>
 
-        <div class="fixed inset-x-3 bottom-4">
+        <Notice v-if="submitFailed" tone="error" announce data-test="create-group-error">
+          <p>{{ $t("create-group-error-submit-failed") }}</p>
+        </Notice>
+
+        <BottomAction>
           <SButton
             v-if="!joinUrl"
             variant="primary"
@@ -144,7 +150,7 @@ async function copyJoinLink() {
           >
             {{ $t("create-group-done") }}
           </SButton>
-        </div>
+        </BottomAction>
       </div>
     </template>
   </Layout>
