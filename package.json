@@ -15,6 +15,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "css-var-to-tailwind": "bun scripts/css-var-to-tailwind/index.ts",
+    "generate-pwa-assets": "pwa-assets-generator",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
