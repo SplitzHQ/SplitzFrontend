@@ -16,7 +16,7 @@ interface ButtonEvents {
   click: [e: MouseEvent];
 }
 
-const { variant = "primary", size = "md", disabled, href } = defineProps<LinkButtonProps>();
+const { variant = "secondary", size = "md", disabled, href } = defineProps<LinkButtonProps>();
 const emit = defineEmits<ButtonEvents>();
 
 function clickHandler(e: MouseEvent) {

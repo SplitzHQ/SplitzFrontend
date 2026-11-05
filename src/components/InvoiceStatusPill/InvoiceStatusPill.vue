@@ -4,7 +4,9 @@ import { computed } from "vue";
 
 import { InvoiceStatus } from "@/backend";
 
+/** The status of an invoice as a small colored label. The rules are in `invoice-status-pill.usage.ts`. */
 export interface InvoiceStatusPillProps {
+  /** The status to show. */
   status: InvoiceStatus;
 }
 
@@ -17,7 +19,7 @@ const isSettled = computed(() => props.status === InvoiceStatus.Settled);
 
 <template>
   <span
-    class="rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-200"
+    class="rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-state ease-standard"
     :class="
       isSettled
         ? 'bg-util-color-success-50 text-util-color-success-700'

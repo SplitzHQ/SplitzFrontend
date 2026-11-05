@@ -3,7 +3,7 @@
  * src/libs/motion.ts mirrors the durations and curves for script code. The design-system tests check that the two
  * agree. See the Motion tab of the design-system page (/devtools/design-system.html) for the rules and live demos.
  *
- * Use them in Tailwind as `duration-(--motion-duration-state) ease-(--motion-easing-enter)`.
+ * Use them in Tailwind as `duration-state ease-enter`. The `@theme` block below creates these classes.
  */
 :root {
   /* Slow-motion factor for debugging. 1 is normal speed. */
@@ -19,6 +19,21 @@
   --motion-easing-exit: cubic-bezier(0.32, 0, 0.67, 0);
   --motion-easing-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --motion-easing-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* `inline` makes each class read the token directly, so the slow-motion factor and reduced motion still apply. */
+@theme inline {
+  --transition-duration-hover-in: var(--motion-duration-hover-in);
+  --transition-duration-exit: var(--motion-duration-exit);
+  --transition-duration-feedback: var(--motion-duration-feedback);
+  --transition-duration-state: var(--motion-duration-state);
+  --transition-duration-container: var(--motion-duration-container);
+  --transition-duration-sheet: var(--motion-duration-sheet);
+  --ease-standard: var(--motion-easing-standard);
+  --ease-enter: var(--motion-easing-enter);
+  --ease-exit: var(--motion-easing-exit);
+  --ease-sheet: var(--motion-easing-sheet);
+  --ease-pop: var(--motion-easing-pop);
 }
 
 /*
