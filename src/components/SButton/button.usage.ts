@@ -1,6 +1,6 @@
 /**
  * The usage rules of the SButton family. This file is the one place for these rules.
- * The design-system Button page renders them, and agents read them through the `component-usage` skill.
+ * The design-system Button page renders them, and agents read them through the `spz-component-use` skill.
  * The app does not import this file, so the rules do not go into the app bundle.
  */
 import { BUTTON_SIZES, BUTTON_VARIANTS, type ButtonSize, type ButtonVariant } from "./button";

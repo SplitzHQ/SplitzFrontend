@@ -1,5 +1,5 @@
 ---
-name: component-usage
+name: spz-component-use
 description: Choose the shared component and read its usage rules before any UI change in this repository. Use this skill for every change to a Vue template, a page, a layout or a component style in `src/` or `devtools/`, and every time you add or change a button, sheet, input, notice or another shared component. Use it when you pick a variant or a size, and when you change a file in `src/components/`, even if the change looks small.
 ---
 
