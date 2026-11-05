@@ -41,7 +41,7 @@ const toneClasses: Record<typeof text.value.tone, string> = {
 <template>
   <div
     :class="[
-      'group relative flex items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-(--motion-duration-state) ease-(--motion-easing-standard)',
+      'group relative flex items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-state ease-standard',
       notification.isRead ? 'bg-transparent' : 'bg-core-alpha-brand-5',
     ]"
   >
@@ -90,7 +90,7 @@ const toneClasses: Record<typeof text.value.tone, string> = {
     -->
     <button
       type="button"
-      class="relative flex size-7 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary transition duration-(--motion-duration-feedback) ease-(--motion-easing-standard) after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:bg-util-alpha-black-5 hover:text-base-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid md:group-hover:opacity-100 md:focus-visible:opacity-100 md:[@media(hover:hover)]:opacity-0"
+      class="relative flex size-7 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary transition duration-feedback ease-standard after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:bg-util-alpha-black-5 hover:text-base-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid md:group-hover:opacity-100 md:focus-visible:opacity-100 md:[@media(hover:hover)]:opacity-0"
       :aria-label="$t('notification-dismiss')"
       @click.stop="emit('dismiss', notification)"
     >
