@@ -110,9 +110,9 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "The second line uses `base-text-quaternary`, which has 3.30:1 on the dark page. Card SPZ-8 covers this token. Keep the row as it is until that card is decided.",
+  "The second line uses `base-text-quaternary`, which has 3.30:1 on the dark page. The decision on this token is open. Keep the row as it is until the user decides it.",
   "Must a screen reader read the category of the row? The row has no text for the category. Now only the icon shows it, and the icon is hidden.",
-  "How does a row show a transaction with no known payer? Now the second line is empty. A transaction saved by the new-expense flow when the payer is not in the split has no balance for the payer. Card SPZ-26.",
+  "How does a row show a transaction with no known payer? Now the second line is empty. A transaction saved by the new-expense flow when the payer is not in the split has no balance for the payer.",
   "How does a row show two payers? The app cannot create such a transaction, but the backend accepts one. The row names the user with the larger balance and the full amount.",
   "Should the tile be one shared component? TransactionItemContent, TransactionDetailPage, AddExpenseDetailsSheet and SelectCategorySheet each build the tile with their own size and radius.",
 ];
