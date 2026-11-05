@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useEventListener, useResizeObserver } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
-import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from "reka-ui";
+import { DialogContent, DialogDescription, DialogPortal, DialogRoot, DialogTitle } from "reka-ui";
 import { computed, nextTick, ref, useTemplateRef, watch, watchEffect } from "vue";
 
 import BlurBand from "@/components/BlurBand/BlurBand.vue";
@@ -36,10 +36,13 @@ export type SheetProps = SheetBaseProps &
     | {
         /** The visible title. The sheet draws it and gets its name from it. */
         title: string;
+        /** A short line under the title. A screen reader reads it after the name of the sheet. */
+        description?: string;
         label?: undefined;
       }
     | {
         title?: undefined;
+        description?: undefined;
         /** The name for a screen reader, when the sheet has no visible title. */
         label: string;
       }
@@ -47,6 +50,7 @@ export type SheetProps = SheetBaseProps &
 
 const {
   title,
+  description,
   label,
   detent = "large",
   detentSizing = "maxHeight",
@@ -86,7 +90,7 @@ const actionsRef = useTemplateRef<HTMLElement>("actions");
 const topBandRef = useTemplateRef<HTMLElement>("topBand");
 
 /** The scroll distance at which the top blur has full strength: the top padding and one line of the title. */
-const TOP_BAND_RANGE = 44;
+const TOP_BAND_RANGE = 52;
 /** The gap between the content and the action area. The bottom blur goes over this gap, so the last item stays clear. */
 const ACTIONS_GAP = "1.5rem";
 
@@ -298,7 +302,7 @@ watchEffect((onCleanup) => {
               as-child
               force-mount
               aria-modal="true"
-              :aria-describedby="undefined"
+              v-bind="description ? {} : { 'aria-describedby': undefined }"
               :disable-outside-pointer-events="false"
               @interact-outside.prevent
               @open-auto-focus="focusPanel"
@@ -347,7 +351,8 @@ watchEffect((onCleanup) => {
                 <div
                   ref="content"
                   :class="[
-                    'sheet-content min-h-0 flex-1 overflow-y-auto pt-4 px-safe-4',
+                    'sheet-content min-h-0 flex-1 overflow-y-auto px-safe-4',
+                    title ? 'pt-6' : 'pt-4',
                     { 'pb-safe-4': !$slots.actions },
                   ]"
                   :style="$slots.actions ? contentStyle : undefined"
@@ -360,10 +365,21 @@ watchEffect((onCleanup) => {
                   <DialogTitle
                     v-if="title"
                     :data-sheet-handle="showHandle || undefined"
-                    :class="['pb-4 text-lg font-semibold text-base-text-primary', { 'touch-none': showHandle }]"
+                    :class="[
+                      'text-display-xs font-semibold text-base-text-primary',
+                      description ? 'pb-2' : 'pb-5',
+                      { 'touch-none': showHandle },
+                    ]"
                   >
                     {{ title }}
                   </DialogTitle>
+                  <!-- The gap under the line is for the content, so a sheet with only this line does not get taller. -->
+                  <DialogDescription
+                    v-if="description"
+                    :class="['text-sm text-base-text-secondary', { 'pb-5': $slots.default }]"
+                  >
+                    {{ description }}
+                  </DialogDescription>
                   <slot />
                 </div>
 

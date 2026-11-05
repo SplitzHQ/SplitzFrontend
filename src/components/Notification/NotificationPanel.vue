@@ -75,9 +75,10 @@ function clearAllFromMenu() {
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-col gap-3">
-    <div v-if="inSheet" data-sheet-handle class="flex touch-none items-center justify-between gap-2">
-      <h2 class="text-lg font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
+  <div :class="['flex min-h-0 flex-col', inSheet ? 'gap-4.5' : 'gap-3']">
+    <!-- This row is 32px high and the title line is 28px, so these values give the title the place that Sheet gives it. -->
+    <div v-if="inSheet" data-sheet-handle class="flex touch-none items-center justify-between gap-2 pt-1.5">
+      <h2 class="text-display-xs font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
       <SIconButton
         v-if="items.length > 0"
         variant="ghost"

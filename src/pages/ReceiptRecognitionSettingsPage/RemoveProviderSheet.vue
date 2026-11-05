@@ -23,9 +23,12 @@ const { $t } = useFluent();
 </script>
 
 <template>
-  <Sheet v-model="model" :title="$t('receipt-recognition-remove-confirm-title')" detent="medium">
-    <p class="text-sm text-base-text-secondary">{{ $t("receipt-recognition-remove-confirm-body") }}</p>
-
+  <Sheet
+    v-model="model"
+    :title="$t('receipt-recognition-remove-confirm-title')"
+    :description="$t('receipt-recognition-remove-confirm-body')"
+    detent="medium"
+  >
     <template #actions>
       <Notice v-if="failed" tone="error" announce data-test="remove-settings-error">
         <p>{{ $t("receipt-recognition-remove-error") }}</p>

@@ -47,9 +47,12 @@ async function remove() {
 </script>
 
 <template>
-  <Sheet v-model="model" :title="$t('profile-remove-friend-confirm-title', { name: friendName })" detent="medium">
-    <p class="text-sm text-base-text-secondary">{{ $t("profile-remove-friend-confirm-body") }}</p>
-
+  <Sheet
+    v-model="model"
+    :title="$t('profile-remove-friend-confirm-title', { name: friendName })"
+    :description="$t('profile-remove-friend-confirm-body')"
+    detent="medium"
+  >
     <template #actions>
       <Notice v-if="removeFailed" tone="error" announce data-test="remove-friend-error">
         <p>{{ $t("profile-remove-friend-error") }}</p>

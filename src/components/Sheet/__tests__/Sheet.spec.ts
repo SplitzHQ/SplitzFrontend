@@ -55,6 +55,11 @@ function panel() {
   return document.querySelector<HTMLElement>('[role="dialog"]');
 }
 
+/** Returns the element that describes the panel. */
+function describedBy() {
+  return document.getElementById(panel()!.getAttribute("aria-describedby")!);
+}
+
 /** Returns one element of the content by its test name. */
 function part(name: string) {
   return document.querySelector<HTMLElement>(`[data-test="${name}"]`)!;
@@ -129,6 +134,51 @@ describe("Sheet", () => {
       expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)).toBe(heading);
     });
 
+    it("describes the panel with the line under the title", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "Everyone loses this expense.", modelValue: true, title: "Delete this expense?" },
+      });
+      await flushPromises();
+
+      const dialog = panel()!;
+      const line = document.getElementById(dialog.getAttribute("aria-describedby")!);
+      expect(line?.textContent?.trim()).toBe("Everyone loses this expense.");
+      expect(dialog.querySelector("h2")?.classList.contains("pb-2")).toBe(true);
+    });
+
+    it("adds the gap under the description only when content follows it", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "A line.", modelValue: true, title: "Title" },
+      });
+      await flushPromises();
+      expect(describedBy()?.classList.contains("pb-5")).toBe(false);
+      wrapper.unmount();
+
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "A line.", modelValue: true, title: "Title" },
+        slots: { default: "<p>Text</p>" },
+      });
+      await flushPromises();
+      expect(describedBy()?.classList.contains("pb-5")).toBe(true);
+    });
+
+    it("gives the title more space than a sheet with no title", async () => {
+      wrapper = mount(Sheet, { attachTo: document.body, props: { modelValue: true, title: "Add friend" } });
+      await flushPromises();
+      const title = panel()!.querySelector("h2")!;
+      expect(title.classList.contains("text-display-xs")).toBe(true);
+      expect(title.classList.contains("pb-5")).toBe(true);
+      expect(panel()!.querySelector(".sheet-content")?.classList.contains("pt-6")).toBe(true);
+      wrapper.unmount();
+
+      mountSheet({}, true);
+      await flushPromises();
+      expect(panel()!.querySelector(".sheet-content")?.classList.contains("pt-4")).toBe(true);
+    });
+
     it("hides the name of a sheet that has only a label", async () => {
       mountSheet({}, true);
       await flushPromises();
@@ -161,7 +211,7 @@ describe("Sheet", () => {
       const band = panel()!.querySelector<HTMLElement>(".blur-band.is-top")!.parentElement!;
       expect(band.style.getPropertyValue("--blur-band-strength")).toBe("0");
 
-      content.scrollTop = 22;
+      content.scrollTop = 26;
       content.dispatchEvent(new Event("scroll"));
       expect(band.style.getPropertyValue("--blur-band-strength")).toBe("0.5");
 
