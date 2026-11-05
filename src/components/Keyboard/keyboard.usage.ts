@@ -119,10 +119,10 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "How long can the input be? Now it has no limit. Twenty digits show on the line, but the value is the nearest JavaScript number. A value above about 1e21 saves as `1e+21`, because `saveTransaction` uses `toFixed`. Card SPZ-27.",
+  "How long can the input be? Now it has no limit. Twenty digits show on the line, but the value is the nearest JavaScript number. A value above about 1e21 saves as `1e+21`, because `saveTransaction` uses `toFixed`.",
   "How many decimal places can the user type? Now it has no limit, for every currency. `saveTransaction` always saves two places, so `1.239` saves as `1.24`, and JPY also gets two places. See the same card.",
   "What does the line show for `5 ÷ 0`? Now the value stays 5, and the line stays `5 ÷ 0` with no message. The correct result is not an error while the user types `0.5`, but it can look wrong if the user stops at zero.",
   "Which decimal mark does the key show? The key and the line always show a dot. The amount uses the locale of the browser, so a German browser shows `1,50` above a key with a dot. English and Simplified Chinese both use a dot, so the two app languages are correct.",
-  "Does a desktop user type with a physical keyboard? Now the keys react only to a press. Card SPZ-28.",
+  "Does a desktop user type with a physical keyboard? Now the keys react only to a press.",
   "Is `variant` the correct name? `ghost` and `primary` change only the frame, and they do not have the meaning of the same names on SButton. A name such as `surface` can be clearer.",
 ];

@@ -52,7 +52,7 @@ function lowestOnSurfaces(theme: Theme, token: string): number {
   );
 }
 
-/** Each level of text and the lowest contrast of its job. The values come from the decisions of SPZ-8. */
+/** Each level of text and the lowest contrast of its job. The values are design decisions. */
 const TEXT_LEVELS = [
   { min: 12, token: "base-text-primary" },
   { min: 7, token: "base-text-secondary" },

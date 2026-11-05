@@ -75,7 +75,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "Does the app need one shared status pill? InvoiceDetailPage builds a Paid pill by hand with a check icon, `px-2.5` and `py-1`. A backlog card asks this question.",
+  "Does the app need one shared status pill? InvoiceDetailPage builds a Paid pill by hand with a check icon, `px-2.5` and `py-1`.",
   "Which color family does Open use? The pill uses `yellow`. Notice and StatusBadge use `warning` for a state that waits.",
   "Must the locale keys move? The pill is shared, and the keys are `group-detail-invoice-settled` and `group-detail-invoice-open`. They stay for now, because a rename gives no change to a user.",
 ];
