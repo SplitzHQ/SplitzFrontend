@@ -20,7 +20,7 @@ export interface ButtonBaseProps {
 }
 
 const {
-  variant = "primary",
+  variant = "secondary",
   size = "md",
   iconOnly = false,
   disabled = false,
@@ -207,17 +207,18 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     }
   }
 
+  // A translucent fill takes the hue of the surface, and the disabled fill stays lighter than it in both themes.
   .variant-secondary {
-    --_bg: var(--base-bg-neutral);
+    --_bg: var(--core-alpha-brand-20);
     --_text: var(--base-text-primary);
     --_icon-color: var(--base-fg-primary);
 
     @include hover {
-      --_bg: var(--base-bg-neutral_hover);
+      --_bg: var(--core-alpha-brand-30);
     }
 
     @include pressed {
-      --_bg: var(--base-bg-neutral_pressed);
+      --_bg: var(--core-alpha-brand-40);
     }
   }
 
@@ -249,9 +250,10 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     --_outline-disabled-text: var(--core-alpha-white-40);
   }
 
+  // A parent can set `--s-button-ghost-icon` to change the icon color. See `ICON_RULES` in `button.usage.ts`.
   .variant-ghost {
     --_text: var(--base-text-primary);
-    --_icon-color: var(--base-fg-primary);
+    --_icon-color: var(--s-button-ghost-icon, var(--base-fg-primary));
 
     @include hover {
       --_bg: var(--base-bg-neutral);
@@ -302,7 +304,7 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     &.variant-secondary,
     &.variant-destructive,
     &.variant-destructive-soft {
-      --_bg: var(--base-bg-disabled);
+      --_bg: var(--base-bg-disabled_subtle);
     }
 
     // A fixed grey label gets lost on a tinted surface, so outline uses a translucent label.
@@ -322,6 +324,7 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     min-width: 0;
     overflow: hidden;
     padding-inline: 2px;
+    // A safety net for user data. Fixed copy must fit. See `LABEL_FIT_RULES` in `button.usage.ts`.
     text-overflow: ellipsis;
     transition: opacity var(--motion-duration-feedback) var(--motion-easing-standard);
   }
