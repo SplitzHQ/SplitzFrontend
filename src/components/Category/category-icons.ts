@@ -2,61 +2,89 @@
 // Import needed Phosphor icons (tree-shaken by bundler)
 import {
   PhAirplane,
+  PhArmchair,
   PhBaby,
   PhBank,
+  PhBarbell,
   PhBed,
+  PhBicycle,
+  PhBone,
   PhBookOpen,
   PhBrain,
+  PhBroom,
+  PhBuildings,
   PhBus,
   PhCar,
+  PhChalkboardTeacher,
   PhClipboardText,
+  PhClockCountdown,
   PhCoffee,
+  PhConfetti,
+  PhCookie,
   PhCookingPot,
   PhCreditCard,
   PhDeviceMobile,
+  PhDrop,
+  PhEye,
   PhFilmSlate,
   PhFirstAid,
+  PhFlame,
+  PhFlowerLotus,
   PhForkKnife,
   PhGameController,
+  PhGarage,
+  PhGasPump,
   PhGift,
   PhGraduationCap,
+  PhHairDryer,
   PhHammer,
   PhHeart,
+  PhHospital,
   PhHouse,
   PhLeaf,
+  PhLego,
   PhLightning,
+  PhMoney,
+  PhMonitorPlay,
   PhMusicNotes,
   PhPaintBrush,
   PhPawPrint,
+  PhPersonSimpleTaiChi,
   PhPill,
   PhPizza,
   PhPlug,
   PhQuestion,
   PhReceipt,
   PhRecycle,
+  PhScissors,
   PhShieldCheck,
   PhShoppingBag,
   PhShoppingCart,
   PhSoccerBall,
-  PhTicket,
+  PhStethoscope,
+  PhStorefront,
   PhTShirt,
-  PhUmbrella,
-  PhUsers,
-  PhGasPump,
+  PhTaxi,
+  PhTicket,
   PhTooth,
+  PhWashingMachine,
   PhWifiHigh,
   PhWine,
+  PhWrench,
 } from "@phosphor-icons/vue";
 import type { Component } from "vue";
 
 import type { Subcategory } from "@/libs/categories";
 
-// Central mapping: every Subcategory must have an icon. Missing keys -> TS error.
+/**
+ * The icon of each subcategory. The type check fails when a subcategory has no icon.
+ * PhQuestion is correct for an `other_*` bucket and for `uncategorized`. See `category.usage.ts`.
+ */
 export const categoryIconMap: Record<Subcategory, Component> = {
   // food
   dining_out: PhForkKnife,
   groceries: PhShoppingCart,
-  snacks: PhCookingPot,
+  snacks: PhCookie,
   liquor: PhWine,
   cafe: PhCoffee,
   takeout_delivery: PhPizza,
@@ -65,13 +93,13 @@ export const categoryIconMap: Record<Subcategory, Component> = {
 
   // transport
   public_transport: PhBus,
-  taxi_ride_hailing: PhCar,
+  taxi_ride_hailing: PhTaxi,
   fuel: PhGasPump,
-  parking: PhCar,
+  parking: PhGarage,
   vehicle_maintenance: PhHammer,
   vehicle_purchase: PhCar,
   tolls: PhReceipt,
-  bike_share: PhQuestion, // replace with bike icon when added
+  bike_share: PhBicycle,
   other_transport: PhQuestion,
 
   // entertainment
@@ -79,7 +107,7 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   music: PhMusicNotes,
   events_concerts: PhTicket,
   games: PhGameController,
-  streaming_subscriptions: PhFilmSlate,
+  streaming_subscriptions: PhMonitorPlay,
   nightlife: PhWine,
   hobbies: PhPaintBrush,
   books_media: PhBookOpen,
@@ -87,18 +115,18 @@ export const categoryIconMap: Record<Subcategory, Component> = {
 
   // home
   rent_mortgage: PhHouse,
-  maintenance_repairs: PhHammer,
-  furnishings: PhHouse,
-  cleaning_supplies: PhRecycle,
+  maintenance_repairs: PhWrench,
+  furnishings: PhArmchair,
+  cleaning_supplies: PhBroom,
   home_improvement: PhHammer,
   home_security: PhShieldCheck,
-  hoa: PhHouse,
+  hoa: PhBuildings,
   other_home: PhQuestion,
 
   // bills
   electricity: PhLightning,
-  water: PhUmbrella,
-  gas_utility: PhGasPump,
+  water: PhDrop,
+  gas_utility: PhFlame,
   internet: PhWifiHigh,
   mobile_phone: PhDeviceMobile,
   trash_recycling: PhRecycle,
@@ -125,24 +153,24 @@ export const categoryIconMap: Record<Subcategory, Component> = {
 
   // health
   pharmacy: PhPill,
-  doctor: PhFirstAid,
+  doctor: PhStethoscope,
   dentist: PhTooth,
-  hospital: PhFirstAid,
-  vision: PhQuestion, // add eye icon later
+  hospital: PhHospital,
+  vision: PhEye,
   mental_health: PhBrain,
   other_health: PhQuestion,
 
   // personal care
-  hair: PhUsers,
-  spa: PhHeart,
+  hair: PhScissors,
+  spa: PhFlowerLotus,
   cosmetics: PhPaintBrush,
-  grooming: PhUsers,
-  laundry_dry_cleaning: PhTShirt,
+  grooming: PhHairDryer,
+  laundry_dry_cleaning: PhWashingMachine,
   other_personal_care: PhQuestion,
 
   // education
   tuition: PhGraduationCap,
-  courses: PhBookOpen,
+  courses: PhChalkboardTeacher,
   books: PhBookOpen,
   supplies: PhClipboardText,
   student_fees: PhReceipt,
@@ -151,29 +179,29 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   // gifts & donations
   gifts: PhGift,
   charity: PhHeart,
-  celebrations: PhGift,
+  celebrations: PhConfetti,
   other_gifts_donations: PhQuestion,
 
   // kids
   childcare: PhBaby,
   school_supplies: PhClipboardText,
-  toys: PhGameController,
+  toys: PhLego,
   clothing_kids: PhTShirt,
   activities_lessons: PhGraduationCap,
   other_kids: PhQuestion,
 
   // pets
-  pet_food: PhForkKnife,
+  pet_food: PhBone,
   vet: PhFirstAid,
-  grooming_pets: PhPawPrint,
+  grooming_pets: PhScissors,
   boarding: PhPawPrint,
   pet_supplies: PhShoppingBag,
   other_pets: PhQuestion,
 
   // sports & fitness
-  gym: PhSoccerBall,
+  gym: PhBarbell,
   sports_equipment: PhSoccerBall,
-  fitness_classes: PhSoccerBall,
+  fitness_classes: PhPersonSimpleTaiChi,
   outdoor_activities: PhLeaf,
   other_sports_fitness: PhQuestion,
 
@@ -186,17 +214,17 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   other_insurance: PhQuestion,
 
   // taxes
-  income_tax: PhReceipt,
+  income_tax: PhMoney,
   property_tax: PhHouse,
   sales_tax: PhReceipt,
   other_taxes: PhQuestion,
 
   // fees & charges
   bank_fees: PhBank,
-  late_fees: PhReceipt,
+  late_fees: PhClockCountdown,
   service_fees: PhReceipt,
-  atm_fees: PhBank,
-  platform_fees: PhReceipt,
+  atm_fees: PhMoney,
+  platform_fees: PhStorefront,
   other_fees_charges: PhQuestion,
 
   // debt

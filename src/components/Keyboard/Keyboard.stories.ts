@@ -1,7 +1,4 @@
-import { PhBackspace } from "@phosphor-icons/vue";
 import type { Meta, StoryFn } from "@storybook/vue3-vite";
-
-import SButton from "@/components/SButton/SButton.vue";
 
 import Keyboard from "./Keyboard.vue";
 
@@ -11,7 +8,7 @@ export default {
 } satisfies Meta<typeof Keyboard>;
 
 const Template: StoryFn<typeof Keyboard> = (args) => ({
-  components: { Keyboard, SButton, PhBackspace },
+  components: { Keyboard },
   setup() {
     return { args };
   },
@@ -20,6 +17,6 @@ const Template: StoryFn<typeof Keyboard> = (args) => ({
 
 export const Default = Template.bind({});
 Default.args = {
-  enableCalculator: true,
+  variant: "ghost",
   modelValue: 0,
 };

@@ -2,15 +2,25 @@
 import { Big } from "big.js";
 import { computed, ref } from "vue";
 
+/** A digit key. */
 export type CalculatorInput = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-// if second boolean is true, the number is a decimal. The third number is the number of decimal places
+/**
+ * A number on the line: the digits as a whole number, true when the number has a dot, and the count of decimal places.
+ * For example, "1.50" is `[150, true, 2]`. This form keeps the zeros and the dot that the user typed.
+ */
 export type PartialNumber = [Big, boolean, number];
 
+/** An operator key. */
 export type Operator = "+" | "-" | "×" | "÷";
 
 type CalculatorStack = PartialNumber | Operator;
 
+/**
+ * The state of the number keyboard: the line that the user types, and its value.
+ * The value uses big.js, so 0.1 + 0.2 is 0.3. The value is calculated from left to right, and `expression` adds
+ * parentheses to show this order. Only the first number can be negative, because only `initialize` can load one.
+ */
 export default function useCalculator() {
   const stack = ref<CalculatorStack[]>([]);
 
@@ -114,14 +124,16 @@ export default function useCalculator() {
     }
   }
 
+  /** Replaces the line with one number. Zero, null and a value that is not finite give an empty line. */
   function initialize(value: number | null) {
-    if (value === null || value === 0) {
+    if (value === null || value === 0 || !Number.isFinite(value)) {
       stack.value = [];
       return;
     }
 
     const bigValue = new Big(value);
-    const str = bigValue.toString();
+    // toFixed always gives normal notation. toString gives "1e-7" for a very small value, and that has no dot.
+    const str = bigValue.toFixed();
     const decimalIndex = str.indexOf(".");
 
     if (decimalIndex === -1) {
@@ -158,9 +170,13 @@ export default function useCalculator() {
             case "×":
               partialNumber = partialNumber.times(evaluatePartialNumber(item));
               break;
-            case "÷":
-              partialNumber = partialNumber.div(evaluatePartialNumber(item));
+            case "÷": {
+              // A zero divisor is often an unfinished number, for example the start of "0.5". big.js throws on it.
+              // Keep the value until the divisor is not zero, as with an operator that has no number after it.
+              const divisor = evaluatePartialNumber(item);
+              if (!divisor.eq(0)) partialNumber = partialNumber.div(divisor);
               break;
+            }
             case null:
               break;
           }
@@ -191,23 +207,10 @@ export default function useCalculator() {
           // if the number is a decimal with no decimal places, add a dot
           num += ".";
         }
-        // Handle negative numbers in expression display
-        if (num.startsWith("-") && expression.length === 0) {
-          // If it's the first number and negative, show it as is
-          expression.push(num);
-        } else if (num.startsWith("-")) {
-          // If it's a negative number but not the first, format it properly
-          expression.push(`(${num})`);
-        } else {
-          expression.push(num);
-        }
+        expression.push(num);
       }
     }
     return expression;
-  });
-
-  const isComplexExpression = computed(() => {
-    return stack.value.length > 2;
   });
 
   return {
@@ -217,7 +220,6 @@ export default function useCalculator() {
     expression,
     initialize,
     input,
-    isComplexExpression,
     minus,
     plus,
     result,

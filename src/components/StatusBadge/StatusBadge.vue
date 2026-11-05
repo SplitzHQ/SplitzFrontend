@@ -1,5 +1,11 @@
 <script setup lang="ts">
+/**
+ * An icon in rings at the top of a result screen. The rules are in `status-badge.usage.ts`.
+ * The default slot holds one icon. The icon is decorative, so the text of the screen must give the result.
+ * The rings draw 24px outside the 96px box and take no layout space.
+ */
 export interface StatusBadgeProps {
+  /** The color of the icon and the rings. */
   tone: "brand" | "success" | "warning" | "error";
 }
 
@@ -39,6 +45,7 @@ const toneClasses: Record<StatusBadgeProps["tone"], { core: string; icon: string
     <span aria-hidden="true" :class="['absolute -inset-6 rounded-full border', toneClasses[tone].halo]" />
     <span aria-hidden="true" :class="['absolute -inset-3 rounded-full border', toneClasses[tone].ring]" />
     <div
+      aria-hidden="true"
       :class="[
         'relative flex size-full items-center justify-center rounded-full [&>svg]:size-10',
         toneClasses[tone].core,
