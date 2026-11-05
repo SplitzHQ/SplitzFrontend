@@ -183,5 +183,5 @@ export const OPEN_QUESTIONS = [
   "Must an avatar be hidden from a screen reader by default? Each caller has a visible name or a labeled parent, so each caller must now add `aria-hidden`. A default would remove that work, but a new caller with no name would then have no name.",
   "Must the size names change? `xs` is 40px and `sm` is 48px, but the `sm` button is 32px and the `md` button is 40px. The same word gives two heights.",
   "Must an avatar and a tile have one size in a list? A transaction tile (TransactionItemContent), an invoice tile (InvoiceItem) and an `sm` avatar are 48px with a radius of 12px. A list row avatar is 40px, and the NotificationItem tile is 40px.",
-  "Must GroupCard, FrequentSelectionList and UserList use the group photo? They always show the members. HomePage and the page headers show the group photo when the group has one, so one group can have two pictures. Card SPZ-45.",
+  "Must GroupCard, FrequentSelectionList and UserList use the group photo? They always show the members. HomePage and the page headers show the group photo when the group has one, so one group can have two pictures.",
 ];

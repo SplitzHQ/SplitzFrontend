@@ -139,7 +139,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
 /**
  * Decisions that the user has not made. Ask the user before you rely on a rule that one of these questions affects.
  * Remove a question when the user decides it, and write the decision into the rules above.
- * SPZ-48 decides the first question with a prototype.
+ * A prototype will decide the first question.
  */
 export const OPEN_QUESTIONS = [
   "How does the search field on SelectPeoplePage look? `plain` has 14px text, so iOS zooms the page, and it has no focus style except the caret. The other text in that row is smaller than 16px, so 16px adds one more font size. HomeSearchBar also has 14px text.",
