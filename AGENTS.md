@@ -11,7 +11,7 @@
 - When working with ui code, check `vue`, `vue-testing-best-practices`, `vue-router-best-practices` and `web-design-guidelines` skills for guidelines.
   These skills are in `.agents/skills/<name>/SKILL.md`.
 
-- Before any UI change in `src/` or `devtools/`, follow `.claude/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
+- Before any UI change in `src/` or `devtools/`, follow `.agents/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
 
 - Before a design or UI task, decide if the task needs a prototype first. Follow `devtools/.claude/skills/prototype/SKILL.md`. If `devtools/` does not exist, ask the user.
 
