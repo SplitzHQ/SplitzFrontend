@@ -178,7 +178,7 @@ function getLocation() {
     <div class="flex flex-col gap-4">
       <!-- Name -->
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-semibold text-base-text-secondary" for="name">
+        <label class="px-3.25 text-sm font-semibold text-base-text-secondary" for="name">
           {{ $t("new-expense-review-fields-name-label") }}
         </label>
         <div class="flex items-center gap-2">
@@ -201,7 +201,7 @@ function getLocation() {
 
       <!-- Location -->
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-semibold text-base-text-secondary" for="location">
+        <label class="px-3.25 text-sm font-semibold text-base-text-secondary" for="location">
           {{ $t("new-expense-review-fields-location") }}
         </label>
         <div class="flex items-stretch gap-2">
@@ -231,7 +231,7 @@ function getLocation() {
       <div class="flex flex-col gap-2">
         <!-- The following inputs are triggered programmatically via refs, so they should not be related to a label -->
         <!-- eslint-disable-next-line vuejs-accessibility/label-has-for -->
-        <label class="text-sm font-semibold text-base-text-secondary">
+        <label class="px-3.25 text-sm font-semibold text-base-text-secondary">
           {{ $t("new-expense-review-fields-receipt") }}
         </label>
         <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
@@ -299,7 +299,7 @@ function getLocation() {
 
       <!-- Notes -->
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-semibold text-base-text-secondary" for="notes">
+        <label class="px-3.25 text-sm font-semibold text-base-text-secondary" for="notes">
           {{ $t("new-expense-review-fields-notes-label") }}
         </label>
         <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">

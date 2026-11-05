@@ -18,6 +18,13 @@ describe("HomeSearchBar", () => {
     expect(input.attributes("placeholder")).toBe("home-search-placeholder");
   });
 
+  it("has 16px text, so iOS does not zoom the page", () => {
+    const classes = mount(HomeSearchBar).get("input").classes();
+
+    expect(classes).toContain("text-base");
+    expect(classes.join(" ")).not.toContain("text-sm");
+  });
+
   it("uses a custom placeholder when one is given", () => {
     const wrapper = mount(HomeSearchBar, { props: { placeholder: "Find a group" } });
 

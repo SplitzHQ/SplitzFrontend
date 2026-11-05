@@ -49,7 +49,7 @@ const inputId = useId();
         enterkeyhint="search"
         autocomplete="off"
         :placeholder="placeholder ?? $t('home-search-placeholder')"
-        class="min-w-0 flex-1 bg-transparent text-sm leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
+        class="min-w-0 flex-1 bg-transparent text-base leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
       />
     </label>
     <div v-if="$slots.action" class="absolute top-1 right-1 flex">

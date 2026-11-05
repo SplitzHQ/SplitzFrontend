@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { PhEye, PhEyeSlash } from "@phosphor-icons/vue";
+import { useResizeObserver } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
-import { computed, ref, useId, useTemplateRef } from "vue";
+import { computed, ref, useId, useTemplateRef, watch } from "vue";
+
+import { MOTION_EASING, motionMs } from "@/libs/motion";
 
 /** A text field with an optional label and hint. See `text-input.usage.ts` for when to use it. */
 export interface TextInputProps {
@@ -85,7 +88,10 @@ const containerClass = computed(() => {
   if (disabled) return "border-base-border-disabled_subtle bg-base-bg-disabled_subtle";
   if (isInvalid.value) return "border-base-border-error-solid has-[input:focus]:ring-base-border-error-solid";
   const restBorder = hasValue.value ? "border-base-border-primary" : "border-base-border-secondary";
-  return `${restBorder} hover:border-base-border-brand-solid focus-within:border-base-border-brand-solid has-[input:focus]:ring-base-border-brand-solid`;
+  // A transition uses the time of the state that it goes to. So these two classes make hover and focus faster than the return to rest.
+  const enterTime =
+    "hover:duration-(--motion-duration-hover-in) has-[input:focus]:duration-(--motion-duration-hover-in)";
+  return `${restBorder} ${enterTime} hover:border-base-border-brand-solid focus-within:border-base-border-brand-solid has-[input:focus]:ring-base-border-brand-solid`;
 });
 
 const iconClass = computed(() => {
@@ -98,6 +104,36 @@ const iconClass = computed(() => {
 const textClass = computed(() => (isInvalid.value ? "text-base-text-error" : "text-base-text-primary"));
 
 const inputEl = useTemplateRef<HTMLInputElement>("input");
+const fieldEl = useTemplateRef<HTMLElement>("field");
+const messageEl = useTemplateRef<HTMLElement>("message");
+
+const messageHeight = ref<number>();
+useResizeObserver(messageEl, () => {
+  messageHeight.value = messageEl.value?.offsetHeight;
+});
+
+const messageEnterClass = computed(() =>
+  [
+    "transition-[opacity,translate] duration-(--motion-duration-state) ease-(--motion-easing-enter)",
+    hint ? "delay-(--motion-duration-exit)" : "",
+  ].join(" ")
+);
+
+/** The offsets of the shake in pixels. Each move is smaller than the last, so the field stops softly. */
+const SHAKE_OFFSETS = [0, -3, 2, -1, 0];
+
+// A new error shakes the field one time. A change from one error to another error does not. Reduced motion makes the time 0.
+watch(
+  () => error,
+  (next, previous) => {
+    const duration = motionMs("container");
+    if (!next || previous || duration === 0) return;
+    fieldEl.value?.animate?.(
+      SHAKE_OFFSETS.map((offset) => ({ translate: `${offset}px 0` })),
+      { duration, easing: MOTION_EASING.standard }
+    );
+  }
+);
 
 /** Returns true when a press hits the input or the reveal button, which handle the press themselves. */
 function hitsOwnControl(target: EventTarget | null): boolean {
@@ -116,80 +152,137 @@ function onFieldClick(event: MouseEvent): void {
 </script>
 
 <template>
-  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
-  <input
-    v-if="variant === 'plain'"
-    :id="inputId"
-    v-model="model"
-    :name="name"
-    :type="resolvedType"
-    :placeholder="placeholder"
-    :autocomplete="autocomplete"
-    :inputmode="inputmode"
-    :required="required"
-    :disabled="disabled"
-    :aria-label="label"
-    :aria-invalid="isInvalid ? 'true' : undefined"
-    :aria-describedby="describedByIds"
-    class="h-11 bg-transparent text-sm font-normal text-base-text-primary placeholder:text-sm placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
-  />
+  <!--
+    The text is 16px, so iOS does not zoom the page, and a scale to 87.5% makes it look like 14px in its row. The width and
+    the height are larger by the same ratio, so the input fills its container and the tap area stays 44px. The page counts
+    the width before the scale when it scrolls, so the box around the input clips the extra width.
+  -->
+  <div v-if="variant === 'plain'" class="overflow-x-clip">
+    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+    <input
+      :id="inputId"
+      v-model="model"
+      :name="name"
+      :type="resolvedType"
+      :placeholder="placeholder"
+      :autocomplete="autocomplete"
+      :inputmode="inputmode"
+      :required="required"
+      :disabled="disabled"
+      :aria-label="label"
+      :aria-invalid="isInvalid ? 'true' : undefined"
+      :aria-describedby="describedByIds"
+      class="h-[calc(--spacing(11)/0.875)] w-[calc(100%/0.875)] origin-left scale-[0.875] bg-transparent text-base font-normal text-ellipsis text-base-text-primary placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
+    />
+  </div>
 
-  <div v-else class="flex flex-col gap-1.5">
-    <label v-if="label" :for="inputId" :class="hideLabel ? 'sr-only' : 'text-sm font-semibold text-base-text-primary'">
-      {{ label }}
-    </label>
-
-    <!-- A pointer shortcut only: the input stays in the tab order, and the label names it. -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
-    <div
-      :class="[
-        'flex w-full items-center gap-2 rounded-xl border p-3 has-[input:focus]:ring-1 has-[input:focus]:ring-inset',
-        disabled ? 'cursor-not-allowed' : 'cursor-text',
-        containerClass,
-      ]"
-      @mousedown="onFieldMouseDown"
-      @click="onFieldClick"
-    >
-      <span v-if="$slots.icon" :class="['flex size-5 shrink-0 items-center justify-center [&>svg]:size-5', iconClass]">
-        <slot name="icon" />
-      </span>
-
-      <input
-        :id="inputId"
-        ref="input"
-        v-model="model"
-        :name="name"
-        :type="resolvedType"
-        :placeholder="placeholder"
-        :autocomplete="autocomplete"
-        :inputmode="inputmode"
-        :required="required"
-        :disabled="disabled"
-        :aria-invalid="isInvalid ? 'true' : undefined"
-        :aria-describedby="describedByIds"
-        :class="[
-          'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
-          textClass,
-        ]"
-      />
-
-      <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
-      <!-- The button is 24px. An invisible box around it makes the tap area 44px. -->
-      <button
-        v-if="isPassword"
-        type="button"
-        class="relative flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
-        :disabled="disabled"
-        @click="revealed = !revealed"
+  <div v-else class="flex flex-col">
+    <div class="flex flex-col gap-1.5">
+      <!-- The side space is the padding and the border of the field, so the label, the icon and the text under the field line up. -->
+      <label
+        v-if="label"
+        :for="inputId"
+        :class="hideLabel ? 'sr-only' : 'px-3.25 text-sm font-semibold text-base-text-primary'"
       >
-        <PhEyeSlash v-if="revealed" />
-        <PhEye v-else />
-        <span class="sr-only">{{ revealed ? $t("text-input-hide-password") : $t("text-input-show-password") }}</span>
-      </button>
+        {{ label }}
+      </label>
+
+      <!-- A pointer shortcut only: the input stays in the tab order, and the label names it. -->
+      <!-- The ring is 0px wide and inset in each state, so it can fade. A ring that exists only on focus would change at once. -->
+      <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
+      <div
+        ref="field"
+        :class="[
+          'flex w-full items-center gap-2 rounded-xl border p-3 ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-(--motion-duration-exit) ease-(--motion-easing-standard) ring-inset has-[input:focus]:ring-1',
+          disabled ? 'cursor-not-allowed' : 'cursor-text',
+          containerClass,
+        ]"
+        @mousedown="onFieldMouseDown"
+        @click="onFieldClick"
+      >
+        <span
+          v-if="$slots.icon"
+          :class="[
+            'flex size-5 shrink-0 items-center justify-center transition-colors duration-(--motion-duration-exit) ease-(--motion-easing-standard) [&>svg]:size-5',
+            iconClass,
+          ]"
+        >
+          <slot name="icon" />
+        </span>
+
+        <input
+          :id="inputId"
+          ref="input"
+          v-model="model"
+          :name="name"
+          :type="resolvedType"
+          :placeholder="placeholder"
+          :autocomplete="autocomplete"
+          :inputmode="inputmode"
+          :required="required"
+          :disabled="disabled"
+          :aria-invalid="isInvalid ? 'true' : undefined"
+          :aria-describedby="describedByIds"
+          :class="[
+            'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-(--motion-duration-exit) ease-(--motion-easing-standard) placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
+            textClass,
+          ]"
+        />
+
+        <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
+        <!-- The button is 24px. An invisible box around it makes the tap area 44px. The negative margin puts the ink of the icon on the 13px line, because the button and the icon have about 3px of empty space. -->
+        <button
+          v-if="isPassword"
+          type="button"
+          class="relative -mr-[3.25px] flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
+          :disabled="disabled"
+          @click="revealed = !revealed"
+        >
+          <PhEyeSlash v-if="revealed" />
+          <PhEye v-else />
+          <span class="sr-only">{{ revealed ? $t("text-input-hide-password") : $t("text-input-show-password") }}</span>
+        </button>
+      </div>
     </div>
 
-    <!-- The error appears after the first render, so `role="alert"` makes a screen reader read it. -->
-    <p v-if="error" :id="errorId" role="alert" class="px-1 text-xs text-base-text-error">{{ error }}</p>
-    <p v-else-if="hint" :id="hintId" class="px-1 text-xs text-base-text-quaternary">{{ hint }}</p>
+    <!-- The area changes its height smoothly, so the content below does not jump. The first height comes from `auto`, with no motion. -->
+    <div
+      class="overflow-hidden transition-[height] duration-(--motion-duration-container) ease-(--motion-easing-enter)"
+      :style="messageHeight === undefined ? undefined : { height: `${messageHeight}px` }"
+    >
+      <div ref="message" class="relative">
+        <!--
+          The text leaves in `absolute` position, so the area gets its new height at the start of the leave. A hint and an
+          error swap in one place, so the new text waits until the old text has left.
+          `will-change` keeps the text on its own layer at all times. Without it, Windows draws the text differently during
+          the fade and after it, and the color seems to jump from a bright red to a dark red at the end.
+        -->
+        <Transition
+          :enter-active-class="messageEnterClass"
+          enter-from-class="-translate-y-1 opacity-0"
+          leave-active-class="absolute inset-x-0 top-0 transition-opacity duration-(--motion-duration-exit) ease-(--motion-easing-exit)"
+          leave-to-class="opacity-0"
+        >
+          <!-- The error appears after the first render, so `role="alert"` makes a screen reader read it. -->
+          <p
+            v-if="error"
+            :id="errorId"
+            key="error"
+            role="alert"
+            class="px-3.25 pt-1.5 text-xs text-base-text-error will-change-[opacity]"
+          >
+            {{ error }}
+          </p>
+          <p
+            v-else-if="hint"
+            :id="hintId"
+            key="hint"
+            class="px-3.25 pt-1.5 text-xs text-base-text-quaternary will-change-[opacity]"
+          >
+            {{ hint }}
+          </p>
+        </Transition>
+      </div>
+    </div>
   </div>
 </template>
