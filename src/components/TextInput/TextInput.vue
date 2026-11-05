@@ -139,7 +139,15 @@ function onFieldClick(event: MouseEvent): void {
       {{ label }}
     </label>
 
-    <!-- A pointer shortcut only: the input stays in the tab order, and the label names it. -->
+    <!--
+      The whole field is the tap target, but the input is smaller than the field. Without these handlers, a tap on the
+      padding or the icon does nothing.
+      - `mousedown` stops the browser from moving the focus away from the input, so a phone keeps its keyboard open.
+      - `click` then gives the focus to the input. iOS opens the keyboard only in a user gesture, and `click` is one.
+      - A press on a control in the field, for example the password button, goes to that control. See `hitsOwnControl`.
+      The handlers are only for a pointer. The input stays in the tab order and the label names it, so a keyboard or a
+      screen reader does not use this `div`. That is why the `div` has no role or key handlers.
+    -->
     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
     <div
       :class="[
