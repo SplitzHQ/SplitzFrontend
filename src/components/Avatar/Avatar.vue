@@ -79,7 +79,7 @@ function onImageError(src: string) {
       <template v-for="(image, index) in shownImages" :key="index">
         <img
           v-if="image.src"
-          :class="[isGroup ? 'image-count-multiple' : 'image-count-single', 'block object-cover']"
+          :class="[isGroup ? 'image-count-multiple' : 'image-count-single', 'picture-line block object-cover']"
           :src="image.src"
           :alt="isGroup ? '' : image.alt"
           @error="onImageError(image.src!)"
@@ -105,6 +105,20 @@ function onImageError(src: string) {
 
 <style lang="scss" scoped>
 @reference '../../assets/base.css';
+
+/*
+ * The edge of a photo can have the same color as the background, so a photo has a faint line inside its edge. An outline
+ * follows the corners and does not change the size. A tile with an initial has no line, because its fill is already
+ * different from the background. See `avatar.usage.ts`.
+ */
+.picture-line {
+  outline: 1px solid var(--core-alpha-black-5);
+  outline-offset: -1px;
+}
+
+.dark .picture-line {
+  outline-color: var(--core-alpha-white-10);
+}
 
 /*
  * The initial is 45% of the side of its tile, and 10px at the smallest. In a group, the corner of the frame is the corner

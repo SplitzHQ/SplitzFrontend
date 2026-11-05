@@ -8,10 +8,10 @@ import { useId } from "vue";
  *
  * This is a pill-shaped input with a light fill and a magnifying glass on
  * the left. It differs from the shared TextInput component, so the home
- * page uses this component instead. The field has no visible border until
- * it has the focus. Then it shows the same brand border as an outlined
- * TextInput. The `action` slot holds one small icon button at the right
- * end of the field.
+ * page uses this component instead. The field has a muted border at rest,
+ * because the fill alone is hard to see on the header. With the focus, it
+ * shows the same brand border as an outlined TextInput. The `action` slot
+ * holds one small icon button at the right end of the field.
  */
 export interface HomeSearchBarProps {
   /** Text shown while the field is empty. Defaults to the localized "Search" string. */
@@ -32,11 +32,13 @@ const inputId = useId();
     <!--
       The button is not in the label, because a click on it must not focus the field.
       The padding is 1px smaller than 2.5 because of the border, so the field stays 40px high.
+      The ring is inset and 0px wide at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
+      transition does not cover a box shadow. So the field names `box-shadow`, and the ring fades with the border.
     -->
     <label
       :for="inputId"
       :class="[
-        'flex w-full items-center gap-2 rounded-full border border-transparent bg-base-bg-primary_alt p-[calc(--spacing(2.5)-1px)] text-base-fg-placeholder focus-within:border-base-border-brand-solid focus-within:ring-1 focus-within:ring-base-border-brand-solid focus-within:ring-inset',
+        'flex w-full items-center gap-2 rounded-full border border-base-border-muted bg-base-bg-primary_alt p-[calc(--spacing(2.5)-1px)] text-base-fg-placeholder ring-0 ring-transparent transition-[color,background-color,border-color,box-shadow] ring-inset focus-within:border-base-border-brand-solid focus-within:ring-1 focus-within:ring-base-border-brand-solid',
         $slots.action && 'pr-11',
       ]"
     >

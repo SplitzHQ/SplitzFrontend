@@ -137,6 +137,10 @@ export const PICTURE_RULES: UsageRule[] = [
     title: "No picture",
   },
   {
+    rule: "A photo has a line of 1px inside its edge, so a photo with a pale or dark edge stays separate from the background. The line is black at 5% in the light theme and white at 10% in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
+    title: "Line on a photo",
+  },
+  {
     rule: "The color family comes from the name, so a person has one color on all pages. The families are brand, leaf, waterblue, purple, magenta, rosered and yellow. The size of the initial is 45% of the side of the tile, and 10px at the smallest.",
     title: "Color and size of the initial",
   },

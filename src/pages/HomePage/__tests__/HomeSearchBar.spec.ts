@@ -25,6 +25,13 @@ describe("HomeSearchBar", () => {
     expect(classes.join(" ")).not.toContain("text-sm");
   });
 
+  it("has a muted border at rest and a brand border with the focus", () => {
+    const classes = mount(HomeSearchBar).get("label").classes();
+
+    expect(classes).toContain("border-base-border-muted");
+    expect(classes).toContain("focus-within:border-base-border-brand-solid");
+  });
+
   it("uses a custom placeholder when one is given", () => {
     const wrapper = mount(HomeSearchBar, { props: { placeholder: "Find a group" } });
 
