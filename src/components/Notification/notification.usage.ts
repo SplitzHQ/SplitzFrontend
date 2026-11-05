@@ -116,7 +116,7 @@ export const PANEL_STATES: Record<NotificationPanelState, UsageRule> = {
   },
 };
 
-/** Where the actions of the panel go. The user chose this layout in the prototype of card SPZ-41. */
+/** Where the actions of the panel go. The user chose this layout in a prototype. */
 export const HEADER_RULES: UsageRule[] = [
   {
     rule: "The header has the title, Mark all read, Clear all and the settings icon in one row. A popover has no close button, so the row has space for them.",
@@ -217,7 +217,7 @@ export const OPEN_QUESTIONS = [
   "Must a phone show the requests behind the avatar? The open question in `popover.usage.ts` covers this. The name of the avatar says the number of pending requests, but the tap opens the profile page. Must the name also say that?",
   'Must a new notification be read by a screen reader when it arrives? The store polls each 5 minutes, and only the name of the bell changes. Nothing is read at that time. The old `role="status"` on the badge did not do this, because a browser reads such a role reliably only on an element that was already there.',
   "Must Clear all ask for a confirm step? It removes all rows at once, and the app has no way to undo it.",
-  "Where must focus go after the user dismisses a row or answers a request? The element goes away, so a keyboard user loses the place. Card SPZ-44.",
+  "Where must focus go after the user dismisses a row or answers a request? The element goes away, so a keyboard user loses the place.",
   "Must the ring of the badge follow the surface? Both callers are on `base-bg-secondary_alt`, so the fixed color is correct today.",
   "Must the time of a row change in the dark theme? It has `base-text-quaternary`, and its contrast is 3.30:1 in the dark theme. WCAG 1.4.3 asks for 4.5:1. Other screens use this token too, so this is a question about the token.",
   "Must the bell swing again each time? It swings when HomePage opens with unread activity and when the panel closes with unread activity left. It does not swing when a new notification arrives while the panel is closed and the count was already above zero.",
