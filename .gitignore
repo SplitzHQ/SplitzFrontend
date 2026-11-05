@@ -18,6 +18,10 @@ coverage
 # Private dev tools. This folder is a separate repository.
 /devtools/
 
+# Local Claude Code state. The shared files in .claude/ stay tracked.
+/.claude/worktrees/
+/.claude/settings.local.json
+
 /cypress/videos/
 /cypress/screenshots/
 

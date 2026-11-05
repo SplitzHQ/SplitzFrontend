@@ -9,8 +9,13 @@
 - When implementing functions, first check if similar functions already existed somewhere. If appropriate, extract the functions and reuse them.
 
 - When working with ui code, check `vue`, `vue-testing-best-practices`, `vue-router-best-practices` and `web-design-guidelines` skills for guidelines.
+  These skills are in `.agents/skills/<name>/SKILL.md`.
 
-- Before any UI change in `src/` or `devtools/`, follow `.agents/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
+- Before any UI change in `src/` or `devtools/`, follow `.claude/skills/component-usage/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
+
+- Before a design or UI task, decide if the task needs a prototype first. Follow `devtools/.claude/skills/prototype/SKILL.md`. If `devtools/` does not exist, ask the user.
+
+- When you add a backlog card, follow the category rule in `devtools/AGENTS.md`. Ask the user before you add a category.
 
 - When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file.
 

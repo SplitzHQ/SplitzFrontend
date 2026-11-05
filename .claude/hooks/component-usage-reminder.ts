@@ -21,7 +21,7 @@ if (match && !SKIPPED_FILE.test(path)) {
   console.log(
     JSON.stringify({
       hookSpecificOutput: {
-        additionalContext: `You changed the ${folder} component. ${target} See .agents/skills/component-usage/SKILL.md.`,
+        additionalContext: `You changed the ${folder} component. ${target} See .claude/skills/component-usage/SKILL.md.`,
         hookEventName: "PostToolUse",
       },
     })
