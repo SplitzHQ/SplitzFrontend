@@ -6,7 +6,8 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    ".claude/hooks/*.ts"
+    ".claude/hooks/*.ts",
+    "scripts/check-tailwind-classes/**/*.ts"
   ],
   "compilerOptions": {
     "composite": true,

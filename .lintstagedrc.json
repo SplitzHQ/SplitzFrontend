@@ -1,7 +1,9 @@
 {
   "*.{js,jsx,ts,tsx,vue,cjs,mjs,cts,mts}": [
     "oxlint --fix --type-aware --deny-warnings",
+    "bun scripts/check-tailwind-classes/index.ts",
     "oxfmt --no-error-on-unmatched-pattern"
   ],
+  "*.{css,scss}": "bun scripts/check-tailwind-classes/index.ts",
   "*.{json,md,mdx,css,scss,html,yml,yaml}": "oxfmt --no-error-on-unmatched-pattern"
 }
