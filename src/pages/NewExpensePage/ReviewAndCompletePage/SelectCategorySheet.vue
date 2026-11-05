@@ -80,8 +80,11 @@ watch(
     detent-sizing="height"
     :show-handle="false"
   >
-    <!-- The negative offset and margin cover the top padding of the sheet, so a stuck header has no gap above it. -->
-    <div ref="stickyHeader" class="sticky -top-4 z-sticky -mt-4 bg-comp-sheet-bg pt-4 pb-4">
+    <!--
+      The negative offset covers the top padding of the sheet, so a stuck header has no gap above it.
+      The negative margin takes the gap under the title into the header, so this padding gives the same gap.
+    -->
+    <div ref="stickyHeader" class="sticky -top-6 z-sticky -mt-5 bg-comp-sheet-bg pt-5 pb-4">
       <div class="flex flex-col gap-3">
         <!-- Search -->
         <TextInput

@@ -14,11 +14,14 @@ import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { formatCurrency } from "@/libs/format-currency";
+import { useStatusBarTopColor } from "@/libs/status-bar-color";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import HomeEmptyState from "./HomeEmptyState.vue";
 import HomeSearchBar from "./HomeSearchBar.vue";
+
+useStatusBarTopColor("--base-bg-secondary_alt");
 
 const { $t } = useFluent();
 const router = useRouter();

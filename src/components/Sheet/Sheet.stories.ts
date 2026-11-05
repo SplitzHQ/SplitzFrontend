@@ -209,6 +209,39 @@ export const TitleAndActions: Story = {
   },
 };
 
+export const TitleAndDescription: Story = {
+  render: (args) => ({
+    components: { SButton, Sheet },
+    setup() {
+      const isOpen = ref(false);
+      return { args, isOpen };
+    },
+    template: `
+      <div class="p-4 text-base-text-primary">
+        <button
+          @click="isOpen = true"
+          class="px-4 py-2 rounded-lg transition-colors"
+        >
+          Open Sheet with Title and Description
+        </button>
+
+        <Sheet v-model="isOpen" v-bind="args">
+          <template #actions>
+            <SButton variant="destructive" size="xl" @click="isOpen = false">Delete expense</SButton>
+            <SButton variant="secondary" size="xl" @click="isOpen = false">Cancel</SButton>
+          </template>
+        </Sheet>
+      </div>
+    `,
+  }),
+  args: {
+    description: "Everyone in the group loses this expense.",
+    detent: "medium",
+    label: undefined,
+    title: "Delete this expense?",
+  },
+};
+
 export const NoHandle: Story = {
   render: (args) => ({
     components: { Sheet },

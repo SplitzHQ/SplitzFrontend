@@ -6,6 +6,7 @@ import "vue-sonner/style.css";
 import ReloadPrompt from "@/components/ReloadPrompt/ReloadPrompt.vue";
 import Sonner from "@/components/Sonner/Sonner.vue";
 import { DebugPanel } from "@/libs/devtools";
+import { useStatusBarColor } from "@/libs/status-bar-color";
 import { useNotificationStore } from "@/stores/notification";
 import { useUserStore } from "@/stores/user";
 
@@ -24,6 +25,8 @@ const toastMobileOffset = {
   right: "calc(16px + var(--safe-area-right))",
   top: "calc(16px + var(--safe-area-top) - env(safe-area-inset-top, 0px))",
 };
+
+useStatusBarColor();
 
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();

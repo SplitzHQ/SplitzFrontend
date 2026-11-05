@@ -21,13 +21,10 @@ const { $t } = useFluent();
   <Sheet
     :model-value="modelValue"
     :title="$t('transaction-detail-delete-confirm-title')"
+    :description="$t('transaction-detail-delete-confirm-message')"
     detent="medium"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <p class="text-sm text-base-text-secondary">
-      {{ $t("transaction-detail-delete-confirm-message") }}
-    </p>
-
     <template #actions>
       <SButton variant="destructive" size="xl" :loading="isDeleting" @click="emit('confirm')">
         {{ $t("transaction-detail-delete-confirm-yes") }}

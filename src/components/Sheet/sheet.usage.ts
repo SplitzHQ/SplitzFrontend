@@ -107,12 +107,20 @@ export const CLOSE_RULES: UsageRule[] = [
 /** How to place a sheet and its content. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
-    rule: "Set `title`, and Sheet draws the title: an h2 with size lg and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
+    rule: "The sheet dims the status bar area through `useStatusBarDim` in `src/libs/status-bar-color.ts`. Do not set a status bar color in a screen. A new overlay with a backdrop calls the same function.",
+    title: "Status bar",
+  },
+  {
+    rule: "Set `title`, and Sheet draws the title: an h2 with size display-xs and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
     title: "Title",
   },
   {
-    rule: "Sheet gives the content 16px at the sides and at the top. At the bottom it gives 16px above the safe area, or 24px above an action area, because the blur goes over that gap. Do not add padding around the content.",
+    rule: "Sheet gives the content 16px at the sides. It gives 24px above a title, 20px between a title and the content, and 16px at the top of a sheet with no title. The comparison is the prototype `2026-11-04-sheet-title-spacing`. At the bottom it gives 16px above the safe area, or 24px above an action area, because the blur goes over that gap. Do not add padding around the content.",
     title: "Padding",
+  },
+  {
+    rule: "Set `description` for a short line that explains the title, for example in a confirm step. Sheet draws it 8px under the title, with size sm. Do not write this line in the content. The content then starts 20px under the line.",
+    title: "Description",
   },
   {
     rule: "Put the actions in the `actions` slot. The slot stays at the bottom, and the content scrolls under it. A progressive blur with no line separates them. The comparison is the prototype `2026-11-04-sheet-action-divider`. The buttons use size xl and fill the width: see `SIZE_DECISION` in `button.usage.ts`. NotificationSheet is the one exception: its bulk actions are not the task of the sheet, so they use size sm. An error or a countdown about the action goes above the buttons in this slot, so the user can see it when the content is scrolled.",
@@ -171,7 +179,7 @@ export const COPY_RULES: CopyRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `label`, and the panel gets its name from that prop.",
+    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `label`, and the panel gets its name from that prop. `description` gives the panel its `aria-describedby`.",
     title: "Role and name",
   },
   {
