@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 
 import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
-import { defineConfig, type Plugin, runnerImport, type ViteDevServer } from "vite";
+import { defineConfig, normalizePath, type Plugin, runnerImport, type ViteDevServer } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import vueDevTools from "vite-plugin-vue-devtools";
 
@@ -18,7 +18,8 @@ const isStorybookOrTestProcess =
  * Starts the server code of the private dev tools. The tools are in `devtools/`, which is a separate repository that
  * this repository ignores. Without that folder, the plugin does nothing and the app runs normally.
  *
- * The plugin loads the file at run time, because a static import fails when the folder does not exist.
+ * The plugin loads the file at run time, because a static import fails when the folder does not exist. Vite does not
+ * count a file loaded this way as a config file, so the plugin restarts the server itself when that code changes.
  */
 function optionalDevtools(): Plugin {
   const entry = fileURLToPath(new URL("devtools/vite-plugin.ts", import.meta.url));
@@ -26,8 +27,14 @@ function optionalDevtools(): Plugin {
     apply: "serve",
     async configureServer(server) {
       if (!fs.existsSync(entry)) return;
-      const { module } = await runnerImport<{ configureDevtools(devServer: ViteDevServer): void }>(entry);
+      const { dependencies, module } = await runnerImport<{ configureDevtools(devServer: ViteDevServer): void }>(entry);
       module.configureDevtools(server);
+
+      // `dependencies` does not include the entry file. A restart closes this watcher, so listeners do not add up.
+      const serverFiles = new Set([entry, ...dependencies].map((file) => normalizePath(file)));
+      server.watcher.on("change", (file) => {
+        if (serverFiles.has(normalizePath(file))) void server.restart();
+      });
     },
     name: "splitz-optional-devtools",
   };
