@@ -1,5 +1,8 @@
 home-profile = Profile
-home-search-placeholder = Search
+home-search-placeholder = Search groups
+home-button-clear-search = Clear search
+home-no-results-title = No groups match “{ $keyword }”
+home-no-results-description = Search only checks group names. Try another word.
 home-all-groups = All groups
 home-total-balance = Total balance
 home-you-lent = You are owed

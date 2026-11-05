@@ -20,6 +20,7 @@ import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import HomeEmptyState from "./HomeEmptyState.vue";
+import HomeNoResults from "./HomeNoResults.vue";
 import HomeSearchBar from "./HomeSearchBar.vue";
 
 useStatusBarTopColor("--base-bg-secondary_alt");
@@ -55,15 +56,19 @@ const groupWithExtraInfo = computed(() => {
   });
 });
 
+const trimmedKeyword = computed(() => searchKeyword.value.trim());
+
 const visibleGroups = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase();
+  const keyword = trimmedKeyword.value.toLowerCase();
   const filtered = keyword
     ? groupWithExtraInfo.value.filter((g) => g.name.toLowerCase().includes(keyword))
     : groupWithExtraInfo.value;
   return [...filtered].sort((a, b) => b.lastActivityTime.getTime() - a.lastActivityTime.getTime());
 });
 
-const hasGroups = computed(() => visibleGroups.value.length > 0);
+// These two read the list before the search filter. A search with no result must not look like a new user.
+const hasGroups = computed(() => groups.value.length > 0);
+const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
 const showErrorState = computed(() => groupsQuery.value.status === "error");
@@ -138,9 +143,21 @@ const userBalances = computed(() => {
           <PhPlus />
         </SIconButton>
 
+        <!-- This element stays in the page, so a screen reader reads the result when the text changes. -->
+        <p role="status" class="sr-only">
+          {{ showNoResults ? $t("home-no-results-title", { keyword: trimmedKeyword }) : "" }}
+        </p>
+
         <div v-if="hasGroups" class="flex flex-col gap-1 pt-3 pb-4">
+          <Transition
+            enter-active-class="transition-opacity duration-(--motion-duration-state) ease-(--motion-easing-enter)"
+            enter-from-class="opacity-0"
+          >
+            <HomeNoResults v-if="showNoResults" :keyword="trimmedKeyword" @clear="searchKeyword = ''" />
+          </Transition>
+
           <!-- Section Header -->
-          <div class="flex items-center justify-between px-1">
+          <div v-if="!showNoResults" class="flex items-center justify-between px-1">
             <p class="text-sm font-semibold text-base-text-quaternary">{{ $t("home-all-groups") }}</p>
             <div v-if="userBalances.length > 0" class="flex items-center gap-1 text-sm font-medium">
               <PhArrowsDownUp class="icon-4 text-base-text-quinary" />

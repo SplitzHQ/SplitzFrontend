@@ -1,5 +1,8 @@
 home-profile = 个人资料
-home-search-placeholder = 搜索
+home-search-placeholder = 搜索群组
+home-button-clear-search = 清除搜索
+home-no-results-title = 没有找到「{ $keyword }」
+home-no-results-description = 只能按群组名搜索，换个词试试。
 home-all-groups = 全部群组
 home-total-balance = 总结余
 home-you-lent = 你应收
