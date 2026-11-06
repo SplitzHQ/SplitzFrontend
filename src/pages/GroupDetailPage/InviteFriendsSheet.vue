@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { PhCheck } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
@@ -10,6 +9,7 @@ import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import SelectableRow from "@/components/SelectableRow/SelectableRow.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import reportError from "@/libs/report-error";
 import { useUserStore } from "@/stores/user";
@@ -86,16 +86,14 @@ async function send() {
       {{ $t("group-invite-empty") }}
     </p>
 
-    <div v-else class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
-      <button
+    <div v-else class="flex flex-col gap-1">
+      <SelectableRow
         v-for="friend in candidates"
         :key="friend.friendUser.id"
-        type="button"
-        class="flex w-full items-center gap-3 px-4 py-3 text-left disabled:opacity-60"
+        :selected="selected.has(friend.friendUser.id)"
         :disabled="friend.pending"
-        :aria-pressed="selected.has(friend.friendUser.id)"
         :data-test="`invite-${friend.friendUser.id}`"
-        @click="toggle(friend.friendUser.id)"
+        @toggle="toggle(friend.friendUser.id)"
       >
         <Avatar
           aria-hidden="true"
@@ -110,17 +108,7 @@ async function send() {
             {{ $t("group-invite-pending") }}
           </span>
         </span>
-        <span
-          :class="[
-            'flex size-6 items-center justify-center rounded-full border transition-colors',
-            selected.has(friend.friendUser.id)
-              ? 'border-util-color-brand-700 bg-util-color-brand-700 text-base-text-primary-reverse'
-              : 'border-base-border-secondary bg-transparent text-transparent',
-          ]"
-        >
-          <PhCheck class="size-3.5" weight="bold" />
-        </span>
-      </button>
+      </SelectableRow>
     </div>
 
     <template #actions>
