@@ -18,7 +18,7 @@ const { $t } = useFluent();
   <button
     type="button"
     :aria-label="$t('new-expense-select-people-remove', { name })"
-    class="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-comp-user-tag-border bg-base-bg-brand-subtle py-0.5 pr-2 pl-0.5 transition-opacity duration-100 after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-[max(100%,--spacing(11))] after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring active:opacity-70 motion-reduce:transition-none"
+    class="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-comp-user-tag-border bg-base-bg-brand-subtle py-0.5 pr-2 pl-0.5 transition-opacity duration-feedback ease-standard after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-[max(100%,--spacing(11))] after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring active:opacity-70 motion-reduce:transition-none"
     @click="$emit('remove', $event)"
   >
     <Avatar aria-hidden="true" :images="[{ src: photo, alt: name }]" size="xxs" />
