@@ -118,7 +118,7 @@ describe("TransactionItem", () => {
     const classes = (await mountLink(transaction([]))).get("a").classes().join(" ");
 
     expect(classes).toContain("focus-visible:outline-2");
-    expect(classes).toContain("duration-(--motion-duration-hover-in)");
+    expect(classes).toContain("duration-hover-in");
   });
 
   it("reads the row in order for a screen reader", async () => {

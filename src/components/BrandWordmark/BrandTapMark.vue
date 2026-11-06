@@ -49,7 +49,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- The tap area grows outside the 32px button to 44px, so the page keeps its layout. -->
+  <!-- The tap area grows outside the button to 44px, so the page keeps its layout. -->
   <button
     ref="root"
     type="button"

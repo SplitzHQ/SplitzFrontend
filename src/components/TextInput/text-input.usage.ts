@@ -43,7 +43,7 @@ export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
     title: "outlined",
   },
   plain: {
-    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is 16px and scaled to look like 14px, so it fits a row of 14px text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-base` and scaled to look like `text-sm`, so it fits a row of `text-sm` text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
     title: "plain",
   },
 };
@@ -79,7 +79,7 @@ export const LABEL_RULES: UsageRule[] = [
     title: "A label outside the field",
   },
   {
-    rule: "The label, the text under the field and the text in the field line up with the icon in the field, 13px from the outer edge. The ink of the password icon ends on the same line at the other side, so its button has a small negative margin. This is the padding and the border of the field. A `<label>` outside the field uses `px-3.25` for the same line. The field keeps the edge of the page, so the label does not line up with the title of a section.",
+    rule: "The label, the text under the field and the text in the field line up with the icon in the field. The ink of the password icon ends on the same line at the other side, so its button has a small negative margin. This is the padding and the border of the field. A `<label>` outside the field uses `px-3.25` for the same line. The field keeps the edge of the page, so the label does not line up with the title of a section.",
     title: "Alignment",
   },
 ];
@@ -111,23 +111,23 @@ export const MESSAGE_RULES: UsageRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The `outlined` field is about 50px high. A tap anywhere on it moves the focus to the input, and the keyboard of a phone stays open when the input already has the focus.",
+    text: "A tap anywhere on the `outlined` field moves the focus to the input, and the keyboard of a phone stays open when the input already has the focus.",
     title: "Tap area",
   },
   {
-    text: "The show and hide button is 24px. An invisible box makes the tap area 44px. Its name follows the state, and the name comes from the locale files.",
+    text: "An invisible box around the show and hide button makes the tap area 44px. Its name follows the state, and the name comes from the locale files.",
     title: "Password button",
   },
   {
-    text: "The `plain` input is 44px high. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
+    text: "The `plain` input is as high as its tap area. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
     title: "Plain tap area",
   },
   {
-    text: "The brand border and an inset ring of 1px show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
+    text: "The brand border and a thin inset ring show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
     title: "Focus",
   },
   {
-    text: "All motion in the `outlined` field uses the motion tokens, so reduced motion turns it off. Hover and focus colors take 100ms, and the return to rest takes 150ms. The text under the field fades, and the content below moves smoothly. A new error also shakes the field one time, by 3px at most. A change from one error to another error does not shake it. Do not add another shake on a page.",
+    text: "All motion in the `outlined` field uses the motion tokens, so reduced motion turns it off. Hover and focus colors use `hover-in`, and the return to rest uses `exit`, so the return is slower. The text under the field fades, and the content below moves smoothly. A new error also shakes the field one time, by a small distance. A change from one error to another error does not shake it. Do not add another shake on a page.",
     title: "Motion",
   },
   {
@@ -135,7 +135,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Screen reader",
   },
   {
-    text: "Each input that a person can type in has a computed text size of at least 16px, because a focused input under 16px makes iOS zoom the page. This includes HomeSearchBar and a raw `<input>` or `<textarea>`. A placeholder has the same size as the text. The `outlined` text is 16px. The `plain` text is 16px and scaled to look like 14px. A real iPhone did not zoom for HomeSearchBar or for this scaled input (2026-11-04). Do not use `maximum-scale` in the viewport, because it can stop pinch zoom.",
+    text: "Each input that a person can type in has a computed text size of at least 16px, because a focused input under 16px makes iOS zoom the page. This includes HomeSearchBar and a raw `<input>` or `<textarea>`. A placeholder has the same size as the text. The `outlined` text is `text-base`. The `plain` text is `text-base` and scaled to look like `text-sm`. A real iPhone did not zoom for HomeSearchBar or for this scaled input (2026-11-04). Do not use `maximum-scale` in the viewport, because it can stop pinch zoom.",
     title: "Zoom on iOS",
   },
   {

@@ -76,7 +76,12 @@ function clearAllFromMenu() {
 
 <template>
   <div :class="['flex min-h-0 flex-col', inSheet ? 'gap-4.5' : 'gap-3']">
-    <!-- This row is 32px high and the title line is 28px, so these values give the title the place that Sheet gives it. -->
+    <!--
+      In a sheet, this row takes the place of the title that Sheet draws, so the title must start and end on the same lines.
+      The row also holds the clear button, so it is taller than one title line. `pt-1.5` and `gap-4.5` add the difference
+      to the space above and below that Sheet gives its own title. If the size of SIconButton or of the title changes,
+      check this row against a Sheet with `title` again.
+    -->
     <div v-if="inSheet" data-sheet-handle class="flex touch-none items-center justify-between gap-2 pt-1.5">
       <h2 class="text-display-xs font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
       <SIconButton

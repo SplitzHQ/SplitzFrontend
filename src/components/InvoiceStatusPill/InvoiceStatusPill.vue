@@ -19,7 +19,7 @@ const isSettled = computed(() => props.status === InvoiceStatus.Settled);
 
 <template>
   <span
-    class="rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-(--motion-duration-state) ease-(--motion-easing-standard)"
+    class="rounded-full px-2 py-0.5 text-xs font-medium transition-colors duration-state ease-standard"
     :class="
       isSettled
         ? 'bg-util-color-success-50 text-util-color-success-700'

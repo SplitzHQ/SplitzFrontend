@@ -68,11 +68,11 @@ export const PART_RULES: UsageRule[] = [
 /** How the parts make groups and lines. The user picked these rules in the prototype `2026-11-04-sign-in-flow`. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
-    rule: "All text and icons line up with the text in a field, 13px inside the outer edge of the column. Only the fields, the Notice and the buttons have their outer edge on the column. A block of text outside AuthShell's own parts uses `px-3.25`.",
+    rule: "All text and icons line up with the text in a field, inside the outer edge of the column. Only the fields, the Notice and the buttons have their outer edge on the column. A block of text outside AuthShell's own parts uses `px-3.25`.",
     title: "One content line",
   },
   {
-    rule: "Distance makes the groups. In a group the gap is 12px to 16px. Between the title and the content it is 40px, and between the content and the actions at least 24px. Do not add a gap that makes two groups look like one.",
+    rule: "Distance makes the groups. The gap in a group is small. The gap between the title and the content is the largest, and the gap between the content and the actions is between the two. AuthShell sets these gaps. Do not add a gap that makes two groups look like one.",
     title: "Groups",
   },
   {
@@ -84,11 +84,11 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Fields",
   },
   {
-    rule: "A new password has one field and a `PasswordChecklist` under it, 12px away. Link them with `described-by`. The show button lets a person check the value, so the page has no confirm field.",
+    rule: "A new password has one field and a `PasswordChecklist` under it, in the same group. Link them with `described-by`. The show button lets a person check the value, so the page has no confirm field.",
     title: "New password",
   },
   {
-    rule: "From the sm width the column is 704px high, in the center of the screen. The page has no card.",
+    rule: "From the sm width the column has a fixed minimum height, in the center of the screen. The page has no card.",
     title: "Wide screen",
   },
 ];
@@ -101,7 +101,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Status changes",
   },
   {
-    text: "An invisible box around each link in the footer makes the tap area 44px high. The link text stays 20px high, so the look does not change. The logo is 32px, and its invisible box is 44px.",
+    text: "An invisible box around each link in the footer makes the tap area 44px high. The link text keeps its height, so the look does not change. The logo also has an invisible box of 44px.",
     title: "Tap area",
   },
   {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * A setting that is on or off. See `switch.usage.ts` for when to use it.
- * The track is 24px high. An invisible box around it makes the tap area 44px high.
+ * An invisible box around the track makes the tap area 44px high.
  */
 export interface SSwitchProps {
   /** The name for a screen reader. Use the text of the visible label of the row. */
