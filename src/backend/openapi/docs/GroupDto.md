@@ -15,6 +15,8 @@ Name | Type
 `balanceSummaries` | [Array&lt;GroupBalanceSummaryDto&gt;](GroupBalanceSummaryDto.md)
 `transactionCount` | number
 `lastActivityTime` | Date
+`isArchived` | boolean
+`archiveTime` | Date
 
 ## Example
 
@@ -32,6 +34,8 @@ const example = {
   "balanceSummaries": null,
   "transactionCount": null,
   "lastActivityTime": null,
+  "isArchived": null,
+  "archiveTime": null,
 } satisfies GroupDto
 
 console.log(example)

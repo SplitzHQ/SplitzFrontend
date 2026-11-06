@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhArrowCounterClockwise, PhCheck, PhFileText } from "@phosphor-icons/vue";
+import { PhArchive, PhArrowCounterClockwise, PhCheck, PhFileText } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { Big } from "big.js";
 import { useFluent } from "fluent-vue";
@@ -13,6 +13,7 @@ import Avatar from "@/components/Avatar/Avatar.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import InvoiceStatusPill from "@/components/InvoiceStatusPill/InvoiceStatusPill.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TransactionItem from "@/components/TransactionItem/TransactionItem.vue";
@@ -49,6 +50,10 @@ const avatarImages = computed(() => getGroupAvatarImages(group.value));
 
 const myId = computed(() => userStore.user?.id);
 const isSettled = computed(() => invoice.value?.status === InvoiceStatus.Settled);
+const isArchived = computed(() => invoice.value?.isArchived ?? false);
+const isGroupArchived = computed(() => group.value?.isArchived ?? false);
+// The backend refuses payment changes on an archived invoice or on any invoice in an archived group.
+const isReadOnly = computed(() => isArchived.value || isGroupArchived.value);
 
 const formatDate = (date: Date) =>
   new Date(date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -138,6 +143,32 @@ async function undoPayment(settlementId: string) {
     undoingPaymentId.value = null;
   }
 }
+
+// Archive
+const isUpdatingArchive = ref(false);
+
+/**
+ * Archive or unarchive the invoice. The backend archives or unarchives its expenses too,
+ * so the group's expense list is refreshed as well.
+ */
+async function setArchived(archived: boolean) {
+  if (isUpdatingArchive.value) return;
+  try {
+    isUpdatingArchive.value = true;
+    await (archived
+      ? invoiceApi.archiveInvoice({ id: invoiceId.value })
+      : invoiceApi.unarchiveInvoice({ id: invoiceId.value }));
+    await Promise.all([
+      refreshInvoice(),
+      queryCache.invalidateQueries({ key: ["getGroupTransactions", groupId.value] }),
+    ]);
+  } catch (error) {
+    console.error("Error updating invoice archive state:", error);
+    toast.error($t(archived ? "invoice-detail-archive-error" : "invoice-detail-unarchive-error"));
+  } finally {
+    isUpdatingArchive.value = false;
+  }
+}
 </script>
 
 <template>
@@ -169,6 +200,28 @@ async function undoPayment(settlementId: string) {
 
         <!-- Content -->
         <template v-else-if="invoice">
+          <!-- Archive state -->
+          <Notice v-if="isArchived" :title="$t('invoice-detail-archived-title')" data-test="invoice-archived-notice">
+            <template #icon><PhArchive /></template>
+            <p>{{ $t("invoice-detail-archived-message") }}</p>
+            <SButton
+              variant="secondary"
+              color="brand"
+              size="sm"
+              class="self-start"
+              :loading="isUpdatingArchive"
+              :disabled="isUpdatingArchive"
+              data-test="unarchive-invoice"
+              @click="setArchived(false)"
+            >
+              {{ $t("invoice-detail-unarchive") }}
+            </SButton>
+          </Notice>
+          <Notice v-else-if="isGroupArchived" data-test="invoice-group-archived-notice">
+            <template #icon><PhArchive /></template>
+            {{ $t("invoice-detail-group-archived") }}
+          </Notice>
+
           <!-- Summary -->
           <div class="flex flex-col items-center gap-3 pt-4">
             <div
@@ -237,7 +290,7 @@ async function undoPayment(settlementId: string) {
                     {{ $t("invoice-detail-debt-paid") }}
                   </span>
                   <SButton
-                    v-else
+                    v-else-if="!isReadOnly"
                     key="mark"
                     variant="outline"
                     size="sm"
@@ -280,6 +333,7 @@ async function undoPayment(settlementId: string) {
                   {{ money(payment.amount) }}
                 </p>
                 <SIconButton
+                  v-if="!isReadOnly"
                   variant="ghost"
                   size="sm"
                   :loading="undoingPaymentId === payment.invoiceSettlementId"
@@ -299,6 +353,26 @@ async function undoPayment(settlementId: string) {
           <section v-if="invoice.transactions?.length" class="flex flex-col gap-1">
             <h2 class="text-sm font-semibold text-base-text-primary">{{ $t("invoice-detail-expenses-title") }}</h2>
             <TransactionItem v-for="tx in invoice.transactions" :key="tx.transactionId" :transaction="tx" />
+          </section>
+
+          <!-- Archive action. Only a fully paid invoice can be archived. -->
+          <section v-if="!isArchived" class="mt-auto flex flex-col gap-2 pt-4">
+            <SButton
+              variant="secondary"
+              color="neutral"
+              size="xl"
+              :loading="isUpdatingArchive"
+              :disabled="!isSettled || isUpdatingArchive"
+              aria-describedby="invoice-archive-hint"
+              data-test="archive-invoice"
+              @click="setArchived(true)"
+            >
+              <template #icon-left><PhArchive /></template>
+              {{ $t("invoice-detail-archive") }}
+            </SButton>
+            <p id="invoice-archive-hint" class="text-center text-xs text-base-text-quaternary">
+              {{ isSettled ? $t("invoice-detail-archive-hint") : $t("invoice-detail-archive-unpaid-hint") }}
+            </p>
           </section>
         </template>
       </div>

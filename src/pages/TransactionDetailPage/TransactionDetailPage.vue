@@ -46,6 +46,13 @@ const { state: groupQuery } = useQuery({
 const transaction = computed(() => transactionQuery.value.data);
 const group = computed(() => groupQuery.value.data);
 
+/** Why the backend refuses changes to this expense, or null when it can be changed. */
+const lockedMessage = computed(() => {
+  if (transaction.value?.isArchived) return $t("transaction-detail-archived");
+  if (group.value?.isArchived) return $t("transaction-detail-group-archived");
+  return null;
+});
+
 const showDeleteSheet = ref(false);
 const isDeleting = ref(false);
 
@@ -219,11 +226,25 @@ async function handleDelete() {
 
           <!-- Actions -->
           <div class="mt-auto flex flex-col gap-2 pt-4">
-            <SButton variant="secondary" size="xl" disabled>
+            <p
+              v-if="lockedMessage"
+              id="transaction-locked-message"
+              class="text-center text-xs text-base-text-quaternary"
+              data-test="transaction-locked"
+            >
+              {{ lockedMessage }}
+            </p>
+            <SButton variant="secondary" color="neutral" size="xl" disabled>
               <template #icon-left><PhPencil /></template>
               {{ $t("transaction-detail-edit") }}
             </SButton>
-            <SButton variant="destructive-soft" size="xl" @click="showDeleteSheet = true">
+            <SButton
+              variant="destructive-soft"
+              size="xl"
+              :disabled="!!lockedMessage"
+              :aria-describedby="lockedMessage ? 'transaction-locked-message' : undefined"
+              @click="showDeleteSheet = true"
+            >
               <template #icon-left><PhTrash /></template>
               {{ $t("transaction-detail-delete") }}
             </SButton>

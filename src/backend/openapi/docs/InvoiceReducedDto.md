@@ -13,6 +13,8 @@ Name | Type
 `createdBy` | [SplitzUserReducedDto](SplitzUserReducedDto.md)
 `createTime` | Date
 `status` | [InvoiceStatus](InvoiceStatus.md)
+`isArchived` | boolean
+`archiveTime` | Date
 
 ## Example
 
@@ -28,6 +30,8 @@ const example = {
   "createdBy": null,
   "createTime": null,
   "status": null,
+  "isArchived": null,
+  "archiveTime": null,
 } satisfies InvoiceReducedDto
 
 console.log(example)

@@ -18,3 +18,5 @@ group-detail-invoice-unnamed = Untitled invoice
 group-detail-invoice-created-by = Created by { $name }
 group-detail-invoice-settled = Settled
 group-detail-invoice-open = Open
+group-detail-archived-title = This group is archived
+group-detail-archived-message = You can still look around, but you can't add expenses. Unarchive it in group settings to make changes.

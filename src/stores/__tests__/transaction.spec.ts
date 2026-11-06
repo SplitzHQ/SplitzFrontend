@@ -92,7 +92,7 @@ describe("useTransactionStore receipt recognition", () => {
     store.paidBy = "u1";
     store.addToIncludedMembers("u1");
     transactionApiMock.addTransaction.mockImplementation(({ transactionInputDto }) =>
-      Promise.resolve({ ...transactionInputDto!, balances: [], transactionId: "t1" })
+      Promise.resolve({ ...transactionInputDto!, balances: [], isArchived: false, transactionId: "t1" })
     );
 
     store.applyReceiptRecognition(recognition);

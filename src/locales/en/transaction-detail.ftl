@@ -15,3 +15,5 @@ transaction-detail-delete-confirm-message = This will remove the expense for eve
 transaction-detail-delete-confirm-yes = Delete
 transaction-detail-delete-confirm-cancel = Cancel
 transaction-detail-delete-error = Couldn't delete expense. Please try again.
+transaction-detail-archived = This expense is in an archived invoice, so it can't be changed.
+transaction-detail-group-archived = This group is archived, so its expenses can't be changed.

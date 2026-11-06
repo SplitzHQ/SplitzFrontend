@@ -13,6 +13,8 @@ Name | Type
 `createdBy` | [SplitzUserReducedDto](SplitzUserReducedDto.md)
 `createTime` | Date
 `status` | [InvoiceStatus](InvoiceStatus.md)
+`isArchived` | boolean
+`archiveTime` | Date
 `transactions` | [Array&lt;TransactionDto&gt;](TransactionDto.md)
 `debts` | [Array&lt;InvoiceDebtDto&gt;](InvoiceDebtDto.md)
 `settlements` | [Array&lt;InvoiceSettlementDto&gt;](InvoiceSettlementDto.md)
@@ -31,6 +33,8 @@ const example = {
   "createdBy": null,
   "createTime": null,
   "status": null,
+  "isArchived": null,
+  "archiveTime": null,
   "transactions": null,
   "debts": null,
   "settlements": null,

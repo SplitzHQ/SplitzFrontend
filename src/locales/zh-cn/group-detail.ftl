@@ -18,3 +18,5 @@ group-detail-invoice-unnamed = 未命名结算单
 group-detail-invoice-created-by = 由 { $name } 创建
 group-detail-invoice-settled = 已结清
 group-detail-invoice-open = 待结清
+group-detail-archived-title = 这个群组已归档
+group-detail-archived-message = 你仍然可以查看，但不能再记新的支出。如需修改，请在群组设置中取消归档。

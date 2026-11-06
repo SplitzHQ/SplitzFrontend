@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**acceptGroupInvite**](GroupApi.md#acceptgroupinvite) | **POST** /group/invite/{inviteId}/accept | Accept a group invite and join the group. |
+| [**archiveGroup**](GroupApi.md#archivegroup) | **POST** /group/{groupId}/archive | Archive a group. The group must have no unpaid expenses, so every expense must be in a settled invoice.  Archived groups are hidden from the group list by default and do not accept new expenses or invoices. |
 | [**createGroup**](GroupApi.md#creategroup) | **POST** /group | Create a new group. The creator joins immediately; every other user in MembersId receives an invite. |
 | [**createGroupJoinLink**](GroupApi.md#creategroupjoinlink) | **POST** /group/{groupId}/join-link | create a join link for a group |
 | [**deleteGroup**](GroupApi.md#deletegroup) | **DELETE** /group/{groupId} | Delete a group. |
@@ -18,6 +19,7 @@ All URIs are relative to *http://localhost*
 | [**ignoreGroupInvite**](GroupApi.md#ignoregroupinvite) | **POST** /group/invite/{inviteId}/ignore | Ignore a group invite. The inviter is not told. |
 | [**inviteGroupMembers**](GroupApi.md#invitegroupmembers) | **POST** /group/{groupId}/invites | Invite friends to a group. Each invited user gets a request notification and joins only after accepting.  Users who are not friends of the inviter, are already members, or already have a pending invite are skipped. |
 | [**joinGroupByLink**](GroupApi.md#joingroupbylink) | **POST** /group/join/{joinLinkId} | join a group by a join link |
+| [**unarchiveGroup**](GroupApi.md#unarchivegroup) | **POST** /group/{groupId}/unarchive | Unarchive a group. |
 | [**updateGroup**](GroupApi.md#updategroup) | **PUT** /group/{groupId} | Update group info |
 | [**uploadGroupAvatar**](GroupApi.md#uploadgroupavatar) | **POST** /group/{groupId}/avatar | Upload a group avatar image. |
 
@@ -90,6 +92,78 @@ example().catch(console.error);
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
 | **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## archiveGroup
+
+> archiveGroup(groupId)
+
+Archive a group. The group must have no unpaid expenses, so every expense must be in a settled invoice.  Archived groups are hidden from the group list by default and do not accept new expenses or invoices.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { ArchiveGroupRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies ArchiveGroupRequest;
+
+  try {
+    const data = await api.archiveGroup(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **400** | Bad Request |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -522,7 +596,7 @@ example().catch(console.error);
 
 ## getGroupInvoices
 
-> Array&lt;InvoiceReducedDto&gt; getGroupInvoices(groupId)
+> Array&lt;InvoiceReducedDto&gt; getGroupInvoices(groupId, includeArchived)
 
 Get the group invoices
 
@@ -546,6 +620,8 @@ async function example() {
   const body = {
     // string | 
     groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // boolean | Include archived invoices. Archived invoices are hidden by default. (optional)
+    includeArchived: true,
   } satisfies GetGroupInvoicesRequest;
 
   try {
@@ -566,6 +642,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **groupId** | `string` |  | [Defaults to `undefined`] |
+| **includeArchived** | `boolean` | Include archived invoices. Archived invoices are hidden by default. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -593,7 +670,7 @@ example().catch(console.error);
 
 ## getGroupTransactions
 
-> Array&lt;TransactionDto&gt; getGroupTransactions(groupId)
+> Array&lt;TransactionDto&gt; getGroupTransactions(groupId, includeArchived)
 
 Get the group transactions
 
@@ -617,6 +694,8 @@ async function example() {
   const body = {
     // string | 
     groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // boolean | Include archived expenses. Archived expenses are hidden by default. (optional)
+    includeArchived: true,
   } satisfies GetGroupTransactionsRequest;
 
   try {
@@ -637,6 +716,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **groupId** | `string` |  | [Defaults to `undefined`] |
+| **includeArchived** | `boolean` | Include archived expenses. Archived expenses are hidden by default. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -664,7 +744,7 @@ example().catch(console.error);
 
 ## getGroups
 
-> Array&lt;GroupDto&gt; getGroups()
+> Array&lt;GroupDto&gt; getGroups(includeArchived)
 
 Get the current user\&#39;s groups
 
@@ -685,8 +765,13 @@ async function example() {
   });
   const api = new GroupApi(config);
 
+  const body = {
+    // boolean | Include archived groups. Archived groups are hidden by default. (optional)
+    includeArchived: true,
+  } satisfies GetGroupsRequest;
+
   try {
-    const data = await api.getGroups();
+    const data = await api.getGroups(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -699,7 +784,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **includeArchived** | `boolean` | Include archived groups. Archived groups are hidden by default. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -998,6 +1086,77 @@ example().catch(console.error);
 | **401** | Unauthorized |  -  |
 | **404** | Not Found |  -  |
 | **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## unarchiveGroup
+
+> unarchiveGroup(groupId)
+
+Unarchive a group.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  GroupApi,
+} from '';
+import type { UnarchiveGroupRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: Bearer
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new GroupApi(config);
+
+  const body = {
+    // string
+    groupId: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies UnarchiveGroupRequest;
+
+  try {
+    const data = await api.unarchiveGroup(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `text/plain`, `application/json`, `text/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | No Content |  -  |
+| **401** | Unauthorized |  -  |
+| **404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
