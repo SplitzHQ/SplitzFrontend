@@ -17,7 +17,7 @@ export interface LoadMessages {
 
 /** The props of the `Transition` between a skeleton and the content. The skeleton goes at once, the content fades in. */
 export const CONTENT_FADE_IN = {
-  enterActiveClass: "transition-opacity duration-(--motion-duration-state) ease-(--motion-easing-enter)",
+  enterActiveClass: "transition-opacity duration-state ease-enter",
   enterFromClass: "opacity-0",
   leaveActiveClass: "hidden",
 } as const;

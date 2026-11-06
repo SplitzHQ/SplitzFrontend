@@ -211,7 +211,7 @@ const userBalances = computed(() => {
             -->
             <div v-if="hasGroups" class="flex flex-col pb-28" :class="showNoResults ? 'gap-1 pt-3' : 'pt-4'">
               <Transition
-                enter-active-class="transition-opacity duration-(--motion-duration-state) ease-(--motion-easing-enter)"
+                enter-active-class="transition-opacity duration-state ease-enter"
                 enter-from-class="opacity-0"
               >
                 <HomeNoResults v-if="showNoResults" :keyword="trimmedKeyword" @clear="searchKeyword = ''" />

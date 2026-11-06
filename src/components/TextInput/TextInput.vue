@@ -89,8 +89,7 @@ const containerClass = computed(() => {
   if (isInvalid.value) return "border-base-border-error-solid has-[input:focus]:ring-base-border-error-solid";
   const restBorder = hasValue.value ? "border-base-border-primary" : "border-base-border-secondary";
   // A transition uses the time of the state that it goes to. So these two classes make hover and focus faster than the return to rest.
-  const enterTime =
-    "hover:duration-(--motion-duration-hover-in) has-[input:focus]:duration-(--motion-duration-hover-in)";
+  const enterTime = "hover:duration-hover-in has-[input:focus]:duration-hover-in";
   return `${restBorder} ${enterTime} hover:border-base-border-brand-solid focus-within:border-base-border-brand-solid has-[input:focus]:ring-base-border-brand-solid`;
 });
 
@@ -113,10 +112,7 @@ useResizeObserver(messageEl, () => {
 });
 
 const messageEnterClass = computed(() =>
-  [
-    "transition-[opacity,translate] duration-(--motion-duration-state) ease-(--motion-easing-enter)",
-    hint ? "delay-(--motion-duration-exit)" : "",
-  ].join(" ")
+  ["transition-[opacity,translate] duration-state ease-enter", hint ? "delay-(--motion-duration-exit)" : ""].join(" ")
 );
 
 /** The offsets of the shake in pixels. Each move is smaller than the last, so the field stops softly. */
@@ -153,9 +149,10 @@ function onFieldClick(event: MouseEvent): void {
 
 <template>
   <!--
-    The text is 16px, so iOS does not zoom the page, and a scale to 87.5% makes it look like 14px in its row. The width and
-    the height are larger by the same ratio, so the input fills its container and the tap area stays 44px. The page counts
-    the width before the scale when it scrolls, so the box around the input clips the extra width.
+    The input uses `text-base`, because iOS zooms the page when a focused input has text under 16px. The scale makes the
+    text look like the `text-sm` text of its row. The width and the height are larger by the same ratio, so the input fills
+    its container and keeps its tap area. The page counts the width before the scale when it scrolls, so the box around the
+    input clips the extra width.
   -->
   <div v-if="variant === 'plain'" class="overflow-x-clip">
     <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
@@ -187,13 +184,21 @@ function onFieldClick(event: MouseEvent): void {
         {{ label }}
       </label>
 
-      <!-- A pointer shortcut only: the input stays in the tab order, and the label names it. -->
-      <!-- The ring is 0px wide and inset in each state, so it can fade. A ring that exists only on focus would change at once. -->
+      <!--
+        The whole field is the tap target, but the input is smaller than the field. Without these handlers, a tap on the
+        padding or the icon does nothing.
+        - `mousedown` stops the browser from moving the focus away from the input, so a phone keeps its keyboard open.
+        - `click` then gives the focus to the input. iOS opens the keyboard only in a user gesture, and `click` is one.
+        - A press on a control in the field, for example the password button, goes to that control. See `hitsOwnControl`.
+        The handlers are only for a pointer. The input stays in the tab order and the label names it, so a keyboard or a
+        screen reader does not use this `div`. That is why the `div` has no role or key handlers.
+      -->
+      <!-- The ring is `ring-0` and inset in each state, so it can fade. A ring that exists only on focus would change at once. -->
       <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
       <div
         ref="field"
         :class="[
-          'flex w-full items-center gap-2 rounded-xl border p-3 ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-(--motion-duration-exit) ease-(--motion-easing-standard) ring-inset has-[input:focus]:ring-1',
+          'flex w-full items-center gap-2 rounded-xl border p-3 ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-exit ease-standard ring-inset has-[input:focus]:ring-1',
           disabled ? 'cursor-not-allowed' : 'cursor-text',
           containerClass,
         ]"
@@ -203,7 +208,7 @@ function onFieldClick(event: MouseEvent): void {
         <span
           v-if="$slots.icon"
           :class="[
-            'flex size-5 shrink-0 items-center justify-center transition-colors duration-(--motion-duration-exit) ease-(--motion-easing-standard) [&>svg]:size-5',
+            'flex size-5 shrink-0 items-center justify-center transition-colors duration-exit ease-standard [&>svg]:size-5',
             iconClass,
           ]"
         >
@@ -224,17 +229,21 @@ function onFieldClick(event: MouseEvent): void {
           :aria-invalid="isInvalid ? 'true' : undefined"
           :aria-describedby="describedByIds"
           :class="[
-            'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-(--motion-duration-exit) ease-(--motion-easing-standard) placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
+            'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-exit ease-standard placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
             textClass,
           ]"
         />
 
         <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
-        <!-- The button is 24px. An invisible box around it makes the tap area 44px. The negative margin puts the ink of the icon on the 13px line, because the button and the icon have about 3px of empty space. -->
+        <!--
+          An invisible box around the button makes the tap area larger than the button. The button and the icon have empty
+          space around the ink, so the negative margin moves the ink of the icon onto the same line as the start icon, on
+          the other side of the field.
+        -->
         <button
           v-if="isPassword"
           type="button"
-          class="relative -mr-[3.25px] flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
+          class="relative mr-[-3.25px] flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
           :disabled="disabled"
           @click="revealed = !revealed"
         >
@@ -247,7 +256,7 @@ function onFieldClick(event: MouseEvent): void {
 
     <!-- The area changes its height smoothly, so the content below does not jump. The first height comes from `auto`, with no motion. -->
     <div
-      class="overflow-hidden transition-[height] duration-(--motion-duration-container) ease-(--motion-easing-enter)"
+      class="overflow-hidden transition-[height] duration-container ease-enter"
       :style="messageHeight === undefined ? undefined : { height: `${messageHeight}px` }"
     >
       <div ref="message" class="relative">
@@ -260,7 +269,7 @@ function onFieldClick(event: MouseEvent): void {
         <Transition
           :enter-active-class="messageEnterClass"
           enter-from-class="-translate-y-1 opacity-0"
-          leave-active-class="absolute inset-x-0 top-0 transition-opacity duration-(--motion-duration-exit) ease-(--motion-easing-exit)"
+          leave-active-class="absolute inset-x-0 top-0 transition-opacity duration-exit ease-exit"
           leave-to-class="opacity-0"
         >
           <!-- The error appears after the first render, so `role="alert"` makes a screen reader read it. -->

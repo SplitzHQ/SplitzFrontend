@@ -91,7 +91,10 @@ onBeforeUnmount(() => {
     <div
       v-if="showing"
       ref="layer"
-      :class="['pointer-events-none inset-0 z-[9000] flex items-center justify-center', leaving ? 'absolute' : 'fixed']"
+      :class="[
+        'pointer-events-none inset-0 z-opening flex items-center justify-center',
+        leaving ? 'absolute' : 'fixed',
+      ]"
       :style="{ backgroundColor: BRAND_COLOR }"
       aria-hidden="true"
       data-test="brand-opening"

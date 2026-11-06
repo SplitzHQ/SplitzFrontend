@@ -34,7 +34,7 @@ const hasText = computed(() => model.value.length > 0);
 
 /**
  * Keeps the text clear of the buttons at the right end of the field.
- * One button takes 44px with its gap, and two buttons take 80px.
+ * `pr-11` leaves room for one button and its gap, and `pr-20` leaves room for two buttons.
  */
 const trailingPadding = computed(() => {
   if (slots.action && hasText.value) return "pr-20";
@@ -52,8 +52,9 @@ function clear() {
   <div class="relative w-full">
     <!--
       The buttons are not in the label, because a click on them must not focus the field through the label.
-      The padding is 1px smaller than 2.5 because of the border, so the field stays 40px high.
-      The ring is inset and 0px wide at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
+      The padding is smaller than `p-2.5` by the width of the border, so the field has the same height as a field with
+      no border.
+      The ring is inset and `ring-0` at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
       transition does not cover a box shadow. So the field names `box-shadow`, and the ring fades with the border.
     -->
     <label
@@ -84,9 +85,9 @@ function clear() {
     <div class="absolute inset-y-0 right-1 flex items-center gap-1">
       <!-- The span takes the motion classes, because the button has its own transition. -->
       <Transition
-        enter-active-class="transition-[opacity,scale] duration-(--motion-duration-state) ease-(--motion-easing-enter)"
+        enter-active-class="transition-[opacity,scale] duration-state ease-enter"
         enter-from-class="scale-75 opacity-0"
-        leave-active-class="transition-[opacity,scale] duration-(--motion-duration-exit) ease-(--motion-easing-exit)"
+        leave-active-class="transition-[opacity,scale] duration-exit ease-exit"
         leave-to-class="scale-75 opacity-0"
       >
         <span v-if="hasText" class="flex">

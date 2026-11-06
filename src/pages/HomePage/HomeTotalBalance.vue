@@ -58,7 +58,7 @@ const detailParts = computed(() =>
     class="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-base-bg-secondary px-4 text-left text-base whitespace-nowrap"
     :class="
       hasDetails &&
-      'touch-manipulation transition-colors duration-(--motion-duration-hover-in) ease-(--motion-easing-standard) hover:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid active:bg-base-bg-secondary_hover'
+      'touch-manipulation transition-colors duration-hover-in ease-standard hover:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid active:bg-base-bg-secondary_hover'
     "
     data-testid="home-total-balance"
     @click="hasDetails && (open = true)"

@@ -189,7 +189,7 @@ export const SIZE_DECISION: { steps: SizeDecisionStep[]; limit: string } = {
     { size: "xl", when: "The button is a number key or a floating button." },
     {
       size: "sm",
-      when: "The button is inside a search field. The field of HomeSearchBar is 40px high, so a md button does not fit in it.",
+      when: "The button is inside a search field. The field of HomeSearchBar is not as high as a md button, so a md button does not fit in it.",
     },
     {
       size: "md",

@@ -106,7 +106,7 @@ export const CONTENT_RULES: UsageRule[] = [
     title: "Button size",
   },
   {
-    rule: "The default slot has a gap of only 4px. When the message has a second block, for example a countdown, put the blocks in a `flex flex-col gap-2` block. LoginPage does this.",
+    rule: "The default slot has only a small gap. When the message has a second block, for example a countdown, put the blocks in a `flex flex-col gap-2` block. LoginPage does this.",
     title: "More than one block of text",
   },
   {
@@ -114,7 +114,7 @@ export const CONTENT_RULES: UsageRule[] = [
     title: "Icon",
   },
   {
-    rule: "An icon in the slot takes no size. The notice sets 18px and centers the icon on the first line of text. The icon is decorative, so the text must give the full message.",
+    rule: "An icon in the slot takes no size. The notice sets the size and centers the icon on the first line of text. The icon is decorative, so the text must give the full message.",
     title: "Icon size",
   },
   {

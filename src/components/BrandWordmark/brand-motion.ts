@@ -28,8 +28,8 @@ export interface MotionStep {
 const { enter: ENTER, exit: EXIT, pop: POP, sheet: SHEET, standard: STANDARD } = MOTION_EASING;
 
 /**
- * The place of the mark on the word after a tap, in the units of the word. Its size is 20px at the header size, the same
- * as the word. Its bottom is below the baseline, so that its center is on the center of the capitals.
+ * The place of the mark on the word after a tap, in the units of the word. At the header size, the mark has the same
+ * size as the word. Its bottom is below the baseline, so that its center is on the center of the capitals.
  */
 export const TAP_MARK = { belowBaseline: 14, size: 100 } as const;
 

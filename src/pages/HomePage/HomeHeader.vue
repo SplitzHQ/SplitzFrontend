@@ -312,7 +312,7 @@ function openSearch(): void {
     >
       <div
         aria-hidden="true"
-        class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 border-b transition-[border-color] duration-(--motion-duration-state) ease-(--motion-easing-standard)"
+        class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 border-b transition-[border-color] duration-state ease-standard"
         :style="barStyle"
       />
 

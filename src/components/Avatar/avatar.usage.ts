@@ -40,12 +40,8 @@ export const NOT_AN_AVATAR: UseInsteadRule[] = [
   },
 ];
 
-/** One size of an avatar, with the size of the picture and the places that use it. */
+/** The rule of one avatar size and the places that use it. `Avatar.vue` holds the dimensions. */
 export interface AvatarSizeRule {
-  /** The side of the avatar in pixels. */
-  px: number;
-  /** The corner radius in pixels. */
-  radius: number;
   rule: string;
   /** The callers that use this size today. */
   callers: string;
@@ -55,33 +51,23 @@ export interface AvatarSizeRule {
 export const SIZE_GUIDE: Record<AvatarSize, AvatarSizeRule> = {
   header: {
     callers: "AvatarMenu",
-    px: 32,
-    radius: 8,
     rule: "Only the avatar in the home header. Do not use it with a grid.",
   },
   lg: {
     callers: "FrequentSelectionList, the ProfilePage identity card, JoinGroupPage",
-    px: 64,
-    radius: 16,
     rule: "A chooser with the name under the avatar, or the main picture of a page.",
   },
   sm: {
     callers: "HomePage group rows, MarkPaidSheet, PaidByButton, UserItem, RequestCard on ProfilePage",
-    px: 48,
-    radius: 12,
     rule: "A group row on the home screen, with the same size as a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar.",
   },
   xs: {
     callers:
       "NotificationItem, RequestCard in AvatarMenu, the header titles of GroupDetailPage, InvoiceDetailPage and TransactionDetailPage, GroupCard, InviteFriendsSheet, UserList, the friend rows of ProfilePage, the rows of InvoiceDetailPage and TransactionDetailPage",
-    px: 40,
-    radius: 10,
     rule: "A list row, a header title or a compact card. This is the usual size.",
   },
   xxs: {
     callers: "UserTag, with one picture",
-    px: 20,
-    radius: 6,
     rule: "A chip with a name. Use one picture only.",
   },
 };
@@ -93,7 +79,7 @@ export const GROUP_RULES: UsageRule[] = [
     title: "Four pictures",
   },
   {
-    rule: "The app shows a grid at `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is 4px wide, so a person cannot see it. No caller uses `xxs` with a grid.",
+    rule: "The app shows a grid at `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is too small to see. No caller uses `xxs` with a grid.",
     title: "Sizes",
   },
   {
@@ -101,11 +87,11 @@ export const GROUP_RULES: UsageRule[] = [
     title: "One person",
   },
   {
-    rule: "Two people go on a diagonal: the first at the top left and the second at the bottom right. The tiles keep the size of a grid tile. Each tile moves to the center, so the gap between the rounded corners on the diagonal is about 5px to 6px: 0.5px on each axis at `xs`, 1px at `sm` and 1.5px at `lg`. In one row they would leave an empty band above and below the tiles. Three people show two tiles in the first row and one in the center of the second row.",
+    rule: "Two people go on a diagonal: the first at the top left and the second at the bottom right. The tiles keep the size of a grid tile. Each tile moves to the center, so the gap between the rounded corners on the diagonal stays small. `Avatar.vue` holds the shift of each size. In one row they would leave an empty band above and below the tiles. Three people show two tiles in the first row and one in the center of the second row.",
     title: "Two people",
   },
   {
-    rule: "The corner of the frame is the corner of a tile plus the padding. The frame of a grid therefore has a smaller corner than one person at the same size: 12px at `lg`, 10px at `sm` and 8px at `xs`.",
+    rule: "The corner of the frame is the corner of a tile plus the padding. The frame of a grid therefore has a smaller corner than one person at the same size.",
     title: "Corners",
   },
 ];
@@ -141,11 +127,11 @@ export const PICTURE_RULES: UsageRule[] = [
     title: "No picture",
   },
   {
-    rule: "A photo has a line of 1px inside its edge, so a photo with a pale or dark edge stays separate from the background. The line is black at 5% in the light theme and white at 10% in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
+    rule: "A photo has a thin line inside its edge, so a photo with a pale or dark edge stays separate from the background. The line is a dark alpha color in the light theme and a light alpha color in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
     title: "Line on a photo",
   },
   {
-    rule: "The color family comes from the name, so a person has one color on all pages. The families are brand, leaf, waterblue, purple, magenta, rosered and yellow. The size of the initial is 45% of the side of the tile, and 10px at the smallest.",
+    rule: "The color family comes from the name, so a person has one color on all pages. The families are brand, leaf, waterblue, purple, magenta, rosered and yellow. The size of the initial follows the side of the tile.",
     title: "Color and size of the initial",
   },
   {
@@ -189,7 +175,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
 export const OPEN_QUESTIONS = [
   "Must the field `alt` get a new name? It now also sets the initial and the color.",
   "Must an avatar be hidden from a screen reader by default? Each caller has a visible name or a labeled parent, so each caller must now add `aria-hidden`. A default would remove that work, but a new caller with no name would then have no name.",
-  "Must the size names change? `xs` is 40px and `sm` is 48px, but the `sm` button is 32px and the `md` button is 40px. The same word gives two heights.",
-  "Must an avatar and a tile have one size in a list? A transaction tile (TransactionItemContent), an invoice tile (InvoiceItem) and an `sm` avatar are 48px with a radius of 12px. A list row avatar is 40px, and the NotificationItem tile is 40px.",
+  "Must the size names change? An `xs` avatar has the height of an `md` button, and an `sm` avatar is taller than an `sm` button. The same word gives two heights.",
+  "Must an avatar and a tile have one size in a list? A transaction tile (TransactionItemContent), an invoice tile (InvoiceItem) and an `sm` avatar have one size and one radius. A list row avatar and the NotificationItem tile are smaller.",
   "Must GroupCard, FrequentSelectionList and UserList use the group photo? They always show the members. HomePage and the page headers show the group photo when the group has one, so one group can have two pictures.",
 ];

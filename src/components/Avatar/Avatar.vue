@@ -21,7 +21,7 @@ interface Image {
 export interface AvatarProps {
   /** One picture shows at full size. Several pictures show as a grid. The grid shows the first four. */
   images: Image[];
-  /** 20px, 40px, 48px or 64px. `header` is the 32px size of the home header. */
+  /** See `SIZE_GUIDE` in `avatar.usage.ts` for when to use each size. `header` is only for the home header. */
   size: "xxs" | "xs" | "sm" | "lg" | "header";
 }
 
@@ -149,19 +149,19 @@ function onImageError(src: string) {
 }
 
 /*
- * The initial is 45% of the side of its tile, and 10px at the smallest. In a group, the corner of the frame is the corner
- * of a tile plus the padding, so the two curves stay parallel.
+ * The `icon-*` size of the initial follows the side of its tile. In a group, the corner of the frame is the corner of a
+ * tile plus the padding, so the two curves stay parallel.
  */
 .img-container.xxs {
   @apply h-5 w-5 rounded-md;
 
   .image-count-single {
-    @apply h-5 w-5 rounded-md text-[0.625rem];
+    @apply h-5 w-5 rounded-md icon-2.5;
   }
 
-  /* No caller uses this grid, and a 4px tile has no room for an initial. */
+  /* No caller uses this grid, and its tiles have no room for an initial. */
   .image-count-multiple {
-    @apply h-1 w-1 rounded-sm text-[0];
+    @apply h-1 w-1 rounded-sm icon-0;
   }
 }
 
@@ -169,7 +169,7 @@ function onImageError(src: string) {
   @apply h-8 w-8 rounded-lg;
 
   .image-count-single {
-    @apply h-8 w-8 rounded-lg text-[0.875rem];
+    @apply h-8 w-8 rounded-lg icon-3.5;
   }
 }
 
@@ -182,11 +182,11 @@ function onImageError(src: string) {
   }
 
   .image-count-single {
-    @apply h-10 w-10 rounded-05xl text-[1.125rem];
+    @apply h-10 w-10 rounded-05xl icon-4.5;
   }
 
   .image-count-multiple {
-    @apply h-4 w-4 rounded-[0.3125rem] text-[0.625rem];
+    @apply h-4 w-4 rounded-[0.3125rem] icon-2.5;
   }
 }
 
@@ -199,11 +199,11 @@ function onImageError(src: string) {
   }
 
   .image-count-single {
-    @apply h-12 w-12 rounded-xl text-[1.375rem];
+    @apply h-12 w-12 rounded-xl icon-5.5;
   }
 
   .image-count-multiple {
-    @apply h-5 w-5 rounded-[0.4375rem] text-[0.625rem];
+    @apply h-5 w-5 rounded-[0.4375rem] icon-2.5;
   }
 }
 
@@ -216,11 +216,11 @@ function onImageError(src: string) {
   }
 
   .image-count-single {
-    @apply h-16 w-16 rounded-2xl text-[1.8125rem];
+    @apply h-16 w-16 rounded-2xl icon-7.25;
   }
 
   .image-count-multiple {
-    @apply h-[1.6875rem] w-[1.6875rem] rounded-lg text-[0.75rem];
+    @apply h-6.75 w-6.75 rounded-lg icon-3;
   }
 }
 </style>
