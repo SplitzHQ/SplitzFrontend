@@ -24,11 +24,11 @@ const routerHistoryStore = useRouterHistoryStore();
 const { enableBackButton, enableCloseButton, fallback } = defineProps<HeaderMobileSecondaryProps>();
 
 const goBack = () => {
-  routerHistoryStore.goBack(fallback);
+  routerHistoryStore.goBack({ fallback });
 };
 
 const close = () => {
-  routerHistoryStore.restoreSnapshot(fallback);
+  routerHistoryStore.restoreSnapshot({ fallback });
 };
 </script>
 
