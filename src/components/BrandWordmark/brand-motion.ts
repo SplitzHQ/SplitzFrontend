@@ -4,7 +4,8 @@ import { WORDMARK_TITTLE_SHAPE } from "./brand-wordmark";
 
 /**
  * The motion of the logo on HomePage: the full-screen opening, and the small motion when a person taps the word mark.
- * The values are the picks in the `2026-11-04-logo-opening` prototype. The rules are in `brand-wordmark.usage.ts`.
+ * The values are the picks in the `2026-11-04-logo-opening` prototype. The principles are in `brand.usage.ts`, and the
+ * component rules are in `brand-wordmark.usage.ts`.
  *
  * In the small motion, one circle becomes two small circles. One goes to the place of the dot. The other goes to the
  * place of the diamond and changes into the diamond. The bar grows between them.
