@@ -24,7 +24,7 @@ export const COMPONENT_RULES: Record<TransactionItemComponent, UsageRule> = {
     title: "A row that opens the transaction",
   },
   TransactionItemContent: {
-    rule: "The row does something else when the user presses it. SelectableTransactionItem on SettleUpPage puts it in a button that selects the transaction.",
+    rule: "The row does something else when the user presses it. SelectableTransactionItem on SettleUpPage puts it in a SelectableRow, which selects the transaction.",
     title: "A row with another action",
   },
 };
@@ -36,7 +36,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "The parent is the row",
   },
   {
-    rule: "The default slot goes at the end of the row, after the balance. SelectableTransactionItem puts a check mark there.",
+    rule: "The default slot goes at the end of the row, after the balance. A SelectableRow does not use it, because the row draws its own check mark after the content.",
     title: "Slot",
   },
 ];
