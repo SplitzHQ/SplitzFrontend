@@ -29,8 +29,7 @@ const {
 
 const slots = useSlots();
 
-/** The spinner takes the place of the left icon when the button has one, so the width does not change. */
-const hasIconBox = computed(() => iconOnly || slots["icon-left"] !== undefined);
+const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"] === undefined);
 </script>
 
 <template>
@@ -43,22 +42,23 @@ const hasIconBox = computed(() => iconOnly || slots["icon-left"] !== undefined);
         'icon-only': iconOnly,
         'is-disabled': disabled,
         'is-loading': loading,
-        'spinner-covers-label': loading && !hasIconBox,
       },
     ]"
   >
-    <span v-if="hasIconBox" class="icon">
+    <span v-if="$slots['icon-left']" class="icon">
       <Transition name="s-button-swap" mode="out-in">
         <PhCircleNotch v-if="loading" key="spinner" class="animate-spin" aria-hidden="true" />
-        <span v-else key="icon" class="icon-slot"><slot name="icon-left" /></span>
+        <slot key="icon" v-else name="icon-left" class="icon-slot" />
       </Transition>
     </span>
-    <span v-if="$slots.default && !iconOnly" class="label"><slot /></span>
-    <span v-if="$slots['icon-right'] && !iconOnly" class="icon">
-      <span class="icon-slot"><slot name="icon-right" /></span>
+    <span v-if="$slots.default" :class="['label', loading && shouldSpinnerCoverContent ? 'opacity-0' : '']">
+      <slot />
+    </span>
+    <span v-if="$slots['icon-right']" :class="['icon', loading && shouldSpinnerCoverContent ? 'opacity-0' : '']">
+      <slot name="icon-right" class="icon-slot" />
     </span>
     <Transition name="s-button-fade">
-      <span v-if="loading && !hasIconBox" class="spinner-overlay">
+      <span v-if="loading && shouldSpinnerCoverContent" class="spinner-overlay">
         <PhCircleNotch class="icon animate-spin" aria-hidden="true" />
       </span>
     </Transition>
@@ -355,11 +355,6 @@ const hasIconBox = computed(() => iconOnly || slots["icon-left"] !== undefined);
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .spinner-covers-label > .label,
-  .spinner-covers-label > .icon {
-    opacity: 0;
   }
 
   .s-button-swap-enter-active,
