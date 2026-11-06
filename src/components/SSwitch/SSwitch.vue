@@ -36,7 +36,7 @@ function toggle() {
     :aria-disabled="busy ? 'true' : undefined"
     :disabled="disabled"
     :class="[
-      'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors duration-(--motion-duration-state) ease-(--motion-easing-standard)',
+      'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full p-0.5 transition-colors duration-state ease-standard',
       'after:absolute after:top-1/2 after:left-0 after:h-11 after:w-full after:-translate-y-1/2',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid disabled:cursor-not-allowed',
       model

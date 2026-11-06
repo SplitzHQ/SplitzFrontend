@@ -93,7 +93,7 @@ const LAYERS = [
   background: linear-gradient(
     to bottom,
     transparent,
-    color-mix(in srgb, var(--blur-band-color, var(--base-bg-primary)) 70%, transparent) var(--blur-band-height)
+    color-mix(in oklch, var(--blur-band-color, var(--base-bg-primary)) 70%, transparent) var(--blur-band-height)
   );
 }
 
@@ -102,7 +102,7 @@ const LAYERS = [
   background: linear-gradient(
     to top,
     transparent,
-    color-mix(in srgb, var(--blur-band-color, var(--base-bg-primary)) 85%, transparent) var(--blur-band-height),
+    color-mix(in oklch, var(--blur-band-color, var(--base-bg-primary)) 85%, transparent) var(--blur-band-height),
     var(--blur-band-color, var(--base-bg-primary))
   );
   opacity: var(--blur-band-strength);
