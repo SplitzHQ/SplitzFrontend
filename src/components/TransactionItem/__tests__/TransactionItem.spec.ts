@@ -176,11 +176,12 @@ describe("SelectableTransactionItem", () => {
     expect(mountSelectable(false).get("button").attributes("aria-pressed")).toBe("false");
   });
 
-  it("puts the slot at the end of the row and emits toggle", async () => {
+  it("puts the hidden check mark at the end of the row and emits toggle", async () => {
     const wrapper = mountSelectable(false);
     const button = wrapper.get("button");
 
-    expect(button.element.lastElementChild?.tagName.toLowerCase()).toBe("svg");
+    expect(button.element.lastElementChild?.getAttribute("aria-hidden")).toBe("true");
+    expect(button.element.lastElementChild?.querySelector("svg")).not.toBeNull();
 
     await button.trigger("click");
     expect(wrapper.emitted("toggle")).toHaveLength(1);

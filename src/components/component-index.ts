@@ -110,6 +110,12 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "An action that the user starts, or a link that looks like a button.",
   },
   {
+    components: ["SelectableRow"],
+    folder: "SelectableRow",
+    usage: "src/components/SelectableRow/selectable-row.usage.ts",
+    use: "A row in a list where the user selects more than one item, with the selected fill and the check mark.",
+  },
+  {
     components: ["Sheet"],
     folder: "Sheet",
     usage: "src/components/Sheet/sheet.usage.ts",

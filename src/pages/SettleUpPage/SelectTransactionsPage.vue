@@ -136,7 +136,7 @@ const handleNext = () => {
             <PhCheckCircle
               v-if="invoiceStore.isAllTransactionsSelected"
               weight="fill"
-              class="size-5 text-util-color-success-600"
+              class="size-5 text-base-fg-brand"
             />
             <PhCircle v-else class="size-5 text-base-text-quaternary" />
             <span class="text-sm font-medium text-base-text-secondary">{{ $t("settle-up-select-all") }}</span>
