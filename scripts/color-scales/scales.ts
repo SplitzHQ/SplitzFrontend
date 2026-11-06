@@ -343,6 +343,13 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-button-secondary-bg": "core-alpha-brand-20",
   "comp-button-secondary-bg-hover": "core-alpha-brand-30",
   "comp-button-secondary-bg-pressed": "core-alpha-brand-40",
+  // The hover and pressed fill of a shared row. The dark theme needs a step between the page and N2: N2 is too
+  // bright on the dark page, so the 3% white sits about half way.
+  "comp-row-bg-hover": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
+  "comp-row-bg-pressed": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
+  "comp-search-filter-bg": "core-alpha-brand-10",
+  "comp-search-filter-bg-hover": "core-alpha-brand-20",
+  "comp-search-filter-bg-pressed": "core-alpha-brand-30",
   "comp-segment-hover": "core-alpha-brand-10",
   "comp-segment-selected": "core-alpha-brand-20",
   "comp-segment-track": "core-alpha-brand-5",

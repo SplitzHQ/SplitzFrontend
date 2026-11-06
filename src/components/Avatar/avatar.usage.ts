@@ -60,16 +60,16 @@ export const SIZE_GUIDE: Record<AvatarSize, AvatarSizeRule> = {
     rule: "Only the avatar in the home header. Do not use it with a grid.",
   },
   lg: {
-    callers: "HomePage group rows, FrequentSelectionList, the ProfilePage identity card, JoinGroupPage",
+    callers: "FrequentSelectionList, the ProfilePage identity card, JoinGroupPage",
     px: 64,
     radius: 16,
-    rule: "A group row on the home screen, a chooser with the name under the avatar, or the main picture of a page.",
+    rule: "A chooser with the name under the avatar, or the main picture of a page.",
   },
   sm: {
-    callers: "MarkPaidSheet, PaidByButton, UserItem, RequestCard on ProfilePage",
+    callers: "HomePage group rows, MarkPaidSheet, PaidByButton, UserItem, RequestCard on ProfilePage",
     px: 48,
     radius: 12,
-    rule: "A person in a split or a payment, where the row has space or the name is under the avatar.",
+    rule: "A group row on the home screen, with the same size as a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar.",
   },
   xs: {
     callers:
@@ -93,7 +93,7 @@ export const GROUP_RULES: UsageRule[] = [
     title: "Four pictures",
   },
   {
-    rule: "The app shows a grid only at `xs` and `lg`. At `xxs` each picture in a grid is 4px wide, so a person cannot see it. No caller uses `xxs` or `sm` with a grid.",
+    rule: "The app shows a grid at `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is 4px wide, so a person cannot see it. No caller uses `xxs` with a grid.",
     title: "Sizes",
   },
   {
@@ -101,7 +101,11 @@ export const GROUP_RULES: UsageRule[] = [
     title: "One person",
   },
   {
-    rule: "The corner of the frame is the corner of a tile plus the padding. The frame of a grid therefore has a smaller corner than one person at the same size: 12px at `lg` and 8px at `xs`. The tiles stay in the center of the frame, so 2 people leave space above and below.",
+    rule: "Two people go on a diagonal: the first at the top left and the second at the bottom right. The tiles keep the size of a grid tile. Each tile moves to the center, so the gap between the rounded corners on the diagonal is about 5px to 6px: 0.5px on each axis at `xs`, 1px at `sm` and 1.5px at `lg`. In one row they would leave an empty band above and below the tiles. Three people show two tiles in the first row and one in the center of the second row.",
+    title: "Two people",
+  },
+  {
+    rule: "The corner of the frame is the corner of a tile plus the padding. The frame of a grid therefore has a smaller corner than one person at the same size: 12px at `lg`, 10px at `sm` and 8px at `xs`.",
     title: "Corners",
   },
 ];
@@ -113,7 +117,7 @@ export const NAME_RULES: UsageRule[] = [
     title: "alt",
   },
   {
-    rule: 'Set `aria-hidden="true"` on the avatar when the name is next to it. A screen reader then reads the name one time. Each caller in the app has a visible name or a labeled parent. Only HomePage still has no `aria-hidden`, and its work is not finished.',
+    rule: 'Set `aria-hidden="true"` on the avatar when the name is next to it. A screen reader then reads the name one time. Each caller in the app has a visible name or a labeled parent.',
     title: "Name next to the avatar",
   },
   {

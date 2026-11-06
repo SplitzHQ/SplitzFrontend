@@ -268,6 +268,10 @@ export const ICON_RULES: UsageRule[] = [
     title: "Header icons",
   },
   {
+    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
+    title: "Search filter",
+  },
+  {
     rule: "Put a forward arrow and an expand arrow on the right. Put all other icons on the left.",
     title: "Side",
   },

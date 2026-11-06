@@ -114,11 +114,13 @@ describe("TransactionItem", () => {
     expect(wrapper.get("a").attributes("href")).toBe("/group/group/transaction/tx");
   });
 
-  it("has a focus ring and motion tokens", async () => {
+  it("has a focus ring, motion tokens and a press that scales only without reduced motion", async () => {
     const classes = (await mountLink(transaction([]))).get("a").classes().join(" ");
 
     expect(classes).toContain("focus-visible:outline-2");
-    expect(classes).toContain("duration-(--motion-duration-hover-in)");
+    expect(classes).toContain("var(--motion-duration-hover-in)");
+    expect(classes).toContain("active:scale-98");
+    expect(classes).toContain("motion-reduce:active:scale-100");
   });
 
   it("reads the row in order for a screen reader", async () => {

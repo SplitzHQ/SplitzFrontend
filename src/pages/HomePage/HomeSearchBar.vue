@@ -73,10 +73,15 @@ function clear() {
         enterkeyhint="search"
         autocomplete="off"
         :placeholder="placeholder ?? $t('home-search-placeholder')"
-        class="min-w-0 flex-1 bg-transparent text-base leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
+        class="min-w-0 flex-1 appearance-none bg-transparent text-base leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
       />
     </label>
-    <div class="absolute top-1 right-1 flex gap-1">
+    <!--
+      The buttons are centered on the height of the field and are not pinned to the top. Safari on iOS can draw a search
+      input taller than 20px, and the field then grows. A pinned 32px button then sits high and looks small.
+      `appearance-none` on the input turns off that native search look.
+    -->
+    <div class="absolute inset-y-0 right-1 flex items-center gap-1">
       <!-- The span takes the motion classes, because the button has its own transition. -->
       <Transition
         enter-active-class="transition-[opacity,scale] duration-(--motion-duration-state) ease-(--motion-easing-enter)"
