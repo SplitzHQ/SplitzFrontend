@@ -125,6 +125,8 @@ export default {
         popover: "1070",
         tooltip: "1080",
         toast: "1090",
+        // The opening of the app covers the whole app, also sheets and toasts.
+        opening: "9000",
       },
     },
   },

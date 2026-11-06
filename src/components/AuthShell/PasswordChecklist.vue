@@ -19,7 +19,7 @@ const { $t } = useFluent();
       v-for="rule in PASSWORD_RULES"
       :key="rule.labelKey"
       :class="[
-        'flex items-center gap-2 text-sm transition-colors duration-(--motion-duration-state) ease-(--motion-easing-standard)',
+        'flex items-center gap-2 text-sm transition-colors duration-state ease-standard',
         rule.passes(password) ? 'text-base-text-secondary' : 'text-base-text-tertiary',
       ]"
     >
