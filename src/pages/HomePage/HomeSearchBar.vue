@@ -31,8 +31,9 @@ const inputId = useId();
   <div class="relative w-full">
     <!--
       The button is not in the label, because a click on it must not focus the field.
-      The padding is 1px smaller than 2.5 because of the border, so the field stays 40px high.
-      The ring is inset and 0px wide at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
+      The padding is smaller than `p-2.5` by the width of the border, so the field has the same height as a field with
+      no border.
+      The ring is inset and `ring-0` at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
       transition does not cover a box shadow. So the field names `box-shadow`, and the ring fades with the border.
     -->
     <label

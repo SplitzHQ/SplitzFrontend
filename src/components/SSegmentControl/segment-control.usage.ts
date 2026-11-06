@@ -30,14 +30,14 @@ export const NOT_A_SEGMENT_CONTROL: UseInsteadRule[] = [
   { use: "SButton", when: "The tap runs one action and does not keep a value." },
 ];
 
-/** What each size is for. The heights are measured from the rendered segment. The track adds 10px. */
+/** What each size is for. */
 export const SIZE_GUIDE: Record<SegmentSize, UsageRule> = {
   md: {
-    rule: "36px high, 14px text. Use it for each control in `src/`, for example the tabs of GroupDetailPage. The track is 46px high, so the tap area of 44px fits in the track. Do not add padding in the slot.",
+    rule: "The default size in `src/`, for example the tabs of GroupDetailPage. The track is high enough for the tap area of 44px. Do not add padding in the slot.",
     title: "md",
   },
   sm: {
-    rule: "32px high, 14px text. Use it only in `devtools/`: the toolbars, the panels and `SegmentPicker`. The track clips the tap area to 40px high when the track can scroll.",
+    rule: "The compact size. When the track can scroll, it clips the tap area to 40px high. Use it in `src/` when the layout needs a compact control, for example in a row with other controls. The `devtools/` toolbars, panels and `SegmentPicker` also use it.",
     title: "sm",
   },
 };
@@ -49,7 +49,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Width",
   },
   {
-    rule: "The track does not wrap in `src/`. When the segments do not fit, they scroll inside the track. The edge fades on each side that has more segments. A page does not add its own scroll or fade. The four English tabs of GroupDetailPage are 325px wide. They fit in the 359px of free width on a 375px screen, and they scroll on a 320px screen.",
+    rule: "The track does not wrap in `src/`. When the segments do not fit, they scroll inside the track. The edge fades on each side that has more segments. A page does not add its own scroll or fade. The four English tabs of GroupDetailPage fit on a 375px screen, and they scroll on a 320px screen.",
     title: "Segments that do not fit",
   },
   {
@@ -81,7 +81,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Keyboard",
   },
   {
-    text: "Each segment has a tap area of at least 44px wide, from an invisible box. With md, the tap area is 44px high. The look does not change.",
+    text: "Each segment has a tap area of at least 44px wide, from an invisible box. The look does not change. The target height is 44px, and md has it. With sm, the tap area is 44px high when the track does not scroll and 40px high when it can scroll. 40px is accepted when the layout needs sm.",
     title: "Tap area",
   },
   {

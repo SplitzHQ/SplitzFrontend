@@ -217,8 +217,7 @@ function onClickCapture(event: MouseEvent): void {
           data-segment-selection
           :class="[
             'absolute top-0 left-0 rounded-full bg-core-alpha-brand-20',
-            selectionMoves &&
-              'transition-[transform,width,height] duration-(--motion-duration-state) ease-(--motion-easing-standard)',
+            selectionMoves && 'transition-[transform,width,height] duration-state ease-standard',
           ]"
           :style="selectionStyle"
         />
