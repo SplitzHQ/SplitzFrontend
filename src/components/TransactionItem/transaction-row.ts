@@ -7,7 +7,7 @@ import type { SplitzUserReducedDto, TransactionBalanceDto } from "@/backend";
  * The caller adds the offset of the focus ring, because the ring must fit in the scroll area of the screen.
  */
 export const TRANSACTION_ROW_CLASS =
-  "-mx-2 flex items-center gap-3 rounded-2xl px-2 py-2 touch-manipulation transition-colors duration-(--motion-duration-hover-in) ease-(--motion-easing-standard) active:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-base-border-brand-solid";
+  "-mx-2 flex items-center gap-3 rounded-2xl px-2 py-2 touch-manipulation transition-colors duration-hover-in ease-standard active:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-base-border-brand-solid";
 
 /**
  * Returns the user who paid for a transaction, or null when the balances do not show it.

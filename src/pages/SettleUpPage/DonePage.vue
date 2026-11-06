@@ -22,7 +22,7 @@ const groupRoute = { name: "groupDetail", params: { groupId: useRoute().params.g
 
 function handleDone() {
   invoiceStore.reset();
-  routerHistoryStore.restoreSnapshot(groupRoute);
+  routerHistoryStore.restoreSnapshot({ fallback: groupRoute });
 }
 </script>
 

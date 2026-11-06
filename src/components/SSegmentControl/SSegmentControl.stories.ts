@@ -40,7 +40,7 @@ export const Overflow: StoryFn<typeof SSegmentControl> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<div class="w-[343px]"><SSegmentControl v-bind="args" /></div>',
+  template: '<div class="w-85.75"><SSegmentControl v-bind="args" /></div>',
 });
 Overflow.args = {
   items: ["Balances", "Trend", "History", "Members", "Receipts", "Export"],

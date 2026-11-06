@@ -12,6 +12,12 @@ interface RouterHistoryState {
   position?: number;
 }
 
+/** The options of a back or close action. */
+interface BackOptions {
+  /** The page to open when the history has no earlier page of the app. The default is the home page. */
+  fallback?: RouteLocationRaw | undefined;
+}
+
 const getRouterState = () => (history.state ?? {}) as RouterHistoryState;
 
 // vue-router set the position in the history state when navigating, but it doesn't provide a way to access it, so we have to do it ourselves
@@ -29,7 +35,7 @@ export const useRouterHistoryStore = defineStore("routing-history", () => {
    * Opens the earlier page of the app. Without an earlier page, `router.back()` does nothing or leaves the app,
    * so this function replaces the entry with the `fallback` page.
    */
-  const goBack = (fallback: RouteLocationRaw = HOME_ROUTE) => {
+  const goBack = ({ fallback = HOME_ROUTE }: BackOptions = {}) => {
     if (getRouterState().back) {
       router.back();
       return;
@@ -41,7 +47,7 @@ export const useRouterHistoryStore = defineStore("routing-history", () => {
    * Returns to the position of the last snapshot. The snapshots are in memory, so a reload or a link from outside the
    * app leaves none. This function then replaces the entry with the `fallback` page.
    */
-  const restoreSnapshot = (fallback: RouteLocationRaw = HOME_ROUTE) => {
+  const restoreSnapshot = ({ fallback = HOME_ROUTE }: BackOptions = {}) => {
     const snapshotPosition = snapshots.value.pop();
     const stepsToGoBack = snapshotPosition === undefined ? 0 : getPosition() - snapshotPosition;
     if (stepsToGoBack > 0) {
