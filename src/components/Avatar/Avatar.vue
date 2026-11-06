@@ -121,8 +121,8 @@ function onImageError(src: string) {
 }
 
 /*
- * The initial is 45% of the side of its tile, and 10px at the smallest. In a group, the corner of the frame is the corner
- * of a tile plus the padding, so the two curves stay parallel.
+ * The `icon-*` size of the initial follows the side of its tile. In a group, the corner of the frame is the corner of a
+ * tile plus the padding, so the two curves stay parallel.
  */
 .img-container.xxs {
   @apply h-5 w-5 rounded-md;
@@ -131,7 +131,7 @@ function onImageError(src: string) {
     @apply h-5 w-5 rounded-md icon-2.5;
   }
 
-  /* No caller uses this grid, and a 4px tile has no room for an initial. */
+  /* No caller uses this grid, and its tiles have no room for an initial. */
   .image-count-multiple {
     @apply h-1 w-1 rounded-sm icon-0;
   }
