@@ -6,7 +6,8 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    ".claude/hooks/*.ts"
+    ".claude/hooks/*.ts",
+    "src/components/component-index.ts"
   ],
   "compilerOptions": {
     "composite": true,

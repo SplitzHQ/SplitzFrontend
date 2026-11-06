@@ -19,4 +19,10 @@ home-button-record-expense = 记一笔
 home-button-create-group = 创建群组
 home-create-group-hint = 新建群组，和朋友分摊日常支出
 home-filter = 筛选
-
+home-no-expenses = 还没有支出
+home-sort-title = 排序方式
+home-sort-button = 排序方式：{ $sort }
+home-sort-recent = 最近活动
+home-sort-unsettled = 未结清优先
+home-sort-amount = 金额最大
+home-sort-name = 名称

@@ -5,6 +5,16 @@
 
 @config "../../tailwind.config.js";
 
+/*
+ * The duration and curve of each Tailwind `transition*` utility with no `duration-*` or `ease-*` class. This includes the
+ * color transition that this file gives to every element. These defaults point to the motion tokens, so slow motion and
+ * reduced motion change them too.
+ */
+@theme {
+  --default-transition-duration: var(--motion-duration-feedback);
+  --default-transition-timing-function: var(--motion-easing-standard);
+}
+
 @utility skeleton {
   @apply animate-pulse rounded-md bg-base-bg-secondary;
   /* This is 2s, the default of `animate-pulse`. The loop token is 0 with reduced motion, so the pulse stops. */
@@ -86,6 +96,10 @@
     @apply bg-base-bg-primary;
   }
 
+  /*
+   * Each color change on each element fades by default. The duration and curve come from the motion tokens: see the
+   * `@theme` block at the top of this file. This rule does not cover `box-shadow`, so a ring changes at once.
+   */
   * {
     @apply transition-colors;
   }

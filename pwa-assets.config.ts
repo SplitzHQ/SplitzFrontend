@@ -1,7 +1,7 @@
 import { defineConfig, minimal2023Preset } from "@vite-pwa/assets-generator/config";
 
-/** The plate color of `public/favicon.svg`. It has the same value as `--core-color-brand-600`. */
-const BRAND_COLOR = "#647C72";
+/** The plate color of `public/favicon.svg`. It has the same value as `--core-color-brand-700`. */
+const BRAND_COLOR = "#4F635A";
 
 /**
  * The options for an icon that the OS masks: the iOS home screen icon and the Android maskable icon.
@@ -16,7 +16,8 @@ const MASKED_ICON = {
 } as const;
 
 /**
- * Makes the PWA icons in `public/` from `public/favicon.svg`. Run `bun run generate-pwa-assets` after a logo change.
+ * Makes the PWA icons in `public/` from `public/favicon.svg`. Run `bun run generate-pwa-assets` after a logo change. The icon
+ * rules are in `src/components/BrandWordmark/brand.usage.ts`.
  *
  * The default `quality` of 60 writes a palette PNG, and this makes noise in the plate and in the alpha channel.
  */

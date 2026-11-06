@@ -13,7 +13,7 @@
 
 - Before any UI change in `src/` or `devtools/`, follow `.agents/skills/spz-component-use/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
 
-- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file.
+- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file and an entry in `src/components/component-index.ts`.
 
 - Use tailwindcss classes for styling. Use scss for custom styles only when using tailwindcss makes it too complex or impossible.
 
@@ -22,6 +22,8 @@
 - When you need components, check shadcn-vue online.
 
 - Use flex gap (preferred) / grid gap instead of margin for spacing between elements.
+
+- Do not put a table in a card. This rule applies in `src/` and in `devtools/`, prototypes too. A table must not have a rounded frame with a border, a tinted header row, or a band of color behind the header. These parts give the generic AI look. Put the table on the page: a line under the header, a line between rows, and no outer padding on the first and the last column. In `devtools/`, use `DocTable` and the `ds-table` rule. Do not make a table frame by hand.
 
 - Add animations where appropriate. Check `ui-animation` skill.
 

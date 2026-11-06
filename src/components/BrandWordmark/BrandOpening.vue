@@ -25,7 +25,7 @@ import BrandMotionGlyph from "./BrandMotionGlyph.vue";
  */
 
 /** The token that has the same value as `BRAND_COLOR`. */
-const PLATE_COLOR_TOKEN = "--core-color-brand-600";
+const PLATE_COLOR_TOKEN = "--core-color-brand-700";
 
 const showing = shallowRef(claimOpening() && !prefersReducedMotion());
 /** True from the start of the fade. See the template. */

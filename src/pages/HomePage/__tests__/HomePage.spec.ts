@@ -1,7 +1,10 @@
-import { mount, RouterLinkStub } from "@vue/test-utils";
+import { flushPromises, mount, RouterLinkStub } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
+
+import { useRouterHistoryStore } from "@/stores/routing-history";
+import { useUserStore } from "@/stores/user";
 
 import HomePage from "../HomePage.vue";
 
@@ -13,6 +16,8 @@ const NEW_USER_TITLE = "home-empty-state-title";
 const NO_RESULTS_CLEAR = '[data-testid="home-no-results-clear"]';
 const LOAD_ERROR = '[data-testid="home-load-error"]';
 const SKELETON = '[data-testid="home-groups-skeleton"]';
+const SORT_BUTTON = '[data-testid="home-sort"]';
+const TOTAL_BALANCE = '[data-testid="home-total-balance"]';
 
 vi.mock("@pinia/colada", () => ({
   useQuery: () => ({ asyncStatus: groupsAsyncStatus, refetch: refetchGroups, state: groupsState }),
@@ -30,12 +35,32 @@ vi.mock(import("vue-router"), async (importOriginal) => ({
 }));
 
 vi.mock("@/libs/status-bar-color", () => ({
+  useStatusBarDim: vi.fn(),
   useStatusBarTopColor: vi.fn(),
 }));
 
 /** Makes one group that has the fields the home page reads. */
-function makeGroup(name: string) {
-  return { balances: [], groupId: name, lastActivityTime: new Date(0), members: [], name, photo: null };
+function makeGroup(name: string, hoursAgo = 0) {
+  return {
+    balances: [] as { balance: string; currency: string; user: { id: string } }[],
+    groupId: name,
+    lastActivityTime: new Date(Date.UTC(2026, 0, 1) - hoursAgo * 3_600_000),
+    members: [],
+    name,
+    photo: null,
+    transactionCount: 1,
+  };
+}
+
+/** Makes a balance row of the user "me". */
+const myBalance = (amount: string, currency: string) => ({ balance: amount, currency, user: { id: "me" } });
+
+/** Returns the names of the group rows, in the order of the page. */
+function rowNames(wrapper: ReturnType<typeof mountPage>, names: string[]) {
+  return wrapper
+    .findAll("li")
+    .map((row) => names.find((name) => row.text().includes(name)))
+    .filter(Boolean);
 }
 
 /** Mounts the page without the header parts, which need the backend. Each slot of Layout renders. */
@@ -54,6 +79,140 @@ function mountPage() {
   });
 }
 
+describe("HomePage rows", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    localStorage.clear();
+  });
+
+  it("reloads the total balance when the groups refetch, and not on the first answer", async () => {
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "success" };
+    const fetchUserInfo = vi.spyOn(useUserStore(), "fetchUserInfo").mockResolvedValue(undefined);
+    mountPage();
+
+    expect(fetchUserInfo).not.toHaveBeenCalled();
+
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "success" };
+    await nextTick();
+
+    expect(fetchUserInfo).toHaveBeenCalledOnce();
+  });
+
+  it("makes each group row a link to the group", () => {
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "success" };
+    const wrapper = mountPage();
+
+    const row = wrapper.findAllComponents(RouterLinkStub).find((link) => link.text().includes("Paris trip"));
+
+    expect(row?.props("to")).toEqual({ name: "groupDetail", params: { groupId: "Paris trip" } });
+  });
+
+  it("makes the Create group row a link that keeps the place to return to", async () => {
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "success" };
+    const wrapper = mountPage();
+    const snapshot = vi.spyOn(useRouterHistoryStore(), "takeSnapshot").mockImplementation(() => undefined);
+
+    const row = wrapper.get('[data-testid="home-create-group"]');
+    await row.trigger("click");
+
+    const links = wrapper.findAllComponents(RouterLinkStub);
+    expect(links[links.length - 1]?.props("to")).toEqual({ name: "createGroup" });
+    expect(snapshot).toHaveBeenCalledOnce();
+  });
+
+  it("puts the owed and the owing amounts of a group on two lines, each with its own label", () => {
+    const userStore = useUserStore();
+    userStore.user = { id: "me" } as never;
+    groupsState.value = {
+      data: [
+        {
+          ...makeGroup("Ski trip"),
+          balances: [myBalance("1250", "USD"), myBalance("-34000", "JPY"), myBalance("-12", "EUR")],
+        },
+      ],
+      status: "success",
+    };
+    const wrapper = mountPage();
+
+    const row = wrapper.findAllComponents(RouterLinkStub).find((link) => link.text().includes("Ski trip"))!;
+    const lines = row.findAll("p").filter((line) => /home-you-(lent|owe)/.test(line.text()));
+
+    expect(lines.map((line) => line.findAll("span")[0]?.text())).toEqual(["home-you-lent", "home-you-owe"]);
+    expect(lines[1]?.findAll(".text-base-text-error")).toHaveLength(2);
+  });
+
+  it("says No expenses for a group with no expenses, and All settled up for a 0.00 balance", () => {
+    useUserStore().user = { id: "me" } as never;
+    groupsState.value = {
+      data: [
+        { ...makeGroup("New flat"), transactionCount: 0 },
+        { ...makeGroup("Book club", 1), balances: [myBalance("0.00", "USD")] },
+      ],
+      status: "success",
+    };
+    const wrapper = mountPage();
+
+    const rows = wrapper.findAllComponents(RouterLinkStub);
+    expect(rows.find((row) => row.text().includes("New flat"))?.text()).toContain("home-no-expenses");
+    expect(rows.find((row) => row.text().includes("Book club"))?.text()).toContain("home-all-settled-up");
+  });
+
+  it("shows the total in the most used currency with a sign, and opens the details only for two or more totals", () => {
+    const userStore = useUserStore();
+    userStore.user = {
+      balances: [
+        { balance: "-900", currency: "JPY" },
+        { balance: "20", currency: "EUR" },
+      ],
+      id: "me",
+    } as never;
+    groupsState.value = {
+      data: [
+        { ...makeGroup("Lisbon"), balances: [myBalance("20", "EUR")] },
+        { ...makeGroup("Tokyo", 1), balances: [myBalance("-900", "JPY")] },
+      ],
+      status: "success",
+    };
+    const wrapper = mountPage();
+
+    const total = wrapper.get(TOTAL_BALANCE);
+    expect(total.element.tagName).toBe("BUTTON");
+    expect(total.get(".text-base-text-success").text()).toMatch(/^\+/);
+
+    userStore.user = { balances: [{ balance: "20", currency: "EUR" }], id: "me" } as never;
+    return nextTick().then(() => expect(wrapper.get(TOTAL_BALANCE).element.tagName).toBe("DIV"));
+  });
+
+  it("sorts the rows by the pick of the sort button", async () => {
+    groupsState.value = {
+      data: [makeGroup("Bali", 2), makeGroup("Aaron", 5), makeGroup("Camping", 1)],
+      status: "success",
+    };
+    const wrapper = mountPage();
+    const names = ["Aaron", "Bali", "Camping"];
+
+    expect(rowNames(wrapper, names)).toEqual(["Camping", "Bali", "Aaron"]);
+
+    await wrapper.get(SORT_BUTTON).trigger("click");
+    await flushPromises();
+    // The sheet renders in a portal on the body, so the option is outside the wrapper.
+    document.querySelector<HTMLButtonElement>('[data-sort="name"]')!.click();
+    await flushPromises();
+
+    expect(rowNames(wrapper, names)).toEqual(["Aaron", "Bali", "Camping"]);
+    expect(localStorage.getItem("home-group-sort")).toBe("name");
+  });
+
+  it("uses the sort that this device keeps, and ignores a value that is not a sort", () => {
+    groupsState.value = { data: [makeGroup("Bali", 2), makeGroup("Aaron", 5)], status: "success" };
+    localStorage.setItem("home-group-sort", "name");
+    expect(rowNames(mountPage(), ["Aaron", "Bali"])).toEqual(["Aaron", "Bali"]);
+
+    localStorage.setItem("home-group-sort", "owed");
+    expect(rowNames(mountPage(), ["Aaron", "Bali"])).toEqual(["Bali", "Aaron"]);
+  });
+});
+
 describe("HomePage search states", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -69,7 +228,7 @@ describe("HomePage search states", () => {
     expect(wrapper.get('[role="status"]').text()).toBe("home-no-results-title zzz");
     expect(wrapper.text()).not.toContain(NEW_USER_TITLE);
     expect(wrapper.find('[data-testid="home-create-group"]').exists()).toBe(true);
-    expect(wrapper.text()).not.toContain("home-all-groups");
+    expect(wrapper.find(SORT_BUTTON).exists()).toBe(false);
   });
 
   it("shows the group and no no-result state when the search finds a group", async () => {
@@ -80,7 +239,7 @@ describe("HomePage search states", () => {
 
     expect(wrapper.find(NO_RESULTS_CLEAR).exists()).toBe(false);
     expect(wrapper.text()).toContain("Paris trip");
-    expect(wrapper.text()).toContain("home-all-groups");
+    expect(wrapper.find(SORT_BUTTON).exists()).toBe(true);
   });
 
   it("treats a keyword of only spaces as no search", async () => {

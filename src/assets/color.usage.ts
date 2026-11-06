@@ -311,6 +311,16 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
     pattern: /^comp-palette-(?!avatar-)/,
     use: "Data colors: the main categories and the action tiles on the review page. See `src/components/Category/category.usage.ts`.",
   },
+  row: {
+    avoid: "Do not use it outside `TRANSACTION_ROW_CLASS`.",
+    pattern: /^comp-row-/,
+    use: "The hover and pressed fill of a shared row. It is one step lighter than `base-bg-hover`, so the gray tiles and the amount fills in the row stay clear.",
+  },
+  searchFilter: {
+    avoid: "Do not use it outside the filter button of HomePage.",
+    pattern: /^comp-search-filter-/,
+    use: "The translucent brand fill of the filter button in the home search field. A translucent fill stays visible in both themes.",
+  },
   segment: {
     avoid: "Do not use it outside SSegmentControl.",
     pattern: /^comp-segment-/,

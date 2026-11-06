@@ -22,9 +22,9 @@ const ROWS = [
     </div>
 
     <div class="flex flex-col">
-      <div v-for="(row, index) in ROWS" :key="index" class="flex items-center gap-3 py-2">
-        <div class="size-16 shrink-0 skeleton rounded-2xl" />
-        <div class="flex min-w-0 flex-1 flex-col gap-1">
+      <div v-for="(row, index) in ROWS" :key="index" class="flex items-center gap-3 py-3">
+        <div class="size-12 shrink-0 skeleton rounded-xl" />
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <div class="flex h-6 items-center">
             <div :class="['h-4 skeleton', row.name]" />
           </div>

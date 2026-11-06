@@ -132,6 +132,12 @@ const router = createRouter({
       path: "/group/:groupId/settle-up/done",
     },
   ],
+  /*
+   * The page change of App.vue restores the scroll position when its motion ends (see `src/libs/page-transition.ts`).
+   * This option returns false, so the router does not scroll by itself. It still turns on the manual scroll restoration
+   * of the router, and the router then saves the scroll position of each history entry.
+   */
+  scrollBehavior: () => false,
 });
 
 router.beforeEach((to, from, next) => {

@@ -112,6 +112,29 @@ describe("Avatar", () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
+  it("puts two people on a diagonal of the grid", () => {
+    const wrapper = mountAvatar([
+      { alt: "Alex", src: "/alex.png" },
+      { alt: "Bo", src: null },
+    ]);
+
+    const grid = wrapper.get("[data-pair]");
+    const [first, second] = grid.element.children;
+    expect(grid.classes()).toContain("grid");
+    expect(first.className).not.toContain("col-start-2");
+    expect(second.className).toContain("col-start-2");
+    expect(second.className).toContain("row-start-2");
+  });
+
+  it.each([1, 3, 4])("keeps the centered rows for %i people", (count) => {
+    const images = ["A", "B", "C", "D"].slice(0, count).map((alt) => ({ alt, src: null }));
+
+    const wrapper = mountAvatar(images);
+
+    expect(wrapper.find("[data-pair]").exists()).toBe(false);
+    expect(wrapper.html()).not.toContain("col-start-2");
+  });
+
   it("passes aria-hidden to the root, for an avatar next to a visible name", () => {
     const wrapper = mount(Avatar, {
       attrs: { "aria-hidden": "true" },

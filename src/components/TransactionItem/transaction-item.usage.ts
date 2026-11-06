@@ -44,8 +44,12 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Focus ring",
   },
   {
-    rule: "`TRANSACTION_ROW_CLASS` has `-mx-2 px-2`. The pressed fill (`base-bg-secondary_hover`) extends 8px past the content on each side, and the content stays in its place. The parent must have 8px of free space on each side. Do not add `w-full`, because the row then does not extend on the right. Put the row in a flex column, which stretches it. A scroll area cuts the fill, so give the scroll area `-mx-2 px-2`.",
-    title: "Pressed fill",
+    rule: "`TRANSACTION_ROW_CLASS` has `-mx-2 px-2`. The hover and pressed fill (`comp-row-bg-hover` and `comp-row-bg-pressed`, one step lighter than `base-bg-hover`) extends 8px past the content on each side, and the content stays in its place. A press also makes the row 2% smaller with the timing of the SSegmentControl press, except under reduced motion. The user picked this look in the prototype `2026-11-05-home-motion`. The parent must have 8px of free space on each side. Do not add `w-full`, because the row then does not extend on the right. Put the row in a flex column or a block element, which stretches it. A scroll area cuts the fill, so give the scroll area `-mx-2 px-2`.",
+    title: "Hover and pressed fill",
+  },
+  {
+    rule: "A group row and the Create group row on HomePage use `TRANSACTION_ROW_CLASS` with their own content, so all rows react in the same way.",
+    title: "Other rows",
   },
   {
     rule: "Put a date label or a section title above a group of rows, with `flex flex-col gap-1`. TransactionList and InvoiceDetailPage do this.",
@@ -92,8 +96,8 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Focus ring",
   },
   {
-    text: "The row has no hover color, so a tap on a phone cannot leave a stuck color. The press color uses the motion tokens and changes at once when the system asks for reduced motion.",
-    title: "Press and reduced motion",
+    text: "The hover fill uses the Tailwind `hover:` variant, which applies only on a device that can hover, so a tap on a phone cannot leave a stuck color. Do not write the hover fill in another way. The fill uses the motion tokens and changes at once when the system asks for reduced motion.",
+    title: "Hover, press and reduced motion",
   },
   {
     text: "A row in a button must give its state to a screen reader. SelectableTransactionItem uses `aria-pressed`, and its check marks have `aria-hidden`.",
