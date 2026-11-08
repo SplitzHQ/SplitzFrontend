@@ -127,8 +127,10 @@ export default defineConfig({
           },
         ],
       },
+      // The dev server makes no service worker. With one, each server start gave `index.html` a random revision, so
+      // the app showed the new-version toast on almost each open. To test the PWA, build and run `vite preview`.
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
     }),
     // define messages in SFCs

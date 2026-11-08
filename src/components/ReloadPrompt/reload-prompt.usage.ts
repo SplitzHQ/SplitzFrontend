@@ -25,6 +25,10 @@ export const BEHAVIOR_NOTES: UsageRule[] = [
     title: "Ready for offline use",
   },
   { rule: "The service worker checks for a new version each hour. The timer stops on unmount.", title: "Update check" },
+  {
+    rule: "The dev server makes no service worker, so the prompt does not show in dev. In dev, the component removes the service worker of an old dev server. To test the prompt, build the app and run `vite preview`.",
+    title: "Dev server",
+  },
 ];
 
 /**

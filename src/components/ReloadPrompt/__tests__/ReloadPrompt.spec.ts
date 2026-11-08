@@ -10,6 +10,11 @@ const mocks = vi.hoisted(() => ({
   updateServiceWorker: vi.fn(),
 }));
 
+/** A fake service worker registration with one active worker. */
+function registration(scriptURL: string) {
+  return { active: { scriptURL }, installing: null, unregister: vi.fn(() => Promise.resolve(true)), waiting: null };
+}
+
 const needRefresh = ref(false);
 const offlineReady = ref(false);
 
@@ -64,6 +69,23 @@ describe("ReloadPrompt", () => {
     await nextTick();
 
     expect(mocks.toast.success).not.toHaveBeenCalled();
+  });
+
+  it("removes the service worker of an old dev server and keeps other workers", async () => {
+    const devWorker = registration("http://localhost:5173/dev-sw.js?dev-sw");
+    const otherWorker = registration("http://localhost:5173/sw.js");
+    Object.defineProperty(navigator, "serviceWorker", {
+      configurable: true,
+      value: { getRegistrations: () => Promise.resolve([devWorker, otherWorker]) },
+    });
+
+    try {
+      mount(ReloadPrompt);
+      await vi.waitFor(() => expect(devWorker.unregister).toHaveBeenCalledTimes(1));
+      expect(otherWorker.unregister).not.toHaveBeenCalled();
+    } finally {
+      Reflect.deleteProperty(navigator, "serviceWorker");
+    }
   });
 
   it("checks for a new version each hour and stops after unmount", () => {

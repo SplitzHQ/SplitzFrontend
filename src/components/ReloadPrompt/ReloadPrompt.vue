@@ -13,6 +13,24 @@ import { toast } from "vue-sonner";
 
 /** The time between two checks for a new version. */
 const UPDATE_CHECK_MS = 60 * 60 * 1000;
+/** The script path of the service worker that the dev server registered before `devOptions` was off. */
+const DEV_SW_PATH = "/dev-sw.js";
+
+/**
+ * Removes the service worker of an old dev server. The dev server does not make one now, but the browser keeps the old
+ * one. That worker can serve an old `index.html` from its cache. A production build does not include this code.
+ */
+async function removeDevServiceWorker(): Promise<void> {
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  const devRegistrations = registrations.filter((registration) =>
+    [registration.installing, registration.waiting, registration.active].some(
+      (worker) => worker && new URL(worker.scriptURL).pathname === DEV_SW_PATH
+    )
+  );
+  await Promise.all(devRegistrations.map((registration) => registration.unregister()));
+}
+
+if (import.meta.env.DEV && "serviceWorker" in navigator) void removeDevServiceWorker();
 
 const { $t } = useFluent();
 
