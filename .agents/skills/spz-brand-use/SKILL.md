@@ -1,6 +1,6 @@
 ---
 name: spz-brand-use
-description: Read the Splitz brand rules before you change the logo, the glyph, an app icon, a brand color, the logo motion or a brand pattern. Use this skill for every change to `src/components/BrandWordmark/`, `public/favicon.svg`, the PNG and ICO icons in `public/`, `pwa-assets.config.ts` or the brand tokens in `src/assets/`. Also use it when a page starts to show the logo or a pattern, and when you add a splash screen, a store image or another surface with the brand. Use it even when the change looks small.
+description: Read the Splitz brand rules before you change the logo, the glyph, an app icon, a brand color, the logo motion or a brand pattern. Use this skill for every change to `src/components/BrandWordmark/`, `public/favicon.svg`, `public/app-icon-masked.svg`, the PNG and ICO icons in `public/`, the `pwa-assets*.config.ts` files or the brand tokens in `src/assets/`. Also use it when a page starts to show the logo or a pattern, and when you add a splash screen, a store image or another surface with the brand. Use it even when the change looks small.
 ---
 
 # Brand use
@@ -24,7 +24,7 @@ The rules for the logo components are in `src/components/BrandWordmark/brand-wor
 | Show the logo on a page       | Use `BrandWordmark` with a size from `SIZE_GUIDE`. Keep the clear space and the minimum size. Do not write the name as text in place of the logo.                                                              |
 | Change the shape of the glyph | Change `brand-glyph.ts`, the numbers in `brand-motion.ts` and `public/favicon.svg` together. Then run `bun run generate-pwa-assets`. The full list is in `GLYPH_RULES`.                                         |
 | Change a brand color          | Change all files in the "Change a value" rule of `COLOR_RULES` together. Then generate the icons again.                                                                                                        |
-| Change an app icon            | Change only `public/favicon.svg`, then run `bun run generate-pwa-assets`. Keep the glyph in the maskable safe zone. Tell the user to check the icon on a phone, because iOS keeps an icon that a person added. |
+| Change an app icon            | Change only `public/favicon.svg` and `public/app-icon-masked.svg`, together. Then run `bun run generate-pwa-assets`. Keep the depth in `ICON_RULES`. Keep the glyph in the maskable safe zone. Tell the user to check the icon on a phone, because iOS keeps an icon that a person added. |
 | Show a brand pattern          | Read `PATTERN_USE_GUIDE` and `PATTERN_RULES`. Pick the use that fits the surface and start from its preset. Make the pattern in the Patterns tool of the dev tools, which shows each use on a sample screen. If no use fits, ask the user. |
 | Change the logo motion        | Change `brand-motion.ts`. The opening and the two taps use one small motion, so change them together. Keep the principles in `MOTION_RULES`.                                                                   |
 

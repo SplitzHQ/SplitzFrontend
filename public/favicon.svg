@@ -1,8 +1,55 @@
 <svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="600" height="600" rx="150" fill="#4F635A"/>
-  <g fill="#F2F5F3">
-    <circle cx="200" cy="200" r="50"/>
-    <path d="M400 150L450 200L200 450L150 400Z"/>
-    <path d="M393.1 336.2L450 393.1L393.1 450L336.2 393.1Z"/>
+  <!-- The depth is look E of devtools/prototypes/2026-11-05-icon-depth. The rules are in src/components/BrandWordmark/brand.usage.ts. -->
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#566E63"/>
+      <stop offset="1" stop-color="#455950"/>
+    </linearGradient>
+    <linearGradient id="plate-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="0.4" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.75" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.132"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="300" cy="40" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.096"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glyph-fill" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="450">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F2F5F3" stop-opacity="0.82"/>
+    </linearGradient>
+    <linearGradient id="glyph-rim" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="450">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="11.6"/>
+      <feOffset dy="8.8" result="blur"/>
+      <feFlood flood-color="#16201B" flood-opacity="0.11"/>
+      <feComposite in2="blur" operator="in"/>
+    </filter>
+    <g id="glyph">
+      <circle cx="200" cy="200" r="50"/>
+      <path d="M400 150L450 200L200 450L150 400Z"/>
+      <path d="M393.1 336.2L450 393.1L393.1 450L336.2 393.1Z"/>
+    </g>
+    <clipPath id="glyph-clip">
+      <use href="#glyph"/>
+    </clipPath>
+    <clipPath id="plate-clip">
+      <rect width="600" height="600" rx="150"/>
+    </clipPath>
+  </defs>
+  <rect width="600" height="600" rx="150" fill="url(#plate)"/>
+  <g clip-path="url(#plate-clip)">
+    <rect width="600" height="600" fill="url(#sheen)"/>
+    <!-- The clip hides the outer half of the stroke. -->
+    <rect width="600" height="600" rx="150" stroke="url(#plate-rim)" stroke-width="16"/>
+  </g>
+  <use href="#glyph" fill="#000000" filter="url(#shadow)"/>
+  <use href="#glyph" fill="url(#glyph-fill)"/>
+  <g clip-path="url(#glyph-clip)">
+    <use href="#glyph" stroke="url(#glyph-rim)" stroke-width="12"/>
   </g>
 </svg>
