@@ -69,7 +69,6 @@ function mountPage() {
     global: {
       stubs: {
         AvatarMenu: true,
-        BrandOpening: true,
         BrandTapLogo: true,
         Layout: { template: "<div><slot name='header' /><slot /></div>" },
         NotificationBell: true,

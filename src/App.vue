@@ -3,6 +3,7 @@ import { watch } from "vue";
 import { RouterView, useRouter } from "vue-router";
 import "vue-sonner/style.css";
 
+import BrandOpening from "@/components/BrandWordmark/BrandOpening.vue";
 import ReloadPrompt from "@/components/ReloadPrompt/ReloadPrompt.vue";
 import Sonner from "@/components/Sonner/Sonner.vue";
 import { DebugPanel } from "@/libs/devtools";
@@ -57,6 +58,8 @@ watch(
       </div>
     </Transition>
   </RouterView>
+  <!-- The opening plays over the first page of each cold start, whatever that page is. See `brand-wordmark.usage.ts`. -->
+  <BrandOpening />
   <Sonner position="top-center" :offset="toastOffset" :mobile-offset="toastMobileOffset" />
   <ReloadPrompt />
   <component :is="DebugPanel" v-if="DebugPanel" />

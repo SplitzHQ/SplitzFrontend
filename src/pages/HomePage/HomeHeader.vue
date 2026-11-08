@@ -13,7 +13,6 @@ import {
 } from "vue";
 
 import BrandHomeLogo from "@/components/BrandWordmark/BrandHomeLogo.vue";
-import BrandOpening from "@/components/BrandWordmark/BrandOpening.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
@@ -363,7 +362,6 @@ function openSearch(): void {
         </span>
       </div>
 
-      <BrandOpening />
       <h1><BrandHomeLogo ref="logo" /></h1>
       <!-- The copy of the field goes under the bell and the avatar. -->
       <div class="relative z-20 flex items-center gap-1">

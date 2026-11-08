@@ -35,7 +35,7 @@ export const COMPONENT_RULES = {
   BrandHomeLogo:
     "The header of HomePage only. It is `BrandTapLogo`, and `scrub()` changes it to the 18px glyph with the progress of the header collapse. The parent calls `scrub()`, so the logo moves with the search field.",
   BrandOpening:
-    "HomePage only. It covers the screen once for each run of the app. Put it in one page, because the first page that mounts it uses the only play.",
+    "`App.vue` only. It covers the screen once for each run of the app, over the first page of that run: HomePage, the sign-in page or a page from a link. The opening belongs to the start of the app, not to a page. Do not put it in a page, because a cold start on another page then has no opening. The user decided this on 2026-11-07, when a cold start on the sign-in page showed no opening.",
   BrandTapLogo: "Inside `BrandHomeLogo` only. It is `BrandWordmark` with the tap motion.",
   BrandTapMark:
     "AuthShell only. It rests as the glyph alone. A tap plays the small motion, shows the whole word next to the mark, and goes back to the glyph. The user asked for this after the prototype `2026-11-04-sign-in-flow`.",
