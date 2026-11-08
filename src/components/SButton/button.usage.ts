@@ -214,6 +214,10 @@ export const GROUP_RULES: UsageRule[] = [
   { rule: "In a row, put the main action on the right.", title: "Row" },
   { rule: "All buttons in a group use the same size.", title: "One size" },
   {
+    rule: "HomePage hides its floating button while the person has no groups. The empty state then has the only primary of the screen. The user picked this in the prototype `2026-11-05-home-empty-state`.",
+    title: "Home floating button",
+  },
+  {
     rule: "A group uses secondary or outline, not both.",
     title: "One language",
   },
@@ -375,5 +379,5 @@ export const ACCESSIBILITY_NOTES = [
  */
 export const OPEN_QUESTIONS = [
   "Can secondary replace outline on some tinted surfaces? The translucent fill of secondary has a contrast of 1.19 or more on core-alpha-brand-10, base-bg-brand and base-bg-secondary in both themes. The user will decide later. Keep the surface rule and the current buttons until then.",
-  "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. HomePage shows a floating button and a primary in the empty state, and both start the same action. The user will decide later. Do not change these buttons until then.",
+  "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. The user will decide later. Do not change these buttons until then. HomePage has its answer: see the rule Home floating button.",
 ];

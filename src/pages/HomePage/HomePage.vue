@@ -105,6 +105,8 @@ const hasGroups = computed(() => groups.value.length > 0);
 const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
+/** The empty state offers Record new expense only with a friend, because the next page lists only groups and friends. */
+const hasFriends = computed(() => (userStore.user?.friends?.length ?? 0) > 0);
 // A failed refresh keeps the old data, so the list stays and the page shows no error.
 const showErrorState = computed(() => groupsQuery.value.status === "error" && !hasGroups.value);
 const isRetrying = computed(() => showErrorState.value && groupsAsyncStatus.value === "loading");
@@ -184,17 +186,29 @@ const userBalances = computed(() => {
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs">
-        <!-- Floating Action Button -->
-        <SIconButton
-          variant="primary"
-          size="xl"
-          class="fixed right-safe-5 bottom-safe-12 z-10"
-          :aria-label="$t('home-button-record-expense')"
-          @click="addExpense"
+      <div v-bind="layoutAttrs" class="flex flex-col">
+        <!--
+          The floating button records an expense. A person with no groups does not get it: the empty state has its own
+          main button, and with no friends the next page has nobody to pick. The button shows during the first load, so
+          it does not appear late for a person who has groups. It fades out when the load finds no group.
+        -->
+        <Transition
+          enter-active-class="transition-opacity duration-state ease-enter"
+          enter-from-class="opacity-0"
+          leave-active-class="transition-opacity duration-exit ease-exit"
+          leave-to-class="opacity-0"
         >
-          <PhPlus />
-        </SIconButton>
+          <SIconButton
+            v-if="!showEmptyState"
+            variant="primary"
+            size="xl"
+            class="fixed right-safe-5 bottom-safe-12 z-10"
+            :aria-label="$t('home-button-record-expense')"
+            @click="addExpense"
+          >
+            <PhPlus />
+          </SIconButton>
+        </Transition>
 
         <!-- This element stays in the page, so a screen reader reads the result when the text changes. -->
         <p role="status" class="sr-only">
@@ -202,8 +216,11 @@ const userBalances = computed(() => {
         </p>
         <p role="status" class="sr-only">{{ announcement }}</p>
 
-        <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
-        <div ref="content" tabindex="-1" class="outline-none">
+        <!--
+          A successful retry removes the button that had the focus, so the focus moves to this block. The block grows to
+          the bottom of the page, so the empty state can place its content in the free space.
+        -->
+        <div ref="content" tabindex="-1" class="flex grow flex-col outline-none">
           <Transition v-bind="CONTENT_FADE_IN">
             <!--
               The bottom space keeps the last row above the plus button. 16px above the total and 12px under it: the
@@ -317,10 +334,12 @@ const userBalances = computed(() => {
               </TransitionGroup>
             </div>
 
-            <!-- Transition needs one root element, and HomeEmptyState has two. -->
-            <div v-else-if="showEmptyState">
-              <HomeEmptyState @add-expense="addExpense" @create-group="createGroup" />
-            </div>
+            <HomeEmptyState
+              v-else-if="showEmptyState"
+              :has-friends="hasFriends"
+              @add-expense="addExpense"
+              @create-group="createGroup"
+            />
 
             <HomeGroupsSkeleton v-else-if="showLoadingState" />
 
