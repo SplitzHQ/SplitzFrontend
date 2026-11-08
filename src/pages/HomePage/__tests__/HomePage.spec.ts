@@ -69,7 +69,6 @@ function mountPage() {
     global: {
       stubs: {
         AvatarMenu: true,
-        BrandOpening: true,
         BrandTapLogo: true,
         Layout: { template: "<div><slot name='header' /><slot /></div>" },
         NotificationBell: true,
@@ -274,6 +273,53 @@ describe("HomePage search states", () => {
 
     expect(wrapper.text()).toContain(NEW_USER_TITLE);
     expect(wrapper.find(NO_RESULTS_CLEAR).exists()).toBe(false);
+  });
+});
+
+/** Returns the labels of the buttons in the main content, from top to bottom, without the floating button. */
+function contentButtons(wrapper: ReturnType<typeof mountPage>) {
+  return wrapper
+    .findAll("button")
+    .filter((button) => !button.classes("fixed") && button.text().startsWith("home-button"))
+    .map((button) => button.text());
+}
+
+describe("HomePage empty state", () => {
+  const FLOATING_BUTTON = 'button.fixed[aria-label="home-button-record-expense"]';
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    groupsAsyncStatus.value = "idle";
+  });
+
+  it("offers only Create group, with no floating button, to a person with no groups and no friends", () => {
+    groupsState.value = { data: [], status: "success" };
+    useUserStore().user = { friends: [], id: "me" } as never;
+    const wrapper = mountPage();
+
+    expect(contentButtons(wrapper)).toEqual(["home-button-create-group"]);
+    expect(wrapper.find(FLOATING_BUTTON).exists()).toBe(false);
+  });
+
+  it("puts Create group above Record new expense when the person has a friend", () => {
+    groupsState.value = { data: [], status: "success" };
+    useUserStore().user = { friends: [{ friendUser: { id: "f1" } }], id: "me" } as never;
+    const wrapper = mountPage();
+
+    expect(contentButtons(wrapper)).toEqual(["home-button-create-group", "home-button-record-expense"]);
+    expect(wrapper.find(FLOATING_BUTTON).exists()).toBe(false);
+  });
+
+  it("keeps the floating button while the groups load and when the person has groups", async () => {
+    groupsState.value = { data: undefined, status: "pending" };
+    const wrapper = mountPage();
+
+    expect(wrapper.find(FLOATING_BUTTON).exists()).toBe(true);
+
+    groupsState.value = { data: [makeGroup("Paris trip")], status: "success" };
+    await nextTick();
+
+    expect(wrapper.find(FLOATING_BUTTON).exists()).toBe(true);
   });
 });
 

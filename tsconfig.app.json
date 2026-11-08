@@ -9,5 +9,13 @@
       "@/*": ["./src/*"]
     },
     "noImplicitReturns": true
+  },
+  "vueCompilerOptions": {
+    // An attribute that a component does not declare is an error. Without this check, `href` on a component with a
+    // <span> root type-checks and the link does nothing. A component that passes native attributes to its root element
+    // puts `<!-- @fallthroughAttributes true -->` at the top of its file. See `.agents/skills/spz-component-use`.
+    "checkUnknownProps": true,
+    // These attributes are valid on every element, and no component uses them as a prop name. The check skips them.
+    "dataAttributes": ["data-*", "aria-*", "role", "hidden"]
   }
 }

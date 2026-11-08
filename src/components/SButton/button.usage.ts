@@ -214,6 +214,10 @@ export const GROUP_RULES: UsageRule[] = [
   { rule: "In a row, put the main action on the right.", title: "Row" },
   { rule: "All buttons in a group use the same size.", title: "One size" },
   {
+    rule: "HomePage hides its floating button while the person has no groups. The empty state then has the only primary of the screen. The user picked this in the prototype `2026-11-05-home-empty-state`.",
+    title: "Home floating button",
+  },
+  {
     rule: "A group uses secondary or outline, not both.",
     title: "One language",
   },
@@ -268,7 +272,7 @@ export const ICON_RULES: UsageRule[] = [
     title: "Header icons",
   },
   {
-    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
+    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens through `--s-button-ghost-bg` and its `-hover` and `-pressed` forms. Do not put a `bg-*` class on the button: it paints the square root box, not the round button. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
     title: "Search filter",
   },
   {
@@ -375,5 +379,5 @@ export const ACCESSIBILITY_NOTES = [
  */
 export const OPEN_QUESTIONS = [
   "Can secondary replace outline on some tinted surfaces? The translucent fill of secondary has a contrast of 1.19 or more on core-alpha-brand-10, base-bg-brand and base-bg-secondary in both themes. The user will decide later. Keep the surface rule and the current buttons until then.",
-  "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. HomePage shows a floating button and a primary in the empty state, and both start the same action. The user will decide later. Do not change these buttons until then.",
+  "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. The user will decide later. Do not change these buttons until then. HomePage has its answer: see the rule Home floating button.",
 ];

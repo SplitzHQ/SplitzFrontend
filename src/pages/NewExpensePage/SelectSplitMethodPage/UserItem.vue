@@ -62,7 +62,7 @@ const onPlusMinusButtonClick = () => {
       </div>
     </div>
     <div class="shrink-0">
-      <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" is-focused />
+      <SplitDetailInput v-if="isInIncludedMembers" :user-id="userId" />
     </div>
   </div>
 </template>

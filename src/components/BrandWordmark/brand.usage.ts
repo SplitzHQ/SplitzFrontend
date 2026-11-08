@@ -61,7 +61,7 @@ const FORM_RULES: Record<LogoForm, Omit<LogoFormGuide, "form">> = {
   },
   icon: {
     name: "App icon",
-    use: "The glyph in the light color on the plate. Use it only where the system shows the app: the favicon, the home screen, the install dialog and the opening.",
+    use: "The glyph in the light color on the plate. Use it only where the system shows the app: the favicon, the home screen, the install dialog and the opening. The icon files add the depth in `ICON_RULES`. The opening stays flat.",
   },
   wordmark: {
     name: "Word mark",
@@ -113,7 +113,7 @@ export const COLOR_RULES: BrandRule[] = [
     title: "Plate color",
   },
   {
-    rule: `\`${LIGHT_COLOR}\`, the value of \`--core-color-brand-50\`. The glyph on the plate uses it. \`LIGHT_COLOR\` holds it for code. The user compared it with pure white and with white at 80 to 90% in \`2026-11-05-plate-color\`, and kept it.`,
+    rule: `\`${LIGHT_COLOR}\`, the value of \`--core-color-brand-50\`. The glyph on the plate uses it. \`LIGHT_COLOR\` holds it for code. In the icon files, the glyph goes from white at the top to this color at the bottom. The user compared it with pure white and with white at 80 to 90% in \`2026-11-05-plate-color\`, and kept it.`,
     title: "Light color",
   },
   {
@@ -121,7 +121,7 @@ export const COLOR_RULES: BrandRule[] = [
     title: "Logo color",
   },
   {
-    rule: "If a brand value changes, change these files together: the token in `src/assets`, `brand-glyph.ts`, `PLATE_COLOR_TOKEN` in `BrandOpening.vue`, `pwa-assets.config.ts`, `public/favicon.svg` and the `mask-icon` color in `index.html`. Then run `bun run generate-pwa-assets`.",
+    rule: "If a brand value changes, change these files together: the token in `src/assets`, `brand-glyph.ts`, `PLATE_COLOR_TOKEN` in `BrandOpening.vue`, `public/favicon.svg`, `public/app-icon-masked.svg` and the `mask-icon` color in `index.html`. The two SVG files also hold the stops of the plate gradient: make them again from the new color with `plateStops` in the prototype `2026-11-05-icon-depth`. Then run `bun run generate-pwa-assets`.",
     title: "Change a value",
   },
 ];
@@ -163,7 +163,10 @@ const MISUSE_RULES: Record<Misuse, Omit<MisuseGuide, "misuse">> = {
     rule: "The tip of the diamond goes above the box of the word. Do not put a clip or a hidden overflow around the logo.",
     title: "Do not cut the diamond",
   },
-  effect: { rule: "No shadow, outline, gradient, blur or pattern.", title: "Do not add effects" },
+  effect: {
+    rule: "No shadow, outline, gradient, blur or pattern. The only exception is the depth of the app icon files in `ICON_RULES`. Do not add more effects to them.",
+    title: "Do not add effects",
+  },
   lockup: {
     rule: "The glyph and the word show together only during the tap motion and during the collapse of the HomePage header. Do not make a fixed logo from the two.",
     title: "Do not put the glyph next to the word",
@@ -204,7 +207,7 @@ export const GLYPH_RULES: BrandRule[] = [
     title: "Motion numbers",
   },
   {
-    rule: "`public/favicon.svg` draws the same shape. If you change the numbers in `brand-glyph.ts`, change this file and generate the icons again.",
+    rule: "`public/favicon.svg` and `public/app-icon-masked.svg` draw the same shape. If you change the numbers in `brand-glyph.ts`, change these files and generate the icons again.",
     title: "Icons",
   },
 ];
@@ -219,13 +222,22 @@ export interface IconFile {
   use: string;
 }
 
-/** The icon files. `bun run generate-pwa-assets` makes all of them, except the SVG, from `public/favicon.svg`. */
+/**
+ * The icon files. `bun run generate-pwa-assets` makes the PNG and ICO files from the two SVG files: the clear icons from
+ * `public/favicon.svg` and the masked icons from `public/app-icon-masked.svg`.
+ */
 export const ICON_FILES: IconFile[] = [
   {
     masked: false,
     path: "public/favicon.svg",
     px: 600,
-    use: "The source of the other icons, and the favicon of new browsers.",
+    use: "The source of the clear icons, and the favicon of new browsers.",
+  },
+  {
+    masked: true,
+    path: "public/app-icon-masked.svg",
+    px: 600,
+    use: "The source of the masked icons. No page shows it.",
   },
   { masked: false, path: "public/favicon.ico", px: 48, use: "The favicon of old browsers." },
   { masked: false, path: "public/pwa-64x64.png", px: 64, use: "The small icon of the installed app." },
@@ -251,12 +263,16 @@ export const MASKABLE_SAFE_ZONE = 0.8;
 /** The rules for the app icons. */
 export const ICON_RULES: BrandRule[] = [
   {
-    rule: "Do not edit a PNG or the ICO by hand. Change `public/favicon.svg`, then run `bun run generate-pwa-assets`. The options are in `pwa-assets.config.ts`.",
+    rule: "Do not edit a PNG or the ICO by hand. Change `public/favicon.svg` and `public/app-icon-masked.svg` together, then run `bun run generate-pwa-assets`. The options are in `pwa-assets.config.ts` and `pwa-assets-masked.config.ts`.",
     title: "Generate the files",
   },
   {
-    rule: "The apple and maskable icons are opaque squares with no margin. The system cuts the shape, so the file has no corner radius of its own, and the plate color fills the corners.",
+    rule: "The apple and maskable icons are opaque squares with no margin. The system cuts the shape, so their source `public/app-icon-masked.svg` has no corner radius of its own. Its rim and sheen follow the iOS cut, a radius of about 134 on the 600 grid. Android masks cut away most of the rim.",
     title: "Masked icons",
+  },
+  {
+    rule: "The icon files draw look E of the prototype `2026-11-05-icon-depth`, with these strengths: gradient 0.5, shadow 0.2 and highlight 0.6. The plate goes from a lighter top to a darker bottom and has a light rim and a soft sheen at the top. The glyph goes from white to the light color, has a thin light edge at the top and casts a soft shadow. A Home Screen web app gives iOS one PNG, so the system adds no depth of its own. All effects are plain SVG, so the icon generator can draw them.",
+    title: "Depth",
   },
   {
     rule: "The farthest point of the glyph is at 71% of the radius of the icon. The maskable safe zone ends at 80%, so the glyph needs no padding. Keep the glyph inside the safe zone when its shape changes.",

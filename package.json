@@ -16,7 +16,7 @@
     "format:check": "oxfmt --check",
     "css-var-to-tailwind": "bun scripts/css-var-to-tailwind/index.ts",
     "color-scales": "bun scripts/color-scales/index.ts && bun run css-var-to-tailwind && oxfmt src/assets/color.css tailwind.config.colors.js",
-    "generate-pwa-assets": "pwa-assets-generator",
+    "generate-pwa-assets": "pwa-assets-generator && pwa-assets-generator -c pwa-assets-masked.config.ts",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
