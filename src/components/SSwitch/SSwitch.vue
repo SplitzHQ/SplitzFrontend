@@ -1,3 +1,7 @@
+<!--
+  @fallthroughAttributes true
+  The type check accepts the native attributes of the root element, such as `id` or `tabindex`, on this component.
+-->
 <script setup lang="ts">
 /**
  * A setting that is on or off. See `switch.usage.ts` for when to use it.

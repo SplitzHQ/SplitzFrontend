@@ -1,3 +1,7 @@
+<!--
+  @fallthroughAttributes true
+  The type check accepts the native attributes of the root element, such as `id` or `tabindex`, on this component.
+-->
 <script setup lang="ts">
 import { PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";

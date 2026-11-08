@@ -42,6 +42,17 @@ Check the usage file when you change a file in `src/components/`. Update it in t
 
 Also check the design-system page of the component if `devtools/` exists. The page reads the usage file. Commit `devtools/` changes in the `devtools` repository.
 
+The type check rejects an attribute that a component does not declare as a prop (`checkUnknownProps` in `tsconfig.app.json`). `data-*`, `aria-*`, `role` and `hidden` are exempt. If a component must pass native attributes such as `id`, `title` or `tabindex` to its root element, put this block at the top of its file:
+
+```vue
+<!--
+  @fallthroughAttributes true
+  The type check accepts the native attributes of the root element, such as `id` or `tabindex`, on this component.
+-->
+```
+
+The check then accepts only the attributes of that root element. Do not use the block to hide an error. For example, SButtonBase has a `<span>` root, so `href` on it does nothing. Put a real `<a>` or `<button>` around it.
+
 A new folder in `src/components/` needs an entry in `component-index.ts` and a usage file. The test `src/components/__tests__/component-index.spec.ts` fails without them.
 
 ## Rules for usage files
