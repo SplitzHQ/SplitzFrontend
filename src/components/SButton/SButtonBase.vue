@@ -251,16 +251,19 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
   }
 
   // A parent can set `--s-button-ghost-icon` to change the icon color. See `ICON_RULES` in `button.usage.ts`.
+  // A parent can also set `--s-button-ghost-bg` and its `-hover` and `-pressed` forms to give the button a fill. The
+  // fill must go on this element: it is the round shape, and the parent is a box without a radius.
   .variant-ghost {
+    --_bg: var(--s-button-ghost-bg, transparent);
     --_text: var(--base-text-primary);
     --_icon-color: var(--s-button-ghost-icon, var(--base-fg-primary));
 
     @include hover {
-      --_bg: var(--base-bg-neutral);
+      --_bg: var(--s-button-ghost-bg-hover, var(--base-bg-neutral));
     }
 
     @include pressed {
-      --_bg: var(--base-bg-neutral_hover);
+      --_bg: var(--s-button-ghost-bg-pressed, var(--base-bg-neutral_hover));
     }
   }
 
