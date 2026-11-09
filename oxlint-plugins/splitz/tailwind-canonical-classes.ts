@@ -27,10 +27,17 @@ const TAILWIND_ENTRY = resolve(import.meta.dirname, "../../src/assets/base.css")
 /** The root font size. It lets the rule compare `px` and `rem` values with the spacing scale. */
 const ROOT_FONT_SIZE_PX = 16;
 
+/** A class with a canonical form. The load canonicalizes it one time, so Tailwind builds its lookup tables then. */
+const WARM_UP_CANDIDATE = "h-[1rem]";
+
 /** Loads the theme of a Tailwind entry CSS file, with its `@config`, `@theme` and `@utility` rules. */
 async function loadCanonicalize(cssPath: string): Promise<Canonicalize> {
   const designSystem = await loadDesignSystem(readFileSync(cssPath, "utf8"), { base: dirname(cssPath) });
   const results = new Map<string, string>();
+
+  // The first canonicalization builds the lookup tables of Tailwind, which takes some seconds. Do it here, so the
+  // cost is part of the load and not part of the first lint check or the first test.
+  designSystem.canonicalizeCandidates([WARM_UP_CANDIDATE], { rem: ROOT_FONT_SIZE_PX });
 
   return (candidate) => {
     let result = results.get(candidate);
