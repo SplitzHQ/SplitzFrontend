@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { SIGN_IN_PATTERN } from "@/components/BrandPattern/brand-pattern";
+import BrandPattern from "@/components/BrandPattern/BrandPattern.vue";
 import BrandTapMark from "@/components/BrandWordmark/BrandTapMark.vue";
 import { useKeyboardFreeHeight } from "@/libs/use-keyboard-free-height";
 
@@ -37,9 +39,11 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
 <template>
   <!-- The parts rise from below during the entry. The clip stops this motion from making the page scroll for a moment. -->
   <main
-    class="flex min-h-dvh flex-col overflow-hidden bg-base-bg-primary"
+    class="relative isolate flex min-h-dvh flex-col overflow-hidden bg-base-bg-primary"
     :style="keyboardFreeHeight === undefined ? undefined : { minHeight: `${keyboardFreeHeight}px` }"
   >
+    <!-- The brand pattern in the top right corner of the screen, under the content. It fades toward the logo and the title. -->
+    <BrandPattern :pattern="SIGN_IN_PATTERN" class="absolute top-0 right-0 -z-10 h-1/3 w-1/2" />
     <!-- A wide screen has no thumb to help. The column then has the height of a phone, in the center of the screen. -->
     <div
       class="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 pt-safe-10 px-safe-5 pb-safe-6 sm:my-auto sm:min-h-176 sm:flex-none"

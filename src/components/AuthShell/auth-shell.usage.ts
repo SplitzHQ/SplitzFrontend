@@ -91,6 +91,10 @@ export const LAYOUT_RULES: UsageRule[] = [
     rule: "From the sm width the column has a fixed minimum height, in the center of the screen. The page has no card.",
     title: "Wide screen",
   },
+  {
+    rule: "AuthShell shows `SIGN_IN_PATTERN` in the top right corner of the screen, on every account page, under the content. Do not add another pattern to an account page. The user picked this in the prototype `2026-11-06-sign-in-pattern` (SPZ-100).",
+    title: "Brand pattern",
+  },
 ];
 
 /** Accessibility rules that the component follows, written for the people who use it. */
@@ -115,6 +119,10 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
     text: "`AuthStatusIcon` is decorative and has `aria-hidden`. The title must give the result.",
     title: "Status icon",
+  },
+  {
+    text: "The brand pattern is decorative. It has `aria-hidden`, a tap goes through it, and it does not move.",
+    title: "Brand pattern",
   },
 ];
 
