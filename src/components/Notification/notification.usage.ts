@@ -87,8 +87,12 @@ export const PLACEMENT_RULES: UsageRule[] = [
     title: "Surface of the badge",
   },
   {
-    rule: "The parent of a badge must be `relative`. Set the position with `class`: the bell uses `top-0.5 right-0.5`, and the avatar uses `-top-1 -right-1`.",
+    rule: "The parent of a badge must be `relative`. Set the position with `class`: the bell uses `top-0.5 right-0.5`, and the avatar and the home filter button use `-top-1 -right-1`.",
     title: "Position of the badge",
+  },
+  {
+    rule: "Keep the default `neutral` tone. The home filter button uses `brand`, because the button takes the brand fill of a selected FilterPill while a filter is on (SPZ-84). Do not use `brand` on another control without a decision of the user.",
+    title: "Tone of the badge",
   },
   {
     rule: "The name of the control must include the count, because a screen reader does not read the badge. Use `notification-unread-count` and `notification-requests-badge`.",

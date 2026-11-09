@@ -14,11 +14,13 @@ import {
 
 import BrandHomeLogo from "@/components/BrandWordmark/BrandHomeLogo.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
+import NotificationBadge from "@/components/Notification/NotificationBadge.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
+import { frostedBarStyle, frostedColor } from "@/libs/frosted-bar";
 import { motionSlow, prefersReducedMotion, scrollBehavior } from "@/libs/motion";
 
-import { HOME_FILTER_BUTTON_CLASS } from "./home-filter-button";
+import { HOME_FILTER_BUTTON_CLASS, HOME_FILTER_BUTTON_ON_CLASS } from "./home-filter-button";
 import {
   clamp01,
   MORPH_CIRCLE_PX,
@@ -38,18 +40,27 @@ import HomeSearchBar from "./HomeSearchBar.vue";
  */
 const keyword = defineModel<string>({ default: "" });
 
+export interface HomeHeaderProps {
+  /**
+   * The number of conditions that are on. A number above zero gives the filter button the look of a selected
+   * FilterPill and a brand count badge.
+   */
+  filterCount?: number;
+}
+
+const { filterCount = 0 } = defineProps<HomeHeaderProps>();
+
+const emit = defineEmits<{
+  /** The user pressed the filter button in the search field. */
+  openFilter: [];
+}>();
+
+const filterButtonClass = computed(() => (filterCount > 0 ? HOME_FILTER_BUTTON_ON_CLASS : HOME_FILTER_BUTTON_CLASS));
+
 const { $t } = useFluent();
 
 /** The time in which the morph reaches 95% of a scroll step. The spring keeps a wheel step or a flick soft. */
 const FOLLOW_SETTLE_S = 0.28;
-/** The opacity of the frosted bar, in percent. */
-const GLASS_ALPHA = 69;
-/** The blur of the frosted bar, in pixels. */
-const GLASS_BLUR_PX = 18;
-/** The strength of the bottom line of the bar, in percent of `--base-border-quaternary`. */
-const GLASS_LINE = 50;
-/** Under the status bar, the length of the fade from the full header color to the frosted color, in pixels. */
-const TOP_FADE_PX = 24;
 
 const header = useTemplateRef<HTMLElement>("header");
 const topRow = useTemplateRef<HTMLElement>("topRow");
@@ -269,31 +280,24 @@ const extendMax = computed(() =>
   Math.max(0, geometry.value.fieldTop + geometry.value.rowBottom - geometry.value.barBase)
 );
 
+/** The color of the home page under the header. */
+const HEADER_COLOR = "var(--base-bg-secondary_alt)";
 /** The frosted color of the header. */
-const glassColor = `color-mix(in oklab, var(--base-bg-secondary_alt) ${GLASS_ALPHA}%, transparent)`;
+const glassColor = frostedColor(HEADER_COLOR);
 
 /**
  * The frosted bar. The layer starts `--bar-extend-max` above the top row and moves down by `--bar-extend`, so its size
- * does not change on each frame. The status bar area has the full header color, so no content shows behind the time
- * and the battery, and the color fades to the frosted color under it.
+ * does not change on each frame. `frostedBarStyle` gives the look.
  */
-const barStyle = computed(() => {
-  const screenTop = "(var(--bar-extend-max) - var(--bar-extend, 0px))";
-  const solid = "var(--base-bg-secondary_alt)";
-  const fadeStart = `calc(${screenTop} + var(--safe-area-top, 0px))`;
-  const fadeEnd = `calc(${screenTop} + var(--safe-area-top, 0px) + ${TOP_FADE_PX}px)`;
-  return {
-    WebkitBackdropFilter: `blur(${GLASS_BLUR_PX}px)`,
-    backdropFilter: `blur(${GLASS_BLUR_PX}px)`,
-    backgroundColor: glassColor,
-    backgroundImage: `linear-gradient(to bottom, ${solid} 0, ${solid} ${fadeStart}, transparent ${fadeEnd})`,
-    borderBottomColor: edge.value
-      ? `color-mix(in oklab, var(--base-border-quaternary) ${GLASS_LINE}%, transparent)`
-      : "transparent",
-    top: "calc(-1 * var(--bar-extend-max))",
-    transform: "translateY(var(--bar-extend, 0px))",
-  };
-});
+const barStyle = computed(() => ({
+  ...frostedBarStyle({
+    color: HEADER_COLOR,
+    edge: edge.value,
+    screenTop: "(var(--bar-extend-max) - var(--bar-extend, 0px))",
+  }),
+  top: "calc(-1 * var(--bar-extend-max))",
+  transform: "translateY(var(--bar-extend, 0px))",
+}));
 
 /** Goes back to the top of the page and puts the focus in the field. */
 function openSearch(): void {
@@ -356,7 +360,7 @@ function openSearch(): void {
           {{ $t("home-search-placeholder") }}
         </span>
         <span data-morph="filter" class="absolute top-0 left-0 flex">
-          <SIconButton variant="ghost" size="sm" :class="HOME_FILTER_BUTTON_CLASS" tabindex="-1">
+          <SIconButton variant="ghost" size="sm" :class="filterButtonClass" tabindex="-1">
             <PhSlidersHorizontal />
           </SIconButton>
         </span>
@@ -395,9 +399,21 @@ function openSearch(): void {
     >
       <HomeSearchBar v-model="keyword">
         <template #action>
-          <SIconButton variant="ghost" size="sm" :class="HOME_FILTER_BUTTON_CLASS" :aria-label="$t('home-filter')">
-            <PhSlidersHorizontal />
-          </SIconButton>
+          <!-- The badge sits on the corner of the button, so the wrapper is `relative`. -->
+          <div class="relative flex">
+            <SIconButton
+              variant="ghost"
+              size="sm"
+              :class="filterButtonClass"
+              :aria-label="$t('home-filter-button', { count: filterCount })"
+              aria-haspopup="dialog"
+              data-testid="home-filter"
+              @click="emit('openFilter')"
+            >
+              <PhSlidersHorizontal />
+            </SIconButton>
+            <NotificationBadge :count="filterCount" tone="brand" class="-top-1 -right-1" />
+          </div>
         </template>
       </HomeSearchBar>
     </div>

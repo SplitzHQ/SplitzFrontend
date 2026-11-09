@@ -77,10 +77,6 @@ describe("sortGroups", () => {
     expect(names(sortGroups(groups, "recent"))).toEqual(["Roommates", "Lisbon", "Camping", "Office", "bali"]);
   });
 
-  it("puts the unsettled groups first and keeps the recent order in each part", () => {
-    expect(names(sortGroups(groups, "unsettled"))).toEqual(["Roommates", "Lisbon", "Office", "bali", "Camping"]);
-  });
-
   it("compares the most used currency, then the groups without it, then the groups with no balance", () => {
     // USD is the most used currency. Lisbon has only EUR, so it comes after the USD groups. Camping has no balance.
     expect(names(sortGroups(groups, "amount"))).toEqual(["Roommates", "bali", "Office", "Lisbon", "Camping"]);

@@ -19,10 +19,25 @@ home-button-record-expense = Record new expense
 home-button-create-group = Create group
 home-create-group-hint = Start a group to split expenses with others
 home-filter = Filter
+home-filter-button =
+    { $count ->
+        [0] Filter
+       *[other] Filter ({ $count } on)
+    }
+home-filter-pill = Show: { $filter }
+home-filter-sheet-title = Filter and sort
+home-filter-show = Show
+home-filter-unsettled = Not settled
+home-filter-owed = You are owed
+home-filter-owe = You owe
+home-filter-clear = Clear
+home-filter-empty-unsettled = Everything is settled up
+home-filter-empty-owed = You aren't owed anything right now
+home-filter-empty-owe = You don't owe anything right now
+home-button-clear-filter = Clear filter
 home-no-expenses = No expenses
 home-sort-title = Sort by
 home-sort-button = Sort by { $sort }
 home-sort-recent = Recent activity
-home-sort-unsettled = Unsettled first
 home-sort-amount = Largest amount
 home-sort-name = Name

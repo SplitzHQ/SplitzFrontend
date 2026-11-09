@@ -31,8 +31,11 @@ export interface HomeGroupBalances {
   settled: SettledState;
 }
 
-/** The sorts of the group list, in the order of the sort sheet. */
-export const HOME_SORTS = ["recent", "unsettled", "amount", "name"] as const;
+/**
+ * The sorts of the group list, in the order of the sort sheet. "Unsettled first" left in SPZ-84, because the "Not
+ * settled" filter does its job.
+ */
+export const HOME_SORTS = ["recent", "amount", "name"] as const;
 export type HomeSort = (typeof HOME_SORTS)[number];
 
 /**
@@ -105,10 +108,6 @@ export function sortGroups<T extends HomeGroupBalances>(groups: readonly T[], so
   const sorted = [...groups].sort(byRecent);
   if (sort === "recent") return sorted;
   if (sort === "name") return sorted.sort((a, b) => nameCollator.compare(a.name, b.name));
-  if (sort === "unsettled") {
-    const rank = (group: T) => (group.settled === null ? 0 : 1);
-    return sorted.sort((a, b) => rank(a) - rank(b));
-  }
   // `sorted` is in recent order, so the most recent group wins a tie of the most used currency.
   const common = mostUsedCurrency(sorted);
   return sorted.sort((a, b) => amountValue(b.myBalances, common) - amountValue(a.myBalances, common));

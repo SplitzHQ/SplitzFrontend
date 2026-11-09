@@ -9,12 +9,22 @@ import { computed } from "vue";
 export interface NotificationBadgeProps {
   /** The number to show. Zero hides the badge. */
   count: number;
+  /**
+   * `neutral` is the dark badge of the bell and the avatar. `brand` takes the fill of a primary button. The home filter
+   * button uses it, because the button takes the brand fill of a selected FilterPill.
+   */
+  tone?: "neutral" | "brand";
 }
 
 /** A higher number shows as "99+", so the badge stays small. */
 const MAX_COUNT = 99;
 
-const { count } = defineProps<NotificationBadgeProps>();
+const { count, tone = "neutral" } = defineProps<NotificationBadgeProps>();
+
+const TONE_CLASS: Record<NonNullable<NotificationBadgeProps["tone"]>, string> = {
+  brand: "bg-base-bg-brand-solid text-base-text-primary-reverse",
+  neutral: "bg-base-bg-primary-reverse text-base-text-primary-reverse",
+};
 
 const text = computed(() => (count > MAX_COUNT ? `${MAX_COUNT}+` : String(count)));
 </script>
@@ -24,7 +34,10 @@ const text = computed(() => (count > MAX_COUNT ? `${MAX_COUNT}+` : String(count)
     <span
       v-if="count > 0"
       aria-hidden="true"
-      class="pointer-events-none absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-base-bg-primary-reverse px-1 text-[10px] leading-none font-semibold text-base-text-primary-reverse ring-2 ring-base-bg-secondary_alt"
+      :class="[
+        'pointer-events-none absolute flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold ring-2 ring-base-bg-secondary_alt',
+        TONE_CLASS[tone],
+      ]"
     >
       {{ text }}
     </span>

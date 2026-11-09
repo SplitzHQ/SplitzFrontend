@@ -1,11 +1,12 @@
-import { flushPromises, mount, RouterLinkStub } from "@vue/test-utils";
+import { enableAutoUnmount, flushPromises, mount, RouterLinkStub } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
 
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
+import { homeFilter } from "../home-filter";
 import HomePage from "../HomePage.vue";
 
 const groupsState = ref<{ data: unknown[] | undefined; status: string }>({ data: [], status: "success" });
@@ -16,8 +17,12 @@ const NEW_USER_TITLE = "home-empty-state-title";
 const NO_RESULTS_CLEAR = '[data-testid="home-no-results-clear"]';
 const LOAD_ERROR = '[data-testid="home-load-error"]';
 const SKELETON = '[data-testid="home-groups-skeleton"]';
-const SORT_BUTTON = '[data-testid="home-sort"]';
+const FILTER_BUTTON = '[data-testid="home-filter"]';
+const FILTER_PILLS = '[data-testid="home-filter-pills"]';
 const TOTAL_BALANCE = '[data-testid="home-total-balance"]';
+
+// A sheet renders in a portal on the body. Each page unmounts after its test, so no sheet stays for the next test.
+enableAutoUnmount(afterEach);
 
 vi.mock("@pinia/colada", () => ({
   useQuery: () => ({ asyncStatus: groupsAsyncStatus, refetch: refetchGroups, state: groupsState }),
@@ -82,6 +87,7 @@ describe("HomePage rows", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     localStorage.clear();
+    homeFilter.value = "all";
   });
 
   it("reloads the total balance when the groups refetch, and not on the first answer", async () => {
@@ -182,7 +188,7 @@ describe("HomePage rows", () => {
     return nextTick().then(() => expect(wrapper.get(TOTAL_BALANCE).element.tagName).toBe("DIV"));
   });
 
-  it("sorts the rows by the pick of the sort button", async () => {
+  it("sorts the rows by the pick in the filter sheet, and the sheet stays open", async () => {
     groupsState.value = {
       data: [makeGroup("Bali", 2), makeGroup("Aaron", 5), makeGroup("Camping", 1)],
       status: "success",
@@ -192,14 +198,13 @@ describe("HomePage rows", () => {
 
     expect(rowNames(wrapper, names)).toEqual(["Camping", "Bali", "Aaron"]);
 
-    await wrapper.get(SORT_BUTTON).trigger("click");
-    await flushPromises();
-    // The sheet renders in a portal on the body, so the option is outside the wrapper.
-    document.querySelector<HTMLButtonElement>('[data-sort="name"]')!.click();
+    await openFilterSheet(wrapper);
+    sheetButton('[data-sort="name"]').click();
     await flushPromises();
 
     expect(rowNames(wrapper, names)).toEqual(["Aaron", "Bali", "Camping"]);
     expect(localStorage.getItem("home-group-sort")).toBe("name");
+    expect(document.querySelector('[data-sort="name"]')?.getAttribute("aria-checked")).toBe("true");
   });
 
   it("uses the sort that this device keeps, and ignores a value that is not a sort", () => {
@@ -207,14 +212,131 @@ describe("HomePage rows", () => {
     localStorage.setItem("home-group-sort", "name");
     expect(rowNames(mountPage(), ["Aaron", "Bali"])).toEqual(["Aaron", "Bali"]);
 
-    localStorage.setItem("home-group-sort", "owed");
+    // "unsettled" was a sort before SPZ-84. A device that kept it gets the default.
+    localStorage.setItem("home-group-sort", "unsettled");
     expect(rowNames(mountPage(), ["Aaron", "Bali"])).toEqual(["Bali", "Aaron"]);
+  });
+});
+
+/** Opens the full filter sheet with the button in the search field. */
+async function openFilterSheet(wrapper: ReturnType<typeof mountPage>) {
+  await wrapper.get(FILTER_BUTTON).trigger("click");
+  await flushPromises();
+}
+
+/** Returns a button in the open sheet. The sheet renders in a portal on the body, so it is outside the wrapper. */
+function sheetButton(selector: string) {
+  const button = document.querySelector<HTMLButtonElement>(selector);
+  if (!button) throw new Error(`No ${selector} in the sheet`);
+  return button;
+}
+
+/** Returns the count in the tile of a condition. */
+function tileCount(filter: string) {
+  return sheetButton(`[data-filter="${filter}"]`).textContent?.replace(/\D/g, "");
+}
+
+describe("HomePage filter", () => {
+  const names = ["Owed", "Owes", "Even"];
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    localStorage.clear();
+    homeFilter.value = "all";
+    useUserStore().user = { id: "me" } as never;
+    const owed = { ...makeGroup("Owed", 1), balances: [myBalance("20", "USD")] };
+    const owes = { ...makeGroup("Owes", 2), balances: [myBalance("-5", "USD")] };
+    const even = { ...makeGroup("Even", 3), balances: [myBalance("0", "USD")] };
+    groupsState.value = { data: [owed, owes, even], status: "success" };
+  });
+
+  it("shows no pills and no badge while the filter is off", () => {
+    const wrapper = mountPage();
+
+    expect(wrapper.get(FILTER_PILLS).classes()).toContain("grid-rows-[0fr]");
+    expect(wrapper.get(FILTER_BUTTON).attributes("aria-label")).toBe("home-filter-button");
+    expect(rowNames(wrapper, names)).toEqual(["Owed", "Owes", "Even"]);
+  });
+
+  it("keeps only the groups that match, shows the pills with the sort first, and hides Create group", async () => {
+    const wrapper = mountPage();
+
+    await openFilterSheet(wrapper);
+    sheetButton('[data-filter="owe"]').click();
+    await flushPromises();
+
+    expect(rowNames(wrapper, names)).toEqual(["Owes"]);
+    expect(wrapper.get(FILTER_PILLS).classes()).toContain("grid-rows-[1fr]");
+    const pills = wrapper.get(FILTER_PILLS).findAll("button");
+    expect(pills.map((pill) => pill.attributes("data-testid"))).toEqual(["home-sort-pill", "home-filter-pill"]);
+    expect(pills[1]?.text()).toBe("home-filter-owe");
+    expect(wrapper.find('[data-testid="home-create-group"]').exists()).toBe(false);
+  });
+
+  it("counts the groups of each condition in the sheet", async () => {
+    await openFilterSheet(mountPage());
+
+    expect(["all", "unsettled", "owed", "owe"].map(tileCount)).toEqual(["3", "2", "1", "1"]);
+  });
+
+  it("shows Clear in the sheet only when a filter is on, and Clear keeps the sort", async () => {
+    localStorage.setItem("home-group-sort", "name");
+    const wrapper = mountPage();
+    await openFilterSheet(wrapper);
+
+    expect(document.querySelector('[data-testid="home-filter-clear"]')).toBeNull();
+
+    sheetButton('[data-filter="owed"]').click();
+    await flushPromises();
+    sheetButton('[data-testid="home-filter-clear"]').click();
+    await flushPromises();
+
+    expect(rowNames(wrapper, names)).toEqual(["Even", "Owed", "Owes"]);
+    expect(localStorage.getItem("home-group-sort")).toBe("name");
+  });
+
+  it("opens the sheet of one kind from a pill, and a choice there closes the sheet", async () => {
+    homeFilter.value = "owe";
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-testid="home-filter-pill"]').trigger("click");
+    await flushPromises();
+
+    expect(document.querySelector("[data-sort]")).toBeNull();
+    sheetButton('[data-filter="owed"]').click();
+    await flushPromises();
+
+    expect(rowNames(wrapper, names)).toEqual(["Owed"]);
+    expect(document.querySelector("[data-filter]")).toBeNull();
+  });
+
+  it("shows the empty state of the filter with the total, and its button clears the filter", async () => {
+    groupsState.value = { data: [{ ...makeGroup("Even"), balances: [myBalance("0", "USD")] }], status: "success" };
+    homeFilter.value = "owe";
+    const wrapper = mountPage();
+
+    expect(wrapper.text()).toContain("home-filter-empty-owe");
+    expect(wrapper.find(TOTAL_BALANCE).exists()).toBe(true);
+    expect(wrapper.get('[role="status"]').text()).toBe("home-filter-empty-owe");
+
+    await wrapper.get(NO_RESULTS_CLEAR).trigger("click");
+
+    expect(homeFilter.value).toBe("all");
+    expect(wrapper.text()).toContain("Even");
+  });
+
+  it("keeps the filter when the page mounts again", () => {
+    homeFilter.value = "owed";
+    mountPage().unmount();
+
+    expect(rowNames(mountPage(), names)).toEqual(["Owed"]);
   });
 });
 
 describe("HomePage search states", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    homeFilter.value = "all";
   });
 
   it("shows the no-result state, not the new-user state, when the search finds no group", async () => {
@@ -227,7 +349,7 @@ describe("HomePage search states", () => {
     expect(wrapper.get('[role="status"]').text()).toBe("home-no-results-title zzz");
     expect(wrapper.text()).not.toContain(NEW_USER_TITLE);
     expect(wrapper.find('[data-testid="home-create-group"]').exists()).toBe(true);
-    expect(wrapper.find(SORT_BUTTON).exists()).toBe(false);
+    expect(wrapper.find(FILTER_PILLS).exists()).toBe(false);
   });
 
   it("shows the group and no no-result state when the search finds a group", async () => {
@@ -238,7 +360,7 @@ describe("HomePage search states", () => {
 
     expect(wrapper.find(NO_RESULTS_CLEAR).exists()).toBe(false);
     expect(wrapper.text()).toContain("Paris trip");
-    expect(wrapper.find(SORT_BUTTON).exists()).toBe(true);
+    expect(wrapper.find(FILTER_PILLS).exists()).toBe(true);
   });
 
   it("treats a keyword of only spaces as no search", async () => {
