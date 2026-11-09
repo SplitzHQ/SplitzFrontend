@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-import colors from "./tailwind.config.colors";
+// Keep the `.js` extension. Tailwind reloads this file with a cache-busting query, and only a native import gives that
+// query to this import. A native import fails with no extension. The fallback loader then keeps the old colors until
+// the dev server restarts.
+import colors from "./tailwind.config.colors.js";
 
 export default {
   corePlugins: {
