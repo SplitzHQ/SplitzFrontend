@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhLinkBreak, PhLockSimple, PhWarningCircle } from "@phosphor-icons/vue";
+import { PhLinkBreak, PhLockSimple } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
@@ -40,8 +40,16 @@ const resetRequestContext = computed(() => {
 
 const isInvalidLink = computed(() => resetRequestContext.value === null);
 
+const POLICY_ERROR = "auth-reset-password-policy";
+const MISMATCH_ERROR = "auth-reset-password-mismatch";
+
+// An error about one field shows under that field. The Notice shows only an error about the request.
+const noticeErrorKey = computed(() =>
+  errorMessageKey.value === POLICY_ERROR || errorMessageKey.value === MISMATCH_ERROR ? null : errorMessageKey.value
+);
+
 watch([newPassword, confirmPassword], () => {
-  if (errorMessageKey.value === "auth-reset-password-mismatch" && newPassword.value === confirmPassword.value) {
+  if (errorMessageKey.value === MISMATCH_ERROR && newPassword.value === confirmPassword.value) {
     errorMessageKey.value = null;
   }
 });
@@ -54,12 +62,12 @@ async function handleResetPassword() {
   errorMessageKey.value = null;
 
   if (newPassword.value !== confirmPassword.value) {
-    errorMessageKey.value = "auth-reset-password-mismatch";
+    errorMessageKey.value = MISMATCH_ERROR;
     return;
   }
 
   if (!meetsPasswordPolicy(newPassword.value)) {
-    errorMessageKey.value = "auth-reset-password-policy";
+    errorMessageKey.value = POLICY_ERROR;
     return;
   }
 
@@ -95,7 +103,7 @@ async function getResetPasswordErrorMessageKey(error: unknown): Promise<string> 
     const errorCodes = Object.keys(body.errors ?? {});
 
     if (errorCodes.some((code) => code.startsWith("Password"))) {
-      return "auth-reset-password-policy";
+      return POLICY_ERROR;
     }
 
     if (errorCodes.includes("InvalidToken")) {
@@ -158,7 +166,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
         :label="$t('auth-new-password-label')"
         :placeholder="$t('auth-new-password-placeholder')"
         :hint="$t('auth-password-hint')"
-        :invalid="errorMessageKey === 'auth-reset-password-policy'"
+        :error="errorMessageKey === POLICY_ERROR ? $t(POLICY_ERROR) : undefined"
       >
         <template #icon>
           <PhLockSimple />
@@ -174,18 +182,15 @@ function getSingleQueryValue(value: unknown): string | undefined {
         required
         :label="$t('auth-confirm-password-label')"
         :placeholder="$t('auth-confirm-password-placeholder')"
-        :invalid="errorMessageKey === 'auth-reset-password-mismatch'"
+        :error="errorMessageKey === MISMATCH_ERROR ? $t(MISMATCH_ERROR) : undefined"
       >
         <template #icon>
           <PhLockSimple />
         </template>
       </TextInput>
 
-      <Notice v-if="errorMessageKey" tone="error">
-        <template #icon>
-          <PhWarningCircle />
-        </template>
-        <p>{{ $t(errorMessageKey) }}</p>
+      <Notice v-if="noticeErrorKey" tone="error" announce>
+        <p>{{ $t(noticeErrorKey) }}</p>
       </Notice>
 
       <RateLimitCountdown

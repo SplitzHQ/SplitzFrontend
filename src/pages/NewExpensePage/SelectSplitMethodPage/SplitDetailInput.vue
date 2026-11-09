@@ -44,7 +44,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
         isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >
@@ -107,7 +107,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
         isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >
@@ -143,7 +143,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-fg-brand-reverse' : 'bg-util-alpha-black-5',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
         isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
       ]"
     >

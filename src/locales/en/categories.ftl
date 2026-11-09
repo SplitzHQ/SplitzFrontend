@@ -10,7 +10,7 @@ categories-other_food = Other food
 
 categories-public_transport = Public transit
 categories-taxi_ride_hailing = Taxi & rideshare
-categories-fuel = Fuel
+categories-fuel = Gas & charging
 categories-parking = Parking
 categories-vehicle_maintenance = Vehicle maintenance
 categories-vehicle_purchase = Vehicle purchase
@@ -39,7 +39,7 @@ categories-other_home = Other home
 
 categories-electricity = Electricity
 categories-water = Water
-categories-gas_utility = Gas
+categories-gas_utility = Natural gas
 categories-internet = Internet
 categories-mobile_phone = Mobile phone
 categories-trash_recycling = Trash & recycling

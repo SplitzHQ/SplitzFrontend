@@ -1,5 +1,6 @@
 two-factor-title = Two-factor authentication
 two-factor-load-failed = Couldn't load 2FA status
+two-factor-load-retry = Try again
 two-factor-enabled-title = Two-factor authentication is on
 two-factor-enabled-body = You'll need a code from your authenticator app each time you sign in.
 two-factor-disabled-title = Two-factor authentication is off

@@ -1,33 +1,32 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+/**
+ * A small count at the corner of a control. See `notification.usage.ts`.
+ * The caller sets the position with `class`, and the parent must be `relative`.
+ * A screen reader does not read the badge, so the name of the control must include the count.
+ */
 export interface NotificationBadgeProps {
-  /** Number to show. Zero hides the badge. */
+  /** The number to show. Zero hides the badge. */
   count: number;
-  /** Show a plain dot instead of the number. */
-  dot?: boolean;
-  /** Numbers above this show as "99+". */
-  max?: number;
-  label?: string;
 }
 
-const { count, dot = false, max = 99, label } = defineProps<NotificationBadgeProps>();
+/** A higher number shows as "99+", so the badge stays small. */
+const MAX_COUNT = 99;
 
-const text = computed(() => (count > max ? `${max}+` : String(count)));
+const { count } = defineProps<NotificationBadgeProps>();
+
+const text = computed(() => (count > MAX_COUNT ? `${MAX_COUNT}+` : String(count)));
 </script>
 
 <template>
   <Transition name="badge">
     <span
       v-if="count > 0"
-      :aria-label="label"
-      :class="[
-        'pointer-events-none absolute flex items-center justify-center rounded-full bg-util-color-error-500 font-semibold text-base-text-primary-reverse ring-2 ring-base-bg-secondary_alt',
-        dot ? 'size-2.5' : 'h-4 min-w-4 px-1 text-[10px] leading-none',
-      ]"
-      role="status"
+      aria-hidden="true"
+      class="pointer-events-none absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-base-bg-primary-reverse px-1 text-[10px] leading-none font-semibold text-base-text-primary-reverse ring-2 ring-base-bg-secondary_alt"
     >
-      <template v-if="!dot">{{ text }}</template>
+      {{ text }}
     </span>
   </Transition>
 </template>
@@ -35,14 +34,14 @@ const text = computed(() => (count > max ? `${max}+` : String(count)));
 <style scoped>
 .badge-enter-active {
   transition:
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.2s ease;
+    transform var(--motion-duration-container) var(--motion-easing-pop),
+    opacity var(--motion-duration-state) var(--motion-easing-standard);
 }
 
 .badge-leave-active {
   transition:
-    transform 0.15s ease-in,
-    opacity 0.15s ease-in;
+    transform var(--motion-duration-exit) var(--motion-easing-exit),
+    opacity var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 .badge-enter-from,

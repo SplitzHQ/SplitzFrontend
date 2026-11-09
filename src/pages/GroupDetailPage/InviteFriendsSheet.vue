@@ -8,6 +8,7 @@ import { toast } from "vue-sonner";
 import { GroupApi, type GroupDto } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import reportError from "@/libs/report-error";
@@ -43,6 +44,7 @@ const candidates = computed(() =>
 
 const selected = ref(new Set<string>());
 const sending = ref(false);
+const sendFailed = ref(false);
 
 function toggle(id: string) {
   const next = new Set(selected.value);
@@ -52,12 +54,15 @@ function toggle(id: string) {
 }
 
 watch(model, (open) => {
-  if (!open) selected.value = new Set();
+  if (open) return;
+  selected.value = new Set();
+  sendFailed.value = false;
 });
 
 async function send() {
   if (selected.value.size === 0) return;
   sending.value = true;
+  sendFailed.value = false;
   try {
     const invites = await groupApi.inviteGroupMembers({ groupId: group.groupId, requestBody: [...selected.value] });
     await queryCache.invalidateQueries({ key: ["getGroupInvites", group.groupId] });
@@ -65,7 +70,7 @@ async function send() {
     model.value = false;
   } catch (error) {
     reportError("group.invite", error);
-    toast.error($t("group-invite-error"));
+    sendFailed.value = true;
   } finally {
     sending.value = false;
   }
@@ -73,60 +78,59 @@ async function send() {
 </script>
 
 <template>
-  <Sheet v-model="model" detent="large" :show-close-button="true">
-    <div class="flex flex-col gap-4 px-4 pt-2 pb-6">
-      <h2 class="text-lg font-semibold text-base-text-primary">{{ $t("group-invite-title") }}</h2>
+  <Sheet v-model="model" :title="$t('group-invite-title')" detent="large" :show-close-button="true">
+    <p v-if="(userStore.user?.friends?.length ?? 0) === 0" class="text-sm text-base-text-tertiary">
+      {{ $t("group-invite-no-friends") }}
+    </p>
+    <p v-else-if="candidates.length === 0" class="text-sm text-base-text-tertiary">
+      {{ $t("group-invite-empty") }}
+    </p>
 
-      <p v-if="(userStore.user?.friends?.length ?? 0) === 0" class="text-sm text-base-text-tertiary">
-        {{ $t("group-invite-no-friends") }}
-      </p>
-      <p v-else-if="candidates.length === 0" class="text-sm text-base-text-tertiary">
-        {{ $t("group-invite-empty") }}
-      </p>
-
-      <div v-else class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
-        <button
-          v-for="friend in candidates"
-          :key="friend.friendUser.id"
-          type="button"
-          class="flex w-full items-center gap-3 px-4 py-3 text-left disabled:opacity-60"
-          :disabled="friend.pending"
-          :aria-pressed="selected.has(friend.friendUser.id)"
-          :data-test="`invite-${friend.friendUser.id}`"
-          @click="toggle(friend.friendUser.id)"
-        >
-          <Avatar :images="[{ src: friend.friendUser.photo ?? null, alt: friend.friendUser.userName }]" size="xs" />
-          <span class="flex min-w-0 flex-1 flex-col">
-            <span class="truncate text-base font-medium text-base-text-primary">
-              {{ friend.remark || friend.friendUser.userName }}
-            </span>
-            <span v-if="friend.pending" class="text-xs text-base-text-quaternary">
-              {{ $t("group-invite-pending") }}
-            </span>
-          </span>
-          <span
-            :class="[
-              'flex size-6 items-center justify-center rounded-full border transition-colors',
-              selected.has(friend.friendUser.id)
-                ? 'border-util-color-brand-700 bg-util-color-brand-700 text-base-text-primary-reverse'
-                : 'border-base-border-secondary bg-transparent text-transparent',
-            ]"
-          >
-            <PhCheck class="size-3.5" weight="bold" />
-          </span>
-        </button>
-      </div>
-
-      <SButton
-        variant="primary"
-        size="xl"
-        class="w-full"
-        :disabled="selected.size === 0"
-        :loading="sending"
-        @click="send"
+    <div v-else class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+      <button
+        v-for="friend in candidates"
+        :key="friend.friendUser.id"
+        type="button"
+        class="flex w-full items-center gap-3 px-4 py-3 text-left disabled:opacity-60"
+        :disabled="friend.pending"
+        :aria-pressed="selected.has(friend.friendUser.id)"
+        :data-test="`invite-${friend.friendUser.id}`"
+        @click="toggle(friend.friendUser.id)"
       >
+        <Avatar
+          aria-hidden="true"
+          :images="[{ src: friend.friendUser.photo ?? null, alt: friend.friendUser.userName }]"
+          size="xs"
+        />
+        <span class="flex min-w-0 flex-1 flex-col">
+          <span class="truncate text-base font-medium text-base-text-primary">
+            {{ friend.remark || friend.friendUser.userName }}
+          </span>
+          <span v-if="friend.pending" class="text-xs text-base-text-quaternary">
+            {{ $t("group-invite-pending") }}
+          </span>
+        </span>
+        <span
+          :class="[
+            'flex size-6 items-center justify-center rounded-full border transition-colors',
+            selected.has(friend.friendUser.id)
+              ? 'border-util-color-brand-700 bg-util-color-brand-700 text-base-text-primary-reverse'
+              : 'border-base-border-secondary bg-transparent text-transparent',
+          ]"
+        >
+          <PhCheck class="size-3.5" weight="bold" />
+        </span>
+      </button>
+    </div>
+
+    <template #actions>
+      <Notice v-if="sendFailed" tone="error" announce data-test="invite-error">
+        <p>{{ $t("group-invite-error") }}</p>
+      </Notice>
+
+      <SButton variant="primary" size="xl" :disabled="selected.size === 0" :loading="sending" @click="send">
         {{ $t("group-invite-submit", { count: selected.size }) }}
       </SButton>
-    </div>
+    </template>
   </Sheet>
 </template>

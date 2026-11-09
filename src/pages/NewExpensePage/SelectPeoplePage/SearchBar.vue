@@ -34,6 +34,7 @@ const { selectedUsers } = defineProps<{ selectedUsers: { photo: string | null | 
             v-model="model"
             variant="plain"
             class="w-full"
+            :label="$t('new-expense-select-people-search-placeholder')"
             :placeholder="$t('new-expense-select-people-search-placeholder')"
           />
         </motion.div>

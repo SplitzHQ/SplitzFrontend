@@ -74,7 +74,8 @@ describe("ResetPasswordPage", () => {
     await wrapper.find("form").trigger("submit");
 
     expect(userStoreMock.resetPassword).not.toHaveBeenCalled();
-    expect(wrapper.text()).toContain("auth-reset-password-mismatch");
+    expect(wrapper.get("#confirm-password-error").text()).toBe("auth-reset-password-mismatch");
+    expect(wrapper.find("#new-password-error").exists()).toBe(false);
   });
 
   it("validates the configured password policy before submit", async () => {
@@ -86,7 +87,8 @@ describe("ResetPasswordPage", () => {
     await wrapper.find("form").trigger("submit");
 
     expect(userStoreMock.resetPassword).not.toHaveBeenCalled();
-    expect(wrapper.text()).toContain("auth-reset-password-policy");
+    expect(wrapper.get("#new-password-error").text()).toBe("auth-reset-password-policy");
+    expect(wrapper.find("#confirm-password-error").exists()).toBe(false);
   });
 
   it("submits reset and routes to login with success feedback", async () => {

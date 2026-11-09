@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/vue3-vite";
 
+import { SEGMENT_SIZES } from "./segment";
 import SSegmentControl from "./SSegmentControl.vue";
 
 export default {
@@ -12,7 +13,7 @@ export default {
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl"],
+      options: SEGMENT_SIZES,
     },
   },
 } satisfies Meta<typeof SSegmentControl>;
@@ -22,7 +23,8 @@ const Template: StoryFn<typeof SSegmentControl> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SSegmentControl v-bind="args"><template #default="{ item }">{{ item }}</template></SSegmentControl>',
+  template:
+    '<SSegmentControl v-bind="args" aria-label="Sample choice"><template #default="{ item }">{{ item }}</template></SSegmentControl>',
 });
 
 export const Default = Template.bind({});

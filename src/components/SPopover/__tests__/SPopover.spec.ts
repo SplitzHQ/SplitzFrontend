@@ -15,7 +15,7 @@ function mountPopover(enabled = true) {
         return { enabled: ref(enabled), open: ref(false) };
       },
       template: `
-      <SPopover v-model="open" :enabled="enabled" label="Requests" class="w-104" data-test="panel">
+      <SPopover v-model="open" :enabled="enabled" aria-label="Requests" class="w-104" data-test="panel">
         <template #trigger><button type="button">Open requests</button></template>
         <button type="button" @click="open = false">Close requests</button>
         <button type="button" @click="enabled = false">Disable panel</button>

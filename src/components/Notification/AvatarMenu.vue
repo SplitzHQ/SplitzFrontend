@@ -13,6 +13,10 @@ import { useUserStore } from "@/stores/user";
 import NotificationBadge from "./NotificationBadge.vue";
 import RequestCard, { type RequestNotification } from "./RequestCard.vue";
 
+/**
+ * The avatar in the home header. On a desktop with pending requests it opens a popover with the requests.
+ * In other cases it opens the profile page. See `notification.usage.ts`.
+ */
 const { $t } = useFluent();
 const router = useRouter();
 const userStore = useUserStore();
@@ -55,18 +59,19 @@ watch(pendingRequestCount, (value) => {
   <SPopover
     v-model="open"
     :enabled="showRequests"
-    :label="$t('notification-requests-title')"
-    class="gap-3 [--s-popover-max-height:min(70vh,32rem)]"
+    :aria-label="$t('notification-requests-title')"
+    class="gap-3 [--s-popover-max-height:min(70dvh,32rem)]"
   >
     <template #trigger>
+      <!-- The avatar is 32px wide. The invisible box makes the tap area 44px. -->
       <button
         type="button"
-        class="relative block rounded-05xl focus-visible:ring-2 focus-visible:ring-util-color-brand-600 focus-visible:outline-none"
+        class="relative block rounded-lg after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
         :aria-label="avatarLabel"
         data-test="avatar-button"
         @click="onClick"
       >
-        <Avatar :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]" size="xs" />
+        <Avatar :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]" size="header" />
         <NotificationBadge :count="pendingRequestCount" class="-top-1 -right-1" />
       </button>
     </template>
@@ -76,9 +81,10 @@ watch(pendingRequestCount, (value) => {
         <RequestCard :notification="request" compact />
       </li>
     </TransitionGroup>
+    <!-- The row is 36px high. The invisible box makes the tap area 44px. -->
     <button
       type="button"
-      class="flex items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-base-text-secondary hover:bg-util-alpha-black-5"
+      class="relative flex items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-base-text-secondary after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 hover:bg-util-alpha-black-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
       @click="goToProfile"
     >
       {{ $t("home-profile") }}
@@ -91,8 +97,8 @@ watch(pendingRequestCount, (value) => {
 .list-move,
 .list-leave-active {
   transition:
-    transform 0.25s ease,
-    opacity 0.2s ease;
+    transform var(--motion-duration-container) var(--motion-easing-standard),
+    opacity var(--motion-duration-state) var(--motion-easing-standard);
 }
 
 .list-leave-to {

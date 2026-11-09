@@ -65,7 +65,7 @@ const setPaidBy = (memberId: string) => {
       <PhCaretDown />
     </template>
   </SButton>
-  <Sheet v-model="showSheet" detent="medium">
+  <Sheet v-model="showSheet" :title="$t('new-expense-split-paid-by', { username: paidByUsername })" detent="medium">
     <div class="flex flex-col gap-4">
       <button
         v-for="member in transactionStore.members"
@@ -73,7 +73,7 @@ const setPaidBy = (memberId: string) => {
         class="flex items-center gap-3"
         @click="setPaidBy(member.id)"
       >
-        <Avatar :images="[{ src: member.photo, alt: member.userName }]" size="sm" />
+        <Avatar aria-hidden="true" :images="[{ src: member.photo, alt: member.userName }]" size="sm" />
         <div class="text-base font-semibold text-base-text-primary">{{ member.userName }}</div>
       </button>
     </div>

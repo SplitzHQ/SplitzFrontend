@@ -71,7 +71,7 @@ describe("ForgotPasswordPage", () => {
 
     expect(userStoreMock.forgotPassword).toHaveBeenCalledWith("person@example.com");
     expect(wrapper.text()).toContain("auth-forgot-password-success-title");
-    expect(toastMock.success).toHaveBeenCalledWith("auth-forgot-password-success-toast");
+    expect(toastMock.success).not.toHaveBeenCalled();
   });
 
   it("shows a recoverable error without leaking account existence", async () => {
@@ -86,7 +86,7 @@ describe("ForgotPasswordPage", () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain("auth-forgot-password-error");
-    expect(toastMock.error).toHaveBeenCalledWith("auth-forgot-password-error");
+    expect(toastMock.error).not.toHaveBeenCalled();
   });
 
   it("stays on the form during a recovery cooldown and retries only after manual submit", async () => {
@@ -107,7 +107,7 @@ describe("ForgotPasswordPage", () => {
     expect(wrapper.get('[data-test="forgot-password-submit"]').attributes("disabled")).toBeDefined();
     expect(wrapper.find('input[name="email"]').attributes("disabled")).toBeUndefined();
     expect(wrapper.text()).not.toContain("auth-forgot-password-success-title");
-    expect(toastMock.error).not.toHaveBeenCalledWith("auth-forgot-password-error");
+    expect(wrapper.text()).not.toContain("auth-forgot-password-error");
 
     await wrapper.find("form").trigger("submit");
     expect(userStoreMock.forgotPassword).toHaveBeenCalledTimes(1);

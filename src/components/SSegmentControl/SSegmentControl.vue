@@ -1,18 +1,57 @@
 <script setup lang="ts">
+import { useId } from "vue";
+
+import type { SegmentSize } from "./segment";
 import SSegment from "./SSegment.vue";
 
+/**
+ * A choice of one item from a short list that is always visible. See `segment-control.usage.ts` for when to use it.
+ * Set `aria-label` to name the group for a screen reader.
+ */
 export interface SegmentControlProps {
-  size: "xs" | "sm" | "md" | "lg" | "xl";
+  /** The size of each segment. */
+  size: SegmentSize;
+  /** The text of each segment. The default slot can draw the text with other markup. */
   items: string[];
 }
 const { size, items } = defineProps<SegmentControlProps>();
+/** The index of the selected item. */
 const model = defineModel<number>({ required: true });
+
+/** The change of the selected index for each arrow key, as in the WAI-ARIA radio group pattern. */
+const ARROW_STEPS: Record<string, number> = { ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1 };
+
+// The selected background slides only inside this control, so a page can show more than one control.
+const layoutId = useId();
+
+/** An arrow key selects the next or the previous segment and moves the focus to it. The list wraps at each end. */
+function onKeydown(event: KeyboardEvent): void {
+  const step = ARROW_STEPS[event.key];
+  if (step === undefined || items.length === 0) return;
+  event.preventDefault();
+  const next = (model.value + step + items.length) % items.length;
+  model.value = next;
+  const root = event.currentTarget as HTMLElement;
+  root.querySelectorAll<HTMLElement>('[role="radio"]')[next]?.focus();
+}
 </script>
 
 <template>
-  <div class="flex gap-1 rounded-full border border-core-alpha-brand-5 bg-core-alpha-brand-5 p-1">
-    <SSegment v-for="(item, index) in items" :key="item" :size="size" :active="model === index" @click="model = index">
-      <slot :item="item" />
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+  <div
+    role="radiogroup"
+    class="flex gap-1 rounded-full border border-core-alpha-brand-5 bg-core-alpha-brand-5 p-1"
+    @keydown="onKeydown"
+  >
+    <SSegment
+      v-for="(item, index) in items"
+      :key="index"
+      :size="size"
+      :active="model === index"
+      :layout-id="layoutId"
+      @click="model = index"
+    >
+      <slot :item="item">{{ item }}</slot>
     </SSegment>
   </div>
 </template>

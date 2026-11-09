@@ -3,7 +3,6 @@ create-group-name-label = 群组名称
 create-group-name-placeholder = 例如：东京旅行
 create-group-submit = 创建
 create-group-success = 群组已创建
-create-group-error-user-not-ready = 正在加载账户信息，请稍后再试。
 create-group-error-submit-failed = 创建群组失败，请重试。
 create-group-share-link-label = 邀请链接
 create-group-share-link-hint = 把链接发给朋友，对方打开即可加入群组。

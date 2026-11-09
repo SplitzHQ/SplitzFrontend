@@ -15,9 +15,10 @@ import { describeNotification } from "./notification-text";
 
 export type RequestNotification = TypedNotification & { type: "FriendRequest" | "GroupInvite" };
 
+/** One friend request or group invite, with Accept and Ignore. See `notification.usage.ts`. */
 export interface RequestCardProps {
   notification: RequestNotification;
-  /** Compact layout for the dropdown; the default is for full-width lists. */
+  /** Less padding and a 40px avatar, for the AvatarMenu popover. The default is for ProfilePage, with a 48px avatar. */
   compact?: boolean;
 }
 
@@ -32,6 +33,7 @@ const time = computed(() => formatRelativeTime(notification.createTime));
 
 const pending = ref<"accept" | "ignore" | null>(null);
 
+/** Accepts the request. A group invite then opens the group page. */
 async function accept() {
   pending.value = "accept";
   try {
@@ -60,6 +62,7 @@ async function accept() {
   }
 }
 
+/** Ignores the request. */
 async function ignore() {
   pending.value = "ignore";
   try {
@@ -84,7 +87,7 @@ async function ignore() {
   <div
     :class="['flex gap-3 rounded-2xl bg-core-alpha-brand-5 ring-1 ring-core-alpha-brand-10', compact ? 'p-3' : 'p-4']"
   >
-    <Avatar v-if="text.image" :images="[text.image]" :size="compact ? 'xs' : 'sm'" />
+    <Avatar v-if="text.image" aria-hidden="true" :images="[text.image]" :size="compact ? 'xs' : 'sm'" />
 
     <div class="flex min-w-0 flex-1 flex-col gap-2">
       <div class="flex flex-col gap-0.5">
@@ -99,21 +102,11 @@ async function ignore() {
           v-if="notification.type === 'FriendRequest' && notification.data.remark"
           class="text-xs text-base-text-tertiary"
         >
-          “{{ notification.data.remark }}”
+          {{ $t("notification-request-remark", { remark: notification.data.remark }) }}
         </p>
       </div>
 
-      <div class="flex gap-2">
-        <SButton
-          variant="primary"
-          size="sm"
-          :loading="pending === 'accept'"
-          :disabled="pending === 'ignore'"
-          data-test="request-accept"
-          @click="accept"
-        >
-          {{ $t("notification-accept") }}
-        </SButton>
+      <div class="flex justify-end gap-2">
         <SButton
           variant="ghost"
           size="sm"
@@ -123,6 +116,16 @@ async function ignore() {
           @click="ignore"
         >
           {{ $t("notification-ignore") }}
+        </SButton>
+        <SButton
+          variant="primary"
+          size="sm"
+          :loading="pending === 'accept'"
+          :disabled="pending === 'ignore'"
+          data-test="request-accept"
+          @click="accept"
+        >
+          {{ $t("notification-accept") }}
         </SButton>
       </div>
     </div>

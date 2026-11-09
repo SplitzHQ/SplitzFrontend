@@ -142,15 +142,16 @@ async function resetGroupNotificationPreferences() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
-        <span class="text-base font-medium text-base-text-primary">
-          {{ isGroupScope ? $t("notification-settings-group-title") : $t("notification-settings-title") }}
-        </span>
+      <HeaderMobileSecondary
+        :enable-back-button="true"
+        :fallback="groupId ? { name: 'groupDetail', params: { groupId } } : { name: 'profile' }"
+      >
+        {{ isGroupScope ? $t("notification-settings-group-title") : $t("notification-settings-title") }}
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col gap-6 px-4 pt-2 pb-10">
+      <div v-bind="layoutAttrs" class="flex flex-col gap-6 pt-2 pb-10">
         <p class="px-1 text-sm text-base-text-tertiary">
           {{
             isGroupScope
@@ -185,8 +186,9 @@ async function resetGroupNotificationPreferences() {
                 <SSwitch
                   :model-value="row.enabled"
                   :inherited="row.inherited"
-                  :disabled="resetting || optimisticUpdateOverlay.has(row.type)"
-                  :label="$t(`notification-type-${row.type}`)"
+                  :disabled="resetting"
+                  :busy="optimisticUpdateOverlay.has(row.type)"
+                  :aria-label="$t(`notification-type-${row.type}`)"
                   @update:model-value="setEnabled(row.type, $event)"
                 />
               </div>

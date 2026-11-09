@@ -13,6 +13,7 @@ import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import { findTransactionPayer } from "@/components/TransactionItem/transaction-row";
 import { resolveAssetUrl } from "@/libs/asset-url";
 import { getCategory, getMainCategory } from "@/libs/categories";
 import { formatCurrency } from "@/libs/format-currency";
@@ -56,12 +57,7 @@ const subcategory = computed(() => getCategory(transaction.value?.icon));
 const mainCategory = computed(() => getMainCategory(transaction.value?.icon));
 const colorClass = computed(() => categoryColorMap[mainCategory.value]);
 
-// Payer: the person with the most positive balance (creditor)
-const payer = computed(() => {
-  const balances = transaction.value?.balances ?? [];
-  const sorted = [...balances].sort((a, b) => Number(b.balance) - Number(a.balance));
-  return sorted[0]?.user ?? null;
-});
+const payer = computed(() => findTransactionPayer(transaction.value?.balances));
 
 const payerDescription = computed(() => {
   if (!payer.value || !transaction.value) return "";
@@ -115,20 +111,16 @@ async function handleDelete() {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true">
-        <div v-if="group" class="flex items-center justify-center gap-2">
-          <Avatar :images="avatarImages" size="xs" />
-          <p class="text-base font-medium text-base-text-primary">{{ group.name }}</p>
-        </div>
-        <!-- An empty box as wide as the back button keeps the title in the center. -->
-        <template #right>
-          <div class="size-10 shrink-0" />
-        </template>
+      <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'groupDetail', params: { groupId } }">
+        <span v-if="group" class="flex items-center gap-2">
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <span class="min-w-0">{{ group.name }}</span>
+        </span>
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 px-4 pb-8">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 pb-8">
         <!-- Loading -->
         <div v-if="transactionQuery.status === 'pending'" class="pt-6 text-base text-base-text-tertiary">
           {{ $t("transaction-detail-loading") }}
@@ -146,8 +138,8 @@ async function handleDelete() {
             <div class="flex size-16 items-center justify-center rounded-2xl" :class="colorClass">
               <CategoryIcon :category="subcategory" class="icon-8" />
             </div>
-            <p class="text-2xl font-semibold text-base-text-primary">{{ displayName }}</p>
-            <p class="text-3xl font-bold text-base-text-primary">{{ formattedAmount }}</p>
+            <p class="text-center text-display-sm font-semibold text-base-text-primary">{{ displayName }}</p>
+            <p class="text-display-md font-bold text-base-text-primary">{{ formattedAmount }}</p>
             <p class="text-sm text-base-text-quaternary">{{ payerDescription }}</p>
             <p class="text-sm text-base-text-quaternary">{{ formattedDate }}</p>
           </div>
@@ -177,7 +169,11 @@ async function handleDelete() {
                 :key="entry.userId"
                 class="flex items-center gap-3 rounded-xl py-2"
               >
-                <Avatar :images="[{ alt: entry.user.userName, src: entry.user.photo ?? null }]" size="xs" />
+                <Avatar
+                  aria-hidden="true"
+                  :images="[{ alt: entry.user.userName, src: entry.user.photo ?? null }]"
+                  size="xs"
+                />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p class="truncate text-base font-medium text-base-text-primary">
                     {{ entry.user.id === userStore.user?.id ? $t("new-expense-pronoun-you") : entry.user.userName }}
@@ -189,7 +185,7 @@ async function handleDelete() {
                   </p>
                   <p
                     class="text-sm font-medium"
-                    :class="Number(entry.balance) > 0 ? 'text-util-color-success-600' : 'text-base-text-error'"
+                    :class="Number(entry.balance) > 0 ? 'text-base-text-success' : 'text-base-text-error'"
                   >
                     {{ formatCurrency(Number(entry.balance), transaction.currency) }}
                   </p>

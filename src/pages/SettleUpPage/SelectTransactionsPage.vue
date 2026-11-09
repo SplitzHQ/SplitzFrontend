@@ -85,24 +85,24 @@ const handleNext = () => {
 <template>
   <Layout>
     <template #header>
-      <HeaderMobileSecondary :enable-back-button="true" :enable-close-button="true">
-        <div class="flex items-center justify-between">
-          <span class="text-base font-medium text-base-text-primary">{{ $t("settle-up-title") }}</span>
-          <span class="text-sm text-base-text-quaternary">{{
+      <HeaderMobileSecondary :enable-close-button="true" :fallback="{ name: 'groupDetail', params: { groupId } }">
+        <span class="flex items-center justify-between">
+          <span>{{ $t("settle-up-title") }}</span>
+          <span class="text-sm font-normal text-base-text-quaternary">{{
             $t("settle-up-step", { current: "1", total: "2" })
           }}</span>
-        </div>
+        </span>
       </HeaderMobileSecondary>
     </template>
 
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-1 flex-col px-2">
+      <div v-bind="layoutAttrs" class="flex flex-1 flex-col">
         <p class="px-2 pb-4 text-sm text-base-text-quaternary">
           {{ $t("settle-up-select-instruction") }}
         </p>
 
         <!-- Transaction List -->
-        <div class="flex flex-1 flex-col gap-3 overflow-y-auto pb-28">
+        <div class="-mx-2 flex flex-1 flex-col gap-3 overflow-y-auto px-2 pb-28">
           <div v-for="group in groupedTransactions" :key="group.date" class="flex flex-col gap-1">
             <p class="px-2 text-sm font-semibold text-base-text-primary">{{ group.label }}</p>
             <SelectableTransactionItem
@@ -125,7 +125,7 @@ const handleNext = () => {
 
         <!-- Bottom Action Bar -->
         <div
-          class="pb-safe fixed right-0 bottom-0 left-0 z-sticky flex items-center gap-3 bg-base-bg-primary px-4 py-3"
+          class="fixed right-0 bottom-0 left-0 z-sticky flex items-center gap-3 bg-base-bg-primary pt-3 px-safe-4 pb-safe-3"
         >
           <!-- Select All -->
           <button
@@ -150,7 +150,7 @@ const handleNext = () => {
               </span>
               <span class="text-base font-semibold text-base-text-primary">
                 {{ $t("settle-up-total") }}
-                <span class="text-util-color-success-600">
+                <span class="text-base-text-success">
                   {{ formatCurrency(invoiceStore.selectedTransactionsTotalAmount, invoiceStore.invoice.currency) }}
                 </span>
               </span>

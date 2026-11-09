@@ -51,6 +51,24 @@ describe("RegisterPage", () => {
     vi.useRealTimers();
   });
 
+  it("shows a password mismatch under the confirm field, and does not submit or show a toast", async () => {
+    const wrapper = mount(RegisterPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="confirm-password"]').setValue("Different1!");
+    await wrapper.find("form").trigger("submit");
+
+    expect(wrapper.get("#confirm-password-error").text()).toBe("auth-register-password-mismatch");
+    expect(wrapper.get('input[name="confirm-password"]').attributes("aria-describedby")).toBe("confirm-password-error");
+    expect(userStoreMock.register).not.toHaveBeenCalled();
+    expect(toastMock.error).not.toHaveBeenCalled();
+
+    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+
+    expect(wrapper.find("#confirm-password-error").exists()).toBe(false);
+  });
+
   it("tells users to check email after registration when email is enabled", async () => {
     userStoreMock.register.mockResolvedValue(true);
     userStoreMock.fetchEmailCapabilities.mockResolvedValue({ emailEnabled: true, passwordResetEnabled: true });
@@ -61,7 +79,9 @@ describe("RegisterPage", () => {
     await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
     await wrapper.find("form").trigger("submit");
 
-    expect(toastMock.success).toHaveBeenCalledWith("auth-register-success-email-enabled");
+    await flushPromises();
+    expect(wrapper.text()).toContain("auth-register-complete-title");
+    expect(toastMock.success).not.toHaveBeenCalled();
     expect(routerMock.push).not.toHaveBeenCalled();
   });
 
@@ -90,7 +110,7 @@ describe("RegisterPage", () => {
     await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
     await wrapper.find("form").trigger("submit");
 
-    expect(toastMock.error).not.toHaveBeenCalledWith("auth-register-failed");
+    expect(wrapper.text()).not.toContain("auth-register-failed");
     expect(toastMock.success).toHaveBeenCalledWith("auth-register-success");
     expect(routerMock.push).toHaveBeenCalledWith({ name: "login" });
   });
@@ -105,7 +125,7 @@ describe("RegisterPage", () => {
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
-    expect(toastMock.error).toHaveBeenCalledWith("auth-register-failed");
+    expect(wrapper.get('[data-test="register-error"]').text()).toContain("auth-register-failed");
     expect(userStoreMock.fetchEmailCapabilities).not.toHaveBeenCalled();
     expect(wrapper.find('[data-test="register-rate-limit"]').exists()).toBe(false);
     expect(wrapper.get('[data-test="register-submit"]').attributes("disabled")).toBeUndefined();
@@ -131,7 +151,7 @@ describe("RegisterPage", () => {
       await wrapper.find("form").trigger("submit");
       await flushPromises();
 
-      expect(toastMock.error).toHaveBeenCalledExactlyOnceWith("auth-register-email-already-registered");
+      expect(wrapper.get('[data-test="register-error"]').text()).toContain("auth-register-email-already-registered");
       expect(toastMock.success).not.toHaveBeenCalled();
       expect(userStoreMock.fetchEmailCapabilities).not.toHaveBeenCalled();
       expect(routerMock.push).not.toHaveBeenCalled();
@@ -156,7 +176,7 @@ describe("RegisterPage", () => {
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
-    expect(toastMock.error).toHaveBeenCalledExactlyOnceWith("auth-register-failed");
+    expect(wrapper.get('[data-test="register-error"]').text()).toContain("auth-register-failed");
     expect(toastMock.success).not.toHaveBeenCalled();
   });
 
@@ -197,7 +217,7 @@ describe("RegisterPage", () => {
 
     expect(wrapper.get('[data-test="register-rate-limit"]').text()).toContain("2");
     expect(wrapper.get('[data-test="register-submit"]').attributes("disabled")).toBeDefined();
-    expect(toastMock.error).not.toHaveBeenCalledWith("auth-register-failed");
+    expect(wrapper.text()).not.toContain("auth-register-failed");
 
     await wrapper.find("form").trigger("submit");
     expect(userStoreMock.register).toHaveBeenCalledTimes(1);

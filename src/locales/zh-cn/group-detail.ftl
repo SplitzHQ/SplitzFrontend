@@ -3,6 +3,7 @@ group-detail-suggested-payments = 待结算金额
 group-detail-settle-up = 结算
 group-detail-owes-you = { $name } 欠你
 group-detail-you-owe = 你欠 { $name }
+group-detail-tabs-label = 群组视图
 group-detail-tab-balances = 结余
 group-detail-tab-trend = 趋势
 group-detail-tab-history = 记录

@@ -73,16 +73,23 @@ watch(
 </script>
 
 <template>
-  <Sheet v-model="model" detent="large" detent-sizing="height" :show-handle="false">
-    <!-- Some hack here to override the transparent top padding from the sheet -->
-    <div ref="stickyHeader" class="sticky -top-4 z-sticky -mt-4 flex flex-col gap-5 bg-base-bg-primary pt-4 pb-4">
-      <div class="text-lg font-medium text-base-text-tertiary">
-        {{ $t("new-expense-review-actions-select-category") }}
-      </div>
-
+  <Sheet
+    v-model="model"
+    :title="$t('new-expense-review-actions-select-category')"
+    detent="large"
+    detent-sizing="height"
+    :show-handle="false"
+  >
+    <!-- The negative offset and margin cover the top padding of the sheet, so a stuck header has no gap above it. -->
+    <div ref="stickyHeader" class="sticky -top-4 z-sticky -mt-4 bg-comp-sheet-bg pt-4 pb-4">
       <div class="flex flex-col gap-3">
         <!-- Search -->
-        <TextInput v-model="searchQuery" :placeholder="$t('new-expense-review-category-search-placeholder')">
+        <TextInput
+          v-model="searchQuery"
+          hide-label
+          :label="$t('new-expense-review-category-search-placeholder')"
+          :placeholder="$t('new-expense-review-category-search-placeholder')"
+        >
           <template #icon>
             <PhMagnifyingGlass />
           </template>

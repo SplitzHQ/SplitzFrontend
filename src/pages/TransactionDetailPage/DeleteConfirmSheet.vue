@@ -18,24 +18,23 @@ const { $t } = useFluent();
 </script>
 
 <template>
-  <Sheet :model-value="modelValue" detent="medium" @update:model-value="emit('update:modelValue', $event)">
-    <div class="flex flex-col gap-6 p-6">
-      <div class="flex flex-col gap-2">
-        <p class="text-lg font-semibold text-base-text-primary">
-          {{ $t("transaction-detail-delete-confirm-title") }}
-        </p>
-        <p class="text-sm text-base-text-secondary">
-          {{ $t("transaction-detail-delete-confirm-message") }}
-        </p>
-      </div>
-      <div class="flex flex-col gap-2">
-        <SButton variant="destructive" size="xl" :loading="isDeleting" @click="emit('confirm')">
-          {{ $t("transaction-detail-delete-confirm-yes") }}
-        </SButton>
-        <SButton variant="secondary" size="xl" :disabled="isDeleting" @click="emit('update:modelValue', false)">
-          {{ $t("transaction-detail-delete-confirm-cancel") }}
-        </SButton>
-      </div>
-    </div>
+  <Sheet
+    :model-value="modelValue"
+    :title="$t('transaction-detail-delete-confirm-title')"
+    detent="medium"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <p class="text-sm text-base-text-secondary">
+      {{ $t("transaction-detail-delete-confirm-message") }}
+    </p>
+
+    <template #actions>
+      <SButton variant="destructive" size="xl" :loading="isDeleting" @click="emit('confirm')">
+        {{ $t("transaction-detail-delete-confirm-yes") }}
+      </SButton>
+      <SButton variant="secondary" size="xl" :disabled="isDeleting" @click="emit('update:modelValue', false)">
+        {{ $t("transaction-detail-delete-confirm-cancel") }}
+      </SButton>
+    </template>
   </Sheet>
 </template>

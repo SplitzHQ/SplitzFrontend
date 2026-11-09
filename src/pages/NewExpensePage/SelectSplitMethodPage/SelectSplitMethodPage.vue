@@ -127,7 +127,12 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
           <div ref="keyboardContainer" class="fixed inset-x-0 bottom-0 z-fixed">
             <Transition name="slide-fade">
               <div v-if="focusedInputUserId" class="-mt-4" @click.stop>
-                <Keyboard v-model="keyboardValue" class="px-4 pb-4" variant="primary" enable-calculator />
+                <Keyboard
+                  :key="focusedInputUserId"
+                  v-model="keyboardValue"
+                  class="px-safe-4 pb-safe-4"
+                  variant="primary"
+                />
               </div>
             </Transition>
           </div>
