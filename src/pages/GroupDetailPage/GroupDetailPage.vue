@@ -134,7 +134,7 @@ const settleUp = () => {
           <SSegmentControl
             v-model="activeTab"
             size="md"
-            :label="$t('group-detail-tabs-label')"
+            :aria-label="$t('group-detail-tabs-label')"
             :items="tabs"
             class="self-start"
           />

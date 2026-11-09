@@ -11,30 +11,30 @@ import { lockPageScroll } from "./sheet-scroll-lock";
 import { useSheetStack } from "./sheet-stack";
 
 /**
- * A modal panel that comes up from the bottom of the screen. See `sheet.usage.ts` for when to use it.
- * Reka UI gives the dialog role, the focus trap, the return of focus, Escape and the order of layers.
- * This file adds the look, the layout of the title and the action area, and the drag.
+ * A modal bottom sheet. See `sheet.usage.ts` for usage rules.
+ * Reka UI handles the dialog role, focus trap, focus restoration, Escape key, and layer stacking.
+ * This component adds styling, the title and action bar layout, and drag gestures.
  *
- * The default slot is the content, and it scrolls. The `actions` slot stays at the bottom, under the content.
+ * The default slot holds the scrollable content. The `actions` slot stays pinned to the bottom.
  */
 interface SheetBaseProps {
-  /** The largest height: `large` is 90% of the visible screen, and `medium` is 50%. */
+  /** Initial height cap: `large` is 90% of the dynamic viewport height, and `medium` is 50%. */
   detent?: "large" | "medium";
-  /** `maxHeight` lets the sheet fit its content. `height` keeps the detent height when the content changes. */
+  /** `maxHeight` lets the sheet shrink to fit its content up to the detent. `height` fixes the sheet at the detent height. */
   detentSizing?: "maxHeight" | "height";
-  /** Shows the drag handle at the top. A drag of the handle changes the height of the sheet. */
+  /** Shows the top drag handle. Dragging the handle lets the user resize the sheet. */
   showHandle?: boolean;
-  /** Adds a close button. It shows only when an external keyboard focuses it, and a screen reader can always find it. */
+  /** Renders a close button that remains visually hidden until focused by a keyboard, while always accessible to screen readers. */
   showCloseButton?: boolean;
-  /** Lets a drag down close the sheet. Turn it off when the content has its own drag, for example a custom slider. */
+  /** Allows dragging down to close the sheet. Disable this when the content handles its own vertical drag gestures. */
   dismissOnDrag?: boolean;
 }
 
-/** A sheet gets its name from its visible title. A sheet with no visible title must have a label. */
+/** A sheet gets its accessible name from its visible `title`, or from `label` when no visible title is rendered. */
 export type SheetProps = SheetBaseProps &
   (
     | {
-        /** The visible title. The sheet draws it and gets its name from it. */
+        /** Visible heading text, also used as the dialog's accessible name. */
         title: string;
         /** A short line under the title. A screen reader reads it after the name of the sheet. */
         description?: string;
@@ -43,7 +43,7 @@ export type SheetProps = SheetBaseProps &
     | {
         title?: undefined;
         description?: undefined;
-        /** The name for a screen reader, when the sheet has no visible title. */
+        /** Screen-reader label required when the sheet has no visible `title`. */
         label: string;
       }
   );
@@ -67,105 +67,109 @@ const { isBehind } = useSheetStack(open);
 
 useStatusBarDim(open);
 
-/** A touch or a mouse press on these elements does not start a drag, because they use the movement themselves. */
-const NO_DRAG = "input, textarea, select, [contenteditable='true'], [role='slider']";
-/** A mouse also fires `click` at the end of a drag, so a drag from these elements would also run the control. */
-const NO_MOUSE_DRAG = `${NO_DRAG}, button, a, label, summary`;
-/** The scroll position of the content, in pixels, above which a press scrolls the content and does not drag. */
-const SCROLL_TOP_DRAG_LIMIT = 10;
-/** The part of the opening height that a drag must pass below that height to close the sheet. */
+/** Elements that handle their own pointer gestures and should never initiate a sheet drag. */
+const NON_DRAGGABLE_SELECTOR = "input, textarea, select, [contenteditable='true'], [role='slider']";
+/** Mouse releases also fire a `click` event, so mouse drags must not start on interactive controls. */
+const NON_MOUSE_DRAGGABLE_SELECTOR = `${NON_DRAGGABLE_SELECTOR}, button, a, label, summary`;
+/** Maximum scroll offset (px) at which dragging the content area pulls the sheet instead of scrolling. */
+const MAX_SCROLL_TOP_FOR_DRAG = 10;
+/** Fraction of the resting height the user must drag down past to dismiss the sheet. */
 const DISMISS_DRAG_RATIO = 0.3;
-/** The number of pixels of a move that makes a press a drag. A shorter move is a tap, and a tap does nothing. */
-const DRAG_SLOP = 3;
-/** The largest height after a drag of the handle, as a part of the area around the panel. It fills the visible screen. */
-const LARGE_RATIO = 0.9;
-const LARGE_HEIGHT = "90%";
-/** The part of a drag above the largest height that the sheet follows, and the most that it goes above that height. */
-const OVERDRAG_RATIO = 0.2;
-const OVERDRAG_LIMIT = 24;
+/** Minimum pointer movement (px) required to treat a press as a drag rather than a tap. */
+const DRAG_THRESHOLD_PX = 3;
+/** Expanded height target when dragging the handle upward, as a fraction and CSS percentage of the container. */
+const EXPANDED_HEIGHT_RATIO = 0.9;
+const EXPANDED_HEIGHT_CSS = "90%";
+/** Damping factor and maximum pixel offset when dragging upward past the expanded height. */
+const OVERDRAG_DAMPING = 0.2;
+const MAX_OVERDRAG_PX = 24;
 
 const sheetRef = useTemplateRef<HTMLElement>("sheet");
 const contentRef = useTemplateRef<HTMLElement>("content");
+const topBlurBandRef = useTemplateRef<HTMLElement>("topBlurBand");
 const actionsRef = useTemplateRef<HTMLElement>("actions");
-const topBandRef = useTemplateRef<HTMLElement>("topBand");
 
-/** The scroll distance at which the top blur has full strength: the top padding and one line of the title. */
-const TOP_BAND_RANGE = 52;
-/** The gap between the content and the action area. The bottom blur goes over this gap, so the last item stays clear. */
-const ACTIONS_GAP = "1.5rem";
+/** Scroll distance (px) over which the top blur band ramps from 0 to full strength (top padding + one title line). */
+const TOP_BLUR_SCROLL_RANGE_PX = 52;
+/** Extra space between the end of the scrollable content and the floating action bar. */
+const ACTIONS_CLEARANCE_GAP = "1.5rem";
 
 const actionsHeight = ref(0);
 
-// The action area goes over the content. An error or a countdown in the slot changes its height.
+// Track the floating action bar height as its content changes (e.g., error notices or countdowns).
 useResizeObserver(actionsRef, ([entry]) => {
   actionsHeight.value = entry?.borderBoxSize[0]?.blockSize ?? 0;
 });
 
-/** Keeps the end of the content, and a field that gets focus, clear of the action area. */
-const contentStyle = computed(() => {
-  const clearance = `calc(${actionsHeight.value}px + ${ACTIONS_GAP})`;
+/** Bottom padding and scroll padding so the last content item and focused inputs stay above the floating action bar. */
+const contentBottomClearanceStyle = computed(() => {
+  const clearance = `calc(${actionsHeight.value}px + ${ACTIONS_CLEARANCE_GAP})`;
   return { paddingBottom: clearance, scrollPaddingBottom: clearance };
 });
 
 /**
- * Makes the top blur follow the scroll, so the title becomes clear with the finger and not after a timed fade.
- * This writes the style directly, because a render of the sheet on each scroll would cost more than the blur.
+ * Updates the top blur strength directly on the DOM element during scroll to avoid triggering Vue re-renders.
  */
-function updateTopBand() {
-  const strength = Math.min(1, (contentRef.value?.scrollTop ?? 0) / TOP_BAND_RANGE);
-  topBandRef.value?.style.setProperty("--blur-band-strength", String(strength));
+function updateTopBlurBand() {
+  const strength = Math.min(1, (contentRef.value?.scrollTop ?? 0) / TOP_BLUR_SCROLL_RANGE_PX);
+  topBlurBandRef.value?.style.setProperty("--blur-band-strength", String(strength));
 }
 
 const isDragging = ref(false);
-const isMouseDrag = ref(false);
-/** True when the press started on the handle. Only such a press can make the sheet taller. */
-const isHandleDrag = ref(false);
+const isMouseDragging = ref(false);
+/** True when the drag started on the handle or title. Only handle drags can expand the sheet. */
+const isHandleDragging = ref(false);
 const dragStartY = ref(0);
 const dragCurrentY = ref(0);
-/** The height of the sheet when the press started. */
-const startHeight = ref(0);
-/** The height that the sheet opened at, and the largest height. A drag of the handle measures them. */
-const openHeight = ref(0);
-const largestHeight = ref(0);
-/** True when a drag left the sheet at the largest height. */
+/** Sheet height in pixels when the current drag gesture started. */
+const dragStartHeight = ref(0);
+/** Unexpanded height in pixels measured before expanding. Used as the baseline for dismissal and collapsing back. */
+const defaultRestingHeight = ref(0);
+/** Maximum expanded height in pixels (90% of the container, or `defaultRestingHeight` if already taller). */
+const maxExpandedHeight = ref(0);
+/** True when the user has dragged the handle up to lock the sheet at its expanded height. */
 const isExpanded = ref(false);
-/** The height that the sheet moves to while it goes back to its opening height. Null at other times. */
-const settlingHeight = ref<number | null>(null);
-let settleId = 0;
+/** Explicit pixel height used while animating back to the resting height, since CSS cannot transition to `auto`. */
+const collapsingHeight = ref<number | null>(null);
+let collapseAnimationId = 0;
 
-/** The dvh unit follows the browser bars, so the top of the sheet stays on the screen when the address bar shows. */
-const detentStyle = computed(() => {
+/** Default CSS sizing from the `detent` and `detentSizing` props. Uses `dvh` to respect mobile browser toolbars. */
+const sheetDefaultStyle = computed(() => {
   const size = detent === "medium" ? "50dvh" : "90dvh";
   return detentSizing === "height" ? { height: size } : { maxHeight: size };
 });
 
-const dragDelta = computed(() => (isDragging.value ? dragCurrentY.value - dragStartY.value : 0));
-/** The height that the drag asks for. It can be above the largest height and below the opening height. */
-const wantedHeight = computed(() => startHeight.value - dragDelta.value);
-/** The height that the sheet shows during a drag. Above the largest height, it follows only a part of the drag. */
-const dragHeight = computed(() => {
-  const above = wantedHeight.value - largestHeight.value;
-  if (above > 0) return largestHeight.value + Math.min(above * OVERDRAG_RATIO, OVERDRAG_LIMIT);
-  return Math.max(openHeight.value, wantedHeight.value);
+/** Vertical pointer movement in pixels since the drag started (positive = downward, negative = upward). */
+const dragDeltaY = computed(() => (isDragging.value ? dragCurrentY.value - dragStartY.value : 0));
+/** Target height in pixels requested by the pointer position before clamping or overdrag damping. */
+const unclampedDragHeight = computed(() => dragStartHeight.value - dragDeltaY.value);
+/** Clamped height in pixels applied while resizing the sheet. Applies rubber-band damping above `maxExpandedHeight`. */
+const activeDragHeight = computed(() => {
+  const overdrag = unclampedDragHeight.value - maxExpandedHeight.value;
+  if (overdrag > 0) return maxExpandedHeight.value + Math.min(overdrag * OVERDRAG_DAMPING, MAX_OVERDRAG_PX);
+  return Math.max(defaultRestingHeight.value, unclampedDragHeight.value);
 });
-/** The distance that the sheet moves down. It starts when the drag goes below the opening height. */
-const dragOffset = computed(() =>
-  isDragging.value && (dismissOnDrag || !isHandleDrag.value) ? Math.max(0, openHeight.value - wantedHeight.value) : 0
+/**
+ * Downward translation in pixels when dragging below `defaultRestingHeight`.
+ * Only active when `dismissOnDrag` is enabled.
+ */
+const sheetTranslateY = computed(() =>
+  isDragging.value && dismissOnDrag ? Math.max(0, defaultRestingHeight.value - unclampedDragHeight.value) : 0
 );
-const shouldDismiss = computed(() => dragOffset.value > openHeight.value * DISMISS_DRAG_RATIO);
-/** True when the handle shows that the sheet follows the press. */
+const shouldDismiss = computed(() => sheetTranslateY.value > defaultRestingHeight.value * DISMISS_DRAG_RATIO);
+/** Highlights the handle bar immediately on handle press, or once a content drag exceeds the tap threshold. */
 const isHandleActive = computed(
-  () => isDragging.value && (isHandleDrag.value || Math.abs(dragDelta.value) > DRAG_SLOP)
+  () => isDragging.value && (isHandleDragging.value || Math.abs(dragDeltaY.value) > DRAG_THRESHOLD_PX)
 );
 
-/** A height set by a drag replaces the height of the detent. */
-const heightStyle = computed(() => {
-  if (isDragging.value && (isHandleDrag.value || isExpanded.value)) {
-    return { height: `${dragHeight.value}px`, maxHeight: "none" };
+/** Active height style: overrides the default detent sizing during a resize drag, when expanded, or while collapsing. */
+const sheetHeightStyle = computed(() => {
+  if (isDragging.value && (isHandleDragging.value || isExpanded.value)) {
+    return { height: `${activeDragHeight.value}px`, maxHeight: "none" };
   }
-  if (isExpanded.value) return { height: LARGE_HEIGHT, maxHeight: "none" };
-  if (settlingHeight.value !== null) return { height: `${settlingHeight.value}px`, maxHeight: "none" };
-  return detentStyle.value;
+  if (isExpanded.value) return { height: EXPANDED_HEIGHT_CSS, maxHeight: "none" };
+  if (collapsingHeight.value !== null) return { height: `${collapsingHeight.value}px`, maxHeight: "none" };
+  return sheetDefaultStyle.value;
 });
 
 /**
@@ -188,100 +192,104 @@ function dismiss() {
   open.value = false;
 }
 
-/** Returns the vertical position of a touch or a mouse event. */
-function eventY(event: TouchEvent | MouseEvent) {
+/** Extracts the client Y coordinate from a mouse or touch event. */
+function getPointerY(event: TouchEvent | MouseEvent) {
   return "touches" in event ? (event.touches[0]?.clientY ?? 0) : event.clientY;
 }
 
-/** Starts a drag on the handle, or on a free part of the sheet when the content is at its top. */
+/** Starts a drag from the handle (resize + dismiss) or from the content area when scrolled to the top (dismiss only). */
 function startDrag(event: TouchEvent | MouseEvent) {
   const isMouse = !("touches" in event);
   if (isMouse && event.button !== 0) return;
 
   const target = event.target as Element;
-  if (target.closest(isMouse ? NO_MOUSE_DRAG : NO_DRAG)) return;
+  if (target.closest(isMouse ? NON_MOUSE_DRAGGABLE_SELECTOR : NON_DRAGGABLE_SELECTOR)) return;
 
   const isHandle = showHandle && target.closest("[data-sheet-handle]") !== null;
   if (!isHandle) {
     if (!dismissOnDrag) return;
-    if ((contentRef.value?.scrollTop ?? 0) > SCROLL_TOP_DRAG_LIMIT) return;
+    if ((contentRef.value?.scrollTop ?? 0) > MAX_SCROLL_TOP_FOR_DRAG) return;
   }
 
-  const height = sheetRef.value?.offsetHeight ?? 0;
-  if (!isExpanded.value && settlingHeight.value === null) openHeight.value = height;
-  startHeight.value = height;
-  largestHeight.value = Math.max(openHeight.value, (sheetRef.value?.parentElement?.clientHeight ?? 0) * LARGE_RATIO);
+  const currentHeight = sheetRef.value?.offsetHeight ?? 0;
+  if (!isExpanded.value && collapsingHeight.value === null) defaultRestingHeight.value = currentHeight;
+  dragStartHeight.value = currentHeight;
+  maxExpandedHeight.value = Math.max(
+    defaultRestingHeight.value,
+    (sheetRef.value?.parentElement?.clientHeight ?? 0) * EXPANDED_HEIGHT_RATIO
+  );
 
   isDragging.value = true;
-  isMouseDrag.value = isMouse;
-  isHandleDrag.value = isHandle;
-  dragStartY.value = eventY(event);
+  isMouseDragging.value = isMouse;
+  isHandleDragging.value = isHandle;
+  dragStartY.value = getPointerY(event);
   dragCurrentY.value = dragStartY.value;
 }
 
-/** Follows the press. A move above the start of a free press ends the drag, so that the movement can scroll the content. */
+/** Updates the drag position. Cancels non-handle drags if the pointer moves upward so the content can scroll normally. */
 function moveDrag(event: TouchEvent | MouseEvent) {
-  dragCurrentY.value = eventY(event);
-  if (!isHandleDrag.value && dragCurrentY.value < dragStartY.value) resetDrag();
+  dragCurrentY.value = getPointerY(event);
+  if (!isHandleDragging.value && dragCurrentY.value < dragStartY.value) cancelDrag();
 }
 
-/** Ends the drag. A long drag down closes the sheet. Each other drag leaves it at the nearest of its two heights. */
+/** Finishes the drag: dismisses if pulled far enough down, otherwise snaps to the nearest height (expanded or resting). */
 function endDrag() {
-  const closes = shouldDismiss.value;
-  const resizes = isHandleDrag.value || isExpanded.value;
-  const isTap = Math.abs(dragDelta.value) <= DRAG_SLOP;
-  const isNearLargest = dragOffset.value === 0 && dragHeight.value > (openHeight.value + largestHeight.value) / 2;
+  const willDismiss = shouldDismiss.value;
+  const canResize = isHandleDragging.value || isExpanded.value;
+  const isTap = Math.abs(dragDeltaY.value) <= DRAG_THRESHOLD_PX;
+  const shouldExpand =
+    sheetTranslateY.value === 0 && activeDragHeight.value > (defaultRestingHeight.value + maxExpandedHeight.value) / 2;
 
-  if (resizes && !isTap) {
-    if (!closes && isNearLargest) isExpanded.value = true;
-    else void settleAtOpenHeight();
+  if (canResize && !isTap) {
+    if (!willDismiss && shouldExpand) isExpanded.value = true;
+    else void collapseToRestingHeight();
   }
-  if (closes) dismiss();
-  resetDrag();
+  if (willDismiss) dismiss();
+  cancelDrag();
 }
 
 /**
- * Moves the sheet to its opening height. CSS cannot animate a height to `auto`, so the sheet uses a height in pixels
- * until the animation ends. It then fits its content again.
+ * Animates the sheet back to its initial resting height.
+ * Because CSS cannot transition `height` to `auto`, this sets an explicit pixel height until the transition finishes.
  */
-async function settleAtOpenHeight() {
+async function collapseToRestingHeight() {
   isExpanded.value = false;
-  settlingHeight.value = openHeight.value;
-  const id = ++settleId;
+  collapsingHeight.value = defaultRestingHeight.value;
+  const id = ++collapseAnimationId;
   await nextTick();
   await Promise.allSettled(sheetRef.value?.getAnimations?.().map(({ finished }) => finished) ?? []);
-  if (id === settleId) settlingHeight.value = null;
+  if (id === collapseAnimationId) collapsingHeight.value = null;
 }
 
-/** Ends the press. The sheet goes back to the height that it had before the press. */
-function resetDrag() {
+/** Clears active drag flags so the sheet snaps back or finishes its transition. */
+function cancelDrag() {
   isDragging.value = false;
-  isMouseDrag.value = false;
-  isHandleDrag.value = false;
+  isMouseDragging.value = false;
+  isHandleDragging.value = false;
 }
 
-/** Focuses the panel and not the first control. On a phone, focus in a text field would open the keyboard. */
+/** Moves initial focus to the dialog panel itself rather than the first input, preventing mobile keyboards from popping up automatically. */
 function focusPanel(event: Event) {
   event.preventDefault();
   sheetRef.value?.focus({ preventScroll: true });
 }
 
-// The document gets these listeners only during a drag, because a move can leave the sheet.
-const dragTarget = () => (isDragging.value ? document : null);
-useEventListener(dragTarget, ["mousemove", "touchmove"], moveDrag, {
+// Attach document-level move/end listeners only while a drag is active so pointer movement outside the sheet is tracked.
+const activeDragDocument = () => (isDragging.value ? document : null);
+useEventListener(activeDragDocument, ["mousemove", "touchmove"], moveDrag, {
   passive: true,
 });
-useEventListener(dragTarget, ["mouseup", "touchend"], endDrag);
-useEventListener(dragTarget, "touchcancel", resetDrag);
+useEventListener(activeDragDocument, ["mouseup", "touchend"], endDrag);
+useEventListener(activeDragDocument, "touchcancel", cancelDrag);
 
-// A sheet always opens at its opening height, also when it was at the largest height when it closed.
+// Reset expansion state whenever the sheet opens so it always starts at its default detent height.
 watch(open, (isOpen) => {
   if (!isOpen) return;
   isExpanded.value = false;
-  settlingHeight.value = null;
+  collapsingHeight.value = null;
 });
 
-// The cleanup also runs on unmount, so a sheet that a route change removes does not leave the page locked.
+// Lock background page scroll while the sheet is open; cleanup also runs on unmount (e.g., during route navigation).
 watchEffect((onCleanup) => {
   if (open.value) onCleanup(lockPageScroll());
 });
@@ -291,12 +299,12 @@ watchEffect((onCleanup) => {
   <DialogRoot v-model:open="open">
     <DialogPortal>
       <Transition name="sheet-backdrop" @before-leave="releaseStatusBarHold">
-        <!-- The backdrop is a plain element. The DialogOverlay of Reka UI sets `pointer-events: none` on the body, and that stops a tap on a toast. -->
+        <!-- Plain backdrop element instead of Reka UI's DialogOverlay, which sets `pointer-events: none` on body and blocks toast clicks. -->
         <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
         <div v-if="open" class="fixed inset-0 z-modalBackdrop bg-base-bg-overlay" @click="dismiss">
           <div class="absolute inset-0 z-modal flex items-end justify-center">
-            <!-- Only the backdrop closes the sheet on a tap, so a tap on a toast keeps the sheet open. -->
-            <!-- Do not put a comment in the slot of DialogContent. A slot with a comment has no single root in dev mode. -->
+            <!-- Prevent outside interactions (like clicking a toast) from auto-closing the dialog; backdrop clicks call `dismiss` directly. -->
+            <!-- Keep a single root element with no sibling HTML comments inside DialogContent (`as-child` requires a single child node in dev mode). -->
             <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
             <DialogContent
               as-child
@@ -311,21 +319,18 @@ watchEffect((onCleanup) => {
                 ref="sheet"
                 :class="[
                   'sheet relative flex w-full flex-col overflow-hidden rounded-t-3xl bg-comp-sheet-bg shadow-2xl outline-none',
-                  { 'is-behind': isBehind, 'is-dragging': isDragging, 'select-none': isMouseDrag },
+                  { 'is-behind': isBehind, 'is-dragging': isDragging, 'select-none': isMouseDragging },
                 ]"
                 :style="{
-                  ...heightStyle,
-                  transform: isDragging ? `translateY(${dragOffset}px)` : undefined,
+                  ...sheetHeightStyle,
+                  transform: isDragging ? `translateY(${sheetTranslateY}px)` : undefined,
                   opacity: isDragging && shouldDismiss ? 0.8 : undefined,
                 }"
                 @click.stop
                 @touchstart.passive="startDrag"
                 @mousedown="startDrag"
               >
-                <!-- The panel gets its name from a DialogTitle. With no visible title, this one holds the name and is hidden. -->
-                <DialogTitle v-if="!title" hidden>{{ label }}</DialogTitle>
-
-                <!-- The strip has no color, because the top blur goes under it to the edge of the panel. A screen reader does not need the handle, because it can only drag. -->
+                <!-- Transparent handle strip so the top blur band shows through to the panel edge. Hidden from screen readers since dragging is pointer-only. -->
                 <div
                   v-if="showHandle"
                   aria-hidden="true"
@@ -337,7 +342,7 @@ watchEffect((onCleanup) => {
                   </div>
                 </div>
 
-                <!-- A finger closes the sheet with a tap on the backdrop or a drag. This button is for a screen reader and an external keyboard. -->
+                <!-- Visually hidden unless keyboard-focused; provides an accessible close control for keyboard and screen-reader users. -->
                 <button
                   v-if="showCloseButton"
                   type="button"
@@ -355,12 +360,12 @@ watchEffect((onCleanup) => {
                     title ? 'pt-6' : 'pt-4',
                     { 'pb-safe-4': !$slots.actions },
                   ]"
-                  :style="$slots.actions ? contentStyle : undefined"
-                  @scroll.passive="updateTopBand"
+                  :style="$slots.actions ? contentBottomClearanceStyle : undefined"
+                  @scroll.passive="updateTopBlurBand"
                 >
                   <!--
-                    The content is not a flex box, so a sticky header in the slot keeps its place.
-                    With the strip above it, the title makes the handle tall enough for a finger.
+                    Block layout (not flex) so sticky headers inside the default slot work as expected.
+                    Marks the title with `data-sheet-handle` so dragging the title also resizes the sheet.
                   -->
                   <DialogTitle
                     v-if="title"
@@ -373,6 +378,8 @@ watchEffect((onCleanup) => {
                   >
                     {{ title }}
                   </DialogTitle>
+                  <!-- Hidden DialogTitle provides the accessible dialog name when no visible `title` is used. -->
+                  <DialogTitle v-else hidden>{{ label }}</DialogTitle>
                   <!-- The gap under the line is for the content, so a sheet with only this line does not get taller. -->
                   <DialogDescription
                     v-if="description"
@@ -383,10 +390,10 @@ watchEffect((onCleanup) => {
                   <slot />
                 </div>
 
-                <!-- A sheet with no handle can have a sticky header, and this blur would cover it. The size is the strip and the fade. -->
+                <!-- Only render the top blur band when `showHandle` is enabled so sheets without a handle can use their own sticky header. -->
                 <div
                   v-if="showHandle"
-                  ref="topBand"
+                  ref="topBlurBand"
                   class="absolute inset-x-0 top-0"
                   style="--blur-band-size: 2.5rem; --blur-band-strength: 0"
                 >
@@ -409,7 +416,7 @@ watchEffect((onCleanup) => {
 </template>
 
 <style scoped>
-/* The panel is inside the backdrop, so the backdrop fades its color and not its opacity. The panel stays opaque. */
+/* Animate background-color instead of opacity because `.sheet` is nested inside the backdrop and must stay fully opaque. */
 .sheet-backdrop-enter-active,
 .sheet-backdrop-leave-active {
   transition: background-color var(--motion-duration-sheet) var(--motion-easing-sheet);
@@ -420,7 +427,7 @@ watchEffect((onCleanup) => {
   background-color: transparent;
 }
 
-/* A leaving sheet does not stop a tap on the page, because the way out takes some time. */
+/* Allow clicks to pass through to the page immediately while the closing animation plays. */
 .sheet-backdrop-leave-active {
   pointer-events: none;
 }
@@ -429,21 +436,21 @@ watchEffect((onCleanup) => {
   transform: translateY(100%);
 }
 
-/* The way out goes past 100%, so the shadow also leaves the screen. */
+/* Translate past 100% on exit so the panel's top shadow also clears the bottom of the viewport. */
 .sheet-backdrop-leave-to .sheet {
   transform: translateY(105%);
 }
 
 /*
- * The blur bands use the color of the panel. In the dark theme it is not the color of the page.
- * `will-change` makes the panel a backdrop root, so the top blur does not read the scrim above the panel.
+ * Match the blur band tint to the sheet background color (which differs from the page background in dark mode).
+ * `will-change: opacity` establishes a backdrop root so the top blur band only samples content inside the sheet, not the backdrop scrim.
  */
 .sheet {
   --blur-band-color: var(--comp-sheet-bg);
   will-change: opacity;
 }
 
-/* `scale` is separate from `transform`, so the step back and the slide or the drag do not change each other. */
+/* Use the standalone `scale` property so background-sheet scaling does not conflict with slide/drag `transform`. */
 .sheet {
   transform-origin: bottom center;
   transition:
@@ -454,9 +461,9 @@ watchEffect((onCleanup) => {
 }
 
 /*
- * The bar gets 4px wider, and only its two ends move. Do not use a transform here. A running transform puts the bar on
- * its own layer. On a 1.5x screen the 5px bar is 7.5 device pixels, so that layer draws it about 1px thicker until the
- * animation stops.
+ * Expand the handle bar by 2px on each side when active by animating `left` and `right` instead of `transform: scaleX()`.
+ * A transform promotes the 5px-tall bar to its own compositor layer, which causes fractional-pixel rounding on 1.5x displays
+ * and makes the bar appear ~1px thicker during the transition.
  */
 .sheet-handle-fill {
   left: 0;
@@ -473,18 +480,18 @@ watchEffect((onCleanup) => {
   background-color: var(--base-fg-tertiary);
 }
 
-/* Another sheet is open over this one. The bottom edge stays on the edge of the screen. */
+/* Scale down slightly from the bottom center when another sheet opens on top of this one. */
 .sheet.is-behind {
   scale: var(--motion-scale-sheet-back);
 }
 
-/* The sheet follows the press with no delay. The transition returns when the press ends. */
+/* Disable transitions during an active drag so the sheet tracks the pointer without lag. */
 .sheet.is-dragging {
   transition: none;
 }
 
 .sheet-content {
-  /* A field that gets focus stays clear of the handle strip and the top blur. */
+  /* Keep focused inputs from scrolling underneath the top handle strip and blur band. */
   scroll-padding-top: 2.5rem;
   touch-action: pan-y;
   overscroll-behavior: contain;
