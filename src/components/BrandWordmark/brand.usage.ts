@@ -5,6 +5,8 @@
  * `brand-wordmark.usage.ts`.
  * The app does not import this file, so the rules do not go into the app bundle.
  */
+import { SIGN_IN_PATTERN, type PatternSettings } from "@/components/BrandPattern/brand-pattern";
+
 import { BRAND_COLOR, LIGHT_COLOR } from "./brand-glyph";
 
 /** Where the rules apply. */
@@ -355,38 +357,11 @@ const PATTERN_LOOKS: Record<BrandPattern, Omit<PatternGuide, "pattern">> = {
 export const PATTERN_GUIDE: PatternGuide[] = PATTERNS.map((pattern) => ({ pattern, ...PATTERN_LOOKS[pattern] }));
 
 /**
- * All settings of one pattern. The names and the values are the same as in `devtools/patterns/playground.ts`, so the
- * Patterns tool can draw a preset as it is. Lengths are in the units of a box that is 640 wide.
+ * All settings of one pattern. The type is the settings of the generator in
+ * `src/components/BrandPattern/brand-pattern.ts`, so the app and the Patterns tool can draw a preset as it is. Lengths
+ * are in the units of the box. The Patterns tool draws a box that is 640 wide, and the app uses CSS pixels.
  */
-export interface PatternPreset {
-  /** The size of one repeat. */
-  cell: number;
-  /** The size of the shapes against the cell. */
-  scale: number;
-  /** The seed of the `noise` direction. */
-  seed: number;
-  /** The number of shapes against the default grid, in each direction. */
-  density: number;
-  direction: "ltr" | "ttb" | "diagonal" | "radial" | "wave" | "noise";
-  /** True when the change starts from the other side. */
-  reverse: boolean;
-  ease: "linear" | "in" | "out" | "inOut" | "steps";
-  /** True when the color changes from the dot color to the diamond color. */
-  color: boolean;
-  /** True when the size changes from `sizeFrom` to the full size. */
-  sizeRamp: boolean;
-  sizeFrom: number;
-  /** True when a dot turns into a diamond. Only the `morph` pattern reads it. */
-  shape: boolean;
-  /** `split` draws the dots as outlines and fills the diamonds. `grow` goes from an outline to a solid shape. */
-  fill: "solid" | "outline" | "split" | "grow";
-  /** The width of an outline. */
-  stroke: number;
-  /** The ground and its shape colors. `devtools/patterns/playground.ts` has the tokens of each ground. */
-  ground: "white" | "tint" | "brand" | "deep";
-  /** The opacity of all shapes together. The ground stays opaque. */
-  opacity: number;
-}
+export type PatternPreset = Omit<PatternSettings, "shift">;
 
 /**
  * The two tiers of pattern use. In the app UI a pattern is subtle and stays behind the content. Outside the app a
@@ -585,15 +560,15 @@ const PATTERN_USE_RULES: Record<PatternUse, Omit<PatternUseGuide, "use">> = {
     why: "Outlined dots and solid diamonds stay light on white and print well.",
   },
   signIn: {
-    fade: "edges",
+    fade: SIGN_IN_PATTERN.fade,
     ground: false,
     name: "Sign-in page",
-    pattern: "morph",
-    preset: { ...PRESET_BASE, ease: "out", fill: "outline", opacity: 0.15, shape: true },
+    pattern: SIGN_IN_PATTERN.kind,
+    preset: SIGN_IN_PATTERN.settings,
     tier: "ui",
     where:
-      "The background of the sign-in page. The shapes stay at the edges, and the form in the middle sits on clear page.",
-    why: "Thin outlines at the edges frame the form and do not touch it.",
+      "The top right corner of every account page that uses AuthShell: sign in, register, forgot password, reset password and the status pages. The shapes fade toward the logo and the title. The pattern does not move.",
+    why: "A very faint checker marks the page as Splitz and leaves the form on clear page. The user picked the corner, the checker, the radial field and no motion in the prototype `2026-11-06-sign-in-pattern` (SPZ-100).",
   },
   social: {
     fade: "none",
@@ -665,6 +640,10 @@ export const PATTERN_RULES: BrandRule[] = [
     title: "Shapes",
   },
   {
+    rule: "The app draws a pattern with the `BrandPattern` component and the generator in `brand-pattern.ts`. Do not save an SVG file of a pattern into `src/assets`. The preset of each use that the app shows is a constant in `brand-pattern.ts`, and this file reads it. The user decided this when the sign-in pattern landed (SPZ-100).",
+    title: "In the app",
+  },
+  {
     rule: "Use a `ui` use in the app UI and a `brand` use outside the app. Do not use a brand preset in the app UI. The limits of each tier are in `PATTERN_TIER_GUIDE`.",
     title: "Tiers",
   },
@@ -708,5 +687,4 @@ export const OPEN_QUESTIONS: string[] = [
   "Colorways: may the logo be one-color black or white, for example on a photo, in a store screenshot or in print? Now only the two colorways in this file are allowed.",
   "Misuse: the eight cases are a draft. Add, remove or change them.",
   "Pattern motion: may a pattern move, for example on the website or behind the success icon? Now all patterns are still.",
-  "Pattern in the app: save SVG files from the Patterns tool into `src/assets`, or move the generator into a component? Now the app shows no pattern.",
 ];

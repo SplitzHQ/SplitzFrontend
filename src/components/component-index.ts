@@ -36,6 +36,12 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "A progressive blur over content that scrolls under a fixed area. Sheet and BottomAction add it, so a page does not use it directly.",
   },
   {
+    components: ["BrandPattern"],
+    folder: "BrandPattern",
+    usage: "src/components/BrandPattern/brand-pattern.usage.ts",
+    use: "A faint brand pattern of dots and diamonds behind the content of a screen, for example the top right corner of the account pages. The rules for where a pattern may go are in `src/components/BrandWordmark/brand.usage.ts`.",
+  },
+  {
     components: ["BrandWordmark", "BrandHomeLogo", "BrandTapLogo", "BrandTapMark", "BrandOpening"],
     folder: "BrandWordmark",
     usage: "src/components/BrandWordmark/brand-wordmark.usage.ts",

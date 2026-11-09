@@ -31,6 +31,11 @@ describe("AuthShell", () => {
     expect(live.find("h1").exists()).toBe(true);
   });
 
+  it("shows the sign-in pattern on every account page, a status page too", () => {
+    expect(mountShell().findComponent({ name: "BrandPattern" }).exists()).toBe(true);
+    expect(mountShell({ status: true }).findComponent({ name: "BrandPattern" }).exists()).toBe(true);
+  });
+
   it("shows the logo only on a page that is not a status page", () => {
     expect(mountShell().find("header").exists()).toBe(true);
     expect(mountShell({ status: true }).find("header").exists()).toBe(false);
