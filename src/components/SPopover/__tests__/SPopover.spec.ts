@@ -15,7 +15,7 @@ function mountPopover(enabled = true) {
         return { enabled: ref(enabled), open: ref(false) };
       },
       template: `
-      <SPopover v-model="open" :enabled="enabled" aria-label="Requests" class="w-[26rem]" data-test="panel">
+      <SPopover v-model="open" :enabled="enabled" aria-label="Requests" class="w-104" data-test="panel">
         <template #trigger><button type="button">Open requests</button></template>
         <button type="button" @click="open = false">Close requests</button>
         <button type="button" @click="enabled = false">Disable panel</button>
@@ -54,7 +54,7 @@ describe("SPopover", () => {
     const panel = document.querySelector('[role="dialog"]');
     expect(panel?.getAttribute("aria-label")).toBe("Requests");
     expect(panel?.getAttribute("data-test")).toBe("panel");
-    expect(panel?.classList.contains("w-[26rem]")).toBe(true);
+    expect(panel?.classList.contains("w-104")).toBe(true);
     expect(panel?.classList.contains("w-96")).toBe(false);
     expect(trigger.element.closest("[role='dialog']")).toBeNull();
     expect(trigger.attributes("aria-expanded")).toBe("true");

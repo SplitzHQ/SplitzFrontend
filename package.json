@@ -52,6 +52,8 @@
     "@storybook/addon-themes": "^10.6.2",
     "@storybook/addon-vitest": "^10.6.2",
     "@storybook/vue3-vite": "^10.6.2",
+    "@tailwindcss/node": "^4.3.3",
+    "@tailwindcss/oxide": "^4.3.3",
     "@tailwindcss/postcss": "^4.3.3",
     "@tsconfig/node24": "^24.0.5",
     "@types/big.js": "^7.0.0",
