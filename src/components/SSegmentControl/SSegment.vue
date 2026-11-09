@@ -9,16 +9,14 @@ import type { SegmentSize } from "./segment";
 export interface SegmentProps {
   /** The size of the segment. */
   size: SegmentSize;
-  /** True for the selected segment. */
+  /** True for the selected segment. Only the selected segment is in the tab order. */
   active: boolean;
-  /** True for the one segment of the control that is in the tab order. */
-  tabbable: boolean;
-  /** The shared name of the selected background. Each control needs its own, or motion shows only one background. */
+  /** The layout ID of the selected background. All segments of one control use the same ID, so the background slides between them. */
   layoutId: string;
 }
 type SegmentEvents = (e: "click") => void;
 
-const { size, active, tabbable, layoutId } = defineProps<SegmentProps>();
+const { size, active, layoutId } = defineProps<SegmentProps>();
 const emit = defineEmits<SegmentEvents>();
 </script>
 
@@ -28,7 +26,7 @@ const emit = defineEmits<SegmentEvents>();
     type="button"
     role="radio"
     :aria-checked="active"
-    :tabindex="tabbable ? 0 : -1"
+    :tabindex="active ? 0 : -1"
     class="relative rounded-full after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
     @click="emit('click')"
   >

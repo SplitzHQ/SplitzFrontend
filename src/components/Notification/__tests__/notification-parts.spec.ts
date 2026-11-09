@@ -4,6 +4,7 @@ import { reactive } from "vue";
 
 import NotificationBadge from "@/components/Notification/NotificationBadge.vue";
 import NotificationItem from "@/components/Notification/NotificationItem.vue";
+import NotificationList from "@/components/Notification/NotificationList.vue";
 import NotificationPanel from "@/components/Notification/NotificationPanel.vue";
 import NotificationSheet from "@/components/Notification/NotificationSheet.vue";
 import RequestCard, { type RequestNotification } from "@/components/Notification/RequestCard.vue";
@@ -143,47 +144,46 @@ describe("NotificationItem", () => {
   });
 });
 
-/** Mounts the panel with the given store state. */
-function mountPanel(state: Record<string, unknown>) {
+/** Mounts the list with the given store state. */
+function mountList(state: Record<string, unknown>) {
   Object.assign(mocks.store, state);
-  return mount(NotificationPanel, { global, props: {} });
+  return mount(NotificationList, { global });
 }
 
-describe("NotificationPanel", () => {
+describe("NotificationList", () => {
   it("shows the empty message only after the first request", () => {
-    const loading = mountPanel({ loaded: false, loading: true });
+    const loading = mountList({ loaded: false, loading: true });
     expect(loading.text()).not.toContain("notification-empty-title");
     expect(loading.get('[role="status"]').attributes("aria-label")).toBe("notification-loading");
 
-    const empty = mountPanel({ loaded: true, loading: false });
+    const empty = mountList({ loaded: true, loading: false });
     expect(empty.text()).toContain("notification-empty-title");
     expect(empty.find('[role="status"]').exists()).toBe(false);
   });
 
-  it("shows the empty message when no request ran, so the panel does not stay in a loading state", () => {
-    const wrapper = mountPanel({ loaded: false, loading: false });
+  it("shows the empty message when no request ran, so the list does not stay in a loading state", () => {
+    const wrapper = mountList({ loaded: false, loading: false });
 
     expect(wrapper.text()).toContain("notification-empty-title");
   });
 
   it("announces an error and retries", async () => {
-    const wrapper = mountPanel({ error: new Error("offline"), loaded: false });
+    const wrapper = mountList({ error: new Error("offline"), loaded: false });
 
     expect(wrapper.get('[role="alert"]').text()).toBe("notification-error");
-    const buttons = wrapper.findAll("button");
-    await buttons[buttons.length - 1].trigger("click");
+    await wrapper.get("button").trigger("click");
     expect(mocks.store.fetch).toHaveBeenCalledOnce();
   });
 
   it("keeps a stale list on screen when a later request fails", () => {
-    const wrapper = mountPanel({ activity: [activity()], error: new Error("offline") });
+    const wrapper = mountList({ activity: [activity()], error: new Error("offline") });
 
     expect(wrapper.find('[role="alert"]').exists()).toBe(false);
     expect(wrapper.findAll("li")).toHaveLength(1);
   });
 
   it("marks the row as read, opens its page and asks the container to close", async () => {
-    const wrapper = mountPanel({ activity: [activity()] });
+    const wrapper = mountList({ activity: [activity()] });
 
     await wrapper.get("li button").trigger("click");
     await flushPromises();
@@ -197,55 +197,75 @@ describe("NotificationPanel", () => {
   });
 });
 
-/** A sheet with no portal, so a test can read both slots. */
+/** A sheet with no portal, so a test can read both slots. The label names the dialog, so a test can find each sheet. */
 const SHEET_STUB = {
-  props: ["modelValue"],
+  props: ["modelValue", "label"],
   template:
-    '<div v-if="modelValue" role="dialog"><slot /><footer v-if="$slots.actions"><slot name="actions" /></footer></div>',
+    '<div v-if="modelValue" role="dialog" :aria-label="label"><slot /><footer v-if="$slots.actions"><slot name="actions" /></footer></div>',
 };
 
-/** Mounts the panel for a sheet with the given store state. */
-function mountPanelInSheet(state: Record<string, unknown>) {
+/** The second sheet of NotificationSheet, with all the actions. */
+const MENU = '[role="dialog"][aria-label="notification-more"]';
+
+/** Mounts the popover panel with the given store state. The list is a stub. */
+function mountPanel(state: Record<string, unknown>) {
   Object.assign(mocks.store, state);
-  return mount(NotificationPanel, { global: { ...global, stubs: { Sheet: SHEET_STUB } }, props: { inSheet: true } });
+  return mount(NotificationPanel, { global: { ...global, stubs: { NotificationList: true } } });
 }
 
-describe("NotificationPanel in a popover", () => {
+describe("NotificationPanel", () => {
   it("keeps the two actions and the settings in the header", () => {
     const wrapper = mountPanel({ activity: [activity()], unreadActivityCount: 1 });
 
     expect(wrapper.text()).toContain("notification-mark-all-read");
     expect(wrapper.text()).toContain("notification-clear-all");
     expect(wrapper.find('[aria-label="notification-settings"]').exists()).toBe(true);
-    expect(wrapper.find('[aria-label="notification-more"]').exists()).toBe(false);
-  });
-});
-
-describe("NotificationPanel in a sheet", () => {
-  it("has only the More button in the header, and the second sheet stays closed", () => {
-    const wrapper = mountPanelInSheet({ activity: [activity()], unreadActivityCount: 1 });
-
-    expect(wrapper.get('[aria-label="notification-more"]').attributes("aria-expanded")).toBe("false");
-    expect(wrapper.text()).not.toContain("notification-mark-all-read");
-    expect(wrapper.text()).not.toContain("notification-clear-all");
+    expect(wrapper.find('button[aria-label="notification-more"]').exists()).toBe(false);
   });
 
-  it("shows the settings button in place of More when the list has no rows", async () => {
-    const wrapper = mountPanelInSheet({ loaded: true });
+  it("opens the settings and asks the popover to close", async () => {
+    const wrapper = mountPanel({ activity: [], unreadActivityCount: 0 });
 
-    expect(wrapper.find('[aria-label="notification-more"]').exists()).toBe(false);
     await wrapper.get('[aria-label="notification-settings"]').trigger("click");
 
     expect(mocks.push).toHaveBeenCalledWith({ name: "notificationSettings" });
     expect(wrapper.emitted("navigate")).toHaveLength(1);
   });
+});
+
+/** Mounts an open sheet with the given store state. The list is a stub. */
+function mountSheet(state: Record<string, unknown>) {
+  Object.assign(mocks.store, state);
+  return mount(NotificationSheet, {
+    global: { ...global, stubs: { NotificationList: true, Sheet: SHEET_STUB } },
+    props: { modelValue: true },
+  });
+}
+
+describe("NotificationSheet header", () => {
+  it("has only the More button in the header, and the second sheet stays closed", () => {
+    const wrapper = mountSheet({ activity: [activity()], unreadActivityCount: 1 });
+
+    expect(wrapper.get('button[aria-label="notification-more"]').attributes("aria-expanded")).toBe("false");
+    expect(wrapper.find(MENU).exists()).toBe(false);
+  });
+
+  it("shows the settings button in place of More when the list has no rows", async () => {
+    const wrapper = mountSheet({ loaded: true });
+
+    expect(wrapper.find('button[aria-label="notification-more"]').exists()).toBe(false);
+    await wrapper.get('[aria-label="notification-settings"]').trigger("click");
+
+    expect(mocks.push).toHaveBeenCalledWith({ name: "notificationSettings" });
+    expect(wrapper.emitted("update:modelValue")).toEqual([[false]]);
+  });
 
   it("lists all the actions in the second sheet", async () => {
-    const wrapper = mountPanelInSheet({ activity: [activity()], unreadActivityCount: 1 });
+    const wrapper = mountSheet({ activity: [activity()], unreadActivityCount: 1 });
 
-    await wrapper.get('[aria-label="notification-more"]').trigger("click");
+    await wrapper.get('button[aria-label="notification-more"]').trigger("click");
 
-    expect(wrapper.findAll('[role="dialog"] button').map((row) => row.text())).toEqual([
+    expect(wrapper.findAll(`${MENU} button`).map((row) => row.text())).toEqual([
       "notification-mark-all-read",
       "notification-clear-all",
       "notification-settings",
@@ -253,11 +273,11 @@ describe("NotificationPanel in a sheet", () => {
   });
 
   it("leaves out Mark all read when all rows are read", async () => {
-    const wrapper = mountPanelInSheet({ activity: [activity({ isRead: true })], unreadActivityCount: 0 });
+    const wrapper = mountSheet({ activity: [activity({ isRead: true })], unreadActivityCount: 0 });
 
-    await wrapper.get('[aria-label="notification-more"]').trigger("click");
+    await wrapper.get('button[aria-label="notification-more"]').trigger("click");
 
-    expect(wrapper.findAll('[role="dialog"] button').map((row) => row.text())).toEqual([
+    expect(wrapper.findAll(`${MENU} button`).map((row) => row.text())).toEqual([
       "notification-clear-all",
       "notification-settings",
     ]);
@@ -268,37 +288,28 @@ describe("NotificationPanel in a sheet", () => {
     [1, "dismissAllActivity", []],
   ])("runs the action of row %i and closes the second sheet", async (row, action, args) => {
     const spy = vi.fn();
-    const wrapper = mountPanelInSheet({ activity: [activity()], [action]: spy, unreadActivityCount: 1 });
+    const wrapper = mountSheet({ activity: [activity()], [action]: spy, unreadActivityCount: 1 });
 
-    await wrapper.get('[aria-label="notification-more"]').trigger("click");
-    await wrapper.findAll('[role="dialog"] button')[row].trigger("click");
+    await wrapper.get('button[aria-label="notification-more"]').trigger("click");
+    await wrapper.findAll(`${MENU} button`)[row].trigger("click");
 
     expect(spy).toHaveBeenCalledWith(...args);
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+    expect(wrapper.find(MENU).exists()).toBe(false);
   });
 
-  it("closes the second sheet and asks the container to close when the settings open", async () => {
-    const wrapper = mountPanelInSheet({ activity: [activity()], unreadActivityCount: 1 });
+  it("closes both sheets when the settings open", async () => {
+    const wrapper = mountSheet({ activity: [activity()], unreadActivityCount: 1 });
 
-    await wrapper.get('[aria-label="notification-more"]').trigger("click");
-    await wrapper.findAll('[role="dialog"] button')[2].trigger("click");
+    await wrapper.get('button[aria-label="notification-more"]').trigger("click");
+    await wrapper.findAll(`${MENU} button`)[2].trigger("click");
 
     expect(mocks.push).toHaveBeenCalledWith({ name: "notificationSettings" });
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
-    expect(wrapper.emitted("navigate")).toHaveLength(1);
+    expect(wrapper.find(MENU).exists()).toBe(false);
+    expect(wrapper.emitted("update:modelValue")).toEqual([[false]]);
   });
 });
 
-/** Mounts an open sheet with the given store state and with a stub for the panel. */
-function mountSheet(state: Record<string, unknown>) {
-  Object.assign(mocks.store, state);
-  return mount(NotificationSheet, {
-    global: { ...global, stubs: { NotificationPanel: true, Sheet: SHEET_STUB } },
-    props: { modelValue: true },
-  });
-}
-
-describe("NotificationSheet", () => {
+describe("NotificationSheet bottom actions", () => {
   it("puts Clear all on the left and Mark all read on the right", () => {
     const wrapper = mountSheet({ activity: [activity()], unreadActivityCount: 1 });
 

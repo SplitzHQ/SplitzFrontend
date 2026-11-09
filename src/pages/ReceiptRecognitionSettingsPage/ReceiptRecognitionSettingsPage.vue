@@ -215,7 +215,7 @@ async function remove() {
                 <SSwitch
                   v-model="customProviderEnabled"
                   :disabled="busy"
-                  :label="$t('receipt-recognition-custom-toggle')"
+                  :aria-label="$t('receipt-recognition-custom-toggle')"
                   data-test="custom-toggle"
                 />
               </div>

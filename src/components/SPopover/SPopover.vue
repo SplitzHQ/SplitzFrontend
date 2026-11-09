@@ -3,18 +3,18 @@ import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger, type Popove
 import { twMerge } from "tailwind-merge";
 import { watch } from "vue";
 
-// Attributes and classes belong to the floating panel, not the trigger.
+// Attributes and classes belong to the floating panel, not the trigger. This includes `aria-label`.
 defineOptions({ inheritAttrs: false });
 
 /**
  * A panel anchored to its trigger. It moves focus into the panel, and it stays inside the screen.
  * Use it on a desktop width only. See `popover.usage.ts`, which also says when to use a sheet.
  *
+ * Set `aria-label` to name the panel for a screen reader.
+ *
  * To limit the height, set `--s-popover-max-height` in `class`. The panel never grows past the free space on the screen.
  */
 export interface PopoverProps {
-  /** The name of the panel for a screen reader. */
-  label: string;
   /** Classes for the panel. They replace a class of the same kind, for example `w-104` replaces the default width. */
   class?: string;
   /** False renders the trigger only, with no popover behavior. The caller then handles the click of the trigger. */
@@ -65,8 +65,8 @@ watch(
           )
         "
       >
-        <!-- Override Reka's trigger label so the panel has its own accessible name. -->
-        <div v-bind="$attrs" :aria-label="props.label" aria-labelledby="">
+        <!-- Clear Reka's trigger label so the panel gets its name from its own `aria-label`. -->
+        <div v-bind="$attrs" aria-labelledby="">
           <slot />
         </div>
       </PopoverContent>

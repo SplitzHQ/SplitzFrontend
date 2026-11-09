@@ -59,7 +59,7 @@ watch(pendingRequestCount, (value) => {
   <SPopover
     v-model="open"
     :enabled="showRequests"
-    :label="$t('notification-requests-title')"
+    :aria-label="$t('notification-requests-title')"
     class="gap-3 [--s-popover-max-height:min(70dvh,32rem)]"
   >
     <template #trigger>
