@@ -108,7 +108,7 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
   >
     <template #icon>
       <AuthStatusIcon tone="success">
-        <PhPaperPlaneTilt weight="duotone" />
+        <PhPaperPlaneTilt />
       </AuthStatusIcon>
     </template>
 

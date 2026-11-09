@@ -85,17 +85,17 @@ function getSingleQueryValue(value: unknown): string | undefined {
 <template>
   <AuthShell status :title="$t(copy.title)" :subtitle="$t(copy.body)">
     <template #icon>
-      <AuthStatusIcon v-if="state === 'loading'" tone="brand">
+      <AuthStatusIcon v-if="state === 'loading'" tone="pending">
         <PhCircleNotch class="animate-spin" />
       </AuthStatusIcon>
       <AuthStatusIcon v-else-if="state === 'success'" tone="success">
-        <PhCheck weight="bold" />
+        <PhCheck />
       </AuthStatusIcon>
       <AuthStatusIcon v-else-if="state === 'rateLimited'" tone="warning">
-        <PhHourglassMedium weight="duotone" />
+        <PhHourglassMedium />
       </AuthStatusIcon>
       <AuthStatusIcon v-else tone="error">
-        <PhLinkBreak weight="duotone" />
+        <PhLinkBreak />
       </AuthStatusIcon>
     </template>
 

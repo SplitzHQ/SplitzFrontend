@@ -334,7 +334,7 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
   statusBadge: {
     avoid: "Do not use it outside StatusBadge. Use the semantic status tokens.",
     pattern: /^comp-status-badge-/,
-    use: "The core, the ring, the halo and the icon of the badge on a result page.",
+    use: "The core, the rings and the icon of the badge on a result page. The rings use one token at lower opacities.",
   },
   switch: {
     avoid: "Do not use it outside SSwitch.",

@@ -70,7 +70,7 @@ async function handleForgotPassword() {
   >
     <template #icon>
       <AuthStatusIcon tone="success">
-        <PhPaperPlaneTilt weight="duotone" />
+        <PhPaperPlaneTilt />
       </AuthStatusIcon>
     </template>
 

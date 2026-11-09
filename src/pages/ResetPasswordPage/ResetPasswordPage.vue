@@ -119,7 +119,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
   >
     <template #icon>
       <AuthStatusIcon tone="error">
-        <PhLinkBreak weight="duotone" />
+        <PhLinkBreak />
       </AuthStatusIcon>
     </template>
 

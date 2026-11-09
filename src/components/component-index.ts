@@ -143,7 +143,7 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     components: ["StatusBadge"],
     folder: "StatusBadge",
     usage: "src/components/StatusBadge/status-badge.usage.ts",
-    use: "An icon in rings, with a brand, success, warning or error tone.",
+    use: "An icon in three rings at the top of a result card, with a success, warning or error tone.",
   },
   {
     components: ["TextInput"],

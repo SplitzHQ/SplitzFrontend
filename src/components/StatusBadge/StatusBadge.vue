@@ -1,55 +1,56 @@
 <script setup lang="ts">
 /**
- * An icon in rings at the top of a result screen. The rules are in `status-badge.usage.ts`.
+ * An icon in three rings at the top of a result screen. The rules are in `status-badge.usage.ts`.
  * The default slot holds one icon. The icon is decorative, so the text of the screen must give the result.
- * The rings draw 24px outside the 96px box and take no layout space.
+ * The rings are inside the box, so the box is the full size of the badge and pushes the content under it down.
  */
 export interface StatusBadgeProps {
-  /** The color of the icon and the rings. */
-  tone: "brand" | "success" | "warning" | "error";
+  /** The color of the icon, the core and the rings. */
+  tone: "success" | "warning" | "error";
 }
 
 const { tone } = defineProps<StatusBadgeProps>();
 
-// Full class strings keep Tailwind's scanner happy; tokens flip automatically in dark mode.
-const toneClasses: Record<StatusBadgeProps["tone"], { core: string; icon: string; ring: string; halo: string }> = {
-  brand: {
-    core: "bg-core-alpha-brand-10",
-    halo: "border-core-alpha-brand-5",
-    icon: "text-util-color-brand-600",
-    ring: "border-core-alpha-brand-20",
-  },
+// Full class strings keep Tailwind's scanner happy. The tokens change with the theme. The core draws its token at a low
+// opacity, so it is a tint of the tone over the page: in the dark theme a solid core was a heavy block.
+const TONE_CLASSES: Record<StatusBadgeProps["tone"], { core: string; ring: string }> = {
   error: {
-    core: "bg-util-color-error-50",
-    halo: "border-util-color-error-50",
-    icon: "text-util-color-error-600",
-    ring: "border-util-color-error-100",
+    core: "bg-comp-status-badge-error-core/15 text-comp-status-badge-error-icon",
+    ring: "border-comp-status-badge-error-ring",
   },
   success: {
-    core: "bg-util-color-success-50",
-    halo: "border-util-color-success-50",
-    icon: "text-util-color-success-600",
-    ring: "border-util-color-success-200",
+    core: "bg-comp-status-badge-success-core/15 text-comp-status-badge-success-icon",
+    ring: "border-comp-status-badge-success-ring",
   },
   warning: {
-    core: "bg-util-color-warning-50",
-    halo: "border-util-color-warning-50",
-    icon: "text-util-color-warning-600",
-    ring: "border-util-color-warning-200",
+    core: "bg-comp-status-badge-warning-core/15 text-comp-status-badge-warning-icon",
+    ring: "border-comp-status-badge-warning-ring",
   },
 };
+
+/**
+ * The rings from the inner ring to the outer ring. The gaps are even. All rings use one token, and the opacity falls
+ * evenly toward the outside, so the rings fade into the page. SPZ-76 tuned these values in its prototype.
+ */
+const RINGS = ["inset-8 opacity-50", "inset-4 opacity-31", "inset-0 opacity-12"];
 </script>
 
 <template>
-  <div class="relative flex size-24 items-center justify-center">
-    <span aria-hidden="true" :class="['absolute -inset-6 rounded-full border', toneClasses[tone].halo]" />
-    <span aria-hidden="true" :class="['absolute -inset-3 rounded-full border', toneClasses[tone].ring]" />
+  <div class="relative flex size-42 shrink-0 items-center justify-center">
+    <!-- The rings fade toward the bottom, so the lower half does not compete with the title under the badge. -->
+    <div class="absolute inset-0 mask-b-from-40%">
+      <span
+        v-for="ring in RINGS"
+        :key="ring"
+        aria-hidden="true"
+        :class="['absolute rounded-full border', ring, TONE_CLASSES[tone].ring]"
+      />
+    </div>
     <div
       aria-hidden="true"
       :class="[
-        'relative flex size-full items-center justify-center rounded-full [&>svg]:size-10',
-        toneClasses[tone].core,
-        toneClasses[tone].icon,
+        'relative flex size-18 items-center justify-center rounded-full [&>svg]:size-8',
+        TONE_CLASSES[tone].core,
       ]"
     >
       <slot />
