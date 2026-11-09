@@ -23,13 +23,13 @@ const Template: StoryFn<typeof SSegmentControl> = (args) => ({
   setup() {
     return { args };
   },
-  template: '<SSegmentControl v-bind="args"><template #default="{ item }">{{ item }}</template></SSegmentControl>',
+  template:
+    '<SSegmentControl v-bind="args" aria-label="Sample choice"><template #default="{ item }">{{ item }}</template></SSegmentControl>',
 });
 
 export const Default = Template.bind({});
 Default.args = {
   items: ["Segment 1", "Segment 2", "Segment 3"],
-  label: "Sample choice",
   size: "md",
   modelValue: 0,
 };
