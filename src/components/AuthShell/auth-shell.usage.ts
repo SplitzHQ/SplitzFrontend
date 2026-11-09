@@ -44,7 +44,7 @@ export const PART_RULES: UsageRule[] = [
     title: "Status",
   },
   {
-    rule: "Put one `AuthStatusIcon` in this slot. Only a status page uses this slot.",
+    rule: "Put one `AuthStatusIcon` in this slot. Only a status page uses this slot. Use the default (regular) weight of the Phosphor icon. While the page waits for a result, use the `pending` tone with a spinning `PhCircleNotch`: the page shows no circle until the result is known.",
     title: "Icon",
   },
   {

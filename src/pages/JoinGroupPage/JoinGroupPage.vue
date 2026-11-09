@@ -79,7 +79,7 @@ async function join() {
           <!-- Unavailable link -->
           <template v-if="isUnavailable">
             <StatusBadge tone="error">
-              <PhLinkBreak weight="duotone" />
+              <PhLinkBreak />
             </StatusBadge>
             <div class="relative flex flex-col gap-2">
               <h2 class="text-display-xs font-semibold text-base-text-primary">

@@ -320,14 +320,18 @@ const AVATAR_TEXT_STEPS = {
   yellow: 600,
 };
 
-/** Returns the four parts of the status badge in one tone. */
-function statusBadgeTone(
-  tone: string,
-  parts: { core: TokenRef; halo: TokenRef; icon: TokenRef; ring: TokenRef }
-): Record<string, TokenRef> {
-  return Object.fromEntries(
-    Object.entries(parts).map(([part, ref]) => [`comp-status-badge-${tone}-${part}`, ref])
-  ) as Record<string, TokenRef>;
+/**
+ * Returns the three parts of the status badge in one tone: the fill of the core, the icon, and the color of the rings.
+ * The core and the rings use the 500 step, and StatusBadge draws them at a lower opacity: a solid core was a heavy block
+ * in the dark theme. The tones have no alpha tokens, so the opacity is in the component. SPZ-76 picked the 600 icon,
+ * because the 700 icon looked dull.
+ */
+function statusBadgeTone(tone: "error" | "success" | "warning"): Record<string, TokenRef> {
+  return {
+    [`comp-status-badge-${tone}-core`]: `util-color-${tone}-500`,
+    [`comp-status-badge-${tone}-icon`]: `util-color-${tone}-600`,
+    [`comp-status-badge-${tone}-ring`]: `util-color-${tone}-500`,
+  };
 }
 
 /**
@@ -358,30 +362,9 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-switch-track-on": "util-color-brand-700",
   "comp-switch-track-on-disabled": "core-alpha-brand-40",
   "comp-user-tag-border": neutralAlpha(10),
-  ...statusBadgeTone("brand", {
-    core: "core-alpha-brand-10",
-    halo: "core-alpha-brand-5",
-    icon: "util-color-brand-600",
-    ring: "core-alpha-brand-20",
-  }),
-  ...statusBadgeTone("error", {
-    core: "util-color-error-50",
-    halo: "util-color-error-50",
-    icon: "util-color-error-600",
-    ring: "util-color-error-100",
-  }),
-  ...statusBadgeTone("success", {
-    core: "util-color-success-50",
-    halo: "util-color-success-50",
-    icon: "util-color-success-600",
-    ring: "util-color-success-200",
-  }),
-  ...statusBadgeTone("warning", {
-    core: "util-color-warning-50",
-    halo: "util-color-warning-50",
-    icon: "util-color-warning-600",
-    ring: "util-color-warning-200",
-  }),
+  ...statusBadgeTone("error"),
+  ...statusBadgeTone("success"),
+  ...statusBadgeTone("warning"),
   ...Object.fromEntries(
     PALETTE_FAMILIES.flatMap((family) => [
       [`comp-palette-${family}-fill`, `util-color-${family}-50`],

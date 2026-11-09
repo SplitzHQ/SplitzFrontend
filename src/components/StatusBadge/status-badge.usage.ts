@@ -18,7 +18,7 @@ export const RULE_SCOPE: RuleScope = {
 /** When to use a badge. */
 export const WHEN_TO_USE: UsageRule[] = [
   {
-    rule: "The full screen shows one result or one state, and a heading gives the result in text. The caller is the card of JoinGroupPage. AuthShell uses the smaller `AuthStatusIcon`.",
+    rule: "The full screen shows one result, and a heading gives the result in text. The caller is the card of JoinGroupPage. AuthShell uses the smaller `AuthStatusIcon`. A badge never shows a spinner: while a page waits, it shows no badge.",
     title: "A result screen",
   },
 ];
@@ -39,31 +39,27 @@ export interface ToneRule {
 
 /** A Record makes the type check fail when a new tone has no rule. */
 export const TONE_GUIDE: Record<StatusBadgeProps["tone"], ToneRule> = {
-  brand: { example: "No caller now", meaning: "The result is not known yet." },
   error: {
     example: "JoinGroupPage, a link that does not work",
     meaning: "The action failed, or the link does not work.",
   },
-  success: {
-    example: "ConfirmEmailPage, RegisterPage and ForgotPasswordPage",
-    meaning: "The action is complete, or the app sent the email.",
-  },
-  warning: { example: "ConfirmEmailPage, rate limit", meaning: "The user must wait, and can try again later." },
+  success: { example: "No caller now", meaning: "The action is complete, or the app sent the email." },
+  warning: { example: "No caller now", meaning: "The user must wait, and can try again later." },
 };
 
 /** How to place a badge. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
-    rule: "The box is 96px. The rings draw 24px outside the box and take no layout space. So the badge needs 144px of width and 24px of free space on each side.",
+    rule: "The rings are inside the box, so the badge takes its full size in the layout and pushes the title down. The rings fade toward the bottom, so the space above the title stays quiet. Do not add space for the rings, and do not let the title go over them.",
     title: "Room for the rings",
   },
   {
-    rule: "Center the badge. In AuthShell, put it in `flex justify-center` in the `hero` slot, and set `centered` on the shell.",
+    rule: "Center the badge above the title, in a column with `items-center`, as the card of JoinGroupPage does.",
     title: "Center",
   },
   { rule: "Do not add a size class. The badge has one size.", title: "One size" },
   {
-    rule: "Put one Phosphor icon in the slot, without a size class. The badge sets 40px.",
+    rule: "Put one Phosphor icon in the slot, without a size class and with the default (regular) weight. The badge sets the size and the color.",
     title: "Icon",
   },
 ];
@@ -75,11 +71,11 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Decorative",
   },
   {
-    text: "The rings are `absolute` inside the box. At 375px the badge is narrower than the content, so the page has no sideways scroll.",
+    text: "The rings are inside the box. At 375px the badge is narrower than the content, so the page has no sideways scroll.",
     title: "Phone width",
   },
   {
-    text: "The icon has a contrast above 3:1 on its fill in both themes. The design-system page measures it from the rendered badge.",
+    text: "The icon uses the 600 step of its tone, so the color stays bright. The core is the 500 step at a low opacity, so the surface under the badge shows through it. Each icon has a contrast above 3:1 on its core in both themes. The design-system page measures each icon against the core blended over the page.",
     title: "Contrast",
   },
 ];
@@ -88,8 +84,4 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Decisions that the user has not made. Ask the user before you rely on a rule that one of these questions affects.
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
-export const OPEN_QUESTIONS = [
-  "Which weight does the icon use? The check of ConfirmEmailPage uses `bold`. The other result icons use `duotone`. The loading icon uses the default.",
-  "Which token does the inner ring use? The error tone uses the 100 token, and the success and warning tones use the 200 token.",
-  "How much space goes under the badge? AuthShell has a 24px gap, so the outer ring touches the top of the title. The card of JoinGroupPage has a 20px gap, so the ring goes 4px into the title box. The title has `relative`, so it stays above the ring.",
-];
+export const OPEN_QUESTIONS: string[] = [];

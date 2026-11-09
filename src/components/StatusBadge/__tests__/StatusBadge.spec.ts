@@ -8,6 +8,6 @@ describe("StatusBadge", () => {
     const wrapper = mount(StatusBadge, { props: { tone: "success" }, slots: { default: "<svg />" } });
 
     expect(wrapper.get("svg").element.parentElement?.getAttribute("aria-hidden")).toBe("true");
-    expect(wrapper.findAll('span[aria-hidden="true"]')).toHaveLength(2);
+    expect(wrapper.findAll('span[aria-hidden="true"]')).toHaveLength(3);
   });
 });
