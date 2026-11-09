@@ -2,7 +2,7 @@
 import { PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 
 import type { TransactionDto } from "@/backend";
-import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
+import { LIST_ROW_CLASS } from "@/components/ListRow/list-row";
 import TransactionItemContent from "@/components/TransactionItem/TransactionItemContent.vue";
 
 /** A transaction row that the user can select. A screen reader reads the state from `aria-pressed`. */
@@ -18,7 +18,7 @@ const emit = defineEmits<{ toggle: [] }>();
   <!-- The row reaches the edge of the scroll area, so an outer focus ring is cut. The ring stays inside the row. -->
   <button
     type="button"
-    :class="[TRANSACTION_ROW_CLASS, 'focus-visible:-outline-offset-2']"
+    :class="[LIST_ROW_CLASS, 'focus-visible:-outline-offset-2']"
     :aria-pressed="selected"
     @click="emit('toggle')"
   >

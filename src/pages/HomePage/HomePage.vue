@@ -11,10 +11,10 @@ import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import { LIST_ROW_CLASS } from "@/components/ListRow/list-row";
 import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
-import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
 import { useStatusBarTopColor } from "@/libs/status-bar-color";
 import { CONTENT_FADE_IN, useLoadFeedback, type LoadPhase } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -35,7 +35,7 @@ useStatusBarTopColor("--base-bg-secondary_alt");
  * A group row: the shared row with 12px above and below. The row is taller than a transaction row, because a group row
  * is the main item of the page. HomeGroupsSkeleton has the same sizes.
  */
-const GROUP_ROW_CLASS = twMerge(TRANSACTION_ROW_CLASS, "py-3 focus-visible:outline-offset-2");
+const GROUP_ROW_CLASS = twMerge(LIST_ROW_CLASS, "py-3 focus-visible:outline-offset-2");
 
 const { $t } = useFluent();
 const router = useRouter();

@@ -8,6 +8,7 @@ import { toast } from "vue-sonner";
 import { GroupApi, type GroupDto } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
@@ -103,10 +104,10 @@ async function send() {
           size="xs"
         />
         <span class="flex min-w-0 flex-1 flex-col">
-          <span class="truncate text-base font-medium text-base-text-primary">
+          <span :class="['truncate', LIST_ROW_TEXT.title]">
             {{ friend.remark || friend.friendUser.userName }}
           </span>
-          <span v-if="friend.pending" class="text-xs text-base-text-quaternary">
+          <span v-if="friend.pending" :class="LIST_ROW_TEXT.subtitle">
             {{ $t("group-invite-pending") }}
           </span>
         </span>

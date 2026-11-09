@@ -45,7 +45,7 @@ export const PARTS: Record<NotificationPart, UsageRule> = {
     title: "NotificationBell",
   },
   NotificationItem: {
-    rule: "One row of activity. A tap marks it as read and opens its page. It shows the picture from the notification, or an icon tile.",
+    rule: "One row of activity. A tap marks it as read and opens its page. It shows the picture from the notification, or an icon tile. Its text uses the list row levels in `src/components/ListRow/list-row.usage.ts`: a read row has the quiet name.",
     title: "NotificationItem",
   },
   NotificationPanel: {

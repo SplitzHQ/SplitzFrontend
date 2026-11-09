@@ -312,7 +312,7 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
     use: "Data colors: the main categories and the action tiles on the review page. See `src/components/Category/category.usage.ts`.",
   },
   row: {
-    avoid: "Do not use it outside `TRANSACTION_ROW_CLASS`.",
+    avoid: "Do not use it outside `LIST_ROW_CLASS`.",
     pattern: /^comp-row-/,
     use: "The hover and pressed fill of a shared row. It is one step lighter than `base-bg-hover`, so the gray tiles and the amount fills in the row stay clear.",
   },

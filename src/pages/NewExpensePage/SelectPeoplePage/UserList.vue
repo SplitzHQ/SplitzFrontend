@@ -2,6 +2,7 @@
 import { PhCaretRight, PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import SButtonBase from "@/components/SButton/SButtonBase.vue";
 
 import type { UserListItem } from "./types";
@@ -42,21 +43,20 @@ defineEmits<{
             :images="[{ src: item.friendUser.photo, alt: item.friendUser.userName }]"
             size="xs"
           />
-          <div class="flex flex-1 flex-col justify-center gap-1">
+          <div class="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
             <template v-if="item.__typename === 'UserListItemGroup'">
-              <div class="flex items-center gap-2">
-                <div class="text-base font-medium text-base-text-primary">
-                  {{ item.name }}
-                </div>
+              <div :class="['truncate', LIST_ROW_TEXT.title]">
+                {{ item.name }}
               </div>
-              <div class="text-xs font-normal text-base-text-quinary">
+              <div :class="['truncate', LIST_ROW_TEXT.subtitle]">
                 {{ item.members.map((member) => member.userName).join(", ") }}
               </div>
             </template>
             <div
               v-else-if="item.__typename === 'UserListItemFriend'"
               :class="[
-                'text-base font-medium text-base-text-primary',
+                'truncate',
+                LIST_ROW_TEXT.title,
                 selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : '',
               ]"
             >

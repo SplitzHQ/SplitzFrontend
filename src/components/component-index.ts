@@ -78,6 +78,12 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "The frame of a signed-in page, with a header slot and the main landmark. BottomAction is a page button that is fixed to the bottom of the screen, with a progressive blur.",
   },
   {
+    components: ["ListRowContent", "AmountChip"],
+    folder: "ListRow",
+    usage: "src/components/ListRow/list-row.usage.ts",
+    use: "A list row: the parts of a row that opens a page, the classes of a row that the user presses, the text levels of every list row, and an amount with a direction on a tinted fill.",
+  },
+  {
     components: ["Notice"],
     folder: "Notice",
     usage: "src/components/Notice/notice.usage.ts",

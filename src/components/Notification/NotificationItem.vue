@@ -4,6 +4,7 @@ import { useFluent } from "fluent-vue";
 import { computed } from "vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import { formatRelativeTime } from "@/libs/format-relative-time";
 import type { TypedNotification } from "@/types/notification";
 
@@ -68,17 +69,12 @@ const toneClasses: Record<typeof text.value.tone, string> = {
       </span>
 
       <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span
-          :class="[
-            'text-sm leading-5',
-            notification.isRead ? 'font-medium text-base-text-secondary' : 'font-semibold text-base-text-primary',
-          ]"
-        >
+        <span :class="notification.isRead ? LIST_ROW_TEXT.titleQuiet : LIST_ROW_TEXT.title">
           {{ text.title }}
         </span>
         <span v-if="!notification.isRead" class="sr-only">{{ $t("notification-unread") }}</span>
-        <span class="text-sm leading-5 text-base-text-tertiary">{{ text.body }}</span>
-        <time class="text-xs text-base-text-quaternary" :datetime="notification.createTime.toISOString()">
+        <span :class="LIST_ROW_TEXT.subtitle">{{ text.body }}</span>
+        <time :class="LIST_ROW_TEXT.subtitle" :datetime="notification.createTime.toISOString()">
           {{ time }}
         </time>
       </span>

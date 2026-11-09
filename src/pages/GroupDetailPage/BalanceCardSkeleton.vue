@@ -9,7 +9,7 @@
 <template>
   <div
     aria-hidden="true"
-    class="flex flex-col gap-3 rounded-2xl bg-core-alpha-brand-5 px-4 py-3"
+    class="flex flex-col gap-4 rounded-2xl bg-core-alpha-brand-5 p-4"
     data-test="balance-card-skeleton"
   >
     <div class="flex items-center gap-3">
@@ -23,8 +23,11 @@
       </div>
       <div class="h-10 w-24 skeleton rounded-full bg-core-alpha-brand-10!" />
     </div>
-    <div class="flex h-5 items-center">
-      <div class="h-3.5 w-40 skeleton bg-core-alpha-brand-10!" />
+    <!-- One member line: the avatar, the direction and the amount. -->
+    <div class="flex h-5 items-center gap-2">
+      <div class="size-5 skeleton rounded-md bg-core-alpha-brand-10!" />
+      <div class="h-3.5 w-28 skeleton bg-core-alpha-brand-10!" />
+      <div class="ml-auto h-3.5 w-14 skeleton bg-core-alpha-brand-10!" />
     </div>
   </div>
 </template>

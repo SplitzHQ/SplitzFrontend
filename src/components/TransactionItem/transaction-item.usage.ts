@@ -29,31 +29,15 @@ export const COMPONENT_RULES: Record<TransactionItemComponent, UsageRule> = {
   },
 };
 
-/** How to use the content in your own row. */
+/** How to use the content in your own row. The rules of the row itself are in `src/components/ListRow/list-row.usage.ts`. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
-    rule: "`TransactionItemContent` has several root elements and no flex row of its own. Put it in an element with `TRANSACTION_ROW_CLASS` from `transaction-row.ts`.",
+    rule: "`TransactionItemContent` uses ListRowContent and has several root elements. Put it in a link or a button with `LIST_ROW_CLASS` from `src/components/ListRow/list-row.ts`. The focus ring, the hover fill and the press follow `list-row.usage.ts`.",
     title: "The parent is the row",
   },
   {
-    rule: "The default slot goes at the end of the row, after the balance. SelectableTransactionItem puts a 24px check mark there.",
+    rule: "The default slot goes at the end of the row, after the balance. SelectableTransactionItem puts a check mark there.",
     title: "Slot",
-  },
-  {
-    rule: "`TRANSACTION_ROW_CLASS` has the focus ring but not its offset. Add `focus-visible:outline-offset-2` when the screen has side padding around the row. Add `focus-visible:-outline-offset-2` when the row touches the edge of a scroll area, because that area cuts an outer ring.",
-    title: "Focus ring",
-  },
-  {
-    rule: "`TRANSACTION_ROW_CLASS` has `-mx-2 px-2`. The hover and pressed fill (`comp-row-bg-hover` and `comp-row-bg-pressed`, one step lighter than `base-bg-hover`) extends 8px past the content on each side, and the content stays in its place. A press also makes the row 2% smaller with the timing of the SSegmentControl press, except under reduced motion. The user picked this look in the prototype `2026-11-05-home-motion`. The parent must have 8px of free space on each side. Do not add `w-full`, because the row then does not extend on the right. Put the row in a flex column or a block element, which stretches it. A scroll area cuts the fill, so give the scroll area `-mx-2 px-2`.",
-    title: "Hover and pressed fill",
-  },
-  {
-    rule: "A group row and the Create group row on HomePage use `TRANSACTION_ROW_CLASS` with their own content, so all rows react in the same way.",
-    title: "Other rows",
-  },
-  {
-    rule: "Put a date label or a section title above a group of rows, with `flex flex-col gap-1`. TransactionList and InvoiceDetailPage do this.",
-    title: "Groups",
   },
 ];
 
@@ -68,7 +52,7 @@ export const CONTENT_RULES: UsageRule[] = [
     title: "Second line",
   },
   {
-    rule: "The label and the amount of the current user. The label gives the direction, so the amount has no sign. The block does not show when the user is not in the split or the balance is zero.",
+    rule: "The label and the amount of the current user, at the end of the row. The amount is an AmountChip. The label gives the direction, so the amount has no sign. The block does not show when the user is not in the split or the balance is zero.",
     title: "Balance",
   },
   {
@@ -76,7 +60,7 @@ export const CONTENT_RULES: UsageRule[] = [
     title: "Amount color",
   },
   {
-    rule: "The tile is 48px with a 12px radius (`rounded-xl`). A 48px Avatar has the same radius.",
+    rule: "The tile has the size and the radius (`rounded-xl`) of an `sm` Avatar, as `list-row.usage.ts` says for a row that opens a page.",
     title: "Tile",
   },
 ];

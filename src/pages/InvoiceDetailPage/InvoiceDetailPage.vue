@@ -145,7 +145,7 @@ async function undoPayment(settlementId: string) {
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'groupDetail', params: { groupId } }">
         <span v-if="group" class="flex items-center gap-2">
-          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="title" />
           <span class="min-w-0">{{ group.name }}</span>
         </span>
       </HeaderMobileSecondary>

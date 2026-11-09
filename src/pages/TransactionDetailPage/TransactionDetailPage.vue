@@ -12,6 +12,8 @@ import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import Layout from "@/components/Layout/Layout.vue";
+import AmountChip from "@/components/ListRow/AmountChip.vue";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import SButton from "@/components/SButton/SButton.vue";
 import { findTransactionPayer } from "@/components/TransactionItem/transaction-row";
 import { resolveAssetUrl } from "@/libs/asset-url";
@@ -113,7 +115,7 @@ async function handleDelete() {
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true" :fallback="{ name: 'groupDetail', params: { groupId } }">
         <span v-if="group" class="flex items-center gap-2">
-          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="title" />
           <span class="min-w-0">{{ group.name }}</span>
         </span>
       </HeaderMobileSecondary>
@@ -175,19 +177,20 @@ async function handleDelete() {
                   size="xs"
                 />
                 <div class="flex min-w-0 flex-1 flex-col">
-                  <p class="truncate text-base font-medium text-base-text-primary">
+                  <p :class="['truncate', LIST_ROW_TEXT.title]">
                     {{ entry.user.id === userStore.user?.id ? $t("new-expense-pronoun-you") : entry.user.userName }}
                   </p>
                 </div>
-                <div class="flex shrink-0 flex-col items-end">
-                  <p class="text-xs text-base-text-quaternary">
+                <div class="flex shrink-0 flex-col items-end gap-0.5">
+                  <p :class="LIST_ROW_TEXT.direction">
                     {{ Number(entry.balance) > 0 ? $t("transaction-detail-lent") : $t("transaction-detail-borrowed") }}
                   </p>
-                  <p
-                    class="text-sm font-medium"
-                    :class="Number(entry.balance) > 0 ? 'text-base-text-success' : 'text-base-text-error'"
-                  >
-                    {{ formatCurrency(Number(entry.balance), transaction.currency) }}
+                  <p class="flex">
+                    <AmountChip
+                      :tone="Number(entry.balance) > 0 ? 'owed' : 'owes'"
+                      :amount="entry.balance ?? 0"
+                      :currency="transaction.currency"
+                    />
                   </p>
                 </div>
               </div>

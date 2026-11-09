@@ -1,6 +1,7 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { nextTick } from "vue";
 import { createMemoryHistory, createRouter, type RouteLocationRaw } from "vue-router";
 
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -117,5 +118,21 @@ describe("HeaderMobileSecondary", () => {
 
     expect(go).not.toHaveBeenCalled();
     expect(replace).toHaveBeenCalledWith({ name: "profile" });
+  });
+
+  it("shows the bottom line of the frosted bar only while the page is scrolled", async () => {
+    const { wrapper } = mountHeader();
+    const bar = () => wrapper.get('[data-test="header-frosted-bar"]').element as HTMLElement;
+    expect(bar().style.borderBottomColor).toBe("transparent");
+
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 120 });
+    window.dispatchEvent(new Event("scroll"));
+    await nextTick();
+    expect(bar().style.borderBottomColor).not.toBe("transparent");
+
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    window.dispatchEvent(new Event("scroll"));
+    await nextTick();
+    expect(bar().style.borderBottomColor).toBe("transparent");
   });
 });
