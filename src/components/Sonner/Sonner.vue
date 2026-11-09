@@ -14,8 +14,12 @@ const props = defineProps<ToasterProps>();
 
 const { $t } = useFluent();
 
-/** A toast at the top swipes only up by default. A phone user also expects to swipe it to the side. */
-const SWIPE_DIRECTIONS: ToasterProps["swipeDirections"] = ["top", "left", "right"];
+/**
+ * By default a toast swipes only toward its edge. A phone user also expects to swipe it to the side. vue-sonner takes
+ * one list for all positions, so the list has both edges: a toast at the bottom, such as the new-version prompt, swipes
+ * down.
+ */
+const SWIPE_DIRECTIONS: ToasterProps["swipeDirections"] = ["top", "bottom", "left", "right"];
 
 /** Returns the theme of the page. The `dark` class on the root element sets the dark tokens in color.css. */
 function readPageTheme(): "light" | "dark" {
@@ -83,6 +87,25 @@ html [data-sonner-toast][data-styled="true"] {
 
 html [data-sonner-toast][data-styled="true"] [data-title] {
   text-wrap: pretty;
+}
+
+/*
+ * On a desktop a toast is as wide as its content. A long text wraps at the width of the toaster. At phone width
+ * vue-sonner makes each toast fill the row, and that stays. The breakpoint is the phone breakpoint of vue-sonner.
+ * A toast is `position: absolute` and its `transform` moves it in and out, so `margin-inline: auto` centers it and
+ * does not use `transform`.
+ */
+@media (width > 600px) {
+  html [data-sonner-toast][data-styled="true"] {
+    width: fit-content;
+    max-width: var(--width);
+  }
+
+  html [data-sonner-toast][data-x-position="center"] {
+    right: 0;
+    left: 0;
+    margin-inline: auto;
+  }
 }
 
 /* The surface has the opposite theme of the page, so the icons use core colors and not the theme colors. */

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // The prompt for a new app version. The app has one instance. Do not add another.
-import { useIntervalFn } from "@vueuse/core";
+import { useIntervalFn, useSessionStorage } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
 import { useRegisterSW } from "virtual:pwa-register/vue";
 import { watch } from "vue";
@@ -15,6 +15,8 @@ import { toast } from "vue-sonner";
 const UPDATE_CHECK_MS = 60 * 60 * 1000;
 /** The script path of the service worker that the dev server registered before `devOptions` was off. */
 const DEV_SW_PATH = "/dev-sw.js";
+/** The sessionStorage key that records a closed prompt. A new app start has a new session, so the prompt can show again. */
+const DISMISSED_KEY = "reloadPromptDismissed";
 
 /**
  * Removes the service worker of an old dev server. The dev server does not make one now, but the browser keeps the old
@@ -48,8 +50,14 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
   },
 });
 
+/**
+ * True after the user closes the prompt with the X or a swipe. The new service worker still waits, so each app open and
+ * each hourly check sets `needRefresh` again. This flag keeps the prompt hidden for the rest of the session.
+ */
+const dismissed = useSessionStorage(DISMISSED_KEY, false);
+
 watch(needRefresh, (value) => {
-  if (value) {
+  if (value && !dismissed.value) {
     toast.info($t("reload-prompt-new-version"), {
       action: {
         label: $t("reload-prompt-update"),
@@ -57,6 +65,12 @@ watch(needRefresh, (value) => {
       },
       closeButton: true,
       duration: Infinity,
+      // Only the X and a swipe call this. A tap on Update does not.
+      onDismiss: () => {
+        dismissed.value = true;
+      },
+      // At the top, the prompt covers the page title. Other toasts stay at the top of the host.
+      position: "bottom-center",
     });
   }
 });
