@@ -4,9 +4,14 @@ import { RouterLink } from "vue-router";
 import type { TransactionDto } from "@/backend";
 import TransactionItemContent from "@/components/TransactionItem/TransactionItemContent.vue";
 
-defineProps<{
+import { TRANSACTION_ROW_CLASS } from "./transaction-row";
+
+/** A row that opens the detail page of a transaction. See `transaction-item.usage.ts` for when to use it. */
+export interface TransactionItemProps {
   transaction: TransactionDto;
-}>();
+}
+
+defineProps<TransactionItemProps>();
 </script>
 
 <template>
@@ -15,7 +20,7 @@ defineProps<{
       name: 'transactionDetail',
       params: { groupId: transaction.groupId, transactionId: transaction.transactionId },
     }"
-    class="flex items-center gap-3 rounded-2xl py-2 transition-colors active:bg-base-bg-secondary"
+    :class="[TRANSACTION_ROW_CLASS, 'focus-visible:outline-offset-2']"
   >
     <TransactionItemContent :transaction="transaction" />
   </RouterLink>

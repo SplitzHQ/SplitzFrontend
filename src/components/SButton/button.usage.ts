@@ -3,6 +3,7 @@
  * The design-system Button page renders them, and agents read them through the `spz-component-use` skill.
  * The app does not import this file, so the rules do not go into the app bundle.
  */
+import type { CopyRule, UsageRule, UseInsteadRule } from "../usage-rules";
 import { BUTTON_SIZES, BUTTON_VARIANTS, type ButtonSize, type ButtonVariant } from "./button";
 
 /**
@@ -21,7 +22,10 @@ export const RULE_SCOPE = {
 
 /** When to use each component of the family. */
 export const COMPONENT_GUIDE = [
-  { component: "SButton", use: "A button with a text label and optional icons. Use it when the tap runs logic." },
+  {
+    component: "SButton",
+    use: "A button with a text label and optional icons. Use it when the tap runs logic.",
+  },
   {
     component: "SIconButton",
     use: "A circular button that holds one icon. It has no visible text, so always give it an aria-label that names the action.",
@@ -36,17 +40,20 @@ export const COMPONENT_GUIDE = [
   },
 ];
 
-/** One case with the component to use instead of a button. */
-export interface NotAButtonRule {
-  when: string;
-  use: string;
-}
-
-export const NOT_A_BUTTON: NotAButtonRule[] = [
-  { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
+export const NOT_A_BUTTON: UseInsteadRule[] = [
+  {
+    use: "SSegmentControl",
+    when: "The user chooses one item from a short list, and the items are all visible.",
+  },
   { use: "SSwitch", when: "The user turns a setting on or off." },
-  { use: "A <button> row with a plain icon inside", when: "The user can tap the full row." },
-  { use: "An empty <div> with a fixed size", when: "A layout needs a space. Do not use an invisible button." },
+  {
+    use: "A <button> row with a plain icon inside",
+    when: "The user can tap the full row.",
+  },
+  {
+    use: "An empty <div> with a fixed size",
+    when: "A layout needs a space. Do not use an invisible button.",
+  },
 ];
 
 /** When to use a variant. */
@@ -61,13 +68,13 @@ export interface VariantGuide {
 const VARIANT_RULES: Record<ButtonVariant, Omit<VariantGuide, "variant">> = {
   destructive: {
     example: "Delete expense, Turn off 2FA",
-    role: "Main destructive action",
-    use: "The confirm button of a delete or of a change that cannot be undone. Ask first, then show it.",
+    role: "Confirm a destructive action",
+    use: "The button that runs a destructive action in a confirm step. Use it only in a confirm step.",
   },
   "destructive-soft": {
     example: "Log out, Remove API key",
-    role: "Other destructive action",
-    use: "A destructive action that is not the main action of the screen. It opens a confirm step.",
+    role: "Start a destructive action",
+    use: "The button that opens the confirm step of a destructive action. Also use it for an action that removes no data and has no confirm step, for example Log out.",
   },
   ghost: {
     example: "Back, Close, Mark all as read",
@@ -77,7 +84,7 @@ const VARIANT_RULES: Record<ButtonVariant, Omit<VariantGuide, "variant">> = {
   outline: {
     example: "Copy codes in a tinted card",
     role: "Next action on a tinted surface",
-    use: "Same rank as secondary. Use it on a tinted surface, where a grey fill gets lost.",
+    use: "Same rank as secondary. Use it on a tinted surface.",
   },
   primary: {
     example: "Add expense, Save, Settle up",
@@ -87,11 +94,14 @@ const VARIANT_RULES: Record<ButtonVariant, Omit<VariantGuide, "variant">> = {
   secondary: {
     example: "Cancel, Skip, Scan receipt",
     role: "Next action on a plain surface",
-    use: "The next action beside the main one, on a plain surface. On a tinted surface, use outline instead.",
+    use: "The next action beside the main one, on a plain surface. On a tinted surface, use outline instead. It is also the default of SButton, SLinkButton and SButtonBase, when a button sets no `variant`. SIconButton has ghost as its default, because the user decided that icon buttons such as Close and More are not secondary.",
   },
 };
 
-export const VARIANT_GUIDE: VariantGuide[] = BUTTON_VARIANTS.map((variant) => ({ variant, ...VARIANT_RULES[variant] }));
+export const VARIANT_GUIDE: VariantGuide[] = BUTTON_VARIANTS.map((variant) => ({
+  variant,
+  ...VARIANT_RULES[variant],
+}));
 
 /**
  * The emphasis ladder. Choose the rank first. The surface then chooses between `secondary` and `outline`.
@@ -116,7 +126,7 @@ export const EMPHASIS_LADDER: { intro: string; steps: EmphasisStep[] } = {
   ],
 };
 
-/** One background token that counts as a plain surface. Each ratio compares the grey fill of secondary with the surface. */
+/** One background token that counts as a plain surface. Each ratio compares the fill of secondary with the surface. */
 export interface PlainSurface {
   token: string;
   light: number;
@@ -124,16 +134,20 @@ export interface PlainSurface {
 }
 
 /** The test that decides a plain surface. The ratios are measured from `src/assets/color.css`. */
-export const SURFACE_RULE: { intro: string; plain: PlainSurface[]; tinted: string } = {
+export const SURFACE_RULE: {
+  intro: string;
+  plain: PlainSurface[];
+  tinted: string;
+} = {
   intro:
-    "Read the real background under the button. A surface is plain only when the token is in this list. Each listed token gives the grey fill a contrast of 1.10 or more in both themes.",
+    "Read the real background under the button. A surface is plain only when the token is in this list. Each row shows the contrast of the secondary fill on that token.",
   plain: [
-    { dark: 1.17, light: 1.18, token: "base-bg-primary" },
-    { dark: 1.17, light: 1.12, token: "base-bg-secondary_alt" },
-    { dark: 1.11, light: 1.13, token: "core-alpha-brand-5" },
+    { dark: 1.33, light: 1.21, token: "base-bg-primary" },
+    { dark: 1.33, light: 1.2, token: "base-bg-secondary_alt" },
+    { dark: 1.34, light: 1.2, token: "core-alpha-brand-5" },
   ],
   tinted:
-    "Every other surface is tinted. For example: base-bg-secondary (the grey fill has the same color in the dark theme), base-bg-brand, core-alpha-brand-10, util-alpha-black-5, all util-color tokens, gradients and photos.",
+    "Every other surface is tinted. For example: base-bg-secondary, base-bg-brand, core-alpha-brand-10, util-alpha-black-5, all util-color tokens, gradients and photos.",
 };
 
 /** When to use a size step. */
@@ -149,7 +163,10 @@ const SIZE_RULES: Record<ButtonSize, string> = {
   xl: "The action area of a screen or a sheet, number keys and floating buttons.",
 };
 
-export const SIZE_GUIDE: SizeGuide[] = BUTTON_SIZES.map((size) => ({ size, use: SIZE_RULES[size] }));
+export const SIZE_GUIDE: SizeGuide[] = BUTTON_SIZES.map((size) => ({
+  size,
+  use: SIZE_RULES[size],
+}));
 
 /** One step of the size decision. */
 export interface SizeDecisionStep {
@@ -167,70 +184,108 @@ export const SIZE_DECISION: { steps: SizeDecisionStep[]; limit: string } = {
   steps: [
     {
       size: "xl",
-      when: "The button is in the action area. The action area is the last block of a screen or a sheet, and it holds only buttons. All buttons in the area use xl.",
+      when: "The button is in the action area. The action area is the last block of a screen or a sheet, and it holds only buttons. All buttons in the area use xl. NotificationSheet is the one exception, as `HEADER_RULES` in `notification.usage.ts` says.",
     },
     { size: "xl", when: "The button is a number key or a floating button." },
-    { size: "md", when: "The button is in the header of the screen, or in a search row that belongs to the header." },
+    {
+      size: "md",
+      when: "The button is in the header of the screen, or in a search row that belongs to the header.",
+    },
     { size: "sm", when: "The button is a chip." },
     {
       size: "sm",
       when: "The button shares a row with text, data or a control that is not a button. Another button in the same group does not count.",
     },
-    { size: "sm", when: "The screen shows several cards side by side or in a list, and each card has its own button." },
+    {
+      size: "sm",
+      when: "The screen shows several cards side by side or in a list, and each card has its own button.",
+    },
     { size: "md", when: "No other step matches. This is the default." },
   ],
 };
-
-/** One short rule with a title. */
-export interface UsageRule {
-  title: string;
-  rule: string;
-}
 
 export const GROUP_RULES: UsageRule[] = [
   { rule: "In a stack, put the main action on top.", title: "Stack" },
   { rule: "In a row, put the main action on the right.", title: "Row" },
   { rule: "All buttons in a group use the same size.", title: "One size" },
-  { rule: "A group uses secondary or outline, not both.", title: "One language" },
+  {
+    rule: "A group uses secondary or outline, not both.",
+    title: "One language",
+  },
 ];
 
 export const FULL_WIDTH_RULES: UsageRule[] = [
-  { rule: "An xl button fills its action area. Number keys and floating buttons do not.", title: "xl" },
+  {
+    rule: "An xl button fills its action area. Number keys and floating buttons do not.",
+    title: "xl",
+  },
   {
     rule: "md and sm buttons fit their content. A form submit button in a card fills the card.",
     title: "md and sm",
   },
 ];
 
+/** What to do when a label is long. The limits are in the "Keep it short" rule of `COPY_RULES`. */
+export const LABEL_FIT_RULES: UsageRule[] = [
+  {
+    rule: "A label stays on one line. Fixed copy must fit, and must not end with an ellipsis.",
+    title: "One line",
+  },
+  {
+    rule: "Shorten the label. Put more detail in the text near the button, not in the label.",
+    title: "Too long",
+  },
+  {
+    rule: "If a label does not fit in a row at 375px wide, stack the group. Do not make the text smaller.",
+    title: "Row",
+  },
+  {
+    rule: "The rules apply to each locale. Check each translation at 375px wide.",
+    title: "Translations",
+  },
+  {
+    rule: "Only a label with user data, for example a person's name, can end with an ellipsis.",
+    title: "User data",
+  },
+];
+
 export const ICON_RULES: UsageRule[] = [
-  { rule: "Put an icon in the icon-left or icon-right slot. Do not put it in the default slot.", title: "Slots" },
+  {
+    rule: "Put an icon in the icon-left or icon-right slot. Do not put it in the default slot.",
+    title: "Slots",
+  },
   {
     rule: "Do not add a size, color or margin class to the icon. The button sets these values.",
     title: "No extra classes",
   },
-  { rule: "Put a forward arrow and an expand arrow on the right. Put all other icons on the left.", title: "Side" },
   {
-    rule: "The menu icon and the bell in the home header use text-util-color-brand-700, to match the Splitz wordmark beside them.",
+    rule: "HeaderMobileSecondary sets `--s-button-ghost-icon` to `--base-fg-brand`, so each ghost icon button in that header has a brand icon. Do not set this property in another component without a decision of the user.",
+    title: "Header icons",
+  },
+  {
+    rule: "Put a forward arrow and an expand arrow on the right. Put all other icons on the left.",
+    title: "Side",
+  },
+  {
+    rule: "The bell in the home header uses text-util-color-brand-700, to match the Splitz wordmark in the same row.",
     title: "Exception",
   },
 ];
 
 export const LOADING_RULES: UsageRule[] = [
-  { rule: "Set only loading on the button that does the work. The button then blocks taps.", title: "Loading" },
+  {
+    rule: "Set only loading on the button that does the work. The button then blocks taps.",
+    title: "Loading",
+  },
   {
     rule: "Do not set disabled and loading for the same work. A disabled button turns grey, so the loading button loses its colors.",
     title: "Not both",
   },
-  { rule: "Set disabled on the other buttons of the group while the work runs.", title: "Other buttons" },
+  {
+    rule: "Set disabled on the other buttons of the group while the work runs.",
+    title: "Other buttons",
+  },
 ];
-
-/** One copy rule with an example that follows it and an example that breaks it. */
-export interface CopyRule {
-  title: string;
-  rule: string;
-  do: string[];
-  dont: string[];
-}
 
 export const COPY_RULES: CopyRule[] = [
   {
@@ -247,7 +302,7 @@ export const COPY_RULES: CopyRule[] = [
   },
   {
     do: ["Save", "Scan receipt"],
-    dont: ["Click here to save your changes"],
+    dont: ["Click here to save your changes", "与群组内所有人结清全部账单"],
     rule: "English: 1 to 3 words, about 20 characters. Chinese and Japanese: 2 to 6 characters.",
     title: "Keep it short",
   },
@@ -310,5 +365,6 @@ export const ACCESSIBILITY_NOTES = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
+  "Can secondary replace outline on some tinted surfaces? The translucent fill of secondary has a contrast of 1.19 or more on core-alpha-brand-10, base-bg-brand and base-bg-secondary in both themes. The user will decide later. Keep the surface rule and the current buttons until then.",
   "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. HomePage shows a floating button and a primary in the empty state, and both start the same action. The user will decide later. Do not change these buttons until then.",
 ];

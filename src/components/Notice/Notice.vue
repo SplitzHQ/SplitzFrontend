@@ -1,10 +1,23 @@
 <script setup lang="ts">
+import { NOTICE_ICONS } from "./notice-icons";
+
+/**
+ * A message in the page content. The rules are in `notice.usage.ts`.
+ * The default slot holds the message. The `icon` slot replaces the default icon of the tone. The icon is decorative.
+ */
 export interface NoticeProps {
+  /** The color of the notice. */
   tone?: "info" | "success" | "warning" | "error";
+  /** A short bold line above the message. */
   title?: string;
+  /**
+   * Makes a screen reader read the notice when it appears (`role="alert"`). Set it when the notice appears after the
+   * first render of the page, for example after a submit. Do not set it on a notice that is part of the first render.
+   */
+  announce?: boolean;
 }
 
-const { tone = "info", title } = defineProps<NoticeProps>();
+const { tone = "info", title, announce = false } = defineProps<NoticeProps>();
 
 // Full class strings keep Tailwind's scanner happy; tokens flip automatically in dark mode.
 const toneClasses: Record<NonNullable<NoticeProps["tone"]>, { body: string; container: string; icon: string }> = {
@@ -14,7 +27,7 @@ const toneClasses: Record<NonNullable<NoticeProps["tone"]>, { body: string; cont
     icon: "text-util-color-error-600",
   },
   info: {
-    body: "text-base-text-secondary",
+    body: "text-util-color-brand-900",
     container: "bg-core-alpha-brand-10",
     icon: "text-util-color-brand-600",
   },
@@ -32,12 +45,15 @@ const toneClasses: Record<NonNullable<NoticeProps["tone"]>, { body: string; cont
 </script>
 
 <template>
-  <div :class="['flex gap-3 rounded-2xl p-4', toneClasses[tone].container]">
+  <div :class="['flex gap-3 rounded-2xl p-4', toneClasses[tone].container]" :role="announce ? 'alert' : undefined">
+    <!-- h-5 is the line height of text-sm, so the icon stays in the center of the first line of text. -->
     <span
-      v-if="$slots.icon"
-      :class="['mt-0.5 flex size-5 shrink-0 items-center justify-center [&>svg]:size-5', toneClasses[tone].icon]"
+      aria-hidden="true"
+      :class="['flex h-5 shrink-0 items-center justify-center [&>svg]:size-4.5', toneClasses[tone].icon]"
     >
-      <slot name="icon" />
+      <slot name="icon">
+        <component :is="NOTICE_ICONS[tone]" />
+      </slot>
     </span>
     <div :class="['flex min-w-0 flex-1 flex-col gap-1 text-sm', toneClasses[tone].body]">
       <p v-if="title" class="font-semibold">{{ title }}</p>

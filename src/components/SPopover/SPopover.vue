@@ -6,13 +6,24 @@ import { watch } from "vue";
 // Attributes and classes belong to the floating panel, not the trigger.
 defineOptions({ inheritAttrs: false });
 
-/** Anchored panel for rich content, with focus management and viewport collision handling. */
+/**
+ * A panel anchored to its trigger. It moves focus into the panel, and it stays inside the screen.
+ * Use it on a desktop width only. See `popover.usage.ts`, which also says when to use a sheet.
+ *
+ * To limit the height, set `--s-popover-max-height` in `class`. The panel never grows past the free space on the screen.
+ */
 export interface PopoverProps {
+  /** The name of the panel for a screen reader. */
   label: string;
+  /** Classes for the panel. They replace a class of the same kind, for example `w-104` replaces the default width. */
   class?: string;
+  /** False renders the trigger only, with no popover behavior. The caller then handles the click of the trigger. */
   enabled?: boolean;
+  /** The side of the trigger that the panel opens on. */
   side?: PopoverContentProps["side"];
+  /** The edge of the trigger that the panel lines up with. */
   align?: PopoverContentProps["align"];
+  /** The gap between the trigger and the panel, in pixels. */
   sideOffset?: number;
 }
 
@@ -66,7 +77,10 @@ watch(
 <style scoped>
 .s-popover {
   max-width: var(--reka-popover-content-available-width);
-  max-height: min(var(--s-popover-max-height), var(--reka-popover-content-available-height));
+  max-height: min(
+    var(--s-popover-max-height, var(--reka-popover-content-available-height)),
+    var(--reka-popover-content-available-height)
+  );
   transform-origin: var(--reka-popover-content-transform-origin);
   --popover-enter-x: 0px;
   --popover-enter-y: -4px;
@@ -85,10 +99,10 @@ watch(
 }
 
 .s-popover[data-state="open"] {
-  animation: popover-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: popover-in var(--motion-duration-container) var(--motion-easing-enter);
 }
 .s-popover[data-state="closed"] {
-  animation: popover-out 0.1s ease-out;
+  animation: popover-out var(--motion-duration-exit) var(--motion-easing-exit);
 }
 
 @keyframes popover-in {
@@ -110,12 +124,6 @@ watch(
   to {
     opacity: 0;
     transform: translate(var(--popover-enter-x), var(--popover-enter-y)) scale(0.98);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .s-popover[data-state] {
-    animation: none;
   }
 }
 </style>

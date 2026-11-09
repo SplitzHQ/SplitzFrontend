@@ -1,0 +1,149 @@
+/**
+ * The usage rules of TextInput. This file is the one place for these rules.
+ * The design-system Text input page renders them, and agents read them through the `spz-component-use` skill.
+ * The app does not import this file, so the rules do not go into the app bundle.
+ */
+import type { AccessibilityNote, RuleScope, UsageRule, UseInsteadRule } from "../usage-rules";
+import type { TextInputProps } from "./TextInput.vue";
+
+/** One variant of TextInput. */
+export type TextInputVariant = NonNullable<TextInputProps["variant"]>;
+
+/** One input type of TextInput. */
+export type TextInputType = NonNullable<TextInputProps["type"]>;
+
+/** Where the rules apply. */
+export const RULE_SCOPE: RuleScope = {
+  app: "All rules in this file apply to `src/`.",
+  devtools: [
+    "These rules apply: when not to use a text input, labels and accessibility.",
+    "The props of each input type do not apply. A desktop tool does not need a phone keyboard.",
+    "A demo on a design-system page or a comparison frame in a prototype shows options on purpose. No rule applies to it.",
+    "When a rule does not decide a devtools field, choose and continue. Do not stop to ask, and do not add the choice to this file.",
+  ],
+};
+
+/** When to use a text input. */
+export const WHEN_TO_USE: UsageRule[] = [
+  { rule: "The user types one line of text, for example a name, an email address or a code.", title: "One line" },
+  { rule: "The user searches a list on the same screen.", title: "Search" },
+];
+
+/** The cases with another component. */
+export const NOT_A_TEXT_INPUT: UseInsteadRule[] = [
+  { use: "Keyboard", when: "The user enters an amount of money on the new expense screen." },
+  { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
+  { use: "HomeSearchBar", when: "The field is the search field in the header of the home page." },
+];
+
+/** What each variant is for. */
+export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
+  outlined: {
+    rule: "The default. It has the border, the label, the hint, the icon slot and the password button. Use it in forms and sheets.",
+    title: "outlined",
+  },
+  plain: {
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is 14px. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    title: "plain",
+  },
+};
+
+/** The props that the current forms set for each input type. */
+export const TYPE_GUIDE: Record<TextInputType, UsageRule> = {
+  email: {
+    rule: 'Set `autocomplete="email"` and `inputmode="email"`, so a phone shows the keyboard with the @ key.',
+    title: "email",
+  },
+  password: {
+    rule: 'Set `autocomplete="current-password"` to log in, and `autocomplete="new-password"` to set a password. The field adds the show and hide button.',
+    title: "password",
+  },
+  text: {
+    rule: 'The default. For a code, set `inputmode="numeric"` and `autocomplete="one-time-code"`.',
+    title: "text",
+  },
+};
+
+/** How to name a field. */
+export const LABEL_RULES: UsageRule[] = [
+  {
+    rule: "Each field needs a name. Set `label`. A placeholder is not a name, because it goes away when the user types.",
+    title: "Always a name",
+  },
+  {
+    rule: "`hide-label` keeps the name for a screen reader only. The current uses are the username row on the profile page, which has the name above the field, and the category search, which has a search icon.",
+    title: "Hidden label",
+  },
+  {
+    rule: "If a control must sit between the label and the field, write a `<label>` with `for`, and give the field the same `id`. AddExpenseDetailsSheet does this for the category button and the location button.",
+    title: "A label outside the field",
+  },
+];
+
+/** How to show help and errors. */
+export const MESSAGE_RULES: UsageRule[] = [
+  {
+    rule: "Put help text in `hint`. A screen reader reads it after the label. A placeholder is not help text.",
+    title: "Hint",
+  },
+  {
+    rule: "If the text must be outside the field, give the element an `id` and pass the ID in `described-by`.",
+    title: "Text outside the field",
+  },
+  {
+    rule: "When the value of one field is wrong, put the text in `error`. The text shows directly under the field, replaces the hint and sets the error colors. RegisterPage and ResetPasswordPage do this.",
+    title: "Error",
+  },
+  {
+    rule: "When the problem is not about one field, for example a failed request, use a Notice. Do not put the same text in `error` and in a toast.",
+    title: "Not about one field",
+  },
+  {
+    rule: "Set `invalid` only when the text is outside the field, and link the text with `described-by`. Color alone does not tell the user what is wrong (WCAG 1.4.1). ForgotPasswordPage does this.",
+    title: "Invalid",
+  },
+];
+
+/** Accessibility rules that the component follows, written for the people who use it. */
+export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
+  {
+    text: "The `outlined` field is about 50px high. A tap anywhere on it moves the focus to the input, and the keyboard of a phone stays open when the input already has the focus.",
+    title: "Tap area",
+  },
+  {
+    text: "The show and hide button is 24px. An invisible box makes the tap area 44px. Its name follows the state, and the name comes from the locale files.",
+    title: "Password button",
+  },
+  {
+    text: "The `plain` input is 44px high. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
+    title: "Plain tap area",
+  },
+  {
+    text: "The brand border and an inset ring of 1px show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
+    title: "Focus",
+  },
+  {
+    text: '`label` names the input. In the `plain` variant it is the `aria-label`. `hint`, `error` and `described-by` set `aria-describedby`. `error` and `invalid` set `aria-invalid`. The `error` text has `role="alert"`, so a screen reader reads it when it appears.',
+    title: "Screen reader",
+  },
+  {
+    text: "Text under 16px in a focused input makes iOS zoom the page. The `outlined` text is 16px. The `plain` text is 14px. See the open questions.",
+    title: "Zoom on iOS",
+  },
+  {
+    text: "The empty border, the placeholder and the dark hint are below the WCAG minimum in the contrast tables. See the open questions.",
+    title: "Contrast",
+  },
+];
+
+/**
+ * Decisions that the user has not made. Ask the user before you rely on a rule that one of these questions affects.
+ * Remove a question when the user decides it, and write the decision into the rules above.
+ * A prototype will decide the first question.
+ */
+export const OPEN_QUESTIONS = [
+  "How does the search field on SelectPeoplePage look? `plain` has 14px text, so iOS zooms the page, and it has no focus style except the caret. The other text in that row is smaller than 16px, so 16px adds one more font size. HomeSearchBar also has 14px text.",
+  "Is the contrast of the quiet parts acceptable? The empty border is about 1.3:1, and the filled border is also below 3:1. WCAG 1.4.11 asks for 3:1. The placeholder is about 3:1 in both themes, and the hint is about 3.3:1 in dark mode. WCAG 1.4.3 asks for 4.5:1. A change affects all fields.",
+  "Does a tap on the password button keep the keyboard of a phone open? Now the button takes the focus from the input, so the keyboard can close. A tap on the padding of the field does not do this.",
+  "The notes field of AddExpenseDetailsSheet is a raw `<textarea>` with its own outline. It does not show the states of TextInput. Does the app need a multi-line field?",
+];
