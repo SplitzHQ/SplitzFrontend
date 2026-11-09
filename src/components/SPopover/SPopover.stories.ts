@@ -53,5 +53,5 @@ export const Keyboard: Story = {
 };
 
 export const WidePanel: Story = {
-  args: { class: "w-[26rem]", align: "start" },
+  args: { class: "w-104", align: "start" },
 };
