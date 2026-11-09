@@ -54,6 +54,12 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "The icon or the translated name of an expense category.",
   },
   {
+    components: ["FilterPill"],
+    folder: "FilterPill",
+    usage: "src/components/FilterPill/filter-pill.usage.ts",
+    use: "A round choice button for a filter or a sort: a pill in a row above a list that opens a sheet, or one choice in that sheet.",
+  },
+  {
     components: ["HeaderMobileSecondary"],
     folder: "Header",
     usage: "src/components/Header/header.usage.ts",

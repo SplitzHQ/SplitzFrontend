@@ -4,14 +4,17 @@ import { useQuery } from "@pinia/colada";
 import { useLocalStorage } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
 import { twMerge } from "tailwind-merge";
-import { computed, type ComponentPublicInstance, ref, useTemplateRef, watch } from "vue";
+import { computed, type ComponentPublicInstance, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import FilterPill from "@/components/FilterPill/FilterPill.vue";
 import Layout from "@/components/Layout/Layout.vue";
-import { LIST_ROW_CLASS } from "@/components/ListRow/list-row";
+import AmountChip from "@/components/ListRow/AmountChip.vue";
+import { LIST_ROW_CLASS, LIST_ROW_TEXT } from "@/components/ListRow/list-row";
+import ListRowContent from "@/components/ListRow/ListRowContent.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
@@ -21,12 +24,21 @@ import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
 import { HOME_SORTS, mostUsedCurrency, settledState, sortGroups, type HomeSort } from "./home-balances";
+import {
+  HOME_FILTER_EMPTY_LABELS,
+  HOME_FILTER_LABELS,
+  HOME_FILTERS,
+  HOME_SORT_LABELS,
+  homeFilter,
+  matchesHomeFilter,
+  type HomeFilter,
+} from "./home-filter";
 import HomeAmount from "./HomeAmount.vue";
 import HomeEmptyState from "./HomeEmptyState.vue";
+import HomeFilterSheet, { type HomeFilterSheetMode } from "./HomeFilterSheet.vue";
 import HomeGroupsSkeleton from "./HomeGroupsSkeleton.vue";
 import HomeHeader from "./HomeHeader.vue";
 import HomeNoResults from "./HomeNoResults.vue";
-import HomeSortButton from "./HomeSortButton.vue";
 import HomeTotalBalance from "./HomeTotalBalance.vue";
 
 useStatusBarTopColor("--base-bg-secondary_alt");
@@ -92,17 +104,50 @@ const sort = computed<HomeSort>({
 /** The currency that the most groups use. The total balance row and the amount sort use it. */
 const commonCurrency = computed(() => mostUsedCurrency(sortGroups(groupWithExtraInfo.value, "recent")));
 
+/** The filter of the list. It stays while the app runs, also when the user opens a group and comes back. */
+const filter = homeFilter;
+const filterOn = computed(() => filter.value !== "all");
+
+/** The number of groups that each condition shows. The counts ignore the search, like the total balance. */
+const filterCounts = computed(() => {
+  const counts = {} as Record<HomeFilter, number>;
+  for (const option of HOME_FILTERS) {
+    counts[option] = groupWithExtraInfo.value.filter((g) => matchesHomeFilter(g.myBalances, option)).length;
+  }
+  return counts;
+});
+
 const visibleGroups = computed(() => {
   const keyword = trimmedKeyword.value.toLowerCase();
-  const filtered = keyword
-    ? groupWithExtraInfo.value.filter((g) => g.name.toLowerCase().includes(keyword))
-    : groupWithExtraInfo.value;
+  const filtered = groupWithExtraInfo.value.filter(
+    (g) => matchesHomeFilter(g.myBalances, filter.value) && (!keyword || g.name.toLowerCase().includes(keyword))
+  );
   return sortGroups(filtered, sort.value);
 });
 
-// These two read the list before the search filter. A search with no result must not look like a new user.
+// These read the list before the search and the filter. A list with no result must not look like a new user.
 const hasGroups = computed(() => groups.value.length > 0);
-const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
+/** The search finds no group. This state hides the total, because the user looks for one group. */
+const showNoResults = computed(
+  () => hasGroups.value && trimmedKeyword.value !== "" && visibleGroups.value.length === 0
+);
+/** The filter alone hides every group. The total and the pills stay, so the user can change the filter. */
+const showFilterEmpty = computed(() => hasGroups.value && !showNoResults.value && visibleGroups.value.length === 0);
+/** The line that a screen reader reads when the list has no result. */
+const noResultStatus = computed(() => {
+  if (showNoResults.value) return $t("home-no-results-title", { keyword: trimmedKeyword.value });
+  if (showFilterEmpty.value && filter.value !== "all") return $t(HOME_FILTER_EMPTY_LABELS[filter.value]);
+  return "";
+});
+
+const sheetOpen = shallowRef(false);
+const sheetMode = shallowRef<HomeFilterSheetMode>("all");
+
+/** Opens the filter sheet. The search filter button opens the full sheet, and a pill opens the sheet of its kind. */
+function openFilterSheet(mode: HomeFilterSheetMode) {
+  sheetMode.value = mode;
+  sheetOpen.value = true;
+}
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
 /** The empty state offers Record new expense only with a friend, because the next page lists only groups and friends. */
@@ -152,6 +197,13 @@ const pinLeavingRow = (row: Element) => {
   element.style.top = `${rowTops.get(element.dataset.groupId ?? "") ?? element.offsetTop}px`;
 };
 
+/**
+ * Removes a no-result state at once when the list comes back. The Transition has only enter classes, and with no leave
+ * hook Vue waits for the CSS of the leaving element before it removes it. Every element has a color transition, so the
+ * old state stayed on the screen above the returned rows. A leave hook that takes `done` makes Vue skip that wait.
+ */
+const leaveAtOnce = (_el: Element, done: () => void) => done();
+
 const addExpense = () => {
   routerHistoryStore.takeSnapshot();
   void router.push({ name: "newExpense" });
@@ -182,7 +234,7 @@ const userBalances = computed(() => {
 <template>
   <Layout>
     <template #header>
-      <HomeHeader v-model="searchKeyword" />
+      <HomeHeader v-model="searchKeyword" :filter-count="filterOn ? 1 : 0" @open-filter="openFilterSheet('all')" />
     </template>
 
     <template #default="layoutAttrs">
@@ -210,10 +262,17 @@ const userBalances = computed(() => {
           </SIconButton>
         </Transition>
 
+        <!-- The sheet renders in a portal, so its place here does not change the layout. -->
+        <HomeFilterSheet
+          v-model:open="sheetOpen"
+          v-model:filter="filter"
+          v-model:sort="sort"
+          :mode="sheetMode"
+          :counts="filterCounts"
+        />
+
         <!-- This element stays in the page, so a screen reader reads the result when the text changes. -->
-        <p role="status" class="sr-only">
-          {{ showNoResults ? $t("home-no-results-title", { keyword: trimmedKeyword }) : "" }}
-        </p>
+        <p role="status" class="sr-only">{{ noResultStatus }}</p>
         <p role="status" class="sr-only">{{ announcement }}</p>
 
         <!--
@@ -230,18 +289,76 @@ const userBalances = computed(() => {
               <Transition
                 enter-active-class="transition-opacity duration-state ease-enter"
                 enter-from-class="opacity-0"
+                @leave="leaveAtOnce"
               >
-                <HomeNoResults v-if="showNoResults" :keyword="trimmedKeyword" @clear="searchKeyword = ''" />
+                <HomeNoResults
+                  v-if="showNoResults"
+                  kind="search"
+                  :title="$t('home-no-results-title', { keyword: trimmedKeyword })"
+                  :description="$t('home-no-results-description')"
+                  :clear-label="$t('home-button-clear-search')"
+                  @clear="searchKeyword = ''"
+                />
               </Transition>
 
-              <!-- The total balance and the list title. The sort button is the title. -->
+              <!--
+                The total balance does not follow the filter. The list has no title row. While a filter is on, a row of
+                pills shows under the total: the sort first, then the filter. Each pill opens the sheet of its kind. The
+                row opens to the height of its content, so the list moves down and does not jump.
+              -->
               <template v-if="!showNoResults">
                 <div class="pb-3">
                   <HomeTotalBalance :totals="userBalances" :common-currency="commonCurrency" />
                 </div>
-                <div class="flex min-h-8 items-center">
-                  <HomeSortButton v-model="sort" />
+                <div
+                  :class="[
+                    'grid transition-[grid-template-rows,opacity] duration-container ease-enter',
+                    filterOn ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                  ]"
+                  data-testid="home-filter-pills"
+                >
+                  <!--
+                    The row clips its content while it opens. The padding keeps the tap area and the focus ring of the
+                    pills inside the clip.
+                  -->
+                  <div class="-mx-1 min-h-0 overflow-hidden px-1" :inert="!filterOn">
+                    <div class="flex items-center gap-2 py-1.5">
+                      <FilterPill
+                        caret
+                        aria-haspopup="dialog"
+                        :aria-label="$t('home-sort-button', { sort: $t(HOME_SORT_LABELS[sort]) })"
+                        data-testid="home-sort-pill"
+                        @click="openFilterSheet('sort')"
+                      >
+                        {{ $t(HOME_SORT_LABELS[sort]) }}
+                      </FilterPill>
+                      <FilterPill
+                        caret
+                        :selected="filterOn"
+                        aria-haspopup="dialog"
+                        :aria-label="$t('home-filter-pill', { filter: $t(HOME_FILTER_LABELS[filter]) })"
+                        data-testid="home-filter-pill"
+                        @click="openFilterSheet('filter')"
+                      >
+                        {{ $t(HOME_FILTER_LABELS[filter]) }}
+                      </FilterPill>
+                    </div>
+                  </div>
                 </div>
+
+                <Transition
+                  enter-active-class="transition-opacity duration-state ease-enter"
+                  enter-from-class="opacity-0"
+                  @leave="leaveAtOnce"
+                >
+                  <HomeNoResults
+                    v-if="showFilterEmpty && filter !== 'all'"
+                    kind="filter"
+                    :title="$t(HOME_FILTER_EMPTY_LABELS[filter])"
+                    :clear-label="$t('home-button-clear-filter')"
+                    @clear="filter = 'all'"
+                  />
+                </Transition>
               </template>
 
               <!-- Group List -->
@@ -264,71 +381,65 @@ const userBalances = computed(() => {
                       aria-hidden="true"
                     />
 
-                    <div class="min-w-0 flex-1">
-                      <p class="truncate text-base font-semibold text-base-text-primary">
-                        {{ group.name }}
-                      </p>
-
+                    <ListRowContent :title="group.name">
                       <!--
-                        The labels and the settled text share one neutral color. A tinted fill behind each amount keeps the
-                        dark green and red apart from the black name.
                         Each direction has its own line, also when both fit on one line. The amounts of one
                         direction wrap after the label, and a label or an amount never breaks.
                       -->
-                      <div class="mt-0.5 flex flex-col gap-0.5 text-sm font-medium">
-                        <p v-if="group.myBalancePositive.length > 0" class="flex flex-wrap items-center gap-1">
-                          <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-lent") }}</span>
-                          <span
-                            v-for="balance in group.myBalancePositive"
-                            :key="balance.currency"
-                            class="rounded-md bg-base-bg-success-subtle px-1 whitespace-nowrap text-base-text-success"
-                          >
+                      <template #subtitle>
+                        <p
+                          v-if="group.myBalancePositive.length > 0"
+                          :class="['flex flex-wrap items-center gap-1', LIST_ROW_TEXT.direction]"
+                        >
+                          <span class="whitespace-nowrap">{{ $t("home-you-lent") }}</span>
+                          <AmountChip v-for="balance in group.myBalancePositive" :key="balance.currency" tone="owed">
                             <HomeAmount :amount="balance.amount" :currency="balance.currency" />
-                          </span>
+                          </AmountChip>
                         </p>
-                        <p v-if="group.myBalanceNegative.length > 0" class="flex flex-wrap items-center gap-1">
-                          <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-owe") }}</span>
-                          <span
-                            v-for="balance in group.myBalanceNegative"
-                            :key="balance.currency"
-                            class="rounded-md bg-base-bg-error px-1 whitespace-nowrap text-base-text-error"
-                          >
+                        <p
+                          v-if="group.myBalanceNegative.length > 0"
+                          :class="['flex flex-wrap items-center gap-1', LIST_ROW_TEXT.direction]"
+                        >
+                          <span class="whitespace-nowrap">{{ $t("home-you-owe") }}</span>
+                          <AmountChip v-for="balance in group.myBalanceNegative" :key="balance.currency" tone="owes">
                             <HomeAmount :amount="balance.amount" :currency="balance.currency" />
-                          </span>
+                          </AmountChip>
                         </p>
-                        <span v-if="group.settled === 'none'" class="text-base-text-quaternary">
+                        <p v-if="group.settled === 'none'" :class="LIST_ROW_TEXT.subtitle">
                           {{ $t("home-no-expenses") }}
-                        </span>
-                        <span v-else-if="group.settled === 'all'" class="text-base-text-quaternary">
+                        </p>
+                        <p v-else-if="group.settled === 'all'" :class="LIST_ROW_TEXT.subtitle">
                           {{ $t("home-all-settled-up") }}
-                        </span>
-                        <span v-else-if="group.settled === 'you'" class="text-base-text-quaternary">
+                        </p>
+                        <p v-else-if="group.settled === 'you'" :class="LIST_ROW_TEXT.subtitle">
                           {{ $t("home-you-are-settled-up") }}
-                        </span>
-                      </div>
-                    </div>
+                        </p>
+                      </template>
+                    </ListRowContent>
                   </RouterLink>
                 </li>
 
                 <!--
                   Create Group row. Keeps group creation reachable when the user already has groups. It has no hint
-                  under the name: a person who already has groups does not need it.
+                  under the name: a person who already has groups does not need it. A filtered list does not show it,
+                  because it is not a group that matches.
                 -->
-                <li key="create-group">
+                <li v-if="!filterOn" key="create-group">
                   <RouterLink
                     :to="{ name: 'createGroup' }"
                     :class="GROUP_ROW_CLASS"
                     data-testid="home-create-group"
                     @click="routerHistoryStore.takeSnapshot()"
                   >
-                    <div
-                      class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-dashed border-base-border-secondary text-util-color-brand-700"
-                    >
-                      <PhUsers class="size-5" />
-                    </div>
-                    <p class="min-w-0 flex-1 truncate text-base font-semibold text-base-text-primary">
-                      {{ $t("home-button-create-group") }}
-                    </p>
+                    <ListRowContent :title="$t('home-button-create-group')">
+                      <template #leading>
+                        <div
+                          class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-dashed border-base-border-secondary text-util-color-brand-700"
+                        >
+                          <PhUsers class="size-5" />
+                        </div>
+                      </template>
+                    </ListRowContent>
                   </RouterLink>
                 </li>
               </TransitionGroup>
