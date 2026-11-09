@@ -21,6 +21,14 @@ export const BEHAVIOR_NOTES: UsageRule[] = [
     title: "New version",
   },
   {
+    rule: "The toast is at the bottom center on every page. At the top it covers the page title. It can cover a bottom bar or the round add button. This is accepted, because the user clears it with Update or the close button.",
+    title: "Position",
+  },
+  {
+    rule: "The close button or a swipe hides the prompt for the rest of the session. The new version still waits, and the prompt shows again at the next app start. A tap on Update loads the new version.",
+    title: "After close",
+  },
+  {
     rule: "The app shows no message. A person who did not ask for offline use may not know what it means.",
     title: "Ready for offline use",
   },

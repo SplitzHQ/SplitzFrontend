@@ -42,12 +42,20 @@ export const HOST_RULES: UsageRule[] = [
     title: "One host",
   },
   {
-    rule: "Keep the offsets of `src/App.vue`. They keep the toast out of the safe area of a phone.",
+    rule: "Keep the offsets of `src/App.vue`. They keep the toast out of the safe area of a phone, at the top and at the bottom.",
     title: "Safe area",
+  },
+  {
+    rule: "A toast is at the top center. Do not pass `position`. Only the new-version prompt of ReloadPrompt is at the bottom center. The open questions keep the position of the other toasts.",
+    title: "Position",
+  },
+  {
+    rule: "At phone width a toast fills the row between the offsets. On a desktop a toast is as wide as its content, and a long text wraps at the width of the toaster. Do not set a fixed width.",
+    title: "Width",
   },
   { rule: "Pass a `$t` message. Do not pass English text.", title: "Translated text" },
   {
-    rule: "A normal toast has no close button. It closes by itself, and the user can swipe it up, left or right. A toast with `duration: Infinity` must have an action and `closeButton: true`.",
+    rule: "A normal toast has no close button. It closes by itself, and the user can swipe it up, down, left or right. A toast with `duration: Infinity` must have an action and `closeButton: true`.",
     title: "Close",
   },
 ];
@@ -159,7 +167,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "Where does a toast appear on a phone? Now it appears at the top and covers the page header and the back button for 4 seconds. The research in the prototype `devtools/prototypes/2026-11-04-toast-look` shows that a toast with Undo is usually at the bottom.",
+  "Where does a toast appear on a phone? Now it appears at the top and covers the page header and the back button for 4 seconds. The new-version prompt is already at the bottom (SPZ-99). The research in the prototype `devtools/prototypes/2026-11-04-toast-look` shows that a toast with Undo is usually at the bottom.",
   "Which end does a failure message have? The text uses `Try again.`, `Please try again.` or no end. `Couldn't copy link.` has a period, and `Couldn't copy to clipboard` has none. `Image must be under 10 MB` has none, and `Image must be under { $maxMb } MB.` has a period.",
   "Which text does a validation error use? `Passwords do not match` has no contraction, and the locale README asks for contractions.",
   "Does the app need the warning tone? No call uses it.",

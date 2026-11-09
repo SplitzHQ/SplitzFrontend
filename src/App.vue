@@ -14,15 +14,18 @@ import { useUserStore } from "@/stores/user";
 
 /** Keeps the toasts out of the safe area. The numbers are the default offsets of vue-sonner. */
 const toastOffset = {
+  bottom: "calc(24px + var(--safe-area-bottom))",
   left: "calc(24px + var(--safe-area-left))",
   right: "calc(24px + var(--safe-area-right))",
   top: "calc(24px + var(--safe-area-top))",
 };
 /**
- * At phone width, vue-sonner adds `env(safe-area-inset-top)` to the top offset. The subtraction stops a second count on
- * a real phone, and `--safe-area-top` still works when a tool sets another value.
+ * At phone width, vue-sonner adds `env(safe-area-inset-top)` to the top offset and `env(safe-area-inset-bottom)` to the
+ * bottom offset. The subtraction stops a second count on a real phone, and the `--safe-area-*` values still work when a
+ * tool sets other values.
  */
 const toastMobileOffset = {
+  bottom: "calc(16px + var(--safe-area-bottom) - env(safe-area-inset-bottom, 0px))",
   left: "calc(16px + var(--safe-area-left))",
   right: "calc(16px + var(--safe-area-right))",
   top: "calc(16px + var(--safe-area-top) - env(safe-area-inset-top, 0px))",

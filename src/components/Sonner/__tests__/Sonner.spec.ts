@@ -40,8 +40,8 @@ describe("Sonner", () => {
     expect(mountHost({ theme: "dark" }).toaster().theme).toBe("dark");
   });
 
-  it("lets a toast swipe up and to the side, and lets the caller change this", () => {
-    expect(mountHost().toaster().swipeDirections).toEqual(["top", "left", "right"]);
+  it("lets a toast swipe toward both edges and to the side, and lets the caller change this", () => {
+    expect(mountHost().toaster().swipeDirections).toEqual(["top", "bottom", "left", "right"]);
     expect(mountHost({ swipeDirections: ["top"] }).toaster().swipeDirections).toEqual(["top"]);
   });
 

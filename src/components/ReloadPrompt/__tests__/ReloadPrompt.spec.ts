@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { enableAutoUnmount, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
 
@@ -27,10 +27,14 @@ vi.mock("virtual:pwa-register/vue", () => ({
   },
 }));
 
+// Each mounted prompt watches the shared `needRefresh`. A prompt from an earlier test would show its own toast.
+enableAutoUnmount(afterEach);
+
 describe("ReloadPrompt", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
+    sessionStorage.clear();
     needRefresh.value = false;
     offlineReady.value = false;
   });
@@ -51,15 +55,56 @@ describe("ReloadPrompt", () => {
 
     const [message, options] = mocks.toast.info.mock.calls[0] as [
       string,
-      { action: { label: string; onClick: () => void }; closeButton: boolean; duration: number },
+      { action: { label: string; onClick: () => void }; closeButton: boolean; duration: number; position: string },
     ];
     expect(message).toBe("reload-prompt-new-version");
     expect(options.duration).toBe(Infinity);
     expect(options.closeButton).toBe(true);
+    expect(options.position).toBe("bottom-center");
     expect(options.action.label).toBe("reload-prompt-update");
 
     options.action.onClick();
     expect(mocks.updateServiceWorker).toHaveBeenCalledWith(true);
+  });
+
+  it("does not show the toast again in the session after the user closes it", async () => {
+    const wrapper = mount(ReloadPrompt);
+
+    needRefresh.value = true;
+    await nextTick();
+    const [, options] = mocks.toast.info.mock.calls[0] as [string, { onDismiss: () => void }];
+    options.onDismiss();
+
+    // The waiting worker sets `needRefresh` again, for example after the hourly check or a new mount.
+    needRefresh.value = false;
+    await nextTick();
+    needRefresh.value = true;
+    await nextTick();
+
+    // A reload in the same session mounts the component again.
+    wrapper.unmount();
+    needRefresh.value = false;
+    mount(ReloadPrompt);
+    needRefresh.value = true;
+    await nextTick();
+
+    expect(mocks.toast.info).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the toast again in a new session", async () => {
+    const wrapper = mount(ReloadPrompt);
+    needRefresh.value = true;
+    await nextTick();
+    (mocks.toast.info.mock.calls[0] as [string, { onDismiss: () => void }])[1].onDismiss();
+
+    wrapper.unmount();
+    sessionStorage.clear();
+    needRefresh.value = false;
+    mount(ReloadPrompt);
+    needRefresh.value = true;
+    await nextTick();
+
+    expect(mocks.toast.info).toHaveBeenCalledTimes(2);
   });
 
   it("shows no toast when the app can work offline", async () => {

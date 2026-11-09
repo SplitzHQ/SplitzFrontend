@@ -85,6 +85,15 @@
 }
 
 @layer base {
+  /*
+   * Stops the double-tap zoom on all of the page. Without this rule, two fast taps on a button, or on the space between
+   * two buttons, zoom the page in Safari on iOS. Each element gets the touch actions that it and all its ancestors
+   * permit, so this rule applies to each element. Pinch zoom and scroll stay on.
+   */
+  html {
+    touch-action: manipulation;
+  }
+
   body,
   #app,
   .layout {
