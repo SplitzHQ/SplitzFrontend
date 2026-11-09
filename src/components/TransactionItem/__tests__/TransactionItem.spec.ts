@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createMemoryHistory, createRouter } from "vue-router";
 
 import type { TransactionBalanceDto, TransactionDto } from "@/backend";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import { formatCurrency } from "@/libs/format-currency";
 import SelectableTransactionItem from "@/pages/SettleUpPage/SelectableTransactionItem.vue";
 
@@ -135,18 +136,28 @@ describe("TransactionItem", () => {
 
   it("does not show a minus sign beside the label for money that the user owes", async () => {
     const wrapper = await mountLink(transaction([balance(ME, "-25.00"), balance("a", "25.00")]));
-    const amount = wrapper.findAll("p")[3];
+    const amount = wrapper.findAll("p")[3].get("span");
 
     expect(amount.text()).not.toContain("-");
     expect(amount.classes()).toContain("text-base-text-error");
+    expect(amount.classes()).toContain("bg-base-bg-error");
   });
 
-  it("shows money that the user gets with the success color", async () => {
+  it("shows money that the user gets with the success color on a tinted fill", async () => {
     const wrapper = await mountLink(transaction([balance(ME, "25.00"), balance("a", "-25.00")]));
     const parts = wrapper.findAll("p");
 
     expect(parts[2].text()).toBe("group-detail-you-lent-label");
-    expect(parts[3].classes()).toContain("text-base-text-success");
+    expect(parts[3].get("span").classes()).toContain("text-base-text-success");
+    expect(parts[3].get("span").classes()).toContain("bg-base-bg-success-subtle");
+  });
+
+  it("gives the name and the direction the list row levels", async () => {
+    const wrapper = await mountLink(transaction([balance(ME, "25.00"), balance("a", "-25.00")]));
+    const parts = wrapper.findAll("p");
+
+    expect(parts[0].classes()).toEqual(expect.arrayContaining(LIST_ROW_TEXT.title.split(" ")));
+    expect(parts[2].classes()).toEqual(expect.arrayContaining(LIST_ROW_TEXT.direction.split(" ")));
   });
 
   it("shows no balance when the user is not in the split or has a zero balance", async () => {

@@ -58,17 +58,21 @@ export const SIZE_GUIDE: Record<AvatarSize, AvatarSizeRule> = {
     rule: "A chooser with the name under the avatar, or the main picture of a page.",
   },
   sm: {
-    callers: "HomePage group rows, MarkPaidSheet, PaidByButton, UserItem, RequestCard on ProfilePage",
-    rule: "A group row on the home screen, with the same size as a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar.",
+    callers: "HomePage group rows, MarkPaidSheet, UserItem, RequestCard on ProfilePage",
+    rule: "A list row that opens a page, for example a group row on the home screen. It has the size of a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar. See `src/components/ListRow/list-row.usage.ts`.",
+  },
+  title: {
+    callers: "The header titles of GroupDetailPage, InvoiceDetailPage and TransactionDetailPage",
+    rule: "The avatar in the title of a secondary page, next to the name. It is smaller than the back button, so the name stays the main part of the title. It can show a grid. The prototype `2026-11-05-group-detail-layout` (SPZ-81) decided this size.",
   },
   xs: {
     callers:
-      "NotificationItem, RequestCard in AvatarMenu, the header titles of GroupDetailPage, InvoiceDetailPage and TransactionDetailPage, GroupCard, InviteFriendsSheet, UserList, the friend rows of ProfilePage, the rows of InvoiceDetailPage and TransactionDetailPage",
-    rule: "A list row, a header title or a compact card. This is the usual size.",
+      "NotificationItem, RequestCard in AvatarMenu, GroupCard, InviteFriendsSheet, UserList, PaidByButton, the friend rows of ProfilePage, the rows of InvoiceDetailPage and TransactionDetailPage",
+    rule: "A person row, a notification row, a split row or a compact card. This is the usual size.",
   },
   xxs: {
-    callers: "UserTag, with one picture",
-    rule: "A chip with a name. Use one picture only.",
+    callers: "UserTag, the member rows of BalanceCard, with one picture",
+    rule: "A chip with a name, or a short line of text in a card, for example a member row of BalanceCard. Use one picture only.",
   },
 };
 
@@ -79,7 +83,7 @@ export const GROUP_RULES: UsageRule[] = [
     title: "Four pictures",
   },
   {
-    rule: "The app shows a grid at `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is too small to see. No caller uses `xxs` with a grid.",
+    rule: "The app shows a grid at `title`, `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is too small to see. No caller uses `xxs` with a grid.",
     title: "Sizes",
   },
   {
@@ -176,6 +180,5 @@ export const OPEN_QUESTIONS = [
   "Must the field `alt` get a new name? It now also sets the initial and the color.",
   "Must an avatar be hidden from a screen reader by default? Each caller has a visible name or a labeled parent, so each caller must now add `aria-hidden`. A default would remove that work, but a new caller with no name would then have no name.",
   "Must the size names change? An `xs` avatar has the height of an `md` button, and an `sm` avatar is taller than an `sm` button. The same word gives two heights.",
-  "Must an avatar and a tile have one size in a list? A transaction tile (TransactionItemContent), an invoice tile (InvoiceItem) and an `sm` avatar have one size and one radius. A list row avatar and the NotificationItem tile are smaller.",
   "Must GroupCard, FrequentSelectionList and UserList use the group photo? They always show the members. HomePage and the page headers show the group photo when the group has one, so one group can have two pictures.",
 ];

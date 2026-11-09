@@ -10,6 +10,7 @@ group-detail-tab-history = 记录
 group-detail-tab-export = 导出
 group-detail-you-owe-label = 你应还
 group-detail-you-lent-label = 你应收
+group-detail-all-settled = 已全部结清
 group-detail-paid-by = { $name } 付了 { $amount }
 group-detail-you-paid = 你付了 { $amount }
 group-detail-status-loading = 正在加载群组…

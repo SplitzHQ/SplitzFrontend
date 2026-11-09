@@ -52,6 +52,18 @@ export const BUTTON_RULES: UsageRule[] = [
   },
 ];
 
+/** The look of the header. */
+export const LOOK_RULES: UsageRule[] = [
+  {
+    rule: "The header is a frosted bar, like the home header. The page shows through it with a blur. The status bar area has the full page color, and the color fades to the frosted color under it. `frostedBarStyle` in `@/libs/frosted-bar` holds the values for the two headers. The prototype `2026-11-05-group-detail-layout` (SPZ-81) decided this look for all secondary pages.",
+    title: "Frosted bar",
+  },
+  {
+    rule: "A faint line shows under the header while content is under it, and goes away at the top of the page. The header reads the scroll of the window, or of a box that holds the header. Do not give the header a fill or a border of your own.",
+    title: "Bottom line",
+  },
+];
+
 /** How to write the title. */
 export const TITLE_RULES: UsageRule[] = [
   {
@@ -75,7 +87,7 @@ export const TITLE_RULES: UsageRule[] = [
     title: "Content",
   },
   {
-    rule: 'Set `aria-hidden="true"` on an avatar in the title. Its alt text gives member names, and the h1 then reads as a list of names.',
+    rule: 'Use the `title` size for an avatar in the title, and set `aria-hidden="true"` on it. Its alt text gives member names, and the h1 then reads as a list of names.',
     title: "Avatar in the title",
   },
 ];

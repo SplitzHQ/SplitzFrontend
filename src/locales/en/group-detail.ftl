@@ -10,6 +10,7 @@ group-detail-tab-history = History
 group-detail-tab-export = Export
 group-detail-you-owe-label = You owe
 group-detail-you-lent-label = You are owed
+group-detail-all-settled = All settled up
 group-detail-paid-by = { $name } paid { $amount }
 group-detail-you-paid = You paid { $amount }
 group-detail-status-loading = Loading group…

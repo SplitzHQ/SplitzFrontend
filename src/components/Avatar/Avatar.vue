@@ -21,8 +21,11 @@ interface Image {
 export interface AvatarProps {
   /** One picture shows at full size. Several pictures show as a grid. The grid shows the first four. */
   images: Image[];
-  /** See `SIZE_GUIDE` in `avatar.usage.ts` for when to use each size. `header` is only for the home header. */
-  size: "xxs" | "xs" | "sm" | "lg" | "header";
+  /**
+   * See `SIZE_GUIDE` in `avatar.usage.ts` for when to use each size. `header` is only for the home header, and `title` is
+   * for the title of a secondary page.
+   */
+  size: "xxs" | "title" | "xs" | "sm" | "lg" | "header";
 }
 
 /** The grid has room for this number of pictures. Callers can pass all the members of a group. */
@@ -170,6 +173,27 @@ function onImageError(src: string) {
 
   .image-count-single {
     @apply h-8 w-8 rounded-lg icon-3.5;
+  }
+}
+
+/*
+ * The avatar in the title of a secondary page. It has the size of `header`, and it can also show a grid. The padding
+ * around the tiles of a grid is the same as in `xs` and `sm`.
+ */
+.img-container.title {
+  @apply h-8 w-8 rounded-lg;
+  --pair-shift: 0.5px;
+
+  &.is-group {
+    @apply rounded-[0.4375rem];
+  }
+
+  .image-count-single {
+    @apply h-8 w-8 rounded-lg icon-3.5;
+  }
+
+  .image-count-multiple {
+    @apply h-3 w-3 rounded-sm icon-2;
   }
 }
 

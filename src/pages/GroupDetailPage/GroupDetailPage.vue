@@ -117,11 +117,13 @@ const balanceSummaries = computed(() => {
   const nicknames = new Map(
     (userStore.user?.friends ?? []).map((friend) => [friend.friendUser.id, friend.remark?.trim()])
   );
+  const photos = new Map((group.value?.members ?? []).map((member) => [member.id, member.photo]));
   return summaries.map((summary) => ({
     ...summary,
     memberBalances: summary.memberBalances.map((member) => ({
       ...member,
       name: nicknames.get(member.userId) || member.name,
+      photo: photos.get(member.userId),
     })),
   }));
 });
@@ -151,7 +153,7 @@ const settleUp = () => {
     <template #header>
       <HeaderMobileSecondary :enable-back-button="true">
         <span v-if="group" class="flex items-center gap-2">
-          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="xs" />
+          <Avatar aria-hidden="true" class="shrink-0" :images="avatarImages" size="title" />
           <span class="min-w-0">{{ group.name }}</span>
         </span>
         <template #right>
@@ -172,50 +174,60 @@ const settleUp = () => {
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5">
         <p role="status" class="sr-only">{{ announcement }}</p>
 
-        <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
+        <!--
+          A successful retry removes the button that had the focus, so the focus moves to this block.
+          The tabs control the lists, so they sit closer to the lists than to the balance cards: the gap above the tabs
+          is larger than the gap below them (SPZ-81).
+        -->
         <div ref="content" tabindex="-1" class="flex flex-col gap-5 outline-none">
+          <!-- Balance Card -->
           <Transition v-bind="CONTENT_FADE_IN">
-            <div v-if="!groupFailed" class="flex flex-col gap-3">
-              <!-- Balance Card -->
-              <Transition v-bind="CONTENT_FADE_IN">
-                <BalanceCardSkeleton v-if="groupPending" />
-                <div v-else-if="group" class="flex flex-col gap-3">
-                  <BalanceCard
-                    v-for="summary in balanceSummaries"
-                    :key="summary.currency"
-                    :total-balance="summary.totalBalance"
-                    :currency="summary.currency"
-                    :member-balances="summary.memberBalances"
-                    @settle-up="settleUp"
-                  />
-                </div>
-              </Transition>
-
-              <!-- Tabs -->
-              <SSegmentControl v-model="activeTab" size="md" :label="$t('group-detail-tabs-label')" :items="tabs" />
+            <BalanceCardSkeleton v-if="groupPending" />
+            <div v-else-if="group" class="flex flex-col gap-3">
+              <BalanceCard
+                v-for="summary in balanceSummaries"
+                :key="summary.currency"
+                :total-balance="summary.totalBalance"
+                :currency="summary.currency"
+                :member-balances="summary.memberBalances"
+                @settle-up="settleUp"
+              />
             </div>
           </Transition>
 
-          <!-- Error State -->
-          <Notice v-if="loadFailed" tone="error" announce data-test="group-detail-load-error">
-            <p>{{ loadErrorMessage }}</p>
-            <template #action>
-              <SButton variant="outline" size="sm" :loading="isRetrying" @click="retryFailedRequests">
-                {{ $t("group-detail-error-retry") }}
-              </SButton>
-            </template>
-          </Notice>
+          <div class="flex flex-col gap-4">
+            <!-- Tabs -->
+            <Transition v-bind="CONTENT_FADE_IN">
+              <SSegmentControl
+                v-if="!groupFailed"
+                v-model="activeTab"
+                size="md"
+                :label="$t('group-detail-tabs-label')"
+                :items="tabs"
+              />
+            </Transition>
 
-          <Transition v-bind="CONTENT_FADE_IN">
-            <TransactionListSkeleton v-if="listsPending && !groupFailed" />
-            <div v-else-if="!groupFailed" class="flex flex-col gap-5">
-              <!-- Invoices -->
-              <InvoiceList :invoices="groupInvoices" />
+            <!-- Error State -->
+            <Notice v-if="loadFailed" tone="error" announce data-test="group-detail-load-error">
+              <p>{{ loadErrorMessage }}</p>
+              <template #action>
+                <SButton variant="outline" size="sm" :loading="isRetrying" @click="retryFailedRequests">
+                  {{ $t("group-detail-error-retry") }}
+                </SButton>
+              </template>
+            </Notice>
 
-              <!-- Transaction List -->
-              <TransactionList :transactions="transactions" />
-            </div>
-          </Transition>
+            <Transition v-bind="CONTENT_FADE_IN">
+              <TransactionListSkeleton v-if="listsPending && !groupFailed" />
+              <div v-else-if="!groupFailed" class="flex flex-col gap-5">
+                <!-- Invoices -->
+                <InvoiceList :invoices="groupInvoices" />
+
+                <!-- Transaction List -->
+                <TransactionList :transactions="transactions" />
+              </div>
+            </Transition>
+          </div>
         </div>
 
         <!-- FAB -->

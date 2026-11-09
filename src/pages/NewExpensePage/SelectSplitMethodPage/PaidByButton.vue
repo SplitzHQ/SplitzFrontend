@@ -4,6 +4,7 @@ import { useFluent } from "fluent-vue";
 import { computed, ref, watch } from "vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
+import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import { useTransactionStore } from "@/stores/transaction";
@@ -73,8 +74,8 @@ const setPaidBy = (memberId: string) => {
         class="flex items-center gap-3"
         @click="setPaidBy(member.id)"
       >
-        <Avatar aria-hidden="true" :images="[{ src: member.photo, alt: member.userName }]" size="sm" />
-        <div class="text-base font-semibold text-base-text-primary">{{ member.userName }}</div>
+        <Avatar aria-hidden="true" :images="[{ src: member.photo, alt: member.userName }]" size="xs" />
+        <div :class="['min-w-0 truncate', LIST_ROW_TEXT.title]">{{ member.userName }}</div>
       </button>
     </div>
   </Sheet>
