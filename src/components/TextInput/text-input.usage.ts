@@ -43,7 +43,7 @@ export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
     title: "outlined",
   },
   plain: {
-    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-base` and scaled to look like `text-sm`, so it fits a row of `text-sm` text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-base` and scaled to look like `text-sm`, so it fits a row of `text-sm` text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. The container shows the focus.",
     title: "plain",
   },
 };
@@ -119,11 +119,11 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Password button",
   },
   {
-    text: "The `plain` input is as high as its tap area. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
+    text: "The `plain` input is as high as its tap area. Put it in a container that is at least as high, as SearchBar does.",
     title: "Plain tap area",
   },
   {
-    text: "The brand border and a thin inset ring show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
+    text: "The brand border and a thin inset ring show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret, so its container draws the focus. SearchBar puts the input in a frame with a search icon and the same border and ring as `outlined`.",
     title: "Focus",
   },
   {
@@ -150,7 +150,6 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * A prototype will decide the first question.
  */
 export const OPEN_QUESTIONS = [
-  "How does the search field on SelectPeoplePage show focus, and how dense is its row? `plain` has no focus style except the caret.",
   "Is the contrast of the quiet parts acceptable? The empty border is about 1.3:1, and the filled border is also below 3:1. WCAG 1.4.11 asks for 3:1. The placeholder is about 3:1 in both themes, and the hint is about 3.3:1 in dark mode. WCAG 1.4.3 asks for 4.5:1. A change affects all fields.",
   "Does a tap on the password button keep the keyboard of a phone open? Now the button takes the focus from the input, so the keyboard can close. A tap on the padding of the field does not do this.",
   "The notes field of AddExpenseDetailsSheet is a raw `<textarea>` with its own outline. It does not show the states of TextInput. Does the app need a multi-line field?",

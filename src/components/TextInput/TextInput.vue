@@ -4,7 +4,8 @@ import { useResizeObserver } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
 import { computed, ref, useId, useTemplateRef, watch } from "vue";
 
-import { MOTION_EASING, motionMs } from "@/libs/motion";
+import { fieldTapHandlers } from "@/libs/field-tap";
+import { shakeElement } from "@/libs/motion";
 
 /** A text field with an optional label and hint. See `text-input.usage.ts` for when to use it. */
 export interface TextInputProps {
@@ -115,36 +116,16 @@ const messageEnterClass = computed(() =>
   ["transition-[opacity,translate] duration-state ease-enter", hint ? "delay-(--motion-duration-exit)" : ""].join(" ")
 );
 
-/** The offsets of the shake in pixels. Each move is smaller than the last, so the field stops softly. */
-const SHAKE_OFFSETS = [0, -3, 2, -1, 0];
-
-// A new error shakes the field one time. A change from one error to another error does not. Reduced motion makes the time 0.
+// A new error shakes the field one time. A change from one error to another error does not.
 watch(
   () => error,
   (next, previous) => {
-    const duration = motionMs("container");
-    if (!next || previous || duration === 0) return;
-    fieldEl.value?.animate?.(
-      SHAKE_OFFSETS.map((offset) => ({ translate: `${offset}px 0` })),
-      { duration, easing: MOTION_EASING.standard }
-    );
+    if (next && !previous) shakeElement(fieldEl.value);
   }
 );
 
-/** Returns true when a press hits the input or the reveal button, which handle the press themselves. */
-function hitsOwnControl(target: EventTarget | null): boolean {
-  return target instanceof Element && target.closest("input, button") !== null;
-}
-
-/** A press on the padding or the icon does not take the focus away, so a phone keeps its keyboard open. */
-function onFieldMouseDown(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) event.preventDefault();
-}
-
-/** The whole field is the touch target, but only the input takes the focus. `click` counts as a user gesture on iOS. */
-function onFieldClick(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) inputEl.value?.focus();
-}
+/** A press on the padding or the icon gives the focus to the input. A press on the reveal button goes to the button. */
+const { onClick: onFieldClick, onMouseDown: onFieldMouseDown } = fieldTapHandlers(() => inputEl.value);
 </script>
 
 <template>
@@ -189,7 +170,7 @@ function onFieldClick(event: MouseEvent): void {
         padding or the icon does nothing.
         - `mousedown` stops the browser from moving the focus away from the input, so a phone keeps its keyboard open.
         - `click` then gives the focus to the input. iOS opens the keyboard only in a user gesture, and `click` is one.
-        - A press on a control in the field, for example the password button, goes to that control. See `hitsOwnControl`.
+        - A press on a control in the field, for example the password button, goes to that control. See `fieldTapHandlers`.
         The handlers are only for a pointer. The input stays in the tab order and the label names it, so a keyboard or a
         screen reader does not use this `div`. That is why the `div` has no role or key handlers.
       -->
