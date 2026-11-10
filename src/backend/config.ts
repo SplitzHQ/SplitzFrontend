@@ -1,6 +1,7 @@
 import router, { publicRoutes } from "@/router";
 
 import { SplitzBackendApi } from "./openapi/apis/SplitzBackendApi";
+import { decimalStringMiddleware, identityAuthMiddleware } from "./middleware";
 import { Configuration, type Middleware } from "./openapi/runtime";
 
 export const apiBasePath = import.meta.env.VITE_SPLITZ_API_BASE_URL;
@@ -24,43 +25,45 @@ const unauthorizedMiddleware: Middleware = {
   }
 };
 
-const config = new Configuration({
-  basePath: apiBasePath,
-  middleware: [unauthorizedMiddleware],
+/** Returns the access token of the signed-in user. It refreshes the token first when the token is expired. */
+async function getAccessToken(): Promise<string> {
+  let accessToken = localStorage.getItem("accessToken");
+  const accessTokenExpiration = localStorage.getItem("accessTokenExpiration");
+  const backendApi = new SplitzBackendApi(new Configuration({ basePath: apiBasePath }));
 
-  accessToken: async () => {
-    let accessToken = localStorage.getItem("accessToken");
-    const accessTokenExpiration = localStorage.getItem("accessTokenExpiration");
-    const backendApi = new SplitzBackendApi(new Configuration({ basePath: apiBasePath }));
-
-    if (accessTokenExpiration && parseInt(accessTokenExpiration) < Date.now()) {
-      accessToken = null;
-      // access token expired, refresh it
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        try {
-          const accessTokenResponse = await backendApi.accountRefreshPost({
-            refreshRequest: {
-              refreshToken: refreshToken
-            }
-          });
-          if (accessTokenResponse.accessToken && accessTokenResponse.refreshToken) {
-            localStorage.setItem("accessToken", accessTokenResponse.accessToken);
-            localStorage.setItem("refreshToken", accessTokenResponse.refreshToken);
-            localStorage.setItem(
-              "accessTokenExpiration",
-              new Date(Date.now() + 1000 * accessTokenResponse.expiresIn).getTime().toString()
-            );
-            accessToken = accessTokenResponse.accessToken;
+  if (accessTokenExpiration && parseInt(accessTokenExpiration) < Date.now()) {
+    accessToken = null;
+    // access token expired, refresh it
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+      try {
+        const accessTokenResponse = await backendApi.accountRefreshPost({
+          refreshRequest: {
+            refreshToken: refreshToken
           }
-        } catch {
-          // do nothing, will return undefined accessToken
+        });
+        if (accessTokenResponse.accessToken && accessTokenResponse.refreshToken) {
+          localStorage.setItem("accessToken", accessTokenResponse.accessToken);
+          localStorage.setItem("refreshToken", accessTokenResponse.refreshToken);
+          localStorage.setItem(
+            "accessTokenExpiration",
+            new Date(Date.now() + 1000 * accessTokenResponse.expiresIn).getTime().toString()
+          );
+          accessToken = accessTokenResponse.accessToken;
         }
+      } catch {
+        // do nothing, will return undefined accessToken
       }
     }
-
-    return accessToken!;
   }
+
+  return accessToken!;
+}
+
+const config = new Configuration({
+  basePath: apiBasePath,
+  middleware: [decimalStringMiddleware, identityAuthMiddleware(apiBasePath, getAccessToken), unauthorizedMiddleware],
+  accessToken: getAccessToken,
 });
 
 export default config;
