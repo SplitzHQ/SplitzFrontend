@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createRouter, createWebHistory, type RouteRecordNameGeneric } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type RouteLocationRaw,
+  type RouteRecordNameGeneric,
+} from "vue-router";
 
 import HomePage from "@/pages/HomePage/HomePage.vue";
 
@@ -121,14 +127,17 @@ const router = createRouter({
   scrollBehavior: () => false,
 });
 
-router.beforeEach((to, from, next) => {
+/**
+ * Sends a user without an access token to the sign-in page, except on a public route. The guard returns the target and
+ * does not take the `next` callback, because Vue Router marks `next` as deprecated (VUE_ROUTER_R0025).
+ */
+export function requireSignIn(to: RouteLocationNormalized): RouteLocationRaw | undefined {
   const isAuthenticated = !!localStorage.getItem("accessToken");
-  if (!isAuthenticated && !publicRoutes.includes(to.name)) {
-    next({ name: "login" });
-    return;
-  }
-  next();
-});
+  if (!isAuthenticated && !publicRoutes.includes(to.name)) return { name: "login" };
+  return undefined;
+}
+
+router.beforeEach(requireSignIn);
 
 export const publicRoutes: RouteRecordNameGeneric[] = [
   "login",
