@@ -1,9 +1,7 @@
 import { mount } from "@vue/test-utils";
-import type * as VueUse from "@vueuse/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { nextTick, ref } from "vue";
+import { nextTick } from "vue";
 
-import { fitCount } from "../fit-count";
 import SearchBar from "../SearchBar.vue";
 import UserTag from "../UserTag.vue";
 
@@ -13,19 +11,13 @@ vi.mock("fluent-vue", () => ({
   }),
 }));
 
-// jsdom has no layout. The row is 343px wide, as on a 375px phone, and each measured item is 40px wide.
-vi.mock("@vueuse/core", async (original) => ({
-  ...(await original<typeof VueUse>()),
-  useElementSize: () => ({ height: ref(26), width: ref(343) }),
-}));
-
 const USERS = ["Alex", "Mei", "Sam", "Jordan", "Priya", "Noah"].map((userName) => ({
   id: `id-${userName}`,
   photo: null,
   userName,
 }));
 
-/** Mounts the row and waits for the first measure. */
+/** Mounts the row and waits until it is ready. */
 async function mountRow(count: number) {
   const wrapper = mount(SearchBar, { props: { selectedUsers: USERS.slice(0, count) } });
   await nextTick();
@@ -33,11 +25,12 @@ async function mountRow(count: number) {
   return wrapper;
 }
 
-/** Returns the names on the tags that a person sees. The hidden copy has its own tags. */
+/** Returns the names on the tags. */
 function shownTags(wrapper: Awaited<ReturnType<typeof mountRow>>) {
   return wrapper.findAll("[data-row-tag] button").map((tag) => tag.attributes("aria-label"));
 }
 
+// jsdom has no layout, so each box has the same size.
 beforeEach(() => {
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({ height: 26, width: 40 } as DOMRect);
 });
@@ -46,79 +39,20 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("fitCount", () => {
-  const ROW = { chipWidth: 30, gap: 8, inputWidth: 80 };
-
-  it("shows all tags and no button when they fit next to the field", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [60, 60, 60] })).toBe(3);
-  });
-
-  it("uses the exact width as a fit", () => {
-    expect(fitCount({ ...ROW, available: 60 + 8 + 80, tagWidths: [60] })).toBe(1);
-  });
-
-  it("keeps the space of the button when some tags stay out", () => {
-    // Two tags fit with the field only when the row has no button: 2 * 68 + 80 = 216, and the button needs 38 more.
-    expect(fitCount({ ...ROW, available: 220, tagWidths: [60, 60, 60] })).toBe(1);
-  });
-
-  it("shows only the button when no tag fits", () => {
-    expect(fitCount({ ...ROW, available: 140, tagWidths: [120, 120] })).toBe(0);
-  });
-
-  it("does not show a person with no width yet", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [60, Infinity] })).toBe(1);
-  });
-
-  it("shows no tags and no error when nobody is selected", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [] })).toBe(0);
-  });
-});
-
 describe("SearchBar", () => {
-  it("shows all tags and no button when they fit", async () => {
-    const wrapper = await mountRow(3);
-
-    expect(shownTags(wrapper)).toHaveLength(3);
-    expect(wrapper.find("[data-row-fade] button").exists()).toBe(false);
-  });
-
-  it("folds the tags that do not fit into a button that says how many", async () => {
+  it("shows a tag for each person on the first line", async () => {
     const wrapper = await mountRow(6);
-    const button = wrapper.get("[data-row-fade] button");
-
-    // 343 - 40 - 8 leaves 295px. Three tags take 144px, the button takes 48px and the field keeps 80px.
-    expect(shownTags(wrapper)).toHaveLength(3);
-    expect(button.text()).toBe("+3");
-    expect(button.attributes("aria-label")).toBe("new-expense-select-people-show-more 3");
-    expect(button.attributes("aria-expanded")).toBe("false");
-  });
-
-  it("opens to all tags, and closes again from the same button", async () => {
-    const wrapper = await mountRow(6);
-
-    await wrapper.get("[data-row-fade] button").trigger("click");
-    const open = wrapper.get("[data-row-fade] button");
 
     expect(shownTags(wrapper)).toHaveLength(6);
-    expect(open.attributes("aria-expanded")).toBe("true");
-    expect(open.attributes("aria-label")).toBe("new-expense-select-people-show-fewer");
-    expect(open.text()).toBe("");
-
-    await open.trigger("click");
-
-    expect(shownTags(wrapper)).toHaveLength(3);
+    expect(wrapper.text()).toContain("new-expense-select-people-with");
   });
 
-  it("closes the open row when everyone fits in one line", async () => {
-    const wrapper = await mountRow(6);
-    await wrapper.get("[data-row-fade] button").trigger("click");
+  it("does not show the first line when nobody is selected", async () => {
+    const wrapper = await mountRow(0);
 
-    await wrapper.setProps({ selectedUsers: USERS.slice(0, 2) });
-    await nextTick();
-    await nextTick();
-
-    expect(wrapper.find("[data-row-fade] button").exists()).toBe(false);
+    expect(wrapper.find("[data-row-tag]").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("new-expense-select-people-with");
+    expect(wrapper.find("input").exists()).toBe(true);
   });
 
   it("emits the ID of the person on the tag", async () => {
@@ -145,11 +79,25 @@ describe("SearchBar", () => {
     expect(focus).toHaveBeenCalledTimes(1);
   });
 
-  it("does not put the hidden copy in the tab order", async () => {
-    const wrapper = await mountRow(6);
+  it("gives the focus to the field after a tap on the frame, and keeps it after a press", async () => {
+    const wrapper = await mountRow(1);
+    const focus = vi.spyOn(HTMLInputElement.prototype, "focus");
 
-    expect(wrapper.get("[inert]").attributes("aria-hidden")).toBe("true");
-    expect(wrapper.get("[inert]").findAll("button")).toHaveLength(6);
+    const frame = wrapper.get("input").element.closest(".cursor-text") as HTMLElement;
+
+    const press = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
+    frame.dispatchEvent(press);
+    expect(press.defaultPrevented).toBe(true);
+
+    frame.click();
+    expect(focus).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the full text for a screen reader and shows the short placeholder", async () => {
+    const input = (await mountRow(0)).get("input");
+
+    expect(input.attributes("aria-label")).toBe("new-expense-select-people-search-label");
+    expect(input.attributes("placeholder")).toBe("new-expense-select-people-search-placeholder");
   });
 });
 
