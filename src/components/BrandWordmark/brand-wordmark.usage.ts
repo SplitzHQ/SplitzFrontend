@@ -55,7 +55,7 @@ export const MOTION_RULES = [
   "The diamond on the word has its own `data-part`, so each list of steps must say where the diamond goes.",
   "After a tap on the word, the diamond leaves with the i. It comes back last: a small circle grows into a square, and the square turns 45 degrees. It has no drop and no fade, because the user found them too heavy or wrong in the prototype `2026-11-04-wordmark-split-glyph`. The times are `TITTLE_TIMING`.",
   "A `<rect>` draws the diamond while it forms, and it ends on the place of the path. If the diamond of the word moves, generate `WORDMARK_TITTLE` and `WORDMARK_TITTLE_SHAPE` together. A test checks that they agree.",
-  "The opening plays after each cold start of the app: a new run of the JavaScript. It does not play when a person returns from another page, or from another app while this app is still alive.",
+  "The opening plays after each cold start of the app: a new run of the JavaScript. It does not play when a person returns from another page, or from another app while this app is still alive. In the dev server, it does not play after a hot update, because `claimOpening` keeps its flag in `import.meta.hot.data`.",
   "A full-screen layer gives its color to the status bar through `holdStatusBarColor`. Do not set this color in another way.",
 ];
 
