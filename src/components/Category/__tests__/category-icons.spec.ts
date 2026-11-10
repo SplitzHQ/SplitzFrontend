@@ -54,9 +54,10 @@ describe("categoryIconMap in a main category", () => {
 });
 
 describe("categoryColorMap", () => {
-  it("uses the 50 step and the 600 step of one family for each main category", () => {
+  // The palette tokens hold the steps: the fill is step 50 and the icon is step 600. The generator test checks them.
+  it("uses the fill and the icon of one palette family for each main category", () => {
     for (const main of mainCategories) {
-      expect(categoryColorMap[main]).toMatch(/^bg-util-color-([a-z-]+)-50 text-util-color-\1-600$/);
+      expect(categoryColorMap[main]).toMatch(/^bg-comp-palette-([a-z]+)-fill text-comp-palette-\1-icon$/);
     }
   });
 });

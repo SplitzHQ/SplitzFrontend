@@ -43,7 +43,7 @@ categories-gas_utility = Natural gas
 categories-internet = Internet
 categories-mobile_phone = Mobile phone
 categories-trash_recycling = Trash & recycling
-categories-tv_streaming = TV & streaming
+categories-tv_streaming = Cable & satellite TV
 categories-other_bills = Other bills
 
 categories-flights = Flights
@@ -51,7 +51,6 @@ categories-lodging = Lodging
 categories-local_transport = Local transport
 categories-travel_food = Travel dining
 categories-activities_tours = Activities & tours
-categories-travel_insurance = Travel insurance
 categories-visa_fees = Visa fees
 categories-other_travel = Other travel
 
@@ -79,8 +78,8 @@ categories-other_personal_care = Other personal care
 
 categories-tuition = Tuition
 categories-courses = Courses
-categories-books = Books
-categories-supplies = Supplies
+categories-books = Textbooks
+categories-supplies = Study supplies
 categories-student_fees = Student fees
 categories-other_education = Other education
 
@@ -90,7 +89,7 @@ categories-celebrations = Celebrations
 categories-other_gifts_donations = Other gifts & donations
 
 categories-childcare = Childcare
-categories-school_supplies = School supplies
+categories-school_supplies = Kids' school supplies
 categories-toys = Toys
 categories-clothing_kids = Kids' clothing
 categories-activities_lessons = Activities & lessons

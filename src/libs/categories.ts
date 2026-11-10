@@ -87,7 +87,6 @@ export const travelSubcategories = [
   "local_transport",
   "travel_food",
   "activities_tours",
-  "travel_insurance",
   "visa_fees",
   "other_travel",
 ] as const;
@@ -270,11 +269,30 @@ export const categorySubcategories: SubcategoryMap = {
   travel: travelSubcategories,
 };
 
+/**
+ * Old subcategory keys and the keys that replace them.
+ *
+ * The backend keeps the key of each expense as a plain string, so expenses saved before a merge
+ * still have the old key. `getCategory` and `getMainCategory` read an old key as its new key. When
+ * the user edits such an expense, the app saves the new key. Do not remove an entry while the
+ * backend can still have the old key.
+ */
+export const legacySubcategoryAliases: ReadonlyMap<string, Subcategory> = new Map([
+  // SPZ-50: travel insurance was in travel and in insurance. Only the insurance one stays.
+  ["travel_insurance", "travel_insurance_premium"],
+]);
+
+/** Give the current key for an old key. Give other values back with no change. */
+function resolveLegacySubcategory(value: string): string {
+  return legacySubcategoryAliases.get(value) ?? value;
+}
+
 // Add a reverse mapping from sub category to main category
 let subcategoryToMainCategory: Record<Subcategory, MainCategory> | undefined;
 
-export function getMainCategory(subCategory: string | null | undefined): MainCategory {
-  if (!subCategory) return "other";
+export function getMainCategory(value: string | null | undefined): MainCategory {
+  if (!value) return "other";
+  const subCategory = resolveLegacySubcategory(value);
   // If already a main category, return it directly
   if ((mainCategories as readonly string[]).includes(subCategory)) {
     return subCategory as MainCategory;
@@ -299,5 +317,6 @@ export function getMainCategory(subCategory: string | null | undefined): MainCat
 
 export function getCategory(category: string | null | undefined): Subcategory {
   if (!category) return "uncategorized";
-  return subcategories.find((sub) => sub === category) ?? "uncategorized";
+  const key = resolveLegacySubcategory(category);
+  return subcategories.find((sub) => sub === key) ?? "uncategorized";
 }

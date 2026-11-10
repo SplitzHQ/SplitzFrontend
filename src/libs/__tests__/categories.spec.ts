@@ -1,6 +1,31 @@
 import { describe, it, expect } from "vitest";
 
-import { getMainCategory } from "../categories";
+import { getCategory, getMainCategory, legacySubcategoryAliases, subcategories } from "../categories";
+
+describe("legacySubcategoryAliases", () => {
+  it("maps each old key to a current key that is not itself old", () => {
+    for (const [oldKey, newKey] of legacySubcategoryAliases) {
+      expect((subcategories as readonly string[]).includes(oldKey), oldKey).toBe(false);
+      expect(subcategories, oldKey).toContain(newKey);
+    }
+  });
+
+  it("reads the old travel insurance key as the insurance one", () => {
+    expect(getCategory("travel_insurance")).toBe("travel_insurance_premium");
+    expect(getMainCategory("travel_insurance")).toBe("insurance");
+  });
+});
+
+describe("getCategory", () => {
+  it("gives uncategorized for an empty or unknown value", () => {
+    expect(getCategory(null)).toBe("uncategorized");
+    expect(getCategory("nonexistent_value")).toBe("uncategorized");
+  });
+
+  it("gives a current key back with no change", () => {
+    expect(getCategory("groceries")).toBe("groceries");
+  });
+});
 
 describe("getMainCategory", () => {
   it("returns other for null/undefined", () => {
