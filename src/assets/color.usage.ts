@@ -354,8 +354,13 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
   },
   row: {
     avoid: "Do not use it outside `LIST_ROW_CLASS`.",
-    pattern: /^comp-row-/,
+    pattern: /^comp-row-(?!selected-)/,
     use: "The hover and pressed fill of a shared row. It is one step lighter than `base-bg-hover`, so the gray tiles and the amount fills in the row stay clear.",
+  },
+  rowSelected: {
+    avoid: "Do not use it outside SelectableRow. Use `base-bg-brand-subtle` for the rest fill of a selected item.",
+    pattern: /^comp-row-selected-/,
+    use: "The hover and pressed fill of a selected SelectableRow, the two brand steps after `base-bg-brand-subtle`.",
   },
   searchFilter: {
     avoid: "Do not use it outside the filter button of HomePage.",

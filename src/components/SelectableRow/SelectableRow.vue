@@ -26,8 +26,8 @@ const emit = defineEmits<{ toggle: [] }>();
  * so the main text of each kind of content changes color without a prop. The other text keeps its own color.
  */
 const SELECTED_CLASS = [
-  "aria-pressed:bg-base-bg-brand-subtle aria-pressed:hover:bg-base-bg-brand_hover",
-  "aria-pressed:active:bg-base-bg-brand_pressed",
+  "aria-pressed:bg-base-bg-brand-subtle aria-pressed:hover:bg-comp-row-selected-bg-hover",
+  "aria-pressed:active:bg-comp-row-selected-bg-pressed",
   "aria-pressed:[--base-text-primary:var(--base-text-brand)]",
 ].join(" ");
 </script>

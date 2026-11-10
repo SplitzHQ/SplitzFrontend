@@ -334,6 +334,8 @@ export default {
   "comp-home-page-bg": "var(--comp-home-page-bg)",
   "comp-row-bg-hover": "var(--comp-row-bg-hover)",
   "comp-row-bg-pressed": "var(--comp-row-bg-pressed)",
+  "comp-row-selected-bg-hover": "var(--comp-row-selected-bg-hover)",
+  "comp-row-selected-bg-pressed": "var(--comp-row-selected-bg-pressed)",
   "comp-notification-tint": "var(--comp-notification-tint)",
   "comp-notification-tint-line": "var(--comp-notification-tint-line)",
   "comp-notification-bell-icon": "var(--comp-notification-bell-icon)",
