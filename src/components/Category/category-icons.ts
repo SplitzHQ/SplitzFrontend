@@ -65,6 +65,7 @@ import {
   PhStorefront,
   PhTShirt,
   PhTaxi,
+  PhTelevision,
   PhTicket,
   PhTooth,
   PhWashingMachine,
@@ -130,7 +131,7 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   internet: PhWifiHigh,
   mobile_phone: PhDeviceMobile,
   trash_recycling: PhRecycle,
-  tv_streaming: PhFilmSlate,
+  tv_streaming: PhTelevision,
   other_bills: PhQuestion,
 
   // travel
@@ -139,7 +140,6 @@ export const categoryIconMap: Record<Subcategory, Component> = {
   local_transport: PhCar,
   travel_food: PhForkKnife,
   activities_tours: PhTicket,
-  travel_insurance: PhShieldCheck,
   visa_fees: PhReceipt,
   other_travel: PhQuestion,
 

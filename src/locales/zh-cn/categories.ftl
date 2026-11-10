@@ -43,7 +43,7 @@ categories-gas_utility = 燃气费
 categories-internet = 宽带网费
 categories-mobile_phone = 话费
 categories-trash_recycling = 垃圾清运费
-categories-tv_streaming = 电视 / 会员
+categories-tv_streaming = 有线电视
 categories-other_bills = 其他生活缴费
 
 categories-flights = 机票
@@ -51,7 +51,6 @@ categories-lodging = 住宿
 categories-local_transport = 当地交通
 categories-travel_food = 旅行餐饮
 categories-activities_tours = 门票 / 玩乐
-categories-travel_insurance = 旅行保险
 categories-visa_fees = 签证费
 categories-other_travel = 其他旅行
 
@@ -79,7 +78,7 @@ categories-other_personal_care = 其他个护
 
 categories-tuition = 学费
 categories-courses = 培训课程
-categories-books = 书籍教材
+categories-books = 教材教辅
 categories-supplies = 学习用品
 categories-student_fees = 学杂费
 categories-other_education = 其他教育
@@ -90,7 +89,7 @@ categories-celebrations = 聚会庆典
 categories-other_gifts_donations = 其他礼金捐赠
 
 categories-childcare = 托育看护
-categories-school_supplies = 文具用品
+categories-school_supplies = 孩子文具
 categories-toys = 玩具
 categories-clothing_kids = 童装童鞋
 categories-activities_lessons = 兴趣班

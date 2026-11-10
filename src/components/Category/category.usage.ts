@@ -48,7 +48,7 @@ export const PART_RULES: Record<CategoryPart, UsageRule> = {
 /** How the colors are chosen. These rules describe the map. */
 export const COLOR_RULES: UsageRule[] = [
   {
-    rule: "The fill uses the 50 step and the icon uses the 600 step of one family. This pair is at least 3:1 (WCAG 1.4.11) for all main categories in both themes.",
+    rule: "The fill uses `comp-palette-<family>-fill` and the icon uses `comp-palette-<family>-icon` of one family. The generator gives the fill the 50 step and the icon the 600 step. This pair is at least 3:1 (WCAG 1.4.11) for all main categories in both themes.",
     title: "Steps",
   },
   {
@@ -72,7 +72,15 @@ export const ICON_RULES: UsageRule[] = [
     title: "Gas",
   },
   {
-    rule: "Read a value from the backend with `getCategory` and `getMainCategory`. An unknown value gives `uncategorized` and `other`, so the icon and the color always exist.",
+    rule: '`tv_streaming` in bills is cable and satellite TV: `PhTelevision`, "Cable & satellite TV". `streaming_subscriptions` in entertainment is apps such as video and music services: `PhMonitorPlay`, "Streaming subscriptions". Keep the two apart in the icon and in the name.',
+    title: "TV",
+  },
+  {
+    rule: 'Two subcategories must not have the same name, and a name must not fit two subcategories. Name the one with the narrow meaning for that meaning: "Textbooks" in education and "Books & media" in entertainment. "Study supplies" in education, "Kids\' school supplies" in kids and "Office supplies" in shopping.',
+    title: "Names",
+  },
+  {
+    rule: "Read a value from the backend with `getCategory` and `getMainCategory`. An unknown value gives `uncategorized` and `other`, so the icon and the color always exist. An old key from a merge gives its new key. The list of old keys is `legacySubcategoryAliases` in `src/libs/categories.ts`.",
     title: "Unknown values",
   },
 ];
