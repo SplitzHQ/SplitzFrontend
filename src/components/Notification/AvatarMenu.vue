@@ -66,7 +66,7 @@ watch(pendingRequestCount, (value) => {
       <!-- The avatar is 32px wide. The invisible box makes the tap area 44px. -->
       <button
         type="button"
-        class="relative block rounded-lg after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
+        class="relative block rounded-lg after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring"
         :aria-label="avatarLabel"
         data-test="avatar-button"
         @click="onClick"
@@ -84,7 +84,7 @@ watch(pendingRequestCount, (value) => {
     <!-- The row is 36px high. The invisible box makes the tap area 44px. -->
     <button
       type="button"
-      class="relative flex items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-base-text-secondary after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 hover:bg-util-alpha-black-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
+      class="relative flex items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-base-text-secondary after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 hover:bg-base-bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring"
       @click="goToProfile"
     >
       {{ $t("home-profile") }}

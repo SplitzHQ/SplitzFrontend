@@ -65,7 +65,7 @@ export const TEXT_LEVELS: Record<keyof typeof LIST_ROW_TEXT, UsageRule> = {
 /** The size of the tile or the avatar at the start of a row. */
 export const LEADING_RULES: UsageRule[] = [
   {
-    rule: "A row that opens a page has a large start: the transaction tile, the invoice tile, the group avatar (`sm`) and the Create group tile.",
+    rule: "A row that opens a page has a large start: the transaction tile, the settle-up round tile, the group avatar (`sm`) and the Create group tile.",
     title: "Rows that open a page",
   },
   {
@@ -113,7 +113,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Hover and pressed fill",
   },
   {
-    rule: "Put a date label or a section title above a group of rows, with `flex flex-col gap-1`. TransactionList and InvoiceDetailPage do this.",
+    rule: "Put a date label or a section title above a group of rows, with `flex flex-col gap-1`. TransactionList and SettleUpRoundPage do this.",
     title: "Groups",
   },
 ];

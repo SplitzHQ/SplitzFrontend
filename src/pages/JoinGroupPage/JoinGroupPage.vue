@@ -68,8 +68,9 @@ async function join() {
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-4 pt-2 pb-28">
         <!-- Invite card -->
         <div
-          class="relative flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-core-alpha-brand-10 px-6 pt-10 pb-8 text-center"
+          class="relative flex flex-col items-center gap-5 overflow-hidden rounded-3xl bg-base-bg-brand-subtle px-6 pt-10 pb-8 text-center"
         >
+          <!-- The rings are artwork, so they keep primitive tokens. See `PRIMITIVE_EXCEPTIONS` in `color.usage.ts`. -->
           <div aria-hidden="true" class="pointer-events-none absolute inset-0">
             <div class="absolute -top-16 -right-16 size-48 rounded-full border border-core-alpha-brand-10" />
             <div class="absolute -top-28 -right-28 size-72 rounded-full border border-core-alpha-brand-5" />
@@ -85,7 +86,7 @@ async function join() {
               <h2 class="text-display-xs font-semibold text-base-text-primary">
                 {{ $t("join-group-error-not-found-title") }}
               </h2>
-              <p class="text-sm text-base-text-tertiary">{{ $t("join-group-error-not-found-body") }}</p>
+              <p class="text-sm text-base-text-secondary">{{ $t("join-group-error-not-found-body") }}</p>
             </div>
           </template>
 
@@ -101,7 +102,7 @@ async function join() {
 
           <!-- Invite -->
           <template v-else-if="group">
-            <div class="relative rounded-3xl p-1 ring-4 ring-core-alpha-brand-20">
+            <div class="relative rounded-3xl p-1 ring-4 ring-base-border-brand-subtle">
               <Avatar
                 aria-hidden="true"
                 v-if="group.photo"
@@ -110,17 +111,17 @@ async function join() {
               />
               <div
                 v-else
-                class="flex size-16 items-center justify-center rounded-2xl bg-util-color-brand-100 text-util-color-brand-700"
+                class="flex size-16 items-center justify-center rounded-2xl bg-base-bg-subtle text-base-text-brand"
               >
                 <PhUsersThree weight="duotone" class="size-8" />
               </div>
             </div>
             <div class="relative flex flex-col gap-2">
-              <p class="text-xs font-semibold tracking-wide text-util-color-brand-700 uppercase">
+              <p class="text-xs font-semibold tracking-wide text-base-text-brand uppercase">
                 {{ $t("join-group-invited-title") }}
               </p>
               <h2 class="text-display-sm font-semibold tracking-tight text-base-text-primary">{{ group.name }}</h2>
-              <p class="text-sm text-base-text-tertiary">{{ $t("join-group-invited-body") }}</p>
+              <p class="text-sm text-base-text-secondary">{{ $t("join-group-invited-body") }}</p>
             </div>
           </template>
         </div>

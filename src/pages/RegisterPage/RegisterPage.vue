@@ -179,8 +179,8 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
     </template>
 
     <template #footer>
-      <RouterLink :to="{ name: 'login' }" class="flex gap-1 text-base-text-brand hover:text-base-text-brand_hover">
-        <span class="font-normal text-base-text-tertiary">{{ $t("auth-register-sign-in-lead") }}</span>
+      <RouterLink :to="{ name: 'login' }" class="flex gap-1 text-base-text-brand underline-offset-2 hover:underline">
+        <span class="font-normal text-base-text-secondary">{{ $t("auth-register-sign-in-lead") }}</span>
         {{ $t("auth-register-sign-in-link") }}
       </RouterLink>
     </template>

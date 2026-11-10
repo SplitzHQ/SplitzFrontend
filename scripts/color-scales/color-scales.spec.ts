@@ -105,10 +105,25 @@ describe.each(THEMES)("the color tokens in the %s theme", (theme) => {
     }
   });
 
+  // SPZ-35 set these steps for the category colors. The fill and the icon keep the 3:1 of WCAG 1.4.11.
+  it("gives each palette family the 50 step as the fill and the 600 step as the icon", () => {
+    const families = Object.keys(COMPONENT_TOKENS)
+      .map((token) => /^comp-palette-(?!avatar-)([a-z]+)-fill$/.exec(token)?.[1])
+      .filter((family) => family !== undefined);
+    expect(families.length).toBeGreaterThan(0);
+    for (const family of families) {
+      expect(COMPONENT_TOKENS[`comp-palette-${family}-fill`]).toBe(`util-color-${family}-50`);
+      expect(COMPONENT_TOKENS[`comp-palette-${family}-icon`]).toBe(`util-color-${family}-600`);
+    }
+  });
+
   it("gives each status text 4.5:1 on its subtle fill", () => {
     for (const name of ["brand", "danger", "success", "warning"]) {
       const text = colorOf(theme, `base-text-${name}`);
-      expect(contrast(text, colorOf(theme, `base-bg-${name}-subtle`))).toBeGreaterThan(4.5);
+      // SPZ-112 block 3: the user chose the brighter light success step 9 and accepted about 3.9:1 on its fill. SPZ-121
+      // tracks the fix.
+      const minimum = theme === "light" && name === "success" ? 3.8 : 4.5;
+      expect(contrast(text, colorOf(theme, `base-bg-${name}-subtle`))).toBeGreaterThan(minimum);
     }
   });
 

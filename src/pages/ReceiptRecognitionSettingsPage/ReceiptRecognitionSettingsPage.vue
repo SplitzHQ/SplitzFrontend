@@ -161,22 +161,22 @@ async function remove() {
 
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col gap-6 pt-2 pb-10">
-        <p class="px-1 text-sm text-base-text-tertiary">{{ $t("receipt-recognition-intro") }}</p>
+        <p class="px-1 text-sm text-base-text-secondary">{{ $t("receipt-recognition-intro") }}</p>
 
-        <p v-if="loading || !settings" class="px-1 text-sm text-base-text-quaternary">
+        <p v-if="loading || !settings" class="px-1 text-sm text-base-text-muted">
           {{ $t("receipt-recognition-loading") }}
         </p>
 
         <template v-else>
           <!-- Built-in model -->
           <section class="flex flex-col gap-2">
-            <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">
+            <h2 class="px-1 text-sm font-semibold text-base-text-muted">
               {{ $t("receipt-recognition-server-label") }}
             </h2>
-            <div class="flex items-center gap-3 rounded-3xl bg-util-alpha-black-5 px-4 py-3" data-test="server-status">
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                <PhCloudCheck v-if="settings.serverProviderAvailable" class="size-5 text-util-color-brand-700" />
-                <PhCloudSlash v-else class="size-5 text-base-fg-quaternary" />
+            <div class="flex items-center gap-3 rounded-3xl bg-base-bg-secondary px-4 py-3" data-test="server-status">
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                <PhCloudCheck v-if="settings.serverProviderAvailable" class="size-5 text-base-text-brand" />
+                <PhCloudSlash v-else class="size-5 text-base-text-muted" />
               </span>
               <p class="text-sm text-base-text-secondary">
                 {{
@@ -190,27 +190,27 @@ async function remove() {
 
           <!-- Custom provider -->
           <section class="flex flex-col gap-2">
-            <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">
+            <h2 class="px-1 text-sm font-semibold text-base-text-muted">
               {{ $t("receipt-recognition-custom-label") }}
             </h2>
 
             <p
               v-if="!settings.customProviderAllowed"
-              class="rounded-3xl bg-util-alpha-black-5 px-4 py-3 text-sm text-base-text-secondary"
+              class="rounded-3xl bg-base-bg-secondary px-4 py-3 text-sm text-base-text-secondary"
             >
               {{ $t("receipt-recognition-custom-not-allowed") }}
             </p>
 
             <form v-else class="flex flex-col gap-4" @submit.prevent="save">
-              <div class="flex items-center gap-3 rounded-3xl bg-util-alpha-black-5 px-4 py-3">
-                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                  <PhRobot class="size-5 text-util-color-brand-700" />
+              <div class="flex items-center gap-3 rounded-3xl bg-base-bg-secondary px-4 py-3">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                  <PhRobot class="size-5 text-base-text-brand" />
                 </span>
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p id="custom-provider-label" class="text-base font-medium text-base-text-primary">
                     {{ $t("receipt-recognition-custom-toggle") }}
                   </p>
-                  <p class="text-xs text-base-text-quaternary">{{ $t("receipt-recognition-custom-hint") }}</p>
+                  <p class="text-xs text-base-text-muted">{{ $t("receipt-recognition-custom-hint") }}</p>
                 </div>
                 <SSwitch
                   v-model="customProviderEnabled"
@@ -295,7 +295,7 @@ async function remove() {
             </form>
           </section>
 
-          <p class="px-1 text-sm text-base-text-tertiary" data-test="overall-status">
+          <p class="px-1 text-sm text-base-text-secondary" data-test="overall-status">
             {{ settings.available ? $t("receipt-recognition-status-ready") : $t("receipt-recognition-status-off") }}
           </p>
         </template>

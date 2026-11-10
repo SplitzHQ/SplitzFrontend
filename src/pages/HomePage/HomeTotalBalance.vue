@@ -44,7 +44,7 @@ const detailParts = computed(() =>
     {
       key: "owes",
       label: "home-you-owe",
-      tone: "text-base-text-error",
+      tone: "text-base-text-owe",
       totals: openTotals.value.filter(({ amount }) => amount < 0),
     },
   ].filter((part) => part.totals.length > 0)
@@ -58,23 +58,23 @@ const detailParts = computed(() =>
     class="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-base-bg-secondary px-4 text-left text-base whitespace-nowrap"
     :class="
       hasDetails &&
-      'touch-manipulation transition-colors duration-hover-in ease-standard hover:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid active:bg-base-bg-secondary_hover'
+      'touch-manipulation transition-colors duration-hover-in ease-standard hover:bg-comp-card-bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand active:bg-comp-card-bg-hover'
     "
     data-testid="home-total-balance"
     @click="hasDetails && (open = true)"
   >
-    <span class="text-sm font-medium text-base-text-quaternary">{{ $t("home-total-balance") }}</span>
+    <span class="text-sm font-medium text-base-text-muted">{{ $t("home-total-balance") }}</span>
     <span class="flex items-center gap-1.5">
       <!-- One element for each sign, so the digits roll and the color fades when the sign changes. -->
       <span
         v-if="lead"
         class="font-semibold tabular-nums"
-        :class="lead.amount < 0 ? 'text-base-text-error' : 'text-base-text-success'"
+        :class="lead.amount < 0 ? 'text-base-text-owe' : 'text-base-text-success'"
       >
         {{ lead.amount < 0 ? "−" : "+" }}<HomeAmount :amount="lead.amount" :currency="lead.currency" />
       </span>
-      <span v-else class="text-sm font-medium text-base-text-quaternary">{{ $t("home-you-are-settled-up") }}</span>
-      <PhCaretRight v-if="hasDetails" class="icon-4 text-base-text-quinary" aria-hidden="true" />
+      <span v-else class="text-sm font-medium text-base-text-muted">{{ $t("home-you-are-settled-up") }}</span>
+      <PhCaretRight v-if="hasDetails" class="icon-4 text-base-text-muted" aria-hidden="true" />
     </span>
   </component>
 
@@ -82,7 +82,7 @@ const detailParts = computed(() =>
     <!-- One group for each direction. A line names the currency on the left and the amount on the right. -->
     <div class="flex flex-col gap-5 text-base">
       <section v-for="part in detailParts" :key="part.key" class="flex flex-col gap-1">
-        <h3 class="text-sm font-semibold text-base-text-quaternary">{{ $t(part.label) }}</h3>
+        <h3 class="text-sm font-semibold text-base-text-muted">{{ $t(part.label) }}</h3>
         <p
           v-for="total in part.totals"
           :key="total.currency"

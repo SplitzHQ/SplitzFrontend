@@ -24,7 +24,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
 
 <template>
   <button v-if="transactionStore.splitMethod === 'equally'" type="button" @click.stop="setFocusedInputUserId(userId)">
-    <div class="flex items-center justify-end rounded-full bg-util-alpha-black-5 px-2 py-1.5">
+    <div class="flex items-center justify-end rounded-full bg-base-bg-subtle px-2 py-1.5">
       <span class="text-center text-sm font-normal text-base-text-placeholder">
         {{
           transactionStore.finalSplitAmount[userId]?.toLocaleString(undefined, {
@@ -44,8 +44,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-base-bg-subtle',
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand outline-solid' : '',
       ]"
     >
       <span
@@ -83,7 +83,7 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
       <PhMinus />
     </SIconButton>
     <button type="button" @click.stop="setFocusedInputUserId(userId)">
-      <div class="items-center rounded-full bg-util-alpha-black-5 px-2 py-1.5">
+      <div class="items-center rounded-full bg-base-bg-subtle px-2 py-1.5">
         <span class="text-center text-sm font-normal text-base-text-primary">
           {{ $t("new-expense-split-shares-count", { count: transactionStore.splitBySharesDetails[userId] ?? 1 }) }}
         </span>
@@ -107,8 +107,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-base-bg-subtle',
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand outline-solid' : '',
       ]"
     >
       <span
@@ -143,8 +143,8 @@ const isFocused = computed(() => focusedInputUserId.value === userId);
     <div
       :class="[
         'flex items-center justify-end rounded-full px-2 py-1.5',
-        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-util-alpha-black-5',
-        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand-solid outline-solid' : '',
+        isFocused ? 'bg-base-bg-brand-subtle' : 'bg-base-bg-subtle',
+        isFocused ? 'outline-1 -outline-offset-1 outline-base-border-brand outline-solid' : '',
       ]"
     >
       <span

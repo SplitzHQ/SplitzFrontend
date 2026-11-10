@@ -137,7 +137,7 @@ async function handleForgotPassword() {
     </template>
 
     <template #footer>
-      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand underline-offset-2 hover:underline">
         {{ $t("auth-forgot-password-login-link") }}
       </RouterLink>
     </template>

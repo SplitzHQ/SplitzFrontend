@@ -18,7 +18,7 @@ export const RULE_SCOPE: RuleScope = {
 /** When to use a badge. */
 export const WHEN_TO_USE: UsageRule[] = [
   {
-    rule: "The full screen shows one result, and a heading gives the result in text. The caller is the card of JoinGroupPage. AuthShell uses the smaller `AuthStatusIcon`. A badge never shows a spinner: while a page waits, it shows no badge.",
+    rule: "The full screen shows one result, and a heading gives the result in text. The callers are the card of JoinGroupPage and the top of ReviewAndCompletePage. AuthShell uses the smaller `AuthStatusIcon`. A badge never shows a spinner: while a page waits, it shows no badge.",
     title: "A result screen",
   },
 ];
@@ -26,7 +26,6 @@ export const WHEN_TO_USE: UsageRule[] = [
 /** The cases with another component. */
 export const NOT_A_BADGE: UseInsteadRule[] = [
   { use: "Notice", when: "The message is one part of a page with other content." },
-  { use: "InvoiceStatusPill", when: "The status belongs to one invoice in a list or a detail page." },
   { use: "toast", when: "The result does not change the screen." },
 ];
 
@@ -43,7 +42,10 @@ export const TONE_GUIDE: Record<StatusBadgeProps["tone"], ToneRule> = {
     example: "JoinGroupPage, a link that does not work",
     meaning: "The action failed, or the link does not work.",
   },
-  success: { example: "No caller now", meaning: "The action is complete, or the app sent the email." },
+  success: {
+    example: "ReviewAndCompletePage, the expense is saved",
+    meaning: "The action is complete, or the app sent the email.",
+  },
   warning: { example: "No caller now", meaning: "The user must wait, and can try again later." },
 };
 

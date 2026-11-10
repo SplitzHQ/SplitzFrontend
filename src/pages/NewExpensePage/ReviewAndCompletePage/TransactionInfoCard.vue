@@ -27,11 +27,11 @@ const amountOwed = computed(() => {
 
 <template>
   <div
-    class="flex flex-col justify-center gap-3 rounded-2xl bg-util-color-brand-50 p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid"
+    class="flex flex-col justify-center gap-3 rounded-2xl bg-base-bg-brand-subtle p-3 outline-1 -outline-offset-1 outline-base-border-default outline-solid"
   >
     <div class="flex items-center gap-3">
-      <div class="flex items-center justify-center rounded-xl bg-util-color-brand-100 p-2.5">
-        <PhFiles class="text-[28px] text-util-color-brand-500" />
+      <div class="flex items-center justify-center rounded-xl bg-base-bg-active p-2.5">
+        <PhFiles class="text-[28px] text-base-text-brand" />
       </div>
       <div class="flex flex-1 flex-col justify-center">
         <div class="text-lg font-medium text-base-text-primary">
@@ -43,7 +43,7 @@ const amountOwed = computed(() => {
           }}
         </div>
         <div class="flex items-end gap-1">
-          <div class="text-sm font-normal text-base-text-quaternary">
+          <div class="text-sm font-normal text-base-text-muted">
             {{
               $t("new-expense-split-paid-by", {
                 username:
@@ -54,11 +54,11 @@ const amountOwed = computed(() => {
         </div>
       </div>
       <div class="flex flex-col items-end justify-center gap-1">
-        <div class="text-sm font-normal text-base-text-quaternary">
+        <div class="text-sm font-normal text-base-text-muted">
           {{ amountOwed > 0 ? $t("new-expense-review-you-owe") : $t("new-expense-review-you-are-owed") }}
         </div>
         <div class="flex items-end gap-1">
-          <div v-if="amountOwed > 0" class="text-sm font-medium text-base-text-error">
+          <div v-if="amountOwed > 0" class="text-sm font-medium text-base-text-owe">
             {{
               amountOwed.toLocaleString(undefined, {
                 style: "currency",
@@ -66,7 +66,7 @@ const amountOwed = computed(() => {
               })
             }}
           </div>
-          <div v-else class="text-sm font-medium text-util-color-success-500">
+          <div v-else class="text-sm font-medium text-base-text-success">
             {{
               (0 - amountOwed).toLocaleString(undefined, {
                 style: "currency",

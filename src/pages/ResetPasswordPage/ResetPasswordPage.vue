@@ -130,7 +130,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
     </template>
 
     <template #footer>
-      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand underline-offset-2 hover:underline">
         {{ $t("auth-reset-password-login-link") }}
       </RouterLink>
     </template>
@@ -188,11 +188,11 @@ function getSingleQueryValue(value: unknown): string | undefined {
       <RouterLink
         v-if="errorMessageKey === EXPIRED_ERROR"
         :to="{ name: 'forgotPassword' }"
-        class="text-base-text-brand hover:text-base-text-brand_hover"
+        class="text-base-text-brand underline-offset-2 hover:underline"
       >
         {{ $t("auth-reset-password-forgot-link") }}
       </RouterLink>
-      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand underline-offset-2 hover:underline">
         {{ $t("auth-reset-password-login-link") }}
       </RouterLink>
     </template>

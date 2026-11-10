@@ -144,10 +144,10 @@ export const SURFACE_RULE: {
   plain: [
     { dark: 1.33, light: 1.21, token: "base-bg-primary" },
     { dark: 1.33, light: 1.2, token: "base-bg-secondary_alt" },
-    { dark: 1.34, light: 1.2, token: "core-alpha-brand-5" },
+    { dark: 1.34, light: 1.2, token: "comp-notification-tint" },
   ],
   tinted:
-    "Every other surface is tinted. For example: base-bg-secondary, base-bg-brand, core-alpha-brand-10, util-alpha-black-5, all util-color tokens, gradients and photos.",
+    "Every other surface is tinted. For example: base-bg-secondary, base-bg-subtle, base-bg-brand-subtle, the subtle status fills, all comp-palette tokens, gradients and photos.",
 };
 
 /** When to use a size step. */
@@ -272,7 +272,7 @@ export const ICON_RULES: UsageRule[] = [
     title: "Header icons",
   },
   {
-    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens through `--s-button-ghost-bg` and its `-hover` and `-pressed` forms. Do not put a `bg-*` class on the button: it paints the square root box, not the round button. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. While a filter is on, the button uses `HOME_FILTER_BUTTON_ON_CLASS`: the fill and the text color of a selected FilterPill, with a `brand` NotificationBadge for the count. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
+    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens through `--s-button-ghost-bg` and its `-hover` and `-pressed` forms. Do not put a `bg-*` class on the button: it paints the square root box, not the round button. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. While a filter is on, the button is a `secondary` sm button without these classes. The secondary fill and text color are the same as a selected FilterPill. A `brand` NotificationBadge shows the count. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
     title: "Search filter",
   },
   {
@@ -280,7 +280,7 @@ export const ICON_RULES: UsageRule[] = [
     title: "Side",
   },
   {
-    rule: "The bell in the home header uses text-util-color-brand-700, to match the Splitz wordmark in the same row.",
+    rule: "The bell in the home header uses `comp-notification-bell-icon`, to match the Splitz wordmark in the same row.",
     title: "Exception",
   },
 ];
@@ -378,6 +378,6 @@ export const ACCESSIBILITY_NOTES = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "Can secondary replace outline on some tinted surfaces? The translucent fill of secondary has a contrast of 1.19 or more on core-alpha-brand-10, base-bg-brand and base-bg-secondary in both themes. The user will decide later. Keep the surface rule and the current buttons until then.",
+  "Can secondary replace outline on some tinted surfaces? The translucent fill of secondary has a contrast of 1.19 or more on base-bg-brand-subtle and base-bg-secondary in both themes. The user will decide later. Keep the surface rule and the current buttons until then.",
   "Does a floating button count as the one primary of a screen? GroupDetailPage shows a floating button and a primary Settle up. The user will decide later. Do not change these buttons until then. HomePage has its answer: see the rule Home floating button.",
 ];

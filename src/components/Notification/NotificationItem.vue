@@ -33,9 +33,9 @@ const time = computed(() => formatRelativeTime(notification.createTime));
 
 // Full class strings keep Tailwind's scanner happy.
 const toneClasses: Record<typeof text.value.tone, string> = {
-  brand: "bg-core-alpha-brand-10 text-util-color-brand-700",
-  neutral: "bg-util-alpha-black-5 text-base-text-tertiary",
-  success: "bg-util-color-success-50 text-util-color-success-600",
+  brand: "bg-base-bg-brand-subtle text-base-text-brand",
+  neutral: "bg-base-bg-subtle text-base-text-secondary",
+  success: "bg-base-bg-success-subtle text-base-text-success",
 };
 </script>
 
@@ -43,12 +43,12 @@ const toneClasses: Record<typeof text.value.tone, string> = {
   <div
     :class="[
       'group relative flex items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-state ease-standard',
-      notification.isRead ? 'bg-transparent' : 'bg-core-alpha-brand-5',
+      notification.isRead ? 'bg-transparent' : 'bg-comp-notification-tint',
     ]"
   >
     <button
       type="button"
-      class="flex min-w-0 flex-1 items-start gap-3 rounded-xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
+      class="flex min-w-0 flex-1 items-start gap-3 rounded-xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring"
       @click="emit('open', notification)"
     >
       <span class="relative flex shrink-0">
@@ -64,7 +64,7 @@ const toneClasses: Record<typeof text.value.tone, string> = {
         <span
           v-if="!notification.isRead"
           aria-hidden="true"
-          class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-util-color-brand-600 ring-2 ring-base-bg-primary"
+          class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-base-bg-brand-solid ring-2 ring-base-bg-primary"
         />
       </span>
 
@@ -86,7 +86,7 @@ const toneClasses: Record<typeof text.value.tone, string> = {
     -->
     <button
       type="button"
-      class="relative flex size-7 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary transition duration-feedback ease-standard after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:bg-util-alpha-black-5 hover:text-base-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid md:group-hover:opacity-100 md:focus-visible:opacity-100 md:[@media(hover:hover)]:opacity-0"
+      class="relative flex size-7 shrink-0 items-center justify-center rounded-full text-base-text-muted transition duration-feedback ease-standard after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:bg-base-bg-hover hover:text-base-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring md:group-hover:opacity-100 md:focus-visible:opacity-100 md:[@media(hover:hover)]:opacity-0"
       :aria-label="$t('notification-dismiss')"
       @click.stop="emit('dismiss', notification)"
     >

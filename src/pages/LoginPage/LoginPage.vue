@@ -199,7 +199,7 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
       >
         <button
           type="button"
-          class="text-base-text-tertiary hover:text-base-text-secondary"
+          class="text-base-text-secondary"
           data-test="toggle-two-factor"
           @click="showTwoFactor = !showTwoFactor"
         >
@@ -207,7 +207,7 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
         </button>
         <RouterLink
           :to="{ name: 'forgotPassword' }"
-          class="text-base-text-brand hover:text-base-text-brand_hover"
+          class="text-base-text-brand underline-offset-2 hover:underline"
           data-test="forgot-password-link"
         >
           {{ $t("auth-forgot-password-link") }}
@@ -216,8 +216,8 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
     </template>
 
     <template #footer>
-      <RouterLink :to="{ name: 'register' }" class="flex gap-1 text-base-text-brand hover:text-base-text-brand_hover">
-        <span class="font-normal text-base-text-tertiary">{{ $t("auth-login-register-lead") }}</span>
+      <RouterLink :to="{ name: 'register' }" class="flex gap-1 text-base-text-brand underline-offset-2 hover:underline">
+        <span class="font-normal text-base-text-secondary">{{ $t("auth-login-register-lead") }}</span>
         {{ $t("auth-login-register-link") }}
       </RouterLink>
     </template>

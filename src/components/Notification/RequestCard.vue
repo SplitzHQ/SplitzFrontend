@@ -85,22 +85,25 @@ async function ignore() {
 
 <template>
   <div
-    :class="['flex gap-3 rounded-2xl bg-core-alpha-brand-5 ring-1 ring-core-alpha-brand-10', compact ? 'p-3' : 'p-4']"
+    :class="[
+      'flex gap-3 rounded-2xl bg-comp-notification-tint ring-1 ring-comp-notification-tint-line',
+      compact ? 'p-3' : 'p-4',
+    ]"
   >
     <Avatar v-if="text.image" aria-hidden="true" :images="[text.image]" :size="compact ? 'xs' : 'sm'" />
 
     <div class="flex min-w-0 flex-1 flex-col gap-2">
       <div class="flex flex-col gap-0.5">
         <div class="flex items-baseline justify-between gap-2">
-          <p class="text-xs font-semibold tracking-wide text-util-color-brand-700 uppercase">{{ text.title }}</p>
-          <time class="shrink-0 text-xs text-base-text-quaternary" :datetime="notification.createTime.toISOString()">
+          <p class="text-xs font-semibold tracking-wide text-base-text-brand uppercase">{{ text.title }}</p>
+          <time class="shrink-0 text-xs text-base-text-muted" :datetime="notification.createTime.toISOString()">
             {{ time }}
           </time>
         </div>
         <p class="text-sm leading-5 text-base-text-primary">{{ text.body }}</p>
         <p
           v-if="notification.type === 'FriendRequest' && notification.data.remark"
-          class="text-xs text-base-text-tertiary"
+          class="text-xs text-base-text-secondary"
         >
           {{ $t("notification-request-remark", { remark: notification.data.remark }) }}
         </p>

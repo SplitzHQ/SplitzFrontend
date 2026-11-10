@@ -26,7 +26,7 @@ describe("BalanceCard", () => {
 
     expect(wrapper.text()).toContain("You owe");
     expect(wrapper.get('[data-test="balance-card-total"]').text()).toBe("$25.00");
-    expect(wrapper.get('[data-test="balance-card-total"]').classes()).toContain("text-base-text-error");
+    expect(wrapper.get('[data-test="balance-card-total"]').classes()).toContain("text-base-text-owe");
   });
 
   it("writes one line for each member, with the name in the darker color", () => {
@@ -55,5 +55,17 @@ describe("BalanceCard", () => {
     expect(wrapper.text()).toContain("All settled up");
     expect(wrapper.find("button").exists()).toBe(false);
     expect(wrapper.find("ul").exists()).toBe(false);
+  });
+
+  it("hides the button while a settle-up round runs and keeps the amounts", () => {
+    const wrapper = mountCard({
+      canSettle: false,
+      currency: "USD",
+      memberBalances: [member("Bob", "-5.00")],
+      totalBalance: "5.00",
+    });
+
+    expect(wrapper.find("button").exists()).toBe(false);
+    expect(wrapper.get('[data-test="balance-card-total"]').text()).toBe("$5.00");
   });
 });

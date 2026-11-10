@@ -37,7 +37,7 @@ export const PARTS: Record<NotificationPart, UsageRule> = {
     title: "AvatarMenu",
   },
   NotificationBadge: {
-    rule: "The count at the corner of the bell and the avatar. Zero hides it. A number above 99 shows as 99+. The fill is `base-bg-primary-reverse`. Do not use red, because red is only for an error, a debt or a destructive action.",
+    rule: "The count at the corner of the bell and the avatar. Zero hides it. A number above 99 shows as 99+. The fill is `base-bg-solid`, or `base-bg-brand-solid` for the `brand` tone, with `base-text-inverse`. Do not use red, because red is only for an error, a debt or a destructive action.",
     title: "NotificationBadge",
   },
   NotificationBell: {
@@ -79,11 +79,11 @@ export const PLACEMENT_RULES: UsageRule[] = [
     title: "One place",
   },
   {
-    rule: "The bell keeps `text-util-color-brand-700` on its icon. This is the exception in `ICON_RULES` of `button.usage.ts`.",
+    rule: "The bell keeps `comp-notification-bell-icon` on its icon, so it has the color of the wordmark. This is the exception in `ICON_RULES` of `button.usage.ts`.",
     title: "Bell color",
   },
   {
-    rule: "The ring of the badge has the color `base-bg-secondary_alt`, because the header has that background. The ring looks wrong on another surface. See the open questions.",
+    rule: "The ring of the badge has the color `base-bg-secondary_alt`, because the header has that background. The ring looks wrong on another surface. See the open questions. When HomeHeader moves to a new background token, the ring moves to the same token.",
     title: "Surface of the badge",
   },
   {
@@ -143,7 +143,7 @@ export const HEADER_RULES: UsageRule[] = [
 /** How a row works. */
 export const ROW_RULES: UsageRule[] = [
   {
-    rule: "An unread row has a tint, a dot and a bolder title. The dot is on the top-right corner of the picture or the icon tile. Its ring has the color `base-bg-primary`, because the popover and the sheet have that surface. A screen reader reads the word Unread.",
+    rule: "An unread row has a tint (`comp-notification-tint`), a dot (`base-bg-brand-solid`) and a bolder title. The dot is on the top-right corner of the picture or the icon tile. Its ring has the color `base-bg-primary`, because the popover and the sheet have that surface. A screen reader reads the word Unread.",
     title: "Unread",
   },
   {
@@ -155,7 +155,7 @@ export const ROW_RULES: UsageRule[] = [
     title: "Text",
   },
   {
-    rule: "The icon has `base-fg-quaternary` with no opacity, because WCAG 1.4.11 asks for 3:1. A device that can hover shows the dismiss button on hover or on keyboard focus at the `md` width. Other devices always show it.",
+    rule: "The icon has `base-text-muted` with no opacity, because WCAG 1.4.11 asks for 3:1. A device that can hover shows the dismiss button on hover or on keyboard focus at the `md` width. Other devices always show it.",
     title: "Dismiss",
   },
 ];
@@ -171,7 +171,7 @@ export const REQUEST_RULES: UsageRule[] = [
     title: "While a request runs",
   },
   {
-    rule: "The card has `core-alpha-brand-5`, and that is a plain surface in `SURFACE_RULE` of `button.usage.ts`.",
+    rule: "The card has `comp-notification-tint` and a `comp-notification-tint-line` ring. The tint is a plain surface in `SURFACE_RULE` of `button.usage.ts`.",
     title: "Surface",
   },
 ];
@@ -222,7 +222,8 @@ export const OPEN_QUESTIONS = [
   'Must a new notification be read by a screen reader when it arrives? The store polls each 5 minutes, and only the name of the bell changes. Nothing is read at that time. The old `role="status"` on the badge did not do this, because a browser reads such a role reliably only on an element that was already there.',
   "Must Clear all ask for a confirm step? It removes all rows at once, and the app has no way to undo it.",
   "Where must focus go after the user dismisses a row or answers a request? The element goes away, so a keyboard user loses the place.",
+  "Which fill do the request card and an unread row use? They keep the faint 5% brand tint through `comp-notification-tint`. The token migration map gives `base-bg-brand-subtle`, which is darker and has the color of the brand icon tile. The prototype Notification tint (SPZ-114) compares the two. Do not change the tint until the user decides.",
   "Must the ring of the badge follow the surface? Both callers are on `base-bg-secondary_alt`, so the fixed color is correct today.",
-  "Must the time of a row change in the dark theme? It has `base-text-quaternary`, and its contrast is 3.30:1 in the dark theme. WCAG 1.4.3 asks for 4.5:1. Other screens use this token too, so this is a question about the token.",
+  "Must the time of a row change in the dark theme? It has `base-text-muted`, and its contrast is 3.30:1 in the dark theme. WCAG 1.4.3 asks for 4.5:1. Other screens use this token too, so this is a question about the token.",
   "Must the bell swing again each time? It swings when HomePage opens with unread activity and when the panel closes with unread activity left. It does not swing when a new notification arrives while the panel is closed and the count was already above zero.",
 ];

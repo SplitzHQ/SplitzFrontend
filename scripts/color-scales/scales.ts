@@ -213,7 +213,7 @@ export const BASE_STEPS: Record<string, ThemedRef> = {
   "base-text-quaternary": "N9",
   "base-text-quinary": "N9",
   "base-text-secondary": "N10",
-  "base-text-success": "S11",
+  "base-text-success": { dark: "S11", light: "S9" },
   "base-text-tertiary": "N10",
 };
 
@@ -278,13 +278,17 @@ export const SEMANTIC_TOKENS: Record<SemanticToken, SemanticDefinition> = {
     value: "N1",
   },
   "base-text-muted": { replaces: ["base-text-quaternary", "base-text-quinary", "base-fg-quaternary"], value: "N9" },
+  // The red of danger, with a different job: money that the user owes is not an error.
+  "base-text-owe": { replaces: [], value: "E11" },
   "base-text-placeholder": { replaces: ["base-fg-placeholder"], value: "N8" },
   "base-text-primary": { replaces: ["base-fg-primary", "base-fg-primary_hover"], value: "N12" },
   "base-text-secondary": {
     replaces: ["base-text-tertiary", "base-fg-secondary", "base-fg-secondary_hover", "base-fg-tertiary"],
     value: "N10",
   },
-  "base-text-success": { replaces: [], value: "S11" },
+  // SPZ-58 block 3: the light theme uses step 9, one step brighter and more saturated than step 11. It has 4.6:1 on
+  // white, 4.2:1 on a card and 3.9:1 on the success subtle fill.
+  "base-text-success": { replaces: [], value: { dark: "S11", light: "S9" } },
   "base-text-warning": { replaces: [], value: "W11" },
 };
 
@@ -339,6 +343,17 @@ function statusBadgeTone(tone: "error" | "success" | "warning"): Record<string, 
  * migration card can change the name and keep the look. The rules for each group are in `src/assets/color.usage.ts`.
  */
 export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
+  // The faint line inside the edge of a photo. A tile with an initial has no line.
+  "comp-avatar-picture-line": { dark: "core-alpha-white-10", light: "core-alpha-black-5" },
+  // The solid buttons keep a hover and a pressed step. The semantic layer has only the rest fill of a solid color.
+  "comp-button-destructive-bg-hover": "E10",
+  "comp-button-destructive-bg-pressed": "E11",
+  // The focus ring of the destructive buttons stays red. `base-border-danger` is only for an item with an error.
+  "comp-button-destructive-ring": "E9",
+  "comp-button-destructive-soft-bg-hover": "E4",
+  "comp-button-destructive-soft-bg-pressed": "E5",
+  "comp-button-primary-bg-hover": { dark: "B11", light: "B10" },
+  "comp-button-primary-bg-pressed": "B11",
   "comp-button-outline-bg-hover": neutralAlpha(5),
   "comp-button-outline-bg-pressed": neutralAlpha(10),
   "comp-button-outline-border": { dark: "core-alpha-white-30", light: "core-alpha-black-20" },
@@ -347,10 +362,24 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-button-secondary-bg": "core-alpha-brand-20",
   "comp-button-secondary-bg-hover": "core-alpha-brand-30",
   "comp-button-secondary-bg-pressed": "core-alpha-brand-40",
+  // The hover and pressed fill of a tappable card with the `base-bg-secondary` fill, such as the total balance card on
+  // the home page. SPZ-112 kept the N3 step: the semantic hover fills are translucent and change the card too much.
+  "comp-card-bg-hover": "N3",
+  // The icon tile of EmptyState. The brand tint is translucent, so it follows the surface under it. SPZ-112 kept it.
+  "comp-empty-state-icon-bg": "core-alpha-brand-10",
+  // The page of the home screen, also the color of the status bar and the frosted header. The dark home page is the
+  // dark page color, so it is lighter than a card in the light theme only.
+  "comp-home-page-bg": { dark: "N1", light: "N2" },
   // The hover and pressed fill of a shared row. The dark theme needs a step between the page and N2: N2 is too
   // bright on the dark page, so the 3% white sits about half way.
   "comp-row-bg-hover": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
   "comp-row-bg-pressed": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
+  // The faint brand tint of a request card and of an unread notification row. It is lighter than
+  // `base-bg-brand-subtle`, so the brand icon tile on an unread row stays visible.
+  "comp-notification-tint": "core-alpha-brand-5",
+  "comp-notification-tint-line": "core-alpha-brand-10",
+  // The bell icon in the home header has the color of the Splitz wordmark in the same row.
+  "comp-notification-bell-icon": "util-color-brand-700",
   "comp-search-filter-bg": "core-alpha-brand-10",
   "comp-search-filter-bg-hover": "core-alpha-brand-20",
   "comp-search-filter-bg-pressed": "core-alpha-brand-30",
@@ -371,6 +400,10 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
       [`comp-palette-${family}-icon`, `util-color-${family}-600`],
     ])
   ),
+  // The circle behind the icon of an action tile on the review page. ColoredButton draws it at 70% opacity. The
+  // token is white in the light theme and near black in the dark theme, so the circle is lighter or darker than the
+  // tile. SPZ-112 kept this value.
+  "comp-palette-action-icon-bg": "util-alpha-white-70",
   ...Object.fromEntries(
     ACTION_FAMILIES.flatMap((family) => [
       [`comp-palette-${family}-fill-hover`, `util-color-${family}-100`],

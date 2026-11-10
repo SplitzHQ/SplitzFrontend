@@ -59,7 +59,7 @@ async function save() {
 <template>
   <Sheet v-model="model" :title="$t('profile-edit-nickname-title')" detent="medium" :show-close-button="true">
     <div class="flex flex-col gap-4">
-      <p class="text-sm text-base-text-tertiary">{{ friendName }}</p>
+      <p class="text-sm text-base-text-secondary">{{ friendName }}</p>
 
       <TextInput
         id="edit-nickname"

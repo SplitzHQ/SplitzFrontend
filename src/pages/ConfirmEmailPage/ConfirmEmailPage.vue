@@ -135,7 +135,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
     </template>
 
     <template v-if="state === 'invalid' || state === 'error'" #footer>
-      <RouterLink :to="{ name: 'register' }" class="text-base-text-brand hover:text-base-text-brand_hover">
+      <RouterLink :to="{ name: 'register' }" class="text-base-text-brand underline-offset-2 hover:underline">
         {{ $t("auth-confirm-email-register-link") }}
       </RouterLink>
     </template>

@@ -55,7 +55,7 @@ watch(open, (active) => {
           data-test="notification-bell"
           @click="toggle"
         >
-          <PhBell :class="['text-util-color-brand-700', count > 0 && !open ? 'bell-ring' : '']" />
+          <PhBell :class="['text-comp-notification-bell-icon', count > 0 && !open ? 'bell-ring' : '']" />
         </SIconButton>
       </template>
       <NotificationPanel @navigate="close" />

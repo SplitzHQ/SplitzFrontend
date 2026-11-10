@@ -79,7 +79,7 @@ function onImageError(src: string) {
       'img-container',
       size,
       isGroup && 'is-group',
-      'flex shrink-0 items-center justify-center bg-core-alpha-brand-10',
+      'flex shrink-0 items-center justify-center bg-base-bg-brand-subtle',
     ]"
     :role="gridLabel ? 'img' : undefined"
     :aria-label="gridLabel"
@@ -130,12 +130,8 @@ function onImageError(src: string) {
  * different from the background. See `avatar.usage.ts`.
  */
 .picture-line {
-  outline: 1px solid var(--core-alpha-black-5);
+  outline: 1px solid var(--comp-avatar-picture-line);
   outline-offset: -1px;
-}
-
-.dark .picture-line {
-  outline-color: var(--core-alpha-white-10);
 }
 
 /*

@@ -208,11 +208,11 @@ function getLocation() {
           <button
             type="button"
             aria-label="Get current location"
-            class="flex cursor-pointer items-center justify-center rounded-xl p-3.5 outline -outline-offset-1 outline-base-border-primary"
+            class="flex cursor-pointer items-center justify-center rounded-xl p-3.5 outline -outline-offset-1 outline-base-border-default"
             @click="getLocation"
           >
-            <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-fg-primary" />
-            <PhCircleNotch v-else class="animate-spin icon-5 text-base-fg-primary" />
+            <PhGpsFix v-if="!locationLoading" class="icon-5 text-base-text-primary" />
+            <PhCircleNotch v-else class="animate-spin icon-5 text-base-text-primary" />
           </button>
           <TextInput
             id="location"
@@ -222,7 +222,7 @@ function getLocation() {
             class="grow"
           />
         </div>
-        <span id="location-disclaimer" class="text-xs text-base-text-quaternary">
+        <span id="location-disclaimer" class="text-xs text-base-text-muted">
           {{ $t("new-expense-review-fields-location-disclaimer") }}
         </span>
       </div>
@@ -258,36 +258,36 @@ function getLocation() {
           <img
             :src="receiptPreview"
             alt="Receipt preview"
-            class="h-24 w-24 rounded-lg border border-base-border-primary object-cover"
+            class="h-24 w-24 rounded-lg border border-base-border-default object-cover"
           />
           <button
             type="button"
             aria-label="Remove receipt"
-            class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
+            class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-subtle bg-base-bg-primary p-1 shadow-sm"
             :disabled="receiptControlsDisabled"
             @click="removeReceipt"
           >
-            <PhTrash class="icon-4 text-base-fg-error" />
+            <PhTrash class="icon-4 text-base-text-danger" />
           </button>
         </div>
         <div v-else class="flex gap-2">
           <button
             type="button"
             aria-label="Select image from camera"
-            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-base-bg-brand-subtle p-5"
             :disabled="receiptControlsDisabled"
             @click="triggerCamera"
           >
-            <PhCamera class="icon-8 text-base-fg-brand" />
+            <PhCamera class="icon-8 text-base-text-brand" />
           </button>
           <button
             type="button"
             aria-label="Select image from gallery"
-            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-core-color-brand-50 p-5"
+            class="flex cursor-pointer items-center justify-start gap-2 rounded-lg bg-base-bg-brand-subtle p-5"
             :disabled="receiptControlsDisabled"
             @click="triggerGallery"
           >
-            <PhPlus class="icon-8 text-base-fg-brand" />
+            <PhPlus class="icon-8 text-base-text-brand" />
           </button>
         </div>
         <RateLimitCountdown
@@ -302,7 +302,7 @@ function getLocation() {
         <label class="px-3.25 text-sm font-semibold text-base-text-secondary" for="notes">
           {{ $t("new-expense-review-fields-notes-label") }}
         </label>
-        <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-primary outline-solid">
+        <div class="rounded-xl p-3 outline-1 -outline-offset-1 outline-base-border-default outline-solid">
           <textarea
             id="notes"
             rows="3"

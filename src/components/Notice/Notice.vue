@@ -24,27 +24,27 @@ export interface NoticeProps {
 
 const { tone = "info", title, announce = false } = defineProps<NoticeProps>();
 
-// Full class strings keep Tailwind's scanner happy; tokens flip automatically in dark mode.
+// Full class strings keep Tailwind's scanner happy. Each tone uses the subtle fill and the text token of its status.
 const toneClasses: Record<NonNullable<NoticeProps["tone"]>, { body: string; container: string; icon: string }> = {
   error: {
-    body: "text-util-color-error-900",
-    container: "bg-util-color-error-50",
-    icon: "text-util-color-error-600",
+    body: "text-base-text-danger",
+    container: "bg-base-bg-danger-subtle",
+    icon: "text-base-text-danger",
   },
   info: {
-    body: "text-util-color-brand-900",
-    container: "bg-core-alpha-brand-10",
-    icon: "text-util-color-brand-600",
+    body: "text-base-text-brand",
+    container: "bg-base-bg-brand-subtle",
+    icon: "text-base-text-brand",
   },
   success: {
-    body: "text-util-color-success-900",
-    container: "bg-util-color-success-50",
-    icon: "text-util-color-success-600",
+    body: "text-base-text-success",
+    container: "bg-base-bg-success-subtle",
+    icon: "text-base-text-success",
   },
   warning: {
-    body: "text-util-color-warning-900",
-    container: "bg-util-color-warning-50",
-    icon: "text-util-color-warning-600",
+    body: "text-base-text-warning",
+    container: "bg-base-bg-warning-subtle",
+    icon: "text-base-text-warning",
   },
 };
 </script>

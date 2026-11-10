@@ -5,18 +5,32 @@ export const AVATAR_TONES = ["brand", "leaf", "waterblue", "purple", "magenta", 
 export type AvatarTone = (typeof AVATAR_TONES)[number];
 
 /**
- * The fill and the text color of each family. Util tokens change with the theme, so one step fits both themes.
- * Leaf, waterblue and yellow use step 600 for the text, because step 500 of these families is too pale in the light
- * theme. The names are complete, so a test can check that each token exists.
+ * The fill and the text color of each family. The `comp-palette-avatar-*` tokens change with the theme. The generator in
+ * `scripts/color-scales/` picks their steps. The names are complete, so a test can check that each token exists.
  */
 export const AVATAR_TONE_STYLES: Record<AvatarTone, { backgroundColor: string; color: string }> = {
-  brand: { backgroundColor: "var(--util-color-brand-100)", color: "var(--util-color-brand-500)" },
-  leaf: { backgroundColor: "var(--util-color-leaf-100)", color: "var(--util-color-leaf-600)" },
-  magenta: { backgroundColor: "var(--util-color-magenta-100)", color: "var(--util-color-magenta-500)" },
-  purple: { backgroundColor: "var(--util-color-purple-100)", color: "var(--util-color-purple-500)" },
-  rosered: { backgroundColor: "var(--util-color-rosered-100)", color: "var(--util-color-rosered-500)" },
-  waterblue: { backgroundColor: "var(--util-color-waterblue-100)", color: "var(--util-color-waterblue-600)" },
-  yellow: { backgroundColor: "var(--util-color-yellow-100)", color: "var(--util-color-yellow-600)" },
+  brand: { backgroundColor: "var(--comp-palette-avatar-brand-fill)", color: "var(--comp-palette-avatar-brand-text)" },
+  leaf: { backgroundColor: "var(--comp-palette-avatar-leaf-fill)", color: "var(--comp-palette-avatar-leaf-text)" },
+  magenta: {
+    backgroundColor: "var(--comp-palette-avatar-magenta-fill)",
+    color: "var(--comp-palette-avatar-magenta-text)",
+  },
+  purple: {
+    backgroundColor: "var(--comp-palette-avatar-purple-fill)",
+    color: "var(--comp-palette-avatar-purple-text)",
+  },
+  rosered: {
+    backgroundColor: "var(--comp-palette-avatar-rosered-fill)",
+    color: "var(--comp-palette-avatar-rosered-text)",
+  },
+  waterblue: {
+    backgroundColor: "var(--comp-palette-avatar-waterblue-fill)",
+    color: "var(--comp-palette-avatar-waterblue-text)",
+  },
+  yellow: {
+    backgroundColor: "var(--comp-palette-avatar-yellow-fill)",
+    color: "var(--comp-palette-avatar-yellow-text)",
+  },
 };
 
 /**

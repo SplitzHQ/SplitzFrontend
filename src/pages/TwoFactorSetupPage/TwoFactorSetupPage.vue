@@ -221,15 +221,15 @@ onMounted(() => {
           <div
             :class="[
               'flex items-start gap-4 rounded-3xl p-5',
-              isTwoFactorEnabled ? 'bg-util-color-success-50' : 'bg-util-color-warning-50',
+              isTwoFactorEnabled ? 'bg-base-bg-success-subtle' : 'bg-base-bg-warning-subtle',
             ]"
           >
             <div
               :class="[
                 'flex size-12 shrink-0 items-center justify-center rounded-2xl',
                 isTwoFactorEnabled
-                  ? 'bg-util-color-success-100 text-util-color-success-700'
-                  : 'bg-util-color-warning-100 text-util-color-warning-700',
+                  ? 'bg-base-bg-subtle text-base-text-success'
+                  : 'bg-base-bg-subtle text-base-text-warning',
               ]"
             >
               <PhShieldCheck v-if="isTwoFactorEnabled" weight="duotone" class="size-7" />
@@ -239,14 +239,12 @@ onMounted(() => {
               <p
                 :class="[
                   'text-base font-semibold',
-                  isTwoFactorEnabled ? 'text-util-color-success-900' : 'text-util-color-warning-900',
+                  isTwoFactorEnabled ? 'text-base-text-success' : 'text-base-text-warning',
                 ]"
               >
                 {{ $t(isTwoFactorEnabled ? "two-factor-enabled-title" : "two-factor-disabled-title") }}
               </p>
-              <p
-                :class="['text-sm', isTwoFactorEnabled ? 'text-util-color-success-800' : 'text-util-color-warning-800']"
-              >
+              <p :class="['text-sm', isTwoFactorEnabled ? 'text-base-text-success' : 'text-base-text-warning']">
                 {{ $t(isTwoFactorEnabled ? "two-factor-enabled-body" : "two-factor-disabled-body") }}
               </p>
             </div>
@@ -254,31 +252,31 @@ onMounted(() => {
 
           <!-- Setup flow -->
           <template v-if="!isTwoFactorEnabled">
-            <section class="flex flex-col gap-4 rounded-3xl bg-util-alpha-black-5 p-5">
+            <section class="flex flex-col gap-4 rounded-3xl bg-base-bg-secondary p-5">
               <div class="flex items-start gap-3">
                 <span
-                  class="flex size-7 shrink-0 items-center justify-center rounded-full bg-util-color-brand-700 text-sm font-bold text-base-text-primary-reverse"
+                  class="flex size-7 shrink-0 items-center justify-center rounded-full bg-base-bg-brand-solid text-sm font-bold text-base-text-inverse"
                 >
                   1
                 </span>
                 <div class="flex flex-col gap-1">
                   <h2 class="text-base font-semibold text-base-text-primary">{{ $t("two-factor-step-scan-title") }}</h2>
-                  <p class="text-sm text-base-text-tertiary">{{ $t("two-factor-step-scan-body") }}</p>
+                  <p class="text-sm text-base-text-secondary">{{ $t("two-factor-step-scan-body") }}</p>
                 </div>
               </div>
 
               <!-- QR codes must stay dark-on-white to scan reliably, so this tile ignores the theme. -->
               <div class="mx-auto flex size-56 items-center justify-center rounded-2xl bg-white p-3 shadow-sm">
                 <img v-if="qrCodeUrl" :src="qrCodeUrl" :alt="$t('two-factor-qr-alt')" class="size-full" />
-                <p v-else class="text-sm text-core-color-grey-400">{{ $t("two-factor-qr-loading") }}</p>
+                <p v-else class="text-sm text-base-text-muted">{{ $t("two-factor-qr-loading") }}</p>
               </div>
 
               <div class="flex flex-col gap-1.5">
-                <p class="text-xs font-semibold tracking-wide text-base-text-quaternary uppercase">
+                <p class="text-xs font-semibold tracking-wide text-base-text-muted uppercase">
                   {{ $t("two-factor-manual-key-label") }}
                 </p>
                 <div class="flex items-center gap-2 rounded-2xl bg-base-bg-primary px-4 py-2">
-                  <PhKey class="size-5 shrink-0 text-base-fg-quaternary" />
+                  <PhKey class="size-5 shrink-0 text-base-text-muted" />
                   <code class="min-w-0 flex-1 font-mono text-sm wrap-anywhere text-base-text-primary select-all">
                     {{ sharedKey }}
                   </code>
@@ -294,10 +292,10 @@ onMounted(() => {
               </div>
             </section>
 
-            <section class="flex flex-col gap-4 rounded-3xl bg-util-alpha-black-5 p-5">
+            <section class="flex flex-col gap-4 rounded-3xl bg-base-bg-secondary p-5">
               <div class="flex items-start gap-3">
                 <span
-                  class="flex size-7 shrink-0 items-center justify-center rounded-full bg-util-color-brand-700 text-sm font-bold text-base-text-primary-reverse"
+                  class="flex size-7 shrink-0 items-center justify-center rounded-full bg-base-bg-brand-solid text-sm font-bold text-base-text-inverse"
                 >
                   2
                 </span>
@@ -305,7 +303,7 @@ onMounted(() => {
                   <h2 class="text-base font-semibold text-base-text-primary">
                     {{ $t("two-factor-step-verify-title") }}
                   </h2>
-                  <p class="text-sm text-base-text-tertiary">{{ $t("two-factor-step-verify-body") }}</p>
+                  <p class="text-sm text-base-text-secondary">{{ $t("two-factor-step-verify-body") }}</p>
                 </div>
               </div>
 
@@ -337,12 +335,12 @@ onMounted(() => {
 
           <!-- Enabled: recovery codes and danger zone -->
           <template v-else>
-            <section class="flex flex-col gap-4 rounded-3xl bg-util-alpha-black-5 p-5">
+            <section class="flex flex-col gap-4 rounded-3xl bg-base-bg-secondary p-5">
               <div class="flex flex-col gap-1">
                 <h2 class="text-base font-semibold text-base-text-primary">
                   {{ $t("two-factor-recovery-codes-title") }}
                 </h2>
-                <p class="text-sm text-base-text-tertiary">{{ $t("two-factor-recovery-codes-body") }}</p>
+                <p class="text-sm text-base-text-secondary">{{ $t("two-factor-recovery-codes-body") }}</p>
               </div>
 
               <div v-if="recoveryCodes.length > 0" class="flex flex-col gap-3">
@@ -363,7 +361,7 @@ onMounted(() => {
                 </SButton>
               </div>
 
-              <p class="text-xs text-base-text-quaternary">{{ $t("two-factor-recovery-codes-hint") }}</p>
+              <p class="text-xs text-base-text-muted">{{ $t("two-factor-recovery-codes-hint") }}</p>
               <SButton
                 variant="outline"
                 size="md"
