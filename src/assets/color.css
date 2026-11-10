@@ -334,6 +334,8 @@
   --comp-home-page-bg: var(--core-scale-neutral-2);
   --comp-row-bg-hover: var(--base-bg-secondary);
   --comp-row-bg-pressed: var(--base-bg-secondary);
+  --comp-row-selected-bg-hover: var(--core-scale-brand-4);
+  --comp-row-selected-bg-pressed: var(--core-scale-brand-5);
   --comp-notification-tint: var(--core-alpha-brand-5);
   --comp-notification-tint-line: var(--core-alpha-brand-10);
   --comp-notification-bell-icon: var(--util-color-brand-700);
@@ -1148,6 +1150,8 @@
   --comp-home-page-bg: var(--core-scale-neutral-1);
   --comp-row-bg-hover: var(--core-alpha-white-3);
   --comp-row-bg-pressed: var(--core-alpha-white-3);
+  --comp-row-selected-bg-hover: var(--core-scale-brand-4);
+  --comp-row-selected-bg-pressed: var(--core-scale-brand-5);
   --comp-notification-tint: var(--core-alpha-brand-5);
   --comp-notification-tint-line: var(--core-alpha-brand-10);
   --comp-notification-bell-icon: var(--util-color-brand-700);

@@ -374,6 +374,10 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   // bright on the dark page, so the 3% white sits about half way.
   "comp-row-bg-hover": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
   "comp-row-bg-pressed": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
+  // The hover and pressed fill of a selected SelectableRow. The rest fill is `base-bg-brand-subtle` (B3), so these are
+  // the next two brand steps. The semantic layer has no hover step for a brand-subtle fill.
+  "comp-row-selected-bg-hover": "B4",
+  "comp-row-selected-bg-pressed": "B5",
   // The faint brand tint of a request card and of an unread notification row. It is lighter than
   // `base-bg-brand-subtle`, so the brand icon tile on an unread row stays visible.
   "comp-notification-tint": "core-alpha-brand-5",

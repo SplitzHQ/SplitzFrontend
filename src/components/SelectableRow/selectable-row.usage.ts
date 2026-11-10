@@ -39,7 +39,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "The shared row",
   },
   {
-    rule: "A selected row has the `base-bg-brand-subtle` fill, the same fill as a selected tag. Hover and press use `base-bg-brand_hover` and `base-bg-brand_pressed`. The row has no border, and the content does not move.",
+    rule: "A selected row has the `base-bg-brand-subtle` fill, the same fill as a selected tag. Hover and press use `comp-row-selected-bg-hover` and `comp-row-selected-bg-pressed`. The row has no border, and the content does not move.",
     title: "Selected fill",
   },
   {
