@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhPlus, PhUsers } from "@phosphor-icons/vue";
+import { PhCheckCircle, PhMagnifyingGlass, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useLocalStorage } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
@@ -10,6 +10,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import EmptyState from "@/components/EmptyState/EmptyState.vue";
 import FilterPill from "@/components/FilterPill/FilterPill.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import AmountChip from "@/components/ListRow/AmountChip.vue";
@@ -38,10 +39,9 @@ import HomeEmptyState from "./HomeEmptyState.vue";
 import HomeFilterSheet, { type HomeFilterSheetMode } from "./HomeFilterSheet.vue";
 import HomeGroupsSkeleton from "./HomeGroupsSkeleton.vue";
 import HomeHeader from "./HomeHeader.vue";
-import HomeNoResults from "./HomeNoResults.vue";
 import HomeTotalBalance from "./HomeTotalBalance.vue";
 
-useStatusBarTopColor("--base-bg-secondary_alt");
+useStatusBarTopColor("--comp-home-page-bg");
 
 /**
  * A group row: the shared row with 12px above and below. The row is taller than a transaction row, because a group row
@@ -291,14 +291,23 @@ const userBalances = computed(() => {
                 enter-from-class="opacity-0"
                 @leave="leaveAtOnce"
               >
-                <HomeNoResults
+                <EmptyState
                   v-if="showNoResults"
-                  kind="search"
+                  :icon="PhMagnifyingGlass"
                   :title="$t('home-no-results-title', { keyword: trimmedKeyword })"
                   :description="$t('home-no-results-description')"
-                  :clear-label="$t('home-button-clear-search')"
-                  @clear="searchKeyword = ''"
-                />
+                >
+                  <template #action>
+                    <SButton
+                      variant="secondary"
+                      size="md"
+                      data-testid="home-no-results-clear"
+                      @click="searchKeyword = ''"
+                    >
+                      {{ $t("home-button-clear-search") }}
+                    </SButton>
+                  </template>
+                </EmptyState>
               </Transition>
 
               <!--
@@ -351,13 +360,23 @@ const userBalances = computed(() => {
                   enter-from-class="opacity-0"
                   @leave="leaveAtOnce"
                 >
-                  <HomeNoResults
+                  <!-- With the unsettled filter, no group means that everything is settled, so the icon is a check. -->
+                  <EmptyState
                     v-if="showFilterEmpty && filter !== 'all'"
-                    kind="filter"
+                    :icon="filter === 'unsettled' ? PhCheckCircle : PhSlidersHorizontal"
                     :title="$t(HOME_FILTER_EMPTY_LABELS[filter])"
-                    :clear-label="$t('home-button-clear-filter')"
-                    @clear="filter = 'all'"
-                  />
+                  >
+                    <template #action>
+                      <SButton
+                        variant="secondary"
+                        size="md"
+                        data-testid="home-no-results-clear"
+                        @click="filter = 'all'"
+                      >
+                        {{ $t("home-button-clear-filter") }}
+                      </SButton>
+                    </template>
+                  </EmptyState>
                 </Transition>
               </template>
 
@@ -434,7 +453,7 @@ const userBalances = computed(() => {
                     <ListRowContent :title="$t('home-button-create-group')">
                       <template #leading>
                         <div
-                          class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-dashed border-base-border-secondary text-util-color-brand-700"
+                          class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-dashed border-base-border-subtle text-base-text-brand"
                         >
                           <PhUsers class="size-5" />
                         </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhMagnifyingGlass } from "@phosphor-icons/vue";
 import { useQuery } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -6,6 +7,7 @@ import { useRouter } from "vue-router";
 
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
+import EmptyState from "@/components/EmptyState/EmptyState.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -106,6 +108,18 @@ const friendsInUserListItem = computed(() => {
   return result;
 });
 
+/**
+ * True when a search hides every group and every friend. A person with no group and no friend sees the page as it is:
+ * SPZ-117 (placeholder people) gives that page its way out.
+ */
+const noSearchResult = computed(
+  () =>
+    searchKeyword.value.trim() !== "" &&
+    (mappedGroups.value.length > 0 || (userStore.user?.friends?.length ?? 0) > 0) &&
+    groupsInUserListItem.value.length === 0 &&
+    friendsInUserListItem.value.length === 0
+);
+
 // selected items and selection handler
 const selectedItemsId = ref<string[]>([]);
 const onItemSelected = (itemId: string) => {
@@ -196,6 +210,18 @@ const onSelectedUsersSubmitted = async () => {
           :selected-items-id="selectedItemsId"
           @select="onItemSelected"
         />
+        <EmptyState
+          v-if="noSearchResult"
+          :icon="PhMagnifyingGlass"
+          :title="$t('new-expense-select-people-empty-title', { keyword: searchKeyword.trim() })"
+          :description="$t('new-expense-select-people-empty-description')"
+        >
+          <template #action>
+            <SButton variant="secondary" size="md" @click="searchKeyword = ''">
+              {{ $t("new-expense-select-people-clear-search") }}
+            </SButton>
+          </template>
+        </EmptyState>
         <BottomAction>
           <SButton
             variant="primary"
