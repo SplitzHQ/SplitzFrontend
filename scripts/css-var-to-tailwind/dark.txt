@@ -114,6 +114,7 @@
 --base-text-danger: var(--core-scale-error-11);
 --base-text-inverse: var(--core-scale-neutral-1);
 --base-text-muted: var(--core-scale-neutral-9);
+--base-text-owe: var(--core-scale-error-11);
 --base-text-warning: var(--core-scale-warning-11);
 --util-color-brand-25: var(--core-color-brand-950);
 --util-color-brand-50: var(--core-color-brand-900);
@@ -311,6 +312,14 @@
 --comp-button-close-bg-hover: var(--core-alpha-white-5);
 --comp-button-close-bg-pressed: var(--core-alpha-white-10);
 --comp-sheet-bg: var(--core-color-grey-925);
+--comp-avatar-picture-line: var(--core-alpha-white-10);
+--comp-button-destructive-bg-hover: var(--core-scale-error-10);
+--comp-button-destructive-bg-pressed: var(--core-scale-error-11);
+--comp-button-destructive-ring: var(--core-scale-error-9);
+--comp-button-destructive-soft-bg-hover: var(--core-scale-error-4);
+--comp-button-destructive-soft-bg-pressed: var(--core-scale-error-5);
+--comp-button-primary-bg-hover: var(--core-scale-brand-11);
+--comp-button-primary-bg-pressed: var(--core-scale-brand-11);
 --comp-button-outline-bg-hover: var(--core-alpha-white-5);
 --comp-button-outline-bg-pressed: var(--core-alpha-white-10);
 --comp-button-outline-border: var(--core-alpha-white-30);
@@ -319,8 +328,14 @@
 --comp-button-secondary-bg: var(--core-alpha-brand-20);
 --comp-button-secondary-bg-hover: var(--core-alpha-brand-30);
 --comp-button-secondary-bg-pressed: var(--core-alpha-brand-40);
+--comp-card-bg-hover: var(--core-scale-neutral-3);
+--comp-empty-state-icon-bg: var(--core-alpha-brand-10);
+--comp-home-page-bg: var(--core-scale-neutral-1);
 --comp-row-bg-hover: var(--core-alpha-white-3);
 --comp-row-bg-pressed: var(--core-alpha-white-3);
+--comp-notification-tint: var(--core-alpha-brand-5);
+--comp-notification-tint-line: var(--core-alpha-brand-10);
+--comp-notification-bell-icon: var(--util-color-brand-700);
 --comp-search-filter-bg: var(--core-alpha-brand-10);
 --comp-search-filter-bg-hover: var(--core-alpha-brand-20);
 --comp-search-filter-bg-pressed: var(--core-alpha-brand-30);
@@ -367,6 +382,7 @@
 --comp-palette-waterblue-icon: var(--util-color-waterblue-600);
 --comp-palette-yellow-fill: var(--util-color-yellow-50);
 --comp-palette-yellow-icon: var(--util-color-yellow-600);
+--comp-palette-action-icon-bg: var(--util-alpha-white-70);
 --comp-palette-clearblue-fill-hover: var(--util-color-clearblue-100);
 --comp-palette-clearblue-fill-pressed: var(--util-color-clearblue-200);
 --comp-palette-clearblue-label: var(--util-color-clearblue-700);

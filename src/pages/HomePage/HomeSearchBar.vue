@@ -60,7 +60,7 @@ function clear() {
     <label
       :for="inputId"
       :class="[
-        'flex w-full items-center gap-2 rounded-full border border-base-border-muted bg-base-bg-primary_alt p-[calc(--spacing(2.5)-1px)] text-base-fg-placeholder ring-0 ring-transparent transition-[color,background-color,border-color,box-shadow] ring-inset focus-within:border-base-border-brand-solid focus-within:ring-1 focus-within:ring-base-border-brand-solid',
+        'flex w-full items-center gap-2 rounded-full border border-base-border-muted bg-base-bg-floating p-[calc(--spacing(2.5)-1px)] text-base-text-placeholder ring-0 ring-transparent transition-[color,background-color,border-color,box-shadow] ring-inset focus-within:border-base-border-brand focus-within:ring-1 focus-within:ring-base-border-brand',
         trailingPadding,
       ]"
     >

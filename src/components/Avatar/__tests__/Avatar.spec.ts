@@ -58,8 +58,8 @@ describe("Avatar", () => {
 
   it("gives the same name the same color", () => {
     expect(tileStyle("Alex")).toBe(tileStyle("Alex"));
-    expect(tileStyle("Alex")).toContain("-500)");
-    expect(tileStyle("Alex")).toContain("-100)");
+    expect(tileStyle("Alex")).toContain("-text)");
+    expect(tileStyle("Alex")).toContain("-fill)");
   });
 
   it("shows a silhouette and no name when the name is empty", () => {

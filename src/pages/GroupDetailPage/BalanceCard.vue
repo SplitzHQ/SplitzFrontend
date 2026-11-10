@@ -20,9 +20,14 @@ export interface BalanceCardProps {
   totalBalance: string;
   currency: string;
   memberBalances: BalanceCardMember[];
+  /**
+   * False while a settle-up round runs. Only one round runs at a time, so the button hides (SPZ-105). The amounts stay
+   * the backend balance, which goes down as the receivers confirm the payments.
+   */
+  canSettle?: boolean;
 }
 
-const { totalBalance, currency, memberBalances } = defineProps<BalanceCardProps>();
+const { totalBalance, currency, memberBalances, canSettle = true } = defineProps<BalanceCardProps>();
 const emit = defineEmits<{ settleUp: [] }>();
 
 const { $t } = useFluent();
@@ -39,7 +44,7 @@ const totalLabel = computed(() => {
 
 const totalColor = computed(() => {
   if (total.value === 0) return "text-base-text-primary";
-  return total.value < 0 ? "text-base-text-error" : "text-base-text-success";
+  return total.value < 0 ? "text-base-text-owe" : "text-base-text-success";
 });
 
 /** A negative amount is money that the member owes the user. */
@@ -47,16 +52,16 @@ const owesYou = (member: BalanceCardMember) => Number(member.amount) < 0;
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 rounded-2xl bg-core-alpha-brand-5 p-4" data-test="balance-card">
+  <div class="flex flex-col gap-4 rounded-2xl bg-base-bg-secondary p-4" data-test="balance-card">
     <div class="flex items-center gap-3">
       <div class="flex min-w-0 flex-1 flex-col">
-        <p class="text-sm text-base-text-quaternary">{{ totalLabel }}</p>
+        <p class="text-sm text-base-text-muted">{{ totalLabel }}</p>
         <p class="text-display-lg font-medium wrap-break-word" :class="totalColor" data-test="balance-card-total">
           {{ formatCurrency(totalBalance, currency) }}
         </p>
       </div>
       <!-- A settled group has nothing to settle, so the button does not show. -->
-      <SButton v-if="!settled" class="shrink-0" variant="primary" size="md" @click="emit('settleUp')">
+      <SButton v-if="!settled && canSettle" class="shrink-0" variant="primary" size="md" @click="emit('settleUp')">
         {{ $t("group-detail-settle-up") }}
       </SButton>
     </div>

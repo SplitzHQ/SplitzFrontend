@@ -37,7 +37,6 @@ export const WHEN_TO_USE: UsageRule[] = [
 export const NOT_A_PILL: UseInsteadRule[] = [
   { use: "SSegmentControl", when: "Two to four views of the same content, with one always selected and no sheet." },
   { use: "SButton", when: "The control runs an action and does not show a value." },
-  { use: "InvoiceStatusPill", when: "The pill only shows a status and the user cannot press it." },
 ];
 
 /** When to use each size. */

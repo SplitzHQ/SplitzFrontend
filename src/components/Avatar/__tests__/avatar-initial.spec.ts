@@ -5,12 +5,11 @@ import { describe, expect, it } from "vitest";
 import { AVATAR_TONE_STYLES, AVATAR_TONES, avatarInitial, avatarTone } from "../avatar-initial";
 
 describe("AVATAR_TONE_STYLES", () => {
-  it("uses step 100 for each fill, and step 600 for the text of only the pale families", () => {
-    const paleFamilies = new Set(["leaf", "waterblue", "yellow"]);
+  it("uses the avatar palette tokens of each family", () => {
     for (const tone of AVATAR_TONES) {
       expect(AVATAR_TONE_STYLES[tone]).toEqual({
-        backgroundColor: `var(--util-color-${tone}-100)`,
-        color: `var(--util-color-${tone}-${paleFamilies.has(tone) ? 600 : 500})`,
+        backgroundColor: `var(--comp-palette-avatar-${tone}-fill)`,
+        color: `var(--comp-palette-avatar-${tone}-text)`,
       });
     }
   });

@@ -185,7 +185,7 @@ function onClickCapture(event: MouseEvent): void {
 
 <template>
   <div
-    class="track w-fit max-w-full min-w-0 rounded-full border border-core-alpha-brand-5 bg-core-alpha-brand-5"
+    class="track w-fit max-w-full min-w-0 rounded-full border border-comp-segment-track bg-comp-segment-track"
     :data-pressed="pressed ? '' : undefined"
   >
     <!-- The browser owns the touch scroll, so the momentum and the edge bounce are native. -->
@@ -216,7 +216,7 @@ function onClickCapture(event: MouseEvent): void {
           v-if="items[model] !== undefined"
           data-segment-selection
           :class="[
-            'absolute top-0 left-0 rounded-full bg-core-alpha-brand-20',
+            'absolute top-0 left-0 rounded-full bg-comp-segment-selected',
             selectionMoves && 'transition-[transform,width,height] duration-state ease-standard',
           ]"
           :style="selectionStyle"

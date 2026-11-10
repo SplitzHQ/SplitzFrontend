@@ -31,7 +31,7 @@ describe("HomeSearchBar", () => {
     const classes = mount(HomeSearchBar).get("label").classes();
 
     expect(classes).toContain("border-base-border-muted");
-    expect(classes).toContain("focus-within:border-base-border-brand-solid");
+    expect(classes).toContain("focus-within:border-base-border-brand");
   });
 
   it("uses a custom placeholder when one is given", () => {

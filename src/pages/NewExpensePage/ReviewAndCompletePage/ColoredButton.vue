@@ -10,7 +10,7 @@ const emit = defineEmits<{
     :class="['flex cursor-pointer items-center gap-3 rounded-xl p-1']"
     @click="emit('click', $event)"
   >
-    <div class="rounded-05xl bg-util-alpha-white-70/70 p-1.5 icon-5">
+    <div class="rounded-05xl bg-comp-palette-action-icon-bg/70 p-1.5 icon-5">
       <slot name="icon" />
     </div>
     <span class="text-sm font-medium">

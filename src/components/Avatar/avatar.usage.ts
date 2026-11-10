@@ -33,7 +33,7 @@ export const WHEN_TO_USE: UsageRule[] = [
 
 /** The cases with another component. */
 export const NOT_AN_AVATAR: UseInsteadRule[] = [
-  { use: "CategoryIcon in a tile", when: "The item is an expense or an invoice and not a person." },
+  { use: "CategoryIcon in a tile", when: "The item is an expense or a settle-up round and not a person." },
   {
     use: "An icon tile",
     when: "The item has no person or group picture. NotificationItem has this tile for activity, and JoinGroupPage has it for an invite to a group with no photo.",
@@ -62,12 +62,12 @@ export const SIZE_GUIDE: Record<AvatarSize, AvatarSizeRule> = {
     rule: "A list row that opens a page, for example a group row on the home screen. It has the size of a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar. See `src/components/ListRow/list-row.usage.ts`.",
   },
   title: {
-    callers: "The header titles of GroupDetailPage, InvoiceDetailPage and TransactionDetailPage",
+    callers: "The header titles of GroupDetailPage and TransactionDetailPage",
     rule: "The avatar in the title of a secondary page, next to the name. It is smaller than the back button, so the name stays the main part of the title. It can show a grid. The prototype `2026-11-05-group-detail-layout` (SPZ-81) decided this size.",
   },
   xs: {
     callers:
-      "NotificationItem, RequestCard in AvatarMenu, GroupCard, InviteFriendsSheet, UserList, PaidByButton, the friend rows of ProfilePage, the rows of InvoiceDetailPage and TransactionDetailPage",
+      "NotificationItem, RequestCard in AvatarMenu, GroupCard, InviteFriendsSheet, UserList, PaidByButton, the friend rows of ProfilePage, the transfer rows of SettleUpRoundPage and StartSettleUpSheet, the rows of TransactionDetailPage",
     rule: "A person row, a notification row, a split row or a compact card. This is the usual size.",
   },
   xxs: {
@@ -131,7 +131,7 @@ export const PICTURE_RULES: UsageRule[] = [
     title: "No picture",
   },
   {
-    rule: "A photo has a thin line inside its edge, so a photo with a pale or dark edge stays separate from the background. The line is a dark alpha color in the light theme and a light alpha color in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
+    rule: "A photo has a thin line inside its edge, so a photo with a pale or dark edge stays separate from the background. The line uses `comp-avatar-picture-line`: a dark alpha color in the light theme and a light alpha color in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
     title: "Line on a photo",
   },
   {
@@ -139,7 +139,7 @@ export const PICTURE_RULES: UsageRule[] = [
     title: "Color and size of the initial",
   },
   {
-    rule: "The fill is step 100. The text is step 500, but leaf, waterblue and yellow use step 600 because step 500 of these families is too pale in the light theme. The contrast is 2.66 to 2.94 in the light theme and 2.78 to 5.58 in the dark theme. All families stay below 3:1 in the light theme, so the initial does not replace the name next to the avatar.",
+    rule: "The tile uses the `comp-palette-avatar-<family>-fill` and `-text` tokens. The generator in `scripts/color-scales/` sets their steps. The fill is step 100. The text is step 500, but leaf, waterblue and yellow use step 600 because step 500 of these families is too pale in the light theme. The contrast is 2.66 to 2.94 in the light theme and 2.78 to 5.58 in the dark theme. All families stay below 3:1 in the light theme, so the initial does not replace the name next to the avatar.",
     title: "Steps of the initial",
   },
   {

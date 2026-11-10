@@ -23,7 +23,7 @@ const emit = defineEmits<SegmentEvents>();
     role="radio"
     :aria-checked="active"
     :tabindex="tabbable ? 0 : -1"
-    class="relative rounded-full select-none after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid"
+    class="relative rounded-full select-none after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring"
     @click="emit('click')"
   >
     <span
@@ -50,12 +50,12 @@ const emit = defineEmits<SegmentEvents>();
 
   @media (hover: hover) {
     &:hover {
-      @apply bg-core-alpha-brand-10 text-base-text-brand_hover;
+      @apply bg-comp-segment-hover text-base-text-brand;
     }
   }
 
   &:active {
-    @apply text-base-text-brand_pressed;
+    @apply text-base-text-brand;
   }
 }
 

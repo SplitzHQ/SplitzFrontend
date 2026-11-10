@@ -32,7 +32,7 @@ const { data: group } = useQuery({
 <template>
   <div
     v-if="group"
-    class="flex flex-col items-start gap-2 rounded-2xl bg-util-color-brand-50 py-2 pr-3 pl-2 backdrop-blur-[2px]"
+    class="flex flex-col items-start gap-2 rounded-2xl bg-base-bg-brand-subtle py-2 pr-3 pl-2 backdrop-blur-[2px]"
   >
     <div class="flex items-center gap-3">
       <Avatar

@@ -152,7 +152,7 @@ async function resetGroupNotificationPreferences() {
 
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-col gap-6 pt-2 pb-10">
-        <p class="px-1 text-sm text-base-text-tertiary">
+        <p class="px-1 text-sm text-base-text-secondary">
           {{
             isGroupScope
               ? $t("notification-settings-group-intro", { group: groupQuery.data?.name ?? "" })
@@ -160,14 +160,14 @@ async function resetGroupNotificationPreferences() {
           }}
         </p>
 
-        <p v-if="loading" class="px-1 text-sm text-base-text-quaternary">{{ $t("notification-settings-loading") }}</p>
+        <p v-if="loading" class="px-1 text-sm text-base-text-muted">{{ $t("notification-settings-loading") }}</p>
 
         <template v-else>
           <section v-for="section in sections" :key="section.key" class="flex flex-col gap-2">
-            <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">
+            <h2 class="px-1 text-sm font-semibold text-base-text-muted">
               {{ $t(`notification-settings-section-${section.key}`) }}
             </h2>
-            <div class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+            <div class="flex flex-col divide-y divide-base-border-muted rounded-3xl bg-base-bg-secondary">
               <div
                 v-for="row in section.rows"
                 :key="row.type"
@@ -178,8 +178,8 @@ async function resetGroupNotificationPreferences() {
                   <p :id="`pref-label-${row.type}`" class="text-base font-medium text-base-text-primary">
                     {{ $t(`notification-type-${row.type}`) }}
                   </p>
-                  <p class="text-xs text-base-text-quaternary">{{ $t(`notification-type-${row.type}-hint`) }}</p>
-                  <p v-if="row.inherited" class="text-xs text-util-color-brand-700">
+                  <p class="text-xs text-base-text-muted">{{ $t(`notification-type-${row.type}-hint`) }}</p>
+                  <p v-if="row.inherited" class="text-xs text-base-text-brand">
                     {{ $t("notification-settings-follow-global") }}
                   </p>
                 </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/vue";
+import { PhCheck, PhForkKnife, PhImageSquare, PhMapPin, PhPencil } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
@@ -8,12 +8,12 @@ import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMo
 import Layout from "@/components/Layout/Layout.vue";
 import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
+import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 import { getCategory } from "@/libs/categories";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useTransactionStore } from "@/stores/transaction";
 
 import AddExpenseDetailsSheet from "./AddExpenseDetailsSheet.vue";
-import BackgroundCheckCircle from "./BackgroundCheckCircle.svg";
 import ColoredButton from "./ColoredButton.vue";
 import GroupCard from "./GroupCard.vue";
 import SelectCategorySheet from "./SelectCategorySheet.vue";
@@ -28,7 +28,6 @@ const showDetailsSheet = ref(false);
 const showCategorySheet = ref(false);
 const isSubmitting = ref(false);
 const saveFailed = ref(false);
-const bgUrl = `url("${BackgroundCheckCircle}")`;
 
 const selectedCategory = computed({
   get: () => getCategory(transaction.value.icon),
@@ -65,11 +64,9 @@ async function handleComplete() {
       </HeaderMobileSecondary>
     </template>
     <template #default="layoutAttrs">
-      <div v-bind="layoutAttrs" class="flex flex-col">
-        <div
-          class="flex aspect-square w-full max-w-lg -translate-y-10 flex-col items-center justify-end gap-3 self-center bg-cover bg-center bg-no-repeat"
-          :style="{ backgroundImage: bgUrl }"
-        >
+      <div v-bind="layoutAttrs" class="flex flex-col gap-10">
+        <div class="flex flex-col items-center gap-3">
+          <StatusBadge tone="success"><PhCheck /></StatusBadge>
           <div class="text-base font-medium text-base-text-brand">{{ $t("new-expense-review-expense-added-to") }}</div>
           <GroupCard v-if="transaction.groupId" />
         </div>
@@ -94,47 +91,47 @@ async function handleComplete() {
             </div>
             <div class="grid grid-cols-2 gap-2">
               <ColoredButton
-                class="bg-util-color-clearblue-50 hover:bg-util-color-clearblue-100 active:bg-util-color-clearblue-200"
+                class="bg-comp-palette-clearblue-fill hover:bg-comp-palette-clearblue-fill-hover active:bg-comp-palette-clearblue-fill-pressed"
                 @click="showDetailsSheet = true"
               >
                 <template #icon>
-                  <PhPencil class="text-util-color-clearblue-600" />
+                  <PhPencil class="text-comp-palette-clearblue-icon" />
                 </template>
                 <template #label>
-                  <span class="text-util-color-clearblue-700">{{ $t("new-expense-review-button-name") }}</span>
+                  <span class="text-comp-palette-clearblue-label">{{ $t("new-expense-review-button-name") }}</span>
                 </template>
               </ColoredButton>
               <ColoredButton
-                class="bg-util-color-purple-50 hover:bg-util-color-purple-100 active:bg-util-color-purple-200"
+                class="bg-comp-palette-purple-fill hover:bg-comp-palette-purple-fill-hover active:bg-comp-palette-purple-fill-pressed"
                 @click="showCategorySheet = true"
               >
                 <template #icon>
-                  <PhForkKnife class="text-util-color-purple-600" />
+                  <PhForkKnife class="text-comp-palette-purple-icon" />
                 </template>
                 <template #label>
-                  <span class="text-util-color-purple-700">{{ $t("new-expense-review-button-category") }}</span>
+                  <span class="text-comp-palette-purple-label">{{ $t("new-expense-review-button-category") }}</span>
                 </template>
               </ColoredButton>
               <ColoredButton
-                class="bg-util-color-leaf-50 hover:bg-util-color-leaf-100 active:bg-util-color-leaf-200"
+                class="bg-comp-palette-leaf-fill hover:bg-comp-palette-leaf-fill-hover active:bg-comp-palette-leaf-fill-pressed"
                 @click="showDetailsSheet = true"
               >
                 <template #icon>
-                  <PhMapPin class="text-util-color-leaf-600" />
+                  <PhMapPin class="text-comp-palette-leaf-icon" />
                 </template>
                 <template #label>
-                  <span class="text-util-color-leaf-700">{{ $t("new-expense-review-button-location") }}</span>
+                  <span class="text-comp-palette-leaf-label">{{ $t("new-expense-review-button-location") }}</span>
                 </template>
               </ColoredButton>
               <ColoredButton
-                class="bg-util-color-rosered-50 hover:bg-util-color-rosered-100 active:bg-util-color-rosered-200"
+                class="bg-comp-palette-rosered-fill hover:bg-comp-palette-rosered-fill-hover active:bg-comp-palette-rosered-fill-pressed"
                 @click="showDetailsSheet = true"
               >
                 <template #icon>
-                  <PhImageSquare class="text-util-color-rosered-600" />
+                  <PhImageSquare class="text-comp-palette-rosered-icon" />
                 </template>
                 <template #label>
-                  <span class="text-util-color-rosered-700">{{ $t("new-expense-review-button-receipt") }}</span>
+                  <span class="text-comp-palette-rosered-label">{{ $t("new-expense-review-button-receipt") }}</span>
                 </template>
               </ColoredButton>
             </div>

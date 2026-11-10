@@ -162,15 +162,15 @@ function openSettings() {
 <template>
   <Sheet v-model="isOpen" :title="$t('new-expense-scan-title')" detent="large" show-close-button>
     <div class="flex flex-col gap-5">
-      <p class="text-sm text-base-text-tertiary">{{ $t("new-expense-scan-intro") }}</p>
+      <p class="text-sm text-base-text-secondary">{{ $t("new-expense-scan-intro") }}</p>
 
-      <p v-if="capabilitiesLoading" class="text-sm text-base-text-quaternary">
+      <p v-if="capabilitiesLoading" class="text-sm text-base-text-muted">
         {{ $t("new-expense-scan-loading") }}
       </p>
 
       <div
         v-else-if="!recognitionAvailable"
-        class="flex flex-col gap-3 rounded-2xl bg-util-alpha-black-5 p-4"
+        class="flex flex-col gap-3 rounded-2xl bg-base-bg-subtle p-4"
         data-test="scan-unavailable"
       >
         <p class="text-sm text-base-text-secondary">
@@ -217,23 +217,23 @@ function openSettings() {
             <img
               :src="image.previewUrl"
               alt=""
-              class="size-full rounded-xl border border-base-border-primary object-cover"
+              class="size-full rounded-xl border border-base-border-default object-cover"
             />
             <button
               type="button"
               :aria-label="$t('new-expense-scan-remove-image')"
-              class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-secondary bg-base-bg-primary p-1 shadow-sm"
+              class="absolute -top-2 -right-2 cursor-pointer rounded-full border border-base-border-subtle bg-base-bg-primary p-1 shadow-sm"
               :disabled="controlsDisabled"
               @click="removeImage(image.id)"
             >
-              <PhX class="icon-4 text-base-fg-error" />
+              <PhX class="icon-4 text-base-text-danger" />
             </button>
           </div>
           <button
             v-if="canAddMore"
             key="add-gallery"
             type="button"
-            class="tile flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-core-color-brand-50 text-base-fg-brand"
+            class="tile flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-base-bg-brand-subtle text-base-text-brand"
             :disabled="controlsDisabled"
             data-test="scan-add-gallery"
             @click="triggerGallery"
@@ -245,7 +245,7 @@ function openSettings() {
             v-if="canAddMore"
             key="add-camera"
             type="button"
-            class="tile flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-core-color-brand-50 text-base-fg-brand"
+            class="tile flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl bg-base-bg-brand-subtle text-base-text-brand"
             :disabled="controlsDisabled"
             data-test="scan-add-camera"
             @click="triggerCamera"
@@ -255,11 +255,11 @@ function openSettings() {
           </button>
         </TransitionGroup>
 
-        <p class="text-xs text-base-text-quaternary">
+        <p class="text-xs text-base-text-muted">
           {{ $t("new-expense-scan-count", { count: images.length, max: maxImages }) }}
         </p>
 
-        <p class="text-xs text-base-text-quaternary">{{ $t("new-expense-scan-privacy") }}</p>
+        <p class="text-xs text-base-text-muted">{{ $t("new-expense-scan-privacy") }}</p>
       </template>
     </div>
 

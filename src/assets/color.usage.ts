@@ -66,6 +66,7 @@ export const SEMANTIC_TOKENS = [
   "base-text-danger",
   "base-text-success",
   "base-text-warning",
+  "base-text-owe",
   "base-bg-primary",
   "base-bg-secondary",
   "base-bg-floating",
@@ -229,7 +230,8 @@ export const SEMANTIC_RULES: Record<SemanticToken, TokenRule> = {
     use: "A link, a brand icon or a selected label.",
   },
   "base-text-danger": {
-    avoid: "Do not put it on a solid danger fill. Do not use it for a negative amount that is not an error.",
+    avoid:
+      "Do not put it on a solid danger fill. Do not use it for money that the user owes, because that is not an error. Use `base-text-owe`.",
     typical: "An error message, a destructive label.",
     use: "The text and the icon of an error or a dangerous action.",
   },
@@ -249,6 +251,12 @@ export const SEMANTIC_RULES: Record<SemanticToken, TokenRule> = {
     typical: "A date, a payer, a group label, a secondary icon.",
     use: "The least important reading text: a date, a payer, a group label or a secondary icon.",
   },
+  "base-text-owe": {
+    avoid:
+      "Do not use it for an error or a dangerous action. Use `base-text-danger`. Do not use it for money that the user gets. Use `base-text-success`.",
+    typical: "The total on BalanceCard when the user owes money, the owes tone of AmountChip.",
+    use: "The amount and the direction of money that the user owes. It has the color of `base-text-danger`, but a different job.",
+  },
   "base-text-placeholder": {
     avoid: "Do not use it for an empty state or a loading message.",
     typical: "The hint in TextInput.",
@@ -265,7 +273,8 @@ export const SEMANTIC_RULES: Record<SemanticToken, TokenRule> = {
     use: "A list row, a description, or a control that a person must read.",
   },
   "base-text-success": {
-    avoid: "Do not put it on a solid fill.",
+    avoid:
+      "Do not put it on a solid fill. Do not use it for long text: in the light theme it is step 9 and has less than 4.5:1 on a card and on its subtle fill (SPZ-121 tracks the fix).",
     typical: "A paid status, a success icon.",
     use: "The text and the icon of a success.",
   },
@@ -286,6 +295,11 @@ export interface ComponentTokenRule {
 
 /** The groups of the component tokens. A test checks that each `comp-*` token is in exactly one group. */
 export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
+  avatarLine: {
+    avoid: "Do not use it outside the photo of Avatar. Use `base-border-*` for the line of a control or a container.",
+    pattern: /^comp-avatar-/,
+    use: "The faint line inside the edge of a photo in Avatar. It is translucent, so it shows on a photo that has the color of the page.",
+  },
   avatarPalette: {
     avoid: "Do not use it for a category color. Use the main palette group.",
     pattern: /^comp-palette-avatar-/,
@@ -306,10 +320,37 @@ export const COMPONENT_TOKEN_RULES: Record<string, ComponentTokenRule> = {
     pattern: /^comp-button-secondary-/,
     use: "The translucent fill of the secondary button. It takes the hue of the surface.",
   },
+  buttonSolid: {
+    avoid: "Do not use it outside SButtonBase. Use `base-bg-brand-solid` or `base-bg-danger-*` for the rest fill.",
+    pattern: /^comp-button-(primary|destructive)-/,
+    use: "The hover and pressed fills of the primary, destructive and soft destructive buttons. The semantic layer has only the rest fill.",
+  },
+  cardHover: {
+    avoid:
+      "Do not use it on a row. Use `LIST_ROW_CLASS`. Do not use it on a card with another fill, because the step is only one step lighter than `base-bg-secondary`.",
+    pattern: /^comp-card-/,
+    use: "The hover and pressed fill of a tappable card with the `base-bg-secondary` fill, for example the total balance card on HomePage.",
+  },
+  emptyState: {
+    avoid: "Do not use it outside EmptyState. Use `base-bg-brand-subtle` for another light brand fill.",
+    pattern: /^comp-empty-state-/,
+    use: "The translucent brand tile behind the icon of EmptyState. It follows the surface under it, on the page and on a card.",
+  },
+  homePage: {
+    avoid: "Do not use it outside HomePage and HomeHeader. Use `base-bg-primary` for another page.",
+    pattern: /^comp-home-/,
+    use: "The page of the home screen, the status bar on it and the frosted header. It is the card gray in the light theme and the page color in the dark theme.",
+  },
+  notification: {
+    avoid:
+      "Do not use it outside the Notification components. Use `base-bg-brand-subtle` for another light brand fill and `base-text-brand` for another brand icon.",
+    pattern: /^comp-notification-/,
+    use: "The faint brand tint of a request card and of an unread notification row, the line around the request card, and the bell icon. The tint is lighter than `base-bg-brand-subtle`, so the brand icon tile on an unread row stays visible. The bell has the color of the wordmark next to it.",
+  },
   palette: {
     avoid: "Do not use it for a status. The color shows which item it is, and not a state.",
     pattern: /^comp-palette-(?!avatar-)/,
-    use: "Data colors: the main categories and the action tiles on the review page. See `src/components/Category/category.usage.ts`.",
+    use: "Data colors: the main categories and the action tiles on the review page. `comp-palette-action-icon-bg` is the circle behind the icon of an action tile, at 70% opacity. See `src/components/Category/category.usage.ts`.",
   },
   row: {
     avoid: "Do not use it outside `LIST_ROW_CLASS`.",

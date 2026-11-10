@@ -39,7 +39,7 @@ const emit = defineEmits<{
           <h2 class="text-display-xs font-medium text-base-text-primary">
             {{ $t("home-empty-state-title") }}
           </h2>
-          <p class="text-base font-normal text-base-text-tertiary">
+          <p class="text-base font-normal text-base-text-secondary">
             {{ $t("home-empty-state-description") }}
           </p>
         </div>

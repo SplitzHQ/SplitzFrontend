@@ -36,8 +36,8 @@ const onPlusMinusButtonClick = () => {
       <div class="relative">
         <Avatar aria-hidden="true" :images="[{ src: user.photo, alt: user.userName }]" size="sm" />
         <button class="absolute -right-1.5 -bottom-1.5 rounded-full bg-base-bg-primary" @click="onPlusMinusButtonClick">
-          <PhMinusCircle v-if="isInIncludedMembers" class="text-xl text-base-fg-brand" />
-          <PhPlusCircle v-else class="text-xl text-base-fg-brand" />
+          <PhMinusCircle v-if="isInIncludedMembers" class="text-xl text-base-text-brand" />
+          <PhPlusCircle v-else class="text-xl text-base-text-brand" />
         </button>
       </div>
       <div class="flex min-w-0 flex-col gap-1">

@@ -39,7 +39,7 @@ const { $t } = useFluent();
 /** The icons of the tiles. The two debt states take the colors of the amounts in the group rows. */
 const FILTER_ICONS: Record<HomeFilter, { icon: Component; class?: string }> = {
   all: { icon: PhSquaresFour },
-  owe: { class: "text-base-text-error", icon: PhArrowUpRight },
+  owe: { class: "text-base-text-owe", icon: PhArrowUpRight },
   owed: { class: "text-base-text-success", icon: PhArrowDownLeft },
   unsettled: { icon: PhCircleHalf },
 };
@@ -139,7 +139,7 @@ function chooseSort(next: HomeSort) {
               :class="[
                 'flex min-h-20 touch-manipulation flex-col items-start justify-between gap-2 rounded-2xl border p-3 text-left select-none',
                 'transition-[color,background-color,border-color,scale] duration-state ease-standard active:scale-98',
-                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand',
                 FILTER_PILL_STATE_CLASS[option === filter ? 'selected' : 'idle'],
               ]"
               @click="chooseFilter(option)"

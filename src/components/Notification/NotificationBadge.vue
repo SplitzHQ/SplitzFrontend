@@ -22,8 +22,8 @@ const MAX_COUNT = 99;
 const { count, tone = "neutral" } = defineProps<NotificationBadgeProps>();
 
 const TONE_CLASS: Record<NonNullable<NotificationBadgeProps["tone"]>, string> = {
-  brand: "bg-base-bg-brand-solid text-base-text-primary-reverse",
-  neutral: "bg-base-bg-primary-reverse text-base-text-primary-reverse",
+  brand: "bg-base-bg-brand-solid text-base-text-inverse",
+  neutral: "bg-base-bg-solid text-base-text-inverse",
 };
 
 const text = computed(() => (count > MAX_COUNT ? `${MAX_COUNT}+` : String(count)));

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhMapPin, PhPencil, PhTrash } from "@phosphor-icons/vue";
+import { PhLock, PhMapPin, PhPencil, PhTrash } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
@@ -47,6 +47,8 @@ const { state: groupQuery } = useQuery({
 });
 
 const transaction = computed(() => transactionQuery.value.data);
+/** True when a settle-up covers the expense. The backend then refuses a change or a delete (SPZ-105). */
+const locked = computed(() => !!transaction.value?.invoiceId);
 const group = computed(() => groupQuery.value.data);
 
 const showDeleteSheet = ref(false);
@@ -124,12 +126,12 @@ async function handleDelete() {
     <template #default="layoutAttrs">
       <div v-bind="layoutAttrs" class="flex flex-1 flex-col gap-5 pb-8">
         <!-- Loading -->
-        <div v-if="transactionQuery.status === 'pending'" class="pt-6 text-base text-base-text-tertiary">
+        <div v-if="transactionQuery.status === 'pending'" class="pt-6 text-base text-base-text-secondary">
           {{ $t("transaction-detail-loading") }}
         </div>
 
         <!-- Error -->
-        <div v-else-if="transactionQuery.status === 'error'" class="pt-6 text-base text-base-text-error">
+        <div v-else-if="transactionQuery.status === 'error'" class="pt-6 text-base text-base-text-danger">
           {{ $t("transaction-detail-error") }}
         </div>
 
@@ -142,8 +144,8 @@ async function handleDelete() {
             </div>
             <p class="text-center text-display-sm font-semibold text-base-text-primary">{{ displayName }}</p>
             <p class="text-display-md font-bold text-base-text-primary">{{ formattedAmount }}</p>
-            <p class="text-sm text-base-text-quaternary">{{ payerDescription }}</p>
-            <p class="text-sm text-base-text-quaternary">{{ formattedDate }}</p>
+            <p class="text-sm text-base-text-muted">{{ payerDescription }}</p>
+            <p class="text-sm text-base-text-muted">{{ formattedDate }}</p>
           </div>
 
           <!-- Tags -->
@@ -211,18 +213,26 @@ async function handleDelete() {
           <div v-if="transaction.geoCoordinate" class="flex flex-col gap-2">
             <p class="text-sm font-semibold text-base-text-primary">{{ $t("transaction-detail-location") }}</p>
             <div class="flex items-center gap-2 rounded-2xl bg-base-bg-secondary p-3">
-              <PhMapPin class="shrink-0 text-lg text-base-text-quaternary" />
+              <PhMapPin class="shrink-0 text-lg text-base-text-muted" />
               <p class="text-sm text-base-text-secondary">{{ transaction.geoCoordinate }}</p>
             </div>
           </div>
 
           <!-- Actions -->
           <div class="mt-auto flex flex-col gap-2 pt-4">
-            <SButton variant="secondary" size="xl" disabled>
+            <p
+              v-if="locked"
+              class="flex items-center gap-2 text-sm text-base-text-muted"
+              data-test="transaction-locked"
+            >
+              <PhLock class="shrink-0 icon-4" aria-hidden="true" />
+              <span>{{ $t("settle-up-locked") }}</span>
+            </p>
+            <SButton v-else variant="secondary" size="xl" disabled>
               <template #icon-left><PhPencil /></template>
               {{ $t("transaction-detail-edit") }}
             </SButton>
-            <SButton variant="destructive-soft" size="xl" @click="showDeleteSheet = true">
+            <SButton v-if="!locked" variant="destructive-soft" size="xl" @click="showDeleteSheet = true">
               <template #icon-left><PhTrash /></template>
               {{ $t("transaction-detail-delete") }}
             </SButton>

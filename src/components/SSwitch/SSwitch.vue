@@ -43,11 +43,11 @@ function toggle() {
     :class="[
       'switch-track relative inline-flex h-6 w-12 shrink-0 items-center rounded-full p-0.5',
       'after:absolute after:top-1/2 after:left-0 after:h-11 after:w-full after:-translate-y-1/2',
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid disabled:cursor-not-allowed',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring disabled:cursor-not-allowed',
       model
-        ? 'bg-util-color-brand-700 disabled:bg-core-alpha-brand-40'
-        : 'bg-util-alpha-black-20 disabled:bg-base-bg-disabled',
-      inherited ? 'ring-1 ring-base-border-tertiary ring-inset enabled:opacity-70' : '',
+        ? 'bg-comp-switch-track-on disabled:bg-comp-switch-track-on-disabled'
+        : 'bg-comp-switch-track-off disabled:bg-comp-switch-track-off-disabled',
+      inherited ? 'ring-1 ring-base-border-muted ring-inset enabled:opacity-70' : '',
       busy ? 'is-busy cursor-default' : '',
     ]"
     @click="toggle"
@@ -63,7 +63,7 @@ function toggle() {
         <!-- The arc sits inside the edge. On the edge it has the color of the track and looks like a bite in the thumb. -->
         <svg
           v-if="busy"
-          class="switch-arc absolute inset-0 size-full text-base-fg-brand"
+          class="switch-arc absolute inset-0 size-full text-base-text-brand"
           viewBox="0 0 28 20"
           fill="none"
         >
@@ -114,7 +114,7 @@ function toggle() {
 
 /* The dark thumb is near black, so it sinks into a disabled track. No token is light in light mode and grey in dark mode. */
 .dark :disabled > .switch-thumb {
-  background-color: var(--base-fg-disabled);
+  background-color: var(--base-text-disabled);
 }
 
 .switch-arc-enter-active {

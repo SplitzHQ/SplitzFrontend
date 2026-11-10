@@ -20,7 +20,7 @@ import SIconButton from "@/components/SButton/SIconButton.vue";
 import { frostedBarStyle, frostedColor } from "@/libs/frosted-bar";
 import { motionSlow, prefersReducedMotion, scrollBehavior } from "@/libs/motion";
 
-import { HOME_FILTER_BUTTON_CLASS, HOME_FILTER_BUTTON_ON_CLASS } from "./home-filter-button";
+import { HOME_FILTER_BUTTON_CLASS } from "./home-filter-button";
 import {
   clamp01,
   MORPH_CIRCLE_PX,
@@ -55,7 +55,15 @@ const emit = defineEmits<{
   openFilter: [];
 }>();
 
-const filterButtonClass = computed(() => (filterCount > 0 ? HOME_FILTER_BUTTON_ON_CLASS : HOME_FILTER_BUTTON_CLASS));
+/**
+ * The variant and the classes of the filter button. While a filter is on, the button is a secondary button: it has the
+ * fill and the text color of a selected FilterPill. SPZ-112 picked this.
+ */
+const filterButton = computed(() =>
+  filterCount > 0
+    ? { class: undefined, variant: "secondary" as const }
+    : { class: HOME_FILTER_BUTTON_CLASS, variant: "ghost" as const }
+);
 
 const { $t } = useFluent();
 
@@ -281,7 +289,7 @@ const extendMax = computed(() =>
 );
 
 /** The color of the home page under the header. */
-const HEADER_COLOR = "var(--base-bg-secondary_alt)";
+const HEADER_COLOR = "var(--comp-home-page-bg)";
 /** The frosted color of the header. */
 const glassColor = frostedColor(HEADER_COLOR);
 
@@ -335,23 +343,23 @@ function openSearch(): void {
           <span
             data-morph="left"
             :style="capSize"
-            class="absolute top-0 left-0 origin-top-left rounded-l-full border border-r-0 border-base-border-muted bg-base-bg-primary_alt"
+            class="absolute top-0 left-0 origin-top-left rounded-l-full border border-r-0 border-base-border-muted bg-base-bg-floating"
           />
           <span
             data-morph="mid"
             :style="{ height: capSize.height }"
-            class="absolute top-0 left-0 w-px origin-top-left border-y border-base-border-muted bg-base-bg-primary_alt"
+            class="absolute top-0 left-0 w-px origin-top-left border-y border-base-border-muted bg-base-bg-floating"
           />
           <span
             data-morph="right"
             :style="capSize"
-            class="absolute top-0 left-0 origin-top-left rounded-r-full border border-l-0 border-base-border-muted bg-base-bg-primary_alt"
+            class="absolute top-0 left-0 origin-top-left rounded-r-full border border-l-0 border-base-border-muted bg-base-bg-floating"
           />
         </div>
         <!-- The brand icon fades in over the gray one, so the color change needs no new paint of a color. -->
         <span data-morph="icon" class="absolute top-0 left-0 size-5">
-          <PhMagnifyingGlass class="absolute inset-0 size-5 text-base-fg-placeholder" />
-          <PhMagnifyingGlass data-morph="tint" class="absolute inset-0 size-5 text-util-color-brand-700 opacity-0" />
+          <PhMagnifyingGlass class="absolute inset-0 size-5 text-base-text-placeholder" />
+          <PhMagnifyingGlass data-morph="tint" class="absolute inset-0 size-5 text-base-text-brand opacity-0" />
         </span>
         <span
           data-morph="text"
@@ -360,7 +368,7 @@ function openSearch(): void {
           {{ $t("home-search-placeholder") }}
         </span>
         <span data-morph="filter" class="absolute top-0 left-0 flex">
-          <SIconButton variant="ghost" size="sm" :class="filterButtonClass" tabindex="-1">
+          <SIconButton :variant="filterButton.variant" size="sm" :class="filterButton.class" tabindex="-1">
             <PhSlidersHorizontal />
           </SIconButton>
         </span>
@@ -380,7 +388,7 @@ function openSearch(): void {
           data-testid="home-search-icon"
           @click="openSearch"
         >
-          <PhMagnifyingGlass class="text-util-color-brand-700" />
+          <PhMagnifyingGlass class="text-base-text-brand" />
         </SIconButton>
         <NotificationBell />
         <!-- The slot has the width of the bell, so the 32px avatar has the same space on each side. -->
@@ -402,9 +410,9 @@ function openSearch(): void {
           <!-- The badge sits on the corner of the button, so the wrapper is `relative`. -->
           <div class="relative flex">
             <SIconButton
-              variant="ghost"
+              :variant="filterButton.variant"
               size="sm"
-              :class="filterButtonClass"
+              :class="filterButton.class"
               :aria-label="$t('home-filter-button', { count: filterCount })"
               aria-haspopup="dialog"
               data-testid="home-filter"

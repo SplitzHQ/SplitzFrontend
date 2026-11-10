@@ -138,7 +138,7 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
     // The ring shows only for keyboard focus. A tap does not show it.
     :focus-visible > &,
     [data-force-state="focus"] > & {
-      outline: 2px solid var(--_ring, var(--base-border-brand-solid));
+      outline: 2px solid var(--_ring, var(--base-focus-ring));
       outline-offset: 2px;
     }
   }
@@ -194,60 +194,48 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
   // Variants. Each one sets the colors through private custom properties, and the disabled rules below override them.
   // The class names have a prefix because Tailwind has an `outline` utility. A class named `outline` draws an extra ring.
   .variant-primary {
-    --_bg: var(--base-bg-brand-reverse);
-    --_text: var(--base-text-primary-reverse);
-    --_icon-color: var(--base-fg-primary-reverse);
+    --_bg: var(--base-bg-brand-solid);
+    --_text: var(--base-text-inverse);
+    --_icon-color: var(--base-text-inverse);
 
     @include hover {
-      --_bg: var(--base-bg-brand-reverse_hover);
+      --_bg: var(--comp-button-primary-bg-hover);
     }
 
     @include pressed {
-      --_bg: var(--base-bg-brand-reverse_pressed);
+      --_bg: var(--comp-button-primary-bg-pressed);
     }
   }
 
   // A translucent fill takes the hue of the surface, and the disabled fill stays lighter than it in both themes.
   .variant-secondary {
-    --_bg: var(--core-alpha-brand-20);
+    --_bg: var(--comp-button-secondary-bg);
     --_text: var(--base-text-primary);
-    --_icon-color: var(--base-fg-primary);
+    --_icon-color: var(--base-text-primary);
 
     @include hover {
-      --_bg: var(--core-alpha-brand-30);
+      --_bg: var(--comp-button-secondary-bg-hover);
     }
 
     @include pressed {
-      --_bg: var(--core-alpha-brand-40);
+      --_bg: var(--comp-button-secondary-bg-pressed);
     }
   }
 
-  // A translucent line takes the hue of the surface, so it stays visible on every tinted surface.
+  // A translucent line takes the hue of the surface, so it stays visible on every tinted surface. The tokens are black
+  // in the light theme and white in the dark theme.
   .variant-outline {
-    --_outline-line: var(--core-alpha-black-20);
-    --_outline-hover: var(--core-alpha-black-5);
-    --_outline-pressed: var(--core-alpha-black-10);
-    --_outline-disabled-line: var(--core-alpha-black-10);
-    --_outline-disabled-text: var(--core-alpha-black-40);
     --_text: var(--base-text-primary);
-    --_icon-color: var(--base-fg-primary);
-    border-color: var(--_outline-line);
+    --_icon-color: var(--base-text-primary);
+    border-color: var(--comp-button-outline-border);
 
     @include hover {
-      --_bg: var(--_outline-hover);
+      --_bg: var(--comp-button-outline-bg-hover);
     }
 
     @include pressed {
-      --_bg: var(--_outline-pressed);
+      --_bg: var(--comp-button-outline-bg-pressed);
     }
-  }
-
-  .dark .variant-outline {
-    --_outline-line: var(--core-alpha-white-30);
-    --_outline-hover: var(--core-alpha-white-5);
-    --_outline-pressed: var(--core-alpha-white-10);
-    --_outline-disabled-line: var(--core-alpha-white-10);
-    --_outline-disabled-text: var(--core-alpha-white-40);
   }
 
   // A parent can set `--s-button-ghost-icon` to change the icon color. See `ICON_RULES` in `button.usage.ts`.
@@ -256,65 +244,65 @@ const shouldSpinnerCoverContent = computed(() => !iconOnly && slots["icon-left"]
   .variant-ghost {
     --_bg: var(--s-button-ghost-bg, transparent);
     --_text: var(--base-text-primary);
-    --_icon-color: var(--s-button-ghost-icon, var(--base-fg-primary));
+    --_icon-color: var(--s-button-ghost-icon, var(--base-text-primary));
 
     @include hover {
-      --_bg: var(--s-button-ghost-bg-hover, var(--base-bg-neutral));
+      --_bg: var(--s-button-ghost-bg-hover, var(--base-bg-hover));
     }
 
     @include pressed {
-      --_bg: var(--s-button-ghost-bg-pressed, var(--base-bg-neutral_hover));
+      --_bg: var(--s-button-ghost-bg-pressed, var(--base-bg-active));
     }
   }
 
   .variant-destructive {
-    --_bg: var(--base-bg-error-reverse);
-    --_text: var(--base-text-primary-reverse);
-    --_icon-color: var(--base-fg-primary-reverse);
-    --_ring: var(--base-border-error-solid);
+    --_bg: var(--base-bg-danger-solid);
+    --_text: var(--base-text-inverse);
+    --_icon-color: var(--base-text-inverse);
+    --_ring: var(--comp-button-destructive-ring);
 
     @include hover {
-      --_bg: var(--base-bg-error-reverse_hover);
+      --_bg: var(--comp-button-destructive-bg-hover);
     }
 
     @include pressed {
-      --_bg: var(--base-bg-error-reverse_pressed);
+      --_bg: var(--comp-button-destructive-bg-pressed);
     }
   }
 
   .variant-destructive-soft {
-    --_bg: var(--base-bg-error);
-    --_text: var(--base-text-error_hover);
-    --_icon-color: var(--base-fg-error_hover);
-    --_ring: var(--base-border-error-solid);
+    --_bg: var(--base-bg-danger-subtle);
+    --_text: var(--base-text-danger);
+    --_icon-color: var(--base-text-danger);
+    --_ring: var(--comp-button-destructive-ring);
 
     @include hover {
-      --_bg: var(--base-bg-error_hover);
+      --_bg: var(--comp-button-destructive-soft-bg-hover);
     }
 
     @include pressed {
-      --_bg: var(--base-bg-error_pressed);
+      --_bg: var(--comp-button-destructive-soft-bg-pressed);
     }
   }
 
   // Disabled keeps the shape of the variant: filled buttons get a grey fill, outline keeps its border, ghost stays clear.
   .is-disabled {
     --_text: var(--base-text-disabled);
-    --_icon-color: var(--base-fg-disabled);
+    --_icon-color: var(--base-text-disabled);
     cursor: default;
 
     &.variant-primary,
     &.variant-secondary,
     &.variant-destructive,
     &.variant-destructive-soft {
-      --_bg: var(--base-bg-disabled_subtle);
+      --_bg: var(--base-bg-disabled);
     }
 
     // A fixed grey label gets lost on a tinted surface, so outline uses a translucent label.
     &.variant-outline {
-      --_text: var(--_outline-disabled-text);
-      --_icon-color: var(--_outline-disabled-text);
-      border-color: var(--_outline-disabled-line);
+      --_text: var(--comp-button-outline-text-disabled);
+      --_icon-color: var(--comp-button-outline-text-disabled);
+      border-color: var(--comp-button-outline-border-disabled);
     }
   }
 
