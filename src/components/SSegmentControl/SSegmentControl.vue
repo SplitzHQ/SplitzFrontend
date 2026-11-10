@@ -8,18 +8,21 @@ import type { SegmentSize } from "./segment";
 import { followLeft } from "./segment-scroll";
 import SSegment from "./SSegment.vue";
 
-/** A choice of one item from a short list on one row. See `segment-control.usage.ts` for when to use it. */
+/**
+ * A choice of one item from a short list on one row. See `segment-control.usage.ts` for when to use it.
+ * Set `aria-label` to name the group for a screen reader.
+ */
 export interface SegmentControlProps {
   /** The size of each segment. */
   size: SegmentSize;
   /** The text of each segment. The default slot can draw the text with other markup. */
   items: string[];
-  /** The name of the group for a screen reader. Say what the user chooses, for example "Split method". */
-  label: string;
   /** Puts the segments that do not fit on more rows, and the track does not scroll. Only `devtools/` uses it. */
   wrap?: boolean;
 }
-const { size, items, label, wrap = false } = defineProps<SegmentControlProps>();
+const { size, items, wrap = false } = defineProps<SegmentControlProps>();
+// `aria-label` goes to the radiogroup inside the track. All other attributes, such as `class`, go to the track.
+defineOptions({ inheritAttrs: false });
 /** The index of the selected item. */
 const model = defineModel<number>({ required: true });
 
@@ -39,9 +42,6 @@ const selectionBox = shallowRef({ height: 0, left: 0, top: 0, width: 0 });
 const selectionMoves = shallowRef(false);
 const fadeStart = shallowRef(0);
 const fadeEnd = shallowRef(0);
-
-// Tab goes to the selected segment. If the index is outside the list, Tab goes to the first segment.
-const tabbableIndex = computed(() => (items[model.value] === undefined ? 0 : model.value));
 
 // An edge fades only on a side that has more segments. A control that fits has no mask.
 const scrollerStyle = computed(() =>
@@ -128,7 +128,7 @@ function onKeydown(event: KeyboardEvent): void {
   const step = ARROW_STEPS[event.key];
   if (step === undefined || items.length === 0) return;
   event.preventDefault();
-  const next = (tabbableIndex.value + step + items.length) % items.length;
+  const next = (model.value + step + items.length) % items.length;
   model.value = next;
   // The watcher above scrolls the track, so the focus must not scroll it also.
   radios()[next]?.focus({ preventScroll: true });
@@ -185,6 +185,7 @@ function onClickCapture(event: MouseEvent): void {
 
 <template>
   <div
+    v-bind="{ ...$attrs, 'aria-label': undefined }"
     class="track w-fit max-w-full min-w-0 rounded-full border border-core-alpha-brand-5 bg-core-alpha-brand-5"
     :data-pressed="pressed ? '' : undefined"
   >
@@ -193,7 +194,7 @@ function onClickCapture(event: MouseEvent): void {
     <div
       ref="scroller"
       role="radiogroup"
-      :aria-label="label"
+      :aria-label="$attrs['aria-label'] as string | undefined"
       :class="[
         'touch-manipulation [scrollbar-width:none] overscroll-x-contain [-webkit-touch-callout:none] [&::-webkit-scrollbar]:hidden',
         wrap ? 'overflow-visible' : 'overflow-x-auto overflow-y-hidden rounded-full',
@@ -226,7 +227,6 @@ function onClickCapture(event: MouseEvent): void {
           :key="index"
           :size="size"
           :active="model === index"
-          :tabbable="tabbableIndex === index"
           @click="model = index"
         >
           <slot :item="item">{{ item }}</slot>

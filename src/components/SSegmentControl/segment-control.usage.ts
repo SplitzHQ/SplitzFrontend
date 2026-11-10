@@ -61,7 +61,7 @@ export const LAYOUT_RULES: UsageRule[] = [
 /** How to write the text. */
 export const COPY_RULES: UsageRule[] = [
   {
-    rule: "Set `label` to the thing that the user chooses, for example Split method. Do not repeat the items. A screen reader reads it for the group.",
+    rule: "Set `aria-label` to the thing that the user chooses, for example Split method. Do not repeat the items. A screen reader reads it for the group.",
     title: "Name of the group",
   },
   {

@@ -74,7 +74,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Tap area",
   },
   {
-    text: "The `label` prop is required, because the switch has no visible text. Use the same text as the visible label of the row.",
+    text: "Set `aria-label`, because the switch has no visible text. Use the same text as the visible label of the row.",
     title: "Name",
   },
   {

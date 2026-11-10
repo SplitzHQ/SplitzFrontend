@@ -9,12 +9,12 @@ const meta = {
   title: "Components/Popover",
   component: SPopover,
   parameters: { layout: "centered" },
-  args: { label: "Notifications", modelValue: false, enabled: true },
+  args: { modelValue: false, enabled: true },
   render: (args) => ({
     components: { SPopover, SIconButton },
     setup: () => ({ args }),
     template: `
-      <SPopover v-bind="args">
+      <SPopover v-bind="args" aria-label="Notifications">
         <template #trigger>
           <SIconButton variant="ghost" size="md" aria-label="Open notifications">
             <span aria-hidden="true">•••</span>
@@ -53,5 +53,5 @@ export const Keyboard: Story = {
 };
 
 export const WidePanel: Story = {
-  args: { class: "w-[26rem]", align: "start" },
+  args: { class: "w-104", align: "start" },
 };

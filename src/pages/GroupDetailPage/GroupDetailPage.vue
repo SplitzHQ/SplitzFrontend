@@ -131,7 +131,7 @@ const settleUp = () => {
           </template>
 
           <!-- Tabs -->
-          <SSegmentControl v-model="activeTab" size="md" :label="$t('group-detail-tabs-label')" :items="tabs" />
+          <SSegmentControl v-model="activeTab" size="md" :aria-label="$t('group-detail-tabs-label')" :items="tabs" />
         </div>
 
         <!-- Invoices -->

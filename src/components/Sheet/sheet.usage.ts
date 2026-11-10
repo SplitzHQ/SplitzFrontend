@@ -111,7 +111,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Status bar",
   },
   {
-    rule: "Set `title`, and Sheet draws the title: an h2 with size display-xs and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
+    rule: "Set `title`, and Sheet draws the title: an h2 with size display-xs and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `aria-label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
     title: "Title",
   },
   {
@@ -179,7 +179,7 @@ export const COPY_RULES: CopyRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `label`, and the panel gets its name from that prop. `description` gives the panel its `aria-describedby`.",
+    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `aria-label`. A visible title names the panel through `aria-labelledby`; otherwise `aria-label` names it directly. `description` gives the panel its `aria-describedby`.",
     title: "Role and name",
   },
   {
