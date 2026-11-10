@@ -446,15 +446,23 @@ export function playOpening(
   };
 }
 
-/** True after this run of the app has claimed the opening. A new run of the JavaScript starts at false. */
-let openingClaimed = false;
+/**
+ * The opening state of this run of the app. `claimed` is true after the run has claimed the opening.
+ *
+ * In the dev server, a hot update of this file runs the module again. A module variable then goes back to its first
+ * value, and the opening plays again with no reload. `import.meta.hot.data` keeps one object for this module across hot
+ * updates, so the flag stays. A production build has no `import.meta.hot`, and a new run of the JavaScript starts with
+ * an empty object.
+ */
+const openingState = (import.meta.hot?.data ?? {}) as { claimed?: boolean };
 
 /**
  * Returns true one time for each run of the app. So the opening plays after a cold start, and it does not play when a
- * person comes back from another page or from another app. This flag is in memory, so it needs no storage.
+ * person comes back from another page or from another app. It also does not play after a hot update in the dev server.
+ * This flag is in memory, so it needs no storage.
  */
 export function claimOpening(): boolean {
-  if (openingClaimed) return false;
-  openingClaimed = true;
+  if (openingState.claimed) return false;
+  openingState.claimed = true;
   return true;
 }
