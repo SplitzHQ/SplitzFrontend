@@ -51,7 +51,7 @@ function clearAllFromMenu() {
 </script>
 
 <template>
-  <Sheet v-model="open" :label="$t('notification-title')" detent="large" :show-close-button="true">
+  <Sheet v-model="open" :aria-label="$t('notification-title')" detent="large" :show-close-button="true">
     <div class="flex min-h-0 flex-col gap-4.5">
       <!--
         This row takes the place of the title that Sheet draws, so the title must start and end on the same lines.
@@ -82,7 +82,7 @@ function clearAllFromMenu() {
     </div>
 
     <!-- A choice list: a tap on a row runs the action and closes the sheet, so it has no close button. -->
-    <Sheet v-model="menuOpen" :label="$t('notification-more')" detent="medium">
+    <Sheet v-model="menuOpen" :aria-label="$t('notification-more')" detent="medium">
       <div class="flex flex-col">
         <button
           v-if="hasUnread"

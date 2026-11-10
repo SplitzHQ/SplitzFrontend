@@ -20,7 +20,7 @@ function mountSheet(props: Record<string, unknown> = {}, startOpen = false) {
       setup: () => ({ open, props }),
       template: `
         <button type="button" data-test="opener" @click="open = true">Open</button>
-        <Sheet v-model="open" label="Add friend" v-bind="props">
+        <Sheet v-model="open" aria-label="Add friend" v-bind="props">
           <p data-test="text">Text</p>
           <input data-test="field" />
           <button type="button" data-test="action">Save</button>
@@ -41,8 +41,8 @@ function mountTwoSheets() {
       components: { Sheet },
       setup: () => ({ first, second }),
       template: `
-        <Sheet v-model="first" label="First"><p>First</p></Sheet>
-        <Sheet v-model="second" label="Second"><p>Second</p></Sheet>
+        <Sheet v-model="first" aria-label="First"><p>First</p></Sheet>
+        <Sheet v-model="second" aria-label="Second"><p>Second</p></Sheet>
       `,
     }),
     { attachTo: document.body }
@@ -114,9 +114,22 @@ describe("Sheet", () => {
 
       const dialog = panel()!;
       expect(dialog.getAttribute("aria-modal")).toBe("true");
-      expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)?.textContent).toBe("Add friend");
+      expect(dialog.getAttribute("aria-label")).toBe("Add friend");
+      expect(dialog.hasAttribute("aria-labelledby")).toBe(false);
       expect(dialog.hasAttribute("aria-describedby")).toBe(false);
       expect(warn).not.toHaveBeenCalled();
+    });
+
+    it("updates aria-label on the dialog when the prop changes", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { "aria-label": "Add friend", modelValue: true },
+      });
+      await flushPromises();
+
+      await wrapper.setProps({ "aria-label": "Invite friend" });
+      expect(panel()!.getAttribute("aria-label")).toBe("Invite friend");
+      expect(panel()!.hasAttribute("aria-labelledby")).toBe(false);
     });
 
     it("draws the title as a heading and gets its name from it", async () => {
@@ -132,6 +145,7 @@ describe("Sheet", () => {
       expect(heading?.textContent?.trim()).toBe("Add friend");
       expect(heading?.hidden).toBe(false);
       expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)).toBe(heading);
+      expect(dialog.hasAttribute("aria-label")).toBe(false);
     });
 
     it("describes the panel with the line under the title", async () => {
@@ -179,7 +193,7 @@ describe("Sheet", () => {
       expect(panel()!.querySelector(".sheet-content")?.classList.contains("pt-4")).toBe(true);
     });
 
-    it("hides the name of a sheet that has only a label", async () => {
+    it("keeps the compatibility title hidden when aria-label names the sheet", async () => {
       mountSheet({}, true);
       await flushPromises();
 
@@ -189,7 +203,7 @@ describe("Sheet", () => {
     it("keeps the actions out of the content that scrolls", async () => {
       wrapper = mount(Sheet, {
         attachTo: document.body,
-        props: { label: "Add friend", modelValue: true },
+        props: { "aria-label": "Add friend", modelValue: true },
         slots: {
           actions: '<button type="button" data-test="save">Save</button>',
           default: '<p data-test="text">Text</p>',
@@ -236,7 +250,7 @@ describe("Sheet", () => {
 
       wrapper = mount(Sheet, {
         attachTo: document.body,
-        props: { label: "Add friend", modelValue: true },
+        props: { "aria-label": "Add friend", modelValue: true },
         slots: { actions: '<button type="button">Save</button>', default: "<p>Text</p>" },
       });
       await flushPromises();

@@ -18,6 +18,8 @@ import { useSheetStack } from "./sheet-stack";
  * The default slot holds the scrollable content. The `actions` slot stays pinned to the bottom.
  */
 interface SheetBaseProps {
+  /** Vue normalizes `aria-label` to this key at runtime. Templates must use `aria-label`. */
+  ariaLabel?: string;
   /** Initial height cap: `large` is 90% of the dynamic viewport height, and `medium` is 50%. */
   detent?: "large" | "medium";
   /** `maxHeight` lets the sheet shrink to fit its content up to the detent. `height` fixes the sheet at the detent height. */
@@ -30,7 +32,7 @@ interface SheetBaseProps {
   dismissOnDrag?: boolean;
 }
 
-/** A sheet gets its accessible name from its visible `title`, or from `label` when no visible title is rendered. */
+/** A sheet gets its accessible name from its visible `title`, or from `aria-label` when no visible title is rendered. */
 export type SheetProps = SheetBaseProps &
   (
     | {
@@ -38,20 +40,20 @@ export type SheetProps = SheetBaseProps &
         title: string;
         /** A short line under the title. A screen reader reads it after the name of the sheet. */
         description?: string;
-        label?: undefined;
+        "aria-label"?: undefined;
       }
     | {
         title?: undefined;
         description?: undefined;
-        /** Screen-reader label required when the sheet has no visible `title`. */
-        label: string;
+        /** Accessible name required when the sheet has no visible `title`. Pass it as `aria-label` in templates. */
+        "aria-label": string;
       }
   );
 
 const {
   title,
   description,
-  label,
+  ariaLabel,
   detent = "large",
   detentSizing = "maxHeight",
   showHandle = true,
@@ -310,7 +312,11 @@ watchEffect((onCleanup) => {
               as-child
               force-mount
               aria-modal="true"
-              v-bind="description ? {} : { 'aria-describedby': undefined }"
+              :aria-label="ariaLabel"
+              v-bind="{
+                ...(title ? {} : { 'aria-labelledby': undefined }),
+                ...(description ? {} : { 'aria-describedby': undefined }),
+              }"
               :disable-outside-pointer-events="false"
               @interact-outside.prevent
               @open-auto-focus="focusPanel"
@@ -378,8 +384,8 @@ watchEffect((onCleanup) => {
                   >
                     {{ title }}
                   </DialogTitle>
-                  <!-- Hidden DialogTitle provides the accessible dialog name when no visible `title` is used. -->
-                  <DialogTitle v-else hidden>{{ label }}</DialogTitle>
+                  <!-- Reka checks for a DialogTitle even when aria-label names the dialog. -->
+                  <DialogTitle v-else hidden>{{ ariaLabel }}</DialogTitle>
                   <!-- The gap under the line is for the content, so a sheet with only this line does not get taller. -->
                   <DialogDescription
                     v-if="description"

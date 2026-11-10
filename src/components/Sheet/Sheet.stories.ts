@@ -6,13 +6,13 @@ import SButton from "@/components/SButton/SButton.vue";
 
 import Sheet, { type SheetProps } from "./Sheet.vue";
 
-/** The props in one flat type. Storybook cannot read the union of `title` and `label`. */
-type SheetArgs = Omit<SheetProps, "label" | "title"> & { label?: string; title?: string };
+/** The props in one flat type. Storybook cannot read the union of `title` and `aria-label`. */
+type SheetArgs = Omit<SheetProps, "aria-label" | "title"> & { "aria-label"?: string; title?: string };
 
 const meta: Meta<SheetArgs> = {
   title: "Components/Sheet",
   component: Sheet,
-  args: { label: "Sheet" },
+  args: { "aria-label": "Sheet" },
   argTypes: {
     detent: {
       control: "radio",
@@ -203,7 +203,7 @@ export const TitleAndActions: Story = {
   }),
   args: {
     detent: "medium",
-    label: undefined,
+    "aria-label": undefined,
     showCloseButton: true,
     title: "Add friend",
   },
@@ -237,7 +237,7 @@ export const TitleAndDescription: Story = {
   args: {
     description: "Everyone in the group loses this expense.",
     detent: "medium",
-    label: undefined,
+    "aria-label": undefined,
     title: "Delete this expense?",
   },
 };
