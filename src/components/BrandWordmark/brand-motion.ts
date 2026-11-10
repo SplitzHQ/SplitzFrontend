@@ -389,6 +389,63 @@ export async function cancelWhenDone(animations: Animation[]): Promise<void> {
   });
 }
 
+/** One play of the full-screen opening. See `playOpening`. */
+export interface OpeningPlay {
+  /** Settles when the layer starts to fade. The layer then gives the status bar back to the page. */
+  leaving: Promise<void>;
+  /** Settles when the fade ends, or when `cancel` stops the play. */
+  done: Promise<void>;
+  /** Stops all motion of the play at once. */
+  cancel(): void;
+}
+
+/**
+ * Plays the opening on its full-screen layer. The mark plays the small motion and rests, and then the layer fades out.
+ * The fade also waits for `ready`. Use it when the page under the layer is not there yet.
+ * @param layer - The layer that holds `BrandMotionGlyph`.
+ * @param slow - The factor on all times. See `motionSlow`.
+ * @param ready - Settles when the page under the layer can show.
+ */
+export function playOpening(
+  layer: HTMLElement,
+  slow: number,
+  ready: Promise<unknown> = Promise.resolve()
+): OpeningPlay {
+  const animations = playSteps(layer, OPENING_STEPS, slow);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let cancelled = false;
+  let stop: (() => void) | undefined;
+  const stopped = new Promise<void>((resolve) => {
+    stop = resolve;
+  });
+  const stay = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, OPENING_STAY_MS * slow);
+  });
+  // A failed `ready` also ends the wait, so the layer never covers the page for good.
+  const leaving = Promise.allSettled([stay, ready]).then(() => {
+    if (cancelled) return;
+    animations.push(
+      layer.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: OPENING_FADE_MS * slow,
+        easing: MOTION_EASING.standard,
+        fill: "forwards",
+      })
+    );
+  });
+  return {
+    cancel() {
+      cancelled = true;
+      clearTimeout(timer);
+      animations.forEach((animation) => {
+        animation.cancel();
+      });
+      stop?.();
+    },
+    done: Promise.race([leaving.then(() => cancelWhenDone(animations)), stopped]),
+    leaving,
+  };
+}
+
 /** True after this run of the app has claimed the opening. A new run of the JavaScript starts at false. */
 let openingClaimed = false;
 
