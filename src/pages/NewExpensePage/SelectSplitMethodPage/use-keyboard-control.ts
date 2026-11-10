@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { useTransactionStore } from "@/stores/transaction";
 
@@ -37,6 +37,23 @@ export const useKeyboardControl = () => {
     }
   });
 
+  /**
+   * The decimal places that the keyboard accepts for the current split method.
+   * A share count is a whole number. A percentage has two places. An amount follows the currency, so JPY has none.
+   */
+  const keyboardDecimals = computed(() => {
+    switch (transactionStore.splitMethod) {
+      case "shares":
+        return 0;
+      case "percentage":
+        return 2;
+      case "adjustment":
+      case "custom":
+      case "equally":
+        return transactionStore.amountDecimals;
+    }
+  });
+
   const setFocusedInputUserId = (userId: string | null) => {
     focusedInputUserId.value = userId;
     if (userId) {
@@ -62,6 +79,7 @@ export const useKeyboardControl = () => {
 
   return {
     focusedInputUserId,
+    keyboardDecimals,
     keyboardValue,
     setFocusedInputUserId,
   };

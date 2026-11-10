@@ -61,6 +61,10 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "One keyboard, several values",
   },
   {
+    rule: "Set `max-decimals` from the value that the keyboard edits. An amount uses `amountDecimals` of the transaction store, which comes from `currencyFractionDigits`: JPY has 0 places, USD has 2. A percentage has 2 places. A share count has 0 places. Do not change `max-integer-digits` from its default of 7.",
+    title: "Limits",
+  },
+  {
     rule: "Do not change the keys. `button.usage.ts` says that a number key is an xl ghost button that does not fill an action area. The height is 52px.",
     title: "Keys",
   },
@@ -73,7 +77,7 @@ export const BEHAVIOR_RULES: UsageRule[] = [
     title: "Order",
   },
   {
-    rule: "The math uses big.js, so `0.1 + 0.2` is `0.3`. The value in `v-model` is a JavaScript number. A division that does not end has the precision of a number. The caller rounds the value, as `saveTransaction` does.",
+    rule: "The math uses big.js, so `0.1 + 0.2` is `0.3`. The value in `v-model` is a JavaScript number, rounded half up to `max-decimals`. With two places, `10 ÷ 3` gives 3.33.",
     title: "Exact math",
   },
   {
@@ -83,6 +87,14 @@ export const BEHAVIOR_RULES: UsageRule[] = [
   {
     rule: "A second operator replaces the first. Plus, times and divide do nothing on an empty line. Minus on an empty line starts `0 -`, because an adjustment can be negative.",
     title: "Operators",
+  },
+  {
+    rule: "Each number has at most `max-integer-digits` digits before the dot and `max-decimals` digits after it. The value also stays below the digit limit, so `5000 × 5000` stops at `5000 × 500`. With 0 decimal places, the dot key does nothing. Seven digits keep the amount far below the size where `toFixed` writes `1e+21`.",
+    title: "Length and decimal places",
+  },
+  {
+    rule: "A key that goes over a limit changes nothing. The line shakes one time and the phone vibrates for a short time, so the user knows that the keyboard got the press. No message shows. Reduced motion stops the shake, but the vibration stays. iOS Safari cannot vibrate, so an iPhone only shakes. Backspace always works, also when a value from outside is over a limit.",
+    title: "Over a limit",
   },
   {
     rule: "Backspace removes one character. The line keeps the dot and the zeros that the user typed, so `1.50` stays `1.50`.",
@@ -119,8 +131,6 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * Remove a question when the user decides it, and write the decision into the rules above.
  */
 export const OPEN_QUESTIONS = [
-  "How long can the input be? Now it has no limit. Twenty digits show on the line, but the value is the nearest JavaScript number. A value above about 1e21 saves as `1e+21`, because `saveTransaction` uses `toFixed`.",
-  "How many decimal places can the user type? Now it has no limit, for every currency. `saveTransaction` always saves two places, so `1.239` saves as `1.24`, and JPY also gets two places. See the same card.",
   "What does the line show for `5 ÷ 0`? Now the value stays 5, and the line stays `5 ÷ 0` with no message. The correct result is not an error while the user types `0.5`, but it can look wrong if the user stops at zero.",
   "Which decimal mark does the key show? The key and the line always show a dot. The amount uses the locale of the browser, so a German browser shows `1,50` above a key with a dot. English and Simplified Chinese both use a dot, so the two app languages are correct.",
   "Does a desktop user type with a physical keyboard? Now the keys react only to a press.",
