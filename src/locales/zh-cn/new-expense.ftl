@@ -13,10 +13,14 @@ new-expense-sections-friends = 好友
 
 new-expense-select-people-title = 选择分摊对象
 new-expense-select-people-with = 参与人：
-new-expense-select-people-search-placeholder = 搜索姓名、@用户名、邮箱或手机号
+new-expense-select-people-search-label = 搜索姓名、@用户名、邮箱或手机号
+new-expense-select-people-search-placeholder = 姓名、@用户名、邮箱或手机号
 new-expense-select-people-remove = 移除 { $name }
 new-expense-select-people-show-more = 再显示 { $count } 人
 new-expense-select-people-show-fewer = 收起
+new-expense-select-people-empty-title = 没有找到「{ $keyword }」
+new-expense-select-people-empty-description = 换个名字试试。
+new-expense-select-people-clear-search = 清除搜索
 
 new-expense-split-title = 分摊方式
 new-expense-split-paid-by = 付款人：{ $username }
@@ -59,6 +63,8 @@ new-expense-review-error-receipt-not-image = 请选择图片文件。
 new-expense-review-error-receipt-too-large = 图片不能超过 { $maxMb } MB。
 new-expense-review-actions-select-category = 选择分类
 new-expense-review-category-search-placeholder = 搜索分类
+new-expense-review-category-empty-title = 没有和「{ $keyword }」匹配的分类
+new-expense-review-category-clear-search = 清除搜索
 
 new-expense-scan-button = 扫描小票
 new-expense-scan-title = 扫描小票

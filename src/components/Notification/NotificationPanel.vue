@@ -4,6 +4,7 @@ import { useFluent } from "fluent-vue";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
+import EmptyState from "@/components/EmptyState/EmptyState.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
@@ -117,7 +118,7 @@ function clearAllFromMenu() {
     </div>
 
     <div v-if="store.error && items.length === 0" class="flex flex-col items-center gap-2 py-8 text-center">
-      <p role="alert" class="text-sm text-base-text-error">{{ $t("notification-error") }}</p>
+      <p role="alert" class="text-sm text-base-text-danger">{{ $t("notification-error") }}</p>
       <SButton variant="secondary" size="md" :loading="store.loading" @click="store.fetch">
         {{ $t("notification-retry") }}
       </SButton>
@@ -133,13 +134,14 @@ function clearAllFromMenu() {
       </div>
     </div>
 
-    <div v-else-if="items.length === 0" class="flex flex-col items-center gap-2 px-4 py-10 text-center">
-      <span class="flex size-12 items-center justify-center rounded-2xl bg-core-alpha-brand-10">
-        <PhBellSlash weight="duotone" class="size-6 text-util-color-brand-700" />
-      </span>
-      <p class="text-sm font-medium text-base-text-secondary">{{ $t("notification-empty-title") }}</p>
-      <p class="text-xs text-base-text-quaternary">{{ $t("notification-empty-hint") }}</p>
-    </div>
+    <!-- No button: the settings button in the header is the way to the notification settings. -->
+    <EmptyState
+      v-else-if="items.length === 0"
+      :icon="PhBellSlash"
+      :title="$t('notification-empty-title')"
+      :description="$t('notification-empty-hint')"
+      title-tag="h3"
+    />
 
     <TransitionGroup v-else tag="ul" name="list" class="relative flex flex-col gap-1">
       <li v-for="item in items" :key="item.notificationId">
@@ -154,7 +156,7 @@ function clearAllFromMenu() {
           <PhCheck :size="20" />
           {{ $t("notification-mark-all-read") }}
         </button>
-        <button v-if="items.length > 0" type="button" class="menu-row text-base-text-error" @click="clearAllFromMenu">
+        <button v-if="items.length > 0" type="button" class="menu-row text-base-text-danger" @click="clearAllFromMenu">
           <PhTrash :size="20" />
           {{ $t("notification-clear-all") }}
         </button>
@@ -183,7 +185,7 @@ function clearAllFromMenu() {
 }
 
 .menu-row:focus-visible {
-  outline: 2px solid var(--base-border-brand-solid);
+  outline: 2px solid var(--base-focus-ring);
   outline-offset: 2px;
 }
 

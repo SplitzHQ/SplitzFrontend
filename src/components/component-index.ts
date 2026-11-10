@@ -54,6 +54,12 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "The icon or the translated name of an expense category.",
   },
   {
+    components: ["EmptyState"],
+    folder: "EmptyState",
+    usage: "src/components/EmptyState/empty-state.usage.ts",
+    use: "A list, a sheet or a page with nothing to show, or a search or a filter with no result: an icon in a tile, a title, a description and the actions.",
+  },
+  {
     components: ["FilterPill"],
     folder: "FilterPill",
     usage: "src/components/FilterPill/filter-pill.usage.ts",

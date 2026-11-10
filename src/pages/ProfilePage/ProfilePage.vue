@@ -11,6 +11,7 @@ import {
   PhShieldCheck,
   PhTrash,
   PhUser,
+  PhUserPlus,
   PhUsersThree,
   PhX,
 } from "@phosphor-icons/vue";
@@ -23,6 +24,7 @@ import { toast } from "vue-sonner";
 import { AccountApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
+import EmptyState from "@/components/EmptyState/EmptyState.vue";
 import HeaderMobileSecondary from "@/components/Header/Mobile/Secondary/HeaderMobileSecondary.vue";
 import BottomAction from "@/components/Layout/BottomAction.vue";
 import Layout from "@/components/Layout/Layout.vue";
@@ -207,8 +209,8 @@ function logout() {
         <Transition name="section">
           <section v-if="incomingRequests.length > 0" class="flex flex-col gap-2" data-test="requests-section">
             <div class="flex items-center justify-between px-1">
-              <h2 class="text-sm font-semibold text-base-text-quaternary">{{ $t("notification-requests-title") }}</h2>
-              <span class="text-xs font-medium text-util-color-brand-700">
+              <h2 class="text-sm font-semibold text-base-text-muted">{{ $t("notification-requests-title") }}</h2>
+              <span class="text-xs font-medium text-base-text-brand">
                 {{ $t("notification-requests-badge", { count: incomingRequests.length }) }}
               </span>
             </div>
@@ -220,8 +222,9 @@ function logout() {
 
         <!-- Identity card -->
         <section
-          class="relative flex flex-col items-center gap-3 overflow-hidden rounded-3xl bg-core-alpha-brand-10 px-6 pt-8 pb-6 text-center"
+          class="relative flex flex-col items-center gap-3 overflow-hidden rounded-3xl bg-base-bg-brand-subtle px-6 pt-8 pb-6 text-center"
         >
+          <!-- The rings are artwork, so they keep primitive tokens. See `PRIMITIVE_EXCEPTIONS` in `color.usage.ts`. -->
           <div aria-hidden="true" class="pointer-events-none absolute inset-0">
             <div class="absolute -top-16 -right-16 size-48 rounded-full border border-core-alpha-brand-10" />
             <div class="absolute -top-28 -right-28 size-72 rounded-full border border-core-alpha-brand-5" />
@@ -229,7 +232,7 @@ function logout() {
           </div>
 
           <div class="relative">
-            <div class="rounded-3xl p-1 ring-4 ring-core-alpha-brand-20">
+            <div class="rounded-3xl p-1 ring-4 ring-base-border-brand-subtle">
               <Avatar
                 aria-hidden="true"
                 :images="[{ src: userStore.user?.photo ?? null, alt: userStore.user?.userName ?? '' }]"
@@ -238,7 +241,7 @@ function logout() {
             </div>
             <button
               type="button"
-              class="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full bg-util-color-brand-700 text-base-text-primary-reverse shadow-md ring-2 ring-base-bg-primary disabled:bg-base-bg-disabled disabled:text-base-text-disabled"
+              class="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full bg-base-bg-brand-solid text-base-text-inverse shadow-md ring-2 ring-base-bg-primary disabled:bg-base-bg-disabled disabled:text-base-text-disabled"
               :aria-label="$t('profile-avatar-change')"
               :disabled="avatarControlsDisabled"
               data-test="avatar-upload-trigger"
@@ -250,10 +253,10 @@ function logout() {
 
           <div class="relative flex min-w-0 flex-col gap-0.5">
             <p class="truncate text-display-xs font-semibold text-base-text-primary">{{ userStore.user?.userName }}</p>
-            <p class="truncate text-sm text-base-text-tertiary">{{ userStore.user?.email }}</p>
+            <p class="truncate text-sm text-base-text-secondary">{{ userStore.user?.email }}</p>
           </div>
 
-          <p class="relative text-xs text-base-text-quaternary">{{ $t("profile-avatar-change") }}</p>
+          <p class="relative text-xs text-base-text-muted">{{ $t("profile-avatar-change") }}</p>
           <RateLimitCountdown
             :seconds="avatarCooldown.remainingSeconds.value"
             message-key="profile-avatar-rate-limit"
@@ -264,16 +267,16 @@ function logout() {
 
         <!-- Account -->
         <section class="flex flex-col gap-2">
-          <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("profile-account-label") }}</h2>
-          <div class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+          <h2 class="px-1 text-sm font-semibold text-base-text-muted">{{ $t("profile-account-label") }}</h2>
+          <div class="flex flex-col divide-y divide-base-border-muted rounded-3xl bg-base-bg-secondary">
             <!-- Username -->
             <div class="flex flex-col gap-3 px-4 py-3">
               <div class="flex items-center gap-3">
-                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                  <PhUser class="size-5 text-util-color-brand-700" />
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                  <PhUser class="size-5 text-base-text-brand" />
                 </span>
                 <div class="flex min-w-0 flex-1 flex-col">
-                  <p class="text-xs font-medium text-base-text-quaternary">{{ $t("profile-username-label") }}</p>
+                  <p class="text-xs font-medium text-base-text-muted">{{ $t("profile-username-label") }}</p>
                   <p v-if="!isEditingUsername" class="truncate text-base font-medium text-base-text-primary">
                     {{ userStore.user?.userName }}
                   </p>
@@ -318,22 +321,22 @@ function logout() {
 
             <!-- Email (read-only) -->
             <div class="flex items-center gap-3 px-4 py-3">
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                <PhEnvelopeSimple class="size-5 text-util-color-brand-700" />
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                <PhEnvelopeSimple class="size-5 text-base-text-brand" />
               </span>
               <div class="flex min-w-0 flex-1 flex-col">
-                <p class="text-xs font-medium text-base-text-quaternary">{{ $t("profile-email-label") }}</p>
+                <p class="text-xs font-medium text-base-text-muted">{{ $t("profile-email-label") }}</p>
                 <p class="truncate text-base font-medium text-base-text-primary">{{ userStore.user?.email }}</p>
               </div>
             </div>
 
             <!-- User ID -->
             <div class="flex items-center gap-3 px-4 py-3">
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                <PhIdentificationCard class="size-5 text-util-color-brand-700" />
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                <PhIdentificationCard class="size-5 text-base-text-brand" />
               </span>
               <div class="flex min-w-0 flex-1 flex-col">
-                <p class="text-xs font-medium text-base-text-quaternary">{{ $t("profile-user-id-label") }}</p>
+                <p class="text-xs font-medium text-base-text-muted">{{ $t("profile-user-id-label") }}</p>
                 <p class="truncate font-mono text-sm text-base-text-primary">{{ userStore.user?.id }}</p>
               </div>
               <SIconButton
@@ -351,58 +354,58 @@ function logout() {
 
         <!-- Security -->
         <section class="flex flex-col gap-2">
-          <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("profile-security-label") }}</h2>
+          <h2 class="px-1 text-sm font-semibold text-base-text-muted">{{ $t("profile-security-label") }}</h2>
           <button
             type="button"
-            class="flex w-full items-center gap-3 rounded-3xl bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+            class="flex w-full items-center gap-3 rounded-3xl bg-base-bg-secondary px-4 py-3 text-left hover:bg-base-bg-active"
             @click="router.push({ name: '2faSetup' })"
           >
-            <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-              <PhShieldCheck class="size-5 text-util-color-brand-700" />
+            <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+              <PhShieldCheck class="size-5 text-base-text-brand" />
             </span>
             <span class="flex min-w-0 flex-1 flex-col">
               <span class="text-base font-medium text-base-text-primary">{{ $t("profile-two-factor") }}</span>
-              <span class="text-xs text-base-text-quaternary">{{ $t("profile-two-factor-hint") }}</span>
+              <span class="text-xs text-base-text-muted">{{ $t("profile-two-factor-hint") }}</span>
             </span>
-            <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+            <PhCaretRight class="size-5 shrink-0 text-base-text-muted" />
           </button>
         </section>
 
         <!-- Preferences -->
         <section class="flex flex-col gap-2">
-          <h2 class="px-1 text-sm font-semibold text-base-text-quaternary">{{ $t("profile-preferences-label") }}</h2>
-          <div class="flex flex-col divide-y divide-base-border-tertiary overflow-hidden rounded-3xl">
+          <h2 class="px-1 text-sm font-semibold text-base-text-muted">{{ $t("profile-preferences-label") }}</h2>
+          <div class="flex flex-col divide-y divide-base-border-muted overflow-hidden rounded-3xl">
             <button
               type="button"
-              class="flex w-full items-center gap-3 bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+              class="flex w-full items-center gap-3 bg-base-bg-secondary px-4 py-3 text-left hover:bg-base-bg-active"
               data-test="notification-settings-link"
               @click="router.push({ name: 'notificationSettings' })"
             >
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                <PhBell class="size-5 text-util-color-brand-700" />
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                <PhBell class="size-5 text-base-text-brand" />
               </span>
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="text-base font-medium text-base-text-primary">{{ $t("profile-notifications") }}</span>
-                <span class="text-xs text-base-text-quaternary">{{ $t("profile-notifications-hint") }}</span>
+                <span class="text-xs text-base-text-muted">{{ $t("profile-notifications-hint") }}</span>
               </span>
-              <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+              <PhCaretRight class="size-5 shrink-0 text-base-text-muted" />
             </button>
             <button
               type="button"
-              class="flex w-full items-center gap-3 bg-util-alpha-black-5 px-4 py-3 text-left hover:bg-util-alpha-black-10"
+              class="flex w-full items-center gap-3 bg-base-bg-secondary px-4 py-3 text-left hover:bg-base-bg-active"
               data-test="receipt-recognition-settings-link"
               @click="router.push({ name: 'receiptRecognitionSettings' })"
             >
-              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-core-alpha-brand-10">
-                <PhScan class="size-5 text-util-color-brand-700" />
+              <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-base-bg-brand-subtle">
+                <PhScan class="size-5 text-base-text-brand" />
               </span>
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="text-base font-medium text-base-text-primary">{{
                   $t("profile-receipt-recognition")
                 }}</span>
-                <span class="text-xs text-base-text-quaternary">{{ $t("profile-receipt-recognition-hint") }}</span>
+                <span class="text-xs text-base-text-muted">{{ $t("profile-receipt-recognition-hint") }}</span>
               </span>
-              <PhCaretRight class="size-5 shrink-0 text-base-fg-quaternary" />
+              <PhCaretRight class="size-5 shrink-0 text-base-text-muted" />
             </button>
           </div>
         </section>
@@ -410,7 +413,7 @@ function logout() {
         <!-- Friends -->
         <section class="flex flex-col gap-2">
           <div class="flex items-center justify-between px-1">
-            <h2 class="text-sm font-semibold text-base-text-quaternary">{{ $t("profile-friends-label") }}</h2>
+            <h2 class="text-sm font-semibold text-base-text-muted">{{ $t("profile-friends-label") }}</h2>
             <SIconButton
               variant="secondary"
               size="sm"
@@ -421,20 +424,27 @@ function logout() {
             </SIconButton>
           </div>
 
-          <div
+          <!-- Add friend is the only way forward from an empty list, so it is primary (empty-state.usage.ts). -->
+          <EmptyState
             v-if="friends.length === 0 && outgoingRequests.length === 0"
-            class="flex flex-col items-center gap-2 rounded-3xl bg-util-alpha-black-5 px-4 py-8 text-center"
+            :icon="PhUsersThree"
+            :title="$t('profile-friends-empty')"
+            :description="$t('profile-friends-empty-hint')"
+            title-tag="h3"
           >
-            <span class="flex size-12 items-center justify-center rounded-2xl bg-core-alpha-brand-10">
-              <PhUsersThree weight="duotone" class="size-6 text-util-color-brand-700" />
-            </span>
-            <p class="text-sm font-medium text-base-text-secondary">{{ $t("profile-friends-empty") }}</p>
-            <p class="text-xs text-base-text-quaternary">{{ $t("profile-friends-empty-hint") }}</p>
-          </div>
+            <template #action>
+              <SButton variant="primary" size="md" @click="showAddFriend = true">
+                <template #icon-left>
+                  <PhUserPlus />
+                </template>
+                {{ $t("profile-add-friend") }}
+              </SButton>
+            </template>
+          </EmptyState>
 
           <div
             v-if="friends.length > 0"
-            class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5"
+            class="flex flex-col divide-y divide-base-border-muted rounded-3xl bg-base-bg-secondary"
           >
             <div v-for="friend in friends" :key="friend.friendUser.id" class="flex items-center gap-3 px-4 py-3">
               <Avatar
@@ -446,7 +456,7 @@ function logout() {
                 <p class="truncate text-base font-medium text-base-text-primary">
                   {{ friend.remark || friend.friendUser.userName }}
                 </p>
-                <p v-if="friend.remark" class="truncate text-sm text-base-text-quaternary">
+                <p v-if="friend.remark" class="truncate text-sm text-base-text-muted">
                   {{ friend.friendUser.userName }}
                 </p>
               </div>
@@ -472,10 +482,10 @@ function logout() {
 
           <!-- Outgoing friend requests -->
           <div v-if="outgoingRequests.length > 0" class="flex flex-col gap-1">
-            <p class="px-1 pt-1 text-xs font-medium text-base-text-quaternary">
+            <p class="px-1 pt-1 text-xs font-medium text-base-text-muted">
               {{ $t("profile-friend-requests-sent") }}
             </p>
-            <div class="flex flex-col divide-y divide-base-border-tertiary rounded-3xl bg-util-alpha-black-5">
+            <div class="flex flex-col divide-y divide-base-border-muted rounded-3xl bg-base-bg-secondary">
               <div
                 v-for="request in outgoingRequests"
                 :key="request.friendRequestId"
@@ -488,7 +498,7 @@ function logout() {
                 />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <p class="truncate text-base font-medium text-base-text-primary">{{ request.toUser.userName }}</p>
-                  <p class="text-sm text-base-text-quaternary">{{ $t("profile-friend-request-pending") }}</p>
+                  <p class="text-sm text-base-text-muted">{{ $t("profile-friend-request-pending") }}</p>
                 </div>
                 <SIconButton
                   variant="ghost"

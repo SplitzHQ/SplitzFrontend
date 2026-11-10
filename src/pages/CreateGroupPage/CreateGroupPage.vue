@@ -14,6 +14,7 @@ import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
+import { groupJoinUrl } from "@/libs/group-join-link";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
@@ -35,7 +36,7 @@ const joinLink = ref<GroupJoinLinkDto | null>(null);
 const joinUrl = computed(() => {
   if (!joinLink.value) return null;
   try {
-    return `${globalThis.location.origin}/group/join/${joinLink.value.groupJoinLinkId}`;
+    return groupJoinUrl(joinLink.value.groupJoinLinkId);
   } catch {
     return null;
   }
@@ -107,20 +108,20 @@ async function copyJoinLink() {
           :placeholder="$t('create-group-name-placeholder')"
         />
 
-        <div v-if="joinUrl" class="flex flex-col gap-2 rounded-2xl bg-base-bg-secondary_alt p-4">
+        <div v-if="joinUrl" class="flex flex-col gap-2 rounded-2xl bg-base-bg-secondary p-4">
           <div class="flex items-center justify-between gap-3">
             <div class="text-sm font-semibold text-base-text-primary">{{ $t("create-group-share-link-label") }}</div>
             <SIconButton variant="ghost" size="sm" :aria-label="$t('create-group-copy-link')" @click="copyJoinLink">
               <PhCopy />
             </SIconButton>
           </div>
-          <a class="text-sm font-medium break-all text-util-color-brand-700" :href="joinUrl">
+          <a class="text-sm font-medium break-all text-base-text-brand" :href="joinUrl">
             {{ joinUrl }}
           </a>
-          <div class="text-xs text-base-text-tertiary">{{ $t("create-group-share-link-hint") }}</div>
+          <div class="text-xs text-base-text-secondary">{{ $t("create-group-share-link-hint") }}</div>
         </div>
 
-        <div v-if="createdGroup" class="text-sm text-base-text-tertiary">
+        <div v-if="createdGroup" class="text-sm text-base-text-secondary">
           {{ $t("create-group-created-hint") }}
         </div>
 

@@ -13,10 +13,14 @@ new-expense-sections-friends = Friends
 
 new-expense-select-people-title = Select people or group
 new-expense-select-people-with = With:
-new-expense-select-people-search-placeholder = Search by name, @username, email, or phone
+new-expense-select-people-search-label = Search by name, @username, email, or phone
+new-expense-select-people-search-placeholder = Name, @username, email, or phone
 new-expense-select-people-remove = Remove { $name }
 new-expense-select-people-show-more = Show { $count } more
 new-expense-select-people-show-fewer = Show fewer
+new-expense-select-people-empty-title = No one matches “{ $keyword }”
+new-expense-select-people-empty-description = Try another name.
+new-expense-select-people-clear-search = Clear search
 
 new-expense-split-title = Split options
 new-expense-split-paid-by = Paid by { $username }
@@ -75,6 +79,8 @@ new-expense-review-error-receipt-not-image = Please choose an image file.
 new-expense-review-error-receipt-too-large = Image must be under { $maxMb } MB.
 new-expense-review-actions-select-category = Choose category
 new-expense-review-category-search-placeholder = Search categories
+new-expense-review-category-empty-title = No categories match “{ $keyword }”
+new-expense-review-category-clear-search = Clear search
 
 new-expense-scan-button = Scan receipt
 new-expense-scan-title = Scan a receipt

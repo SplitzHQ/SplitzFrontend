@@ -6,6 +6,8 @@ import { type ComponentPublicInstance, computed, ref, useTemplateRef, watch } fr
 import { categoryColorMap } from "@/components/Category/category-color";
 import CategoryIcon from "@/components/Category/CategoryIcon.vue";
 import CategoryText from "@/components/Category/CategoryText.vue";
+import EmptyState from "@/components/EmptyState/EmptyState.vue";
+import SButton from "@/components/SButton/SButton.vue";
 import Sheet from "@/components/Sheet/Sheet.vue";
 import TextInput from "@/components/TextInput/TextInput.vue";
 import {
@@ -104,7 +106,7 @@ watch(
             v-for="main in mainCategories"
             :key="main"
             type="button"
-            class="shrink-0 rounded-full bg-base-bg-brand px-3 py-1.5 text-sm font-medium text-base-text-brand"
+            class="shrink-0 rounded-full bg-base-bg-brand-subtle px-3 py-1.5 text-sm font-medium text-base-text-brand"
             @click="scrollToSection(main)"
           >
             {{ $t(`main_categories-${main}`) }}
@@ -115,6 +117,18 @@ watch(
 
     <!-- Sections -->
     <div class="flex grow flex-col gap-4">
+      <EmptyState
+        v-if="visibleSections.length === 0"
+        :icon="PhMagnifyingGlass"
+        :title="$t('new-expense-review-category-empty-title', { keyword: searchQuery.trim() })"
+        title-tag="h3"
+      >
+        <template #action>
+          <SButton variant="secondary" size="md" @click="clearSearch">
+            {{ $t("new-expense-review-category-clear-search") }}
+          </SButton>
+        </template>
+      </EmptyState>
       <section v-for="section in visibleSections" :key="section.main" :ref="(el) => setSectionEl(section.main, el)">
         <div class="mb-2 text-sm font-semibold text-base-text-secondary">
           {{ $t(`main_categories-${section.main}`) }}

@@ -25,7 +25,7 @@ export const WHEN_TO_USE: UsageRule[] = [
     title: "A failed submit",
   },
   {
-    rule: "A request that loads the page fails and the page has no data to show. Put the notice in the place of the data, with a retry button. During the retry, the notice stays and the button shows `loading`, so the focus stays on the button. HomePage and GroupDetailPage do this. A failed refresh with old data keeps the old data and shows no notice.",
+    rule: "A request that loads the page fails and the page has no data to show. Put the notice in the place of the data, with a retry button. During the retry, the notice stays and the button shows `loading`, so the focus stays on the button. HomePage and GroupDetailPage do this. A failed refresh with old data keeps the old data and shows no notice. SPZ-104 decided that a failed load moves to the error tone of EmptyState. SPZ-92 decides its copy and its actions, and this rule then moves to `empty-state.usage.ts`.",
     title: "A failed load",
   },
   {
@@ -138,7 +138,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Countdown in a notice",
   },
   {
-    text: "The body text of each tone uses the 900 token of the color of the tone. It has a contrast above 4.5:1 in both themes. The Accessibility part of the design-system page measures it from the rendered notice.",
+    text: "Each tone uses the subtle fill of its status, for example `base-bg-danger-subtle`. The body text and the icon use the text token of the same status, for example `base-text-danger`. The text has a contrast above 4.5:1 on the fill in both themes, and a test in `scripts/color-scales/` checks it. The Accessibility part of the design-system page measures it from the rendered notice.",
     title: "Contrast",
   },
   {
