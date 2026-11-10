@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { PhCaretRight, PhCheckCircle, PhCircle } from "@phosphor-icons/vue";
+import { PhCaretRight } from "@phosphor-icons/vue";
 
 import Avatar from "@/components/Avatar/Avatar.vue";
-import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
+import { LIST_ROW_CLASS, LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import SButtonBase from "@/components/SButton/SButtonBase.vue";
+import SelectableRow from "@/components/SelectableRow/SelectableRow.vue";
 
 import type { UserListItem } from "./types";
 
+/**
+ * A titled list of friends and groups on SelectPeoplePage. A friend row toggles the friend in the selection. A group
+ * row opens the next step, so it has no selected state.
+ */
 const { title, items, selectedItemsId } = defineProps<{
   title: string;
   items: UserListItem[];
@@ -20,85 +25,49 @@ defineEmits<{
 
 <template>
   <div class="flex flex-col gap-1">
-    <div class="flex items-center gap-2">
-      <div class="text-sm font-medium text-base-text-quaternary">{{ title }}</div>
-    </div>
-    <div class="flex flex-col">
-      <button
-        v-for="item in items"
-        :key="item.id"
-        class="flex cursor-pointer items-center gap-3 py-1 text-left"
-        @click="() => $emit('select', item.id)"
-      >
-        <div class="flex flex-1 items-center gap-3">
+    <div class="text-sm font-medium text-base-text-quaternary">{{ title }}</div>
+    <div class="flex flex-col gap-1">
+      <template v-for="item in items" :key="item.id">
+        <SelectableRow
+          v-if="item.__typename === 'UserListItemFriend'"
+          :selected="selectedItemsId.includes(item.id)"
+          @toggle="$emit('select', item.id)"
+        >
           <Avatar
-            v-if="item.__typename === 'UserListItemGroup'"
-            aria-hidden="true"
-            :images="item.members.map((member) => ({ src: member.photo, alt: member.userName }))"
-            size="xs"
-          />
-          <Avatar
-            v-else-if="item.__typename === 'UserListItemFriend'"
             aria-hidden="true"
             :images="[{ src: item.friendUser.photo, alt: item.friendUser.userName }]"
             size="xs"
           />
-          <div class="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-            <template v-if="item.__typename === 'UserListItemGroup'">
-              <div :class="['truncate', LIST_ROW_TEXT.title]">
-                {{ item.name }}
-              </div>
-              <div :class="['truncate', LIST_ROW_TEXT.subtitle]">
-                {{ item.members.map((member) => member.userName).join(", ") }}
-              </div>
+          <span :class="['min-w-0 flex-1 truncate', LIST_ROW_TEXT.title]">
+            {{ item.friendUser.userName }}
+          </span>
+        </SelectableRow>
+        <!-- The ring stays inside the row, like the ring of a friend row. -->
+        <button
+          v-else
+          type="button"
+          :class="[LIST_ROW_CLASS, 'text-left focus-visible:-outline-offset-2']"
+          @click="$emit('select', item.id)"
+        >
+          <Avatar
+            aria-hidden="true"
+            :images="item.members.map((member) => ({ src: member.photo, alt: member.userName }))"
+            size="xs"
+          />
+          <span class="flex min-w-0 flex-1 flex-col justify-center gap-1">
+            <span :class="['truncate', LIST_ROW_TEXT.title]">{{ item.name }}</span>
+            <span :class="['truncate', LIST_ROW_TEXT.subtitle]">
+              {{ item.members.map((member) => member.userName).join(", ") }}
+            </span>
+          </span>
+          <!-- SButtonBase grows to fill its parent, so it does not grow here and stays at the end of the row. -->
+          <SButtonBase size="sm" variant="ghost" icon-only class="grow-0">
+            <template #icon-left>
+              <PhCaretRight />
             </template>
-            <div
-              v-else-if="item.__typename === 'UserListItemFriend'"
-              :class="[
-                'truncate',
-                LIST_ROW_TEXT.title,
-                selectedItemsId.some((id) => item.id === id) ? 'text-util-color-brand-500' : '',
-              ]"
-            >
-              {{ item.friendUser.userName }}
-            </div>
-          </div>
-        </div>
-        <SButtonBase v-if="item.__typename === 'UserListItemFriend'" size="sm" variant="ghost" icon-only>
-          <template #icon-left>
-            <Transition name="fade">
-              <PhCheckCircle
-                v-if="selectedItemsId.some((id) => item.id === id)"
-                weight="fill"
-                class="absolute inset-0 size-full text-base-fg-brand"
-              />
-              <PhCircle v-else class="absolute inset-0" />
-            </Transition>
-          </template>
-        </SButtonBase>
-        <SButtonBase v-else-if="item.__typename === 'UserListItemGroup'" size="sm" variant="ghost" icon-only>
-          <template #icon-left>
-            <PhCaretRight />
-          </template>
-        </SButtonBase>
-      </button>
+          </SButtonBase>
+        </button>
+      </template>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.fade {
-  &-enter-active,
-  &-leave-active {
-    transition: opacity 0.1s ease-in-out;
-  }
-  &-enter-from,
-  &-leave-to {
-    opacity: 0;
-  }
-  &-enter-to,
-  &-leave-from {
-    opacity: 1;
-  }
-}
-</style>
