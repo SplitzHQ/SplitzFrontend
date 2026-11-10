@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from "vue";
 
-import { MOTION_EASING, motionSlow, prefersReducedMotion } from "@/libs/motion";
+import { motionSlow, prefersReducedMotion } from "@/libs/motion";
 import { holdStatusBarColor } from "@/libs/status-bar-color";
 
 import { BRAND_COLOR, LIGHT_COLOR } from "./brand-glyph";
-import {
-  cancelWhenDone,
-  claimOpening,
-  OPENING_FADE_MS,
-  OPENING_MARK_PX,
-  OPENING_STAY_MS,
-  OPENING_STEPS,
-  playSteps,
-} from "./brand-motion";
+import { claimOpening, OPENING_MARK_PX, playOpening, type OpeningPlay } from "./brand-motion";
 import BrandMotionGlyph from "./BrandMotionGlyph.vue";
 
 /**
@@ -33,8 +25,7 @@ const leaving = shallowRef(false);
 const layer = useTemplateRef<HTMLElement>("layer");
 
 let releaseStatusBar: (() => void) | undefined;
-let animations: Animation[] = [];
-let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+let play: OpeningPlay | undefined;
 
 // In setup, so the status bar has this color from the first frame of the layer.
 if (showing.value) releaseStatusBar = holdStatusBarColor(PLATE_COLOR_TOKEN);
@@ -53,31 +44,18 @@ onMounted(() => {
     showing.value = false;
     return;
   }
-  const slow = motionSlow();
-  const total = OPENING_STAY_MS + OPENING_FADE_MS;
-  const fade = element.animate(
-    [
-      { offset: 0, opacity: 1 },
-      { easing: MOTION_EASING.standard, offset: OPENING_STAY_MS / total, opacity: 1 },
-      { offset: 1, opacity: 0 },
-    ],
-    { duration: total * slow, fill: "both" }
-  );
-  animations = [fade, ...playSteps(element, OPENING_STEPS, slow)];
-  fadeTimer = setTimeout(() => {
+  play = playOpening(element, motionSlow());
+  void play.leaving.then(() => {
     leaving.value = true;
     release();
-  }, OPENING_STAY_MS * slow);
-  void cancelWhenDone(animations).then(() => {
+  });
+  void play.done.then(() => {
     showing.value = false;
   });
 });
 
 onBeforeUnmount(() => {
-  clearTimeout(fadeTimer);
-  animations.forEach((animation) => {
-    animation.cancel();
-  });
+  play?.cancel();
   release();
 });
 </script>
