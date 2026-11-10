@@ -21,7 +21,7 @@ export const RULE_SCOPE: RuleScope = {
 /** When to use an empty state. The prototype `2026-11-08-empty-states` (SPZ-104) decided these rules. */
 export const WHEN_TO_USE: UsageRule[] = [
   {
-    rule: "A list, a sheet or a page loaded and has nothing to show. Put the empty state in the place of the list. Examples: a new group with no expenses, the notifications, the friends on ProfilePage, InviteFriendsSheet and SelectTransactionsPage.",
+    rule: "A list, a sheet or a page loaded and has nothing to show. Put the empty state in the place of the list. Examples: a new group with no expenses, the notifications, the friends on ProfilePage and InviteFriendsSheet.",
     title: "Nothing to show",
   },
   {

@@ -71,7 +71,7 @@ export const BOTTOM_ACTION_RULES: UsageRule[] = [
     title: "Taps",
   },
   {
-    rule: "A floating button with an icon, such as the add button of HomePage and GroupDetailPage, does not use BottomAction and has no blur. SelectTransactionsPage has a bar with an opaque fill, so it needs no blur.",
+    rule: "A floating button with an icon, such as the add button of HomePage and GroupDetailPage, does not use BottomAction and has no blur.",
     title: "Not a bottom action",
   },
 ];

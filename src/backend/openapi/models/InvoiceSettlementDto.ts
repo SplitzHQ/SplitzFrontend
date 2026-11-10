@@ -55,6 +55,18 @@ export interface InvoiceSettlementDto {
      * 
      */
     recordedTime: Date;
+    /**
+     * True when the receiver confirmed the payment. False while the payment waits for the receiver.
+     */
+    isConfirmed: boolean;
+    /**
+     * Time when the receiver confirmed the payment. Null while the payment waits.
+     */
+    confirmedTime?: Date | null;
+    /**
+     * User who confirmed the payment. Null while the payment waits.
+     */
+    confirmedBy?: SplitzUserReducedDto | null;
 }
 
 /**
@@ -68,6 +80,7 @@ export function instanceOfInvoiceSettlementDto(value: object): value is InvoiceS
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('recordedBy' in value) || value['recordedBy'] === undefined) return false;
     if (!('recordedTime' in value) || value['recordedTime'] === undefined) return false;
+    if (!('isConfirmed' in value) || value['isConfirmed'] === undefined) return false;
     return true;
 }
 
@@ -88,6 +101,9 @@ export function InvoiceSettlementDtoFromJSONTyped(json: any, ignoreDiscriminator
         'amount': json['amount'],
         'recordedBy': SplitzUserReducedDtoFromJSON(json['recordedBy']),
         'recordedTime': (json['recordedTime'] == null ? json['recordedTime'] : parseDateTime(json['recordedTime'])),
+        'isConfirmed': json['isConfirmed'],
+        'confirmedTime': json['confirmedTime'] === undefined ? undefined : json['confirmedTime'] === null ? null : parseDateTime(json['confirmedTime']),
+        'confirmedBy': json['confirmedBy'] == null ? undefined : SplitzUserReducedDtoFromJSON(json['confirmedBy']),
     };
 }
 
@@ -109,6 +125,9 @@ export function InvoiceSettlementDtoToJSONTyped(value?: InvoiceSettlementDto | n
         'amount': value['amount'],
         'recordedBy': SplitzUserReducedDtoToJSON(value['recordedBy']),
         'recordedTime': value['recordedTime'] == null ? value['recordedTime'] : serializeDateTime(value['recordedTime']),
+        'isConfirmed': value['isConfirmed'],
+        'confirmedTime': value['confirmedTime'] == null ? value['confirmedTime'] : serializeDateTime(value['confirmedTime']),
+        'confirmedBy': SplitzUserReducedDtoToJSON(value['confirmedBy']),
     };
 }
 

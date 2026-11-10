@@ -53,7 +53,7 @@ Use consistent terms across every screen and notification:
 | Group                       | group                           | 群组                        | Avoid bare `组`                                                               |
 | Friend                      | friend                          | 好友                        | Avoid mixing `朋友` in UI labels/titles (`朋友` is fine in casual body prose) |
 | Expense / Transaction       | expense                         | 支出 (or 记一笔 for action) | Avoid `交易` or `费用` in user-facing copy                                    |
-| Invoice (settlement batch)  | invoice                         | 结算单                      | Avoid `账单` (collides with utility bills)                                    |
+| Settle-up round             | settle-up                       | 结算                        | The app no longer says `invoice` / `结算单`; avoid `账单`                     |
 | Settlement / Payment        | payment / settle up             | 还款 / 结算                 | Avoid literal `记录了一笔结算` when referring to a payment                    |
 | Receipt                     | receipt                         | 小票                        | Avoid formal `收据`                                                           |
 | Nickname / Remark           | nickname                        | 备注名                      | Consistent across add/edit friend sheets                                      |

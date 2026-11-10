@@ -70,35 +70,92 @@ describe("describeNotification", () => {
     expect(text.body).toContain("notification-related-transaction-lent-body");
   });
 
-  it("falls back to a placeholder for unnamed invoices", () => {
+  it("uses settle-up wording without a round name", () => {
     const text = describeNotification(
       $t,
-      base("RelatedInvoiceSettled", { groupId: "g", groupName: "Trip", invoiceId: "i", invoiceName: null })
+      base("RelatedInvoiceSettled", { groupId: "g", groupName: "Trip", invoiceId: "i", invoiceName: "Old name" })
     );
 
-    expect(text.body).toContain('"invoice":"notification-invoice-unnamed"');
+    expect(text.title).toBe("notification-related-settle-up-done-title");
+    expect(text.body).toBe('notification-related-settle-up-done-body {"group":"Trip"}');
     expect(text.tone).toBe("success");
+  });
+
+  it("names the creator of a new settle-up", () => {
+    const text = describeNotification(
+      $t,
+      base("InvoiceCreated", {
+        creatorName: "Bob",
+        creatorUserId: "u2",
+        groupId: "g",
+        groupName: "Trip",
+        invoiceId: "i",
+      })
+    );
+
+    expect(text.title).toContain("notification-settle-up-created-title");
+    expect(text.body).toContain("notification-settle-up-created-body");
+    expect(text.body).toContain('"creator":"Bob"');
+    expect(text.body).not.toContain("invoice");
+    expect(text.tone).toBe("neutral");
+  });
+
+  const payment = {
+    amount: 5,
+    currency: "USD",
+    fromUserId: "a",
+    fromUserName: "Ann",
+    groupId: "g",
+    groupName: "Trip",
+    invoiceId: "i",
+    recorderName: "Bob",
+    recorderUserId: "u2",
+    toUserId: "b",
+    toUserName: "Cat",
+  };
+
+  it("asks the receiver to confirm a payment that is not confirmed", () => {
+    const text = describeNotification($t, base("RelatedSettlementRecorded", { ...payment, isConfirmed: false }));
+
+    expect(text.title).toContain("notification-related-settlement-recorded-title");
+    expect(text.body).toContain("notification-related-settlement-recorded-body");
+    expect(text.body).toContain('"from":"Ann"');
+    expect(text.body).toContain('"amount":"$5.00"');
+    expect(text.tone).toBe("brand");
+  });
+
+  it("tells the payer that the receiver confirmed the payment", () => {
+    const text = describeNotification($t, base("RelatedSettlementRecorded", { ...payment, isConfirmed: true }));
+
+    expect(text.title).toContain("notification-related-settlement-confirmed-title");
+    expect(text.body).toContain("notification-related-settlement-confirmed-body");
+    expect(text.body).toContain('"to":"Cat"');
+    expect(text.tone).toBe("success");
+  });
+
+  it("treats an old payment without isConfirmed as confirmed", () => {
+    const text = describeNotification($t, base("RelatedSettlementRecorded", payment));
+
+    expect(text.body).toContain("notification-related-settlement-confirmed-body");
   });
 
   it("keeps plain group activity in the neutral tone", () => {
     const text = describeNotification(
       $t,
-      base("SettlementRecorded", {
-        amount: 5,
-        currency: "USD",
-        fromUserId: "a",
-        fromUserName: "Ann",
-        groupName: "Trip",
-        invoiceId: "i",
-        recorderName: "Bob",
-        recorderUserId: "u2",
-        toUserId: "b",
-        toUserName: null,
-      })
+      base("SettlementRecorded", { ...payment, groupId: null, isConfirmed: false, toUserName: null })
     );
 
     expect(text.tone).toBe("neutral");
+    expect(text.body).toContain("notification-settlement-recorded-body");
     expect(text.body).toContain('"to":"notification-someone"');
     expect(text.title).toContain('"group":"Trip"');
+  });
+
+  it("uses the confirmed wording for a confirmed payment between other members", () => {
+    const text = describeNotification($t, base("SettlementRecorded", { ...payment, isConfirmed: true }));
+
+    expect(text.title).toContain("notification-settlement-confirmed-title");
+    expect(text.body).toContain("notification-settlement-confirmed-body");
+    expect(text.tone).toBe("neutral");
   });
 });

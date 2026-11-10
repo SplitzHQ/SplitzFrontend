@@ -20,11 +20,11 @@ export const RULE_SCOPE: RuleScope = {
 /** Which component to use. */
 export const COMPONENT_RULES: Record<TransactionItemComponent, UsageRule> = {
   TransactionItem: {
-    rule: "The row opens the detail page of the transaction. GroupDetailPage and InvoiceDetailPage use it.",
+    rule: "The row opens the detail page of the transaction. GroupDetailPage and SettleUpRoundPage use it.",
     title: "A row that opens the transaction",
   },
   TransactionItemContent: {
-    rule: "The row does something else when the user presses it. SelectableTransactionItem on SettleUpPage puts it in a SelectableRow, which selects the transaction.",
+    rule: "The row does something else when the user presses it. CoveredExpensesSheet in SettleUpPage puts it in a button that shows the detail of the expense in the same sheet.",
     title: "A row with another action",
   },
 };
@@ -36,7 +36,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "The parent is the row",
   },
   {
-    rule: "The default slot goes at the end of the row, after the balance. A SelectableRow does not use it, because the row draws its own check mark after the content.",
+    rule: "The default slot goes at the end of the row, after the balance, for example a check mark.",
     title: "Slot",
   },
 ];
@@ -84,7 +84,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Hover, press and reduced motion",
   },
   {
-    text: "A row in a button must give its state to a screen reader. SelectableTransactionItem uses `aria-pressed`, and its check marks have `aria-hidden`.",
+    text: "A row in a button that selects must give its state to a screen reader with `aria-pressed`, and a check mark in it has `aria-hidden`.",
     title: "Selected state",
   },
   {

@@ -25,11 +25,35 @@ export interface NotificationText {
 }
 
 /**
+ * Locale keys for a payment notification. `related` goes to the payer or the receiver, `group` goes to the
+ * other members. `recorded` means the payer marked the payment as paid and the receiver must confirm it.
+ * `confirmed` means the receiver confirmed it.
+ */
+const settlementKeys = {
+  group: {
+    confirmed: { body: "notification-settlement-confirmed-body", title: "notification-settlement-confirmed-title" },
+    recorded: { body: "notification-settlement-recorded-body", title: "notification-settlement-recorded-title" },
+  },
+  related: {
+    confirmed: {
+      body: "notification-related-settlement-confirmed-body",
+      title: "notification-related-settlement-confirmed-title",
+    },
+    recorded: {
+      body: "notification-related-settlement-recorded-body",
+      title: "notification-related-settlement-recorded-title",
+    },
+  },
+} as const;
+
+/**
  * Build the human-readable copy for one notification. Kept as a plain function so it can be tested
  * without mounting a component.
+ *
+ * The backend calls a settle-up round an invoice. The copy says settle-up and never shows a round name,
+ * because a round has no name.
  */
 export function describeNotification($t: Translate, n: TypedNotification): NotificationText {
-  const invoiceName = (name: string | null | undefined) => name ?? $t("notification-invoice-unnamed");
   const userName = (name: string | null | undefined) => name ?? $t("notification-someone");
 
   switch (n.type) {
@@ -92,63 +116,56 @@ export function describeNotification($t: Translate, n: TypedNotification): Notif
         tone: "brand",
       };
     }
-    case "InvoiceCreated": {
-      return {
-        body: $t("notification-invoice-created-body", {
-          creator: userName(n.data.creatorName),
-          invoice: invoiceName(n.data.invoiceName),
-        }),
-        icon: PhWallet,
-        title: $t("notification-invoice-created-title", { group: n.data.groupName ?? "" }),
-        tone: "neutral",
-      };
-    }
+    case "InvoiceCreated":
     case "RelatedInvoiceCreated": {
+      const related = n.type === "RelatedInvoiceCreated";
+      const args = { creator: userName(n.data.creatorName), group: n.data.groupName ?? "" };
       return {
-        body: $t("notification-related-invoice-created-body", {
-          creator: userName(n.data.creatorName),
-          group: n.data.groupName ?? "",
-          invoice: invoiceName(n.data.invoiceName),
-        }),
+        body: related
+          ? $t("notification-related-settle-up-created-body", args)
+          : $t("notification-settle-up-created-body", args),
         icon: PhWallet,
-        title: $t("notification-related-invoice-created-title"),
-        tone: "brand",
+        title: related
+          ? $t("notification-related-settle-up-created-title")
+          : $t("notification-settle-up-created-title", args),
+        tone: related ? "brand" : "neutral",
       };
     }
     case "SettlementRecorded":
     case "RelatedSettlementRecorded": {
       const related = n.type === "RelatedSettlementRecorded";
+      // An old payload has no `isConfirmed`. Old payments were recorded in one step, so they count as confirmed.
+      const confirmed = n.data.isConfirmed ?? true;
       const args = {
         amount: formatCurrency(n.data.amount, n.data.currency),
         from: userName(n.data.fromUserName),
         group: n.data.groupName ?? "",
-        invoice: invoiceName(n.data.invoiceName),
-        recorder: userName(n.data.recorderName),
         to: userName(n.data.toUserName),
       };
+      const keys = settlementKeys[related ? "related" : "group"][confirmed ? "confirmed" : "recorded"];
+      let tone: NotificationText["tone"] = "neutral";
+      if (related) {
+        tone = confirmed ? "success" : "brand";
+      }
       return {
-        body: related
-          ? $t("notification-related-settlement-recorded-body", args)
-          : $t("notification-settlement-recorded-body", args),
-        icon: PhArrowsLeftRight,
-        title: related
-          ? $t("notification-related-settlement-recorded-title")
-          : $t("notification-settlement-recorded-title", args),
-        tone: related ? "brand" : "neutral",
+        body: $t(keys.body, args),
+        icon: confirmed ? PhCheckCircle : PhArrowsLeftRight,
+        title: $t(keys.title, args),
+        tone,
       };
     }
     case "InvoiceSettled":
     case "RelatedInvoiceSettled": {
       const related = n.type === "RelatedInvoiceSettled";
-      const args = { group: n.data.groupName ?? "", invoice: invoiceName(n.data.invoiceName) };
+      const args = { group: n.data.groupName ?? "" };
       return {
         body: related
-          ? $t("notification-related-invoice-settled-body", args)
-          : $t("notification-invoice-settled-body", args),
+          ? $t("notification-related-settle-up-done-body", args)
+          : $t("notification-settle-up-done-body", args),
         icon: PhCheckCircle,
         title: related
-          ? $t("notification-related-invoice-settled-title")
-          : $t("notification-invoice-settled-title", args),
+          ? $t("notification-related-settle-up-done-title")
+          : $t("notification-settle-up-done-title", args),
         tone: "success",
       };
     }
