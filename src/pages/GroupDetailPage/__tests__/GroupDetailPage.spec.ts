@@ -28,6 +28,7 @@ const requests: Record<string, ReturnType<typeof makeRequest>> = vi.hoisted(() =
 
 vi.mock("@pinia/colada", () => ({
   useQuery: ({ key }: { key: () => string[] }) => requests[key()[0] ?? ""],
+  useQueryCache: () => ({ invalidateQueries: vi.fn() }),
 }));
 
 vi.mock("fluent-vue", () => ({
@@ -57,9 +58,10 @@ function mountPage() {
         GroupSettingsSheet: true,
         HeaderMobileSecondary: true,
         InviteFriendsSheet: true,
-        InvoiceList: true,
         Layout: { template: "<div><slot name='header' /><slot /></div>" },
+        RoundBar: true,
         SSegmentControl: { template: "<div data-test='tabs' />" },
+        StartSettleUpSheet: true,
         TransactionList: { template: "<div data-test='transactions' />" },
       },
     },
@@ -72,6 +74,7 @@ describe("GroupDetailPage load states", () => {
     requests.getGroup = makeRequest();
     requests.getGroupTransactions = makeRequest();
     requests.getGroupInvoices = makeRequest();
+    requests.getGroupRounds = makeRequest();
   });
 
   it("shows the skeletons and the real tabs during the first load", async () => {
@@ -139,5 +142,46 @@ describe("GroupDetailPage load states", () => {
     expect(wrapper.find(LOAD_ERROR).exists()).toBe(false);
     expect(wrapper.find("balance-card-stub").exists()).toBe(true);
     expect(wrapper.find('[data-test="transactions"]').exists()).toBe(true);
+  });
+});
+
+describe("GroupDetailPage settle-up round", () => {
+  const ME = { id: "me", userName: "You" };
+  const BEN = { id: "ben", userName: "Ben" };
+  const OPEN_ROUND = { createTime: new Date(2026, 10, 9), invoiceId: "round-1", status: "Open" };
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    requests.getGroup = makeRequest();
+    requests.getGroupTransactions = makeRequest();
+    requests.getGroupInvoices = makeRequest();
+    requests.getGroupRounds = makeRequest();
+  });
+
+  it("shows no round line and keeps the Settle up button without a running round", () => {
+    setStates(SUCCESS_GROUP, SUCCESS_LIST, SUCCESS_LIST);
+    const wrapper = mountPage();
+
+    expect(wrapper.find("round-bar-stub").exists()).toBe(false);
+    expect(wrapper.getComponent({ name: "BalanceCard" }).props("canSettle")).toBe(true);
+  });
+
+  it("shows the round line and hides the Settle up button while a round runs", () => {
+    setStates(SUCCESS_GROUP, SUCCESS_LIST, { data: [OPEN_ROUND], status: "success" });
+    requests.getGroupRounds.state.value = {
+      data: [
+        {
+          ...OPEN_ROUND,
+          currency: "USD",
+          debts: [{ amount: "30.00", fromUser: BEN, invoiceId: "round-1", paid: "0", remaining: "30.00", toUser: ME }],
+          settlements: [],
+        },
+      ],
+      status: "success",
+    };
+    const wrapper = mountPage();
+
+    expect(wrapper.find("round-bar-stub").exists()).toBe(true);
+    expect(wrapper.getComponent({ name: "BalanceCard" }).props("canSettle")).toBe(false);
   });
 });

@@ -27,9 +27,10 @@ const router = createRouter({
       path: "/group/:groupId/transaction/:transactionId",
     },
     {
-      component: () => import("@/pages/InvoiceDetailPage/InvoiceDetailPage.vue"),
-      name: "invoiceDetail",
-      path: "/group/:groupId/invoice/:invoiceId",
+      // The backend keeps a settle-up round as an invoice, so the path has the invoice ID (SPZ-105).
+      component: () => import("@/pages/SettleUpPage/SettleUpRoundPage.vue"),
+      name: "settleUpRound",
+      path: "/group/:groupId/settle-up/:invoiceId",
     },
     {
       component: () => import("@/pages/JoinGroupPage/JoinGroupPage.vue"),
@@ -110,26 +111,6 @@ const router = createRouter({
       component: () => import("@/pages/ReceiptRecognitionSettingsPage/ReceiptRecognitionSettingsPage.vue"),
       name: "receiptRecognitionSettings",
       path: "/profile/receipt-recognition",
-    },
-    {
-      name: "settleUp",
-      path: "/group/:groupId/settle-up",
-      redirect: (to) => `/group/${to.params.groupId as string}/settle-up/select-transactions`,
-    },
-    {
-      component: () => import("@/pages/SettleUpPage/SelectTransactionsPage.vue"),
-      name: "settleUpSelectTransactions",
-      path: "/group/:groupId/settle-up/select-transactions",
-    },
-    {
-      component: () => import("@/pages/SettleUpPage/ConfirmDetailsPage.vue"),
-      name: "settleUpConfirmDetails",
-      path: "/group/:groupId/settle-up/confirm-details",
-    },
-    {
-      component: () => import("@/pages/SettleUpPage/DonePage.vue"),
-      name: "settleUpDone",
-      path: "/group/:groupId/settle-up/done",
     },
   ],
   /*

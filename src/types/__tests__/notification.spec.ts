@@ -37,14 +37,24 @@ describe("getNotificationRoute", () => {
     });
   });
 
-  it("deep links invoice events to the invoice detail page", () => {
-    const n = asTypedNotification(raw("InvoiceSettled", { groupId: "g1", invoiceId: "i1" }))!;
-    expect(getNotificationRoute(n)).toEqual({ name: "invoiceDetail", params: { groupId: "g1", invoiceId: "i1" } });
+  it.each(["InvoiceCreated", "RelatedInvoiceCreated", "InvoiceSettled", "RelatedInvoiceSettled"])(
+    "deep links %s to the settle-up round page",
+    (type) => {
+      const n = asTypedNotification(raw(type, { groupId: "g1", invoiceId: "i1" }))!;
+      expect(getNotificationRoute(n)).toEqual({ name: "settleUpRound", params: { groupId: "g1", invoiceId: "i1" } });
+    }
+  );
+
+  it.each(["SettlementRecorded", "RelatedSettlementRecorded"])("deep links %s to the settle-up round page", (type) => {
+    const n = asTypedNotification(raw(type, { groupId: "g1", invoiceId: "i1", isConfirmed: false }))!;
+    expect(getNotificationRoute(n)).toEqual({ name: "settleUpRound", params: { groupId: "g1", invoiceId: "i1" } });
   });
 
-  it("deep links payments to the invoice detail page", () => {
-    const n = asTypedNotification(raw("RelatedSettlementRecorded", { groupId: "g1", invoiceId: "i1" }))!;
-    expect(getNotificationRoute(n)).toEqual({ name: "invoiceDetail", params: { groupId: "g1", invoiceId: "i1" } });
+  it("does not navigate for a payment without a group or a round", () => {
+    const noGroup = asTypedNotification(raw("RelatedSettlementRecorded", { groupId: null, invoiceId: "i1" }))!;
+    const noRound = asTypedNotification(raw("RelatedSettlementRecorded", { groupId: "g1" }))!;
+    expect(getNotificationRoute(noGroup)).toBeNull();
+    expect(getNotificationRoute(noRound)).toBeNull();
   });
 
   it("does not navigate for requests", () => {

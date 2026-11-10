@@ -55,6 +55,17 @@ export interface AddSettlementRequest {
     invoiceSettlementInputDto?: InvoiceSettlementInputDto;
 }
 
+export interface ConfirmSettlementRequest {
+    /**
+     *
+     */
+    id: string;
+    /**
+     *
+     */
+    settlementId: string;
+}
+
 export interface CreateInvoiceRequest {
     /**
      * 
@@ -85,6 +96,17 @@ export interface GetInvoiceRequest {
      * 
      */
     id: string;
+}
+
+export interface RejectSettlementRequest {
+    /**
+     *
+     */
+    id: string;
+    /**
+     *
+     */
+    settlementId: string;
 }
 
 export interface UpdateInvoiceRequest {
@@ -156,6 +178,67 @@ export class InvoiceApi extends runtime.BaseAPI {
      */
     async addSettlement(requestParameters: AddSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<InvoiceSettlementDto> {
         const response = await this.addSettlementRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for confirmSettlement without sending the request
+     */
+    async confirmSettlementRequestOpts(requestParameters: ConfirmSettlementRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling confirmSettlement().'
+            );
+        }
+
+        if (requestParameters['settlementId'] == null) {
+            throw new runtime.RequiredError(
+                'settlementId',
+                'Required parameter "settlementId" was null or undefined when calling confirmSettlement().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/invoice/{id}/settlement/{settlementId}/confirm`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{settlementId}', encodeURIComponent(String(requestParameters['settlementId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Confirm a payment that waits for the receiver. Only the receiver (ToUserId) can confirm it. The confirmed payment counts toward the debt and changes the group balances.
+     */
+    async confirmSettlementRaw(requestParameters: ConfirmSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<InvoiceSettlementDto>> {
+        const requestOptions = await this.confirmSettlementRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => InvoiceSettlementDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Confirm a payment that waits for the receiver. Only the receiver (ToUserId) can confirm it. The confirmed payment counts toward the debt and changes the group balances.
+     */
+    async confirmSettlement(requestParameters: ConfirmSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<InvoiceSettlementDto> {
+        const response = await this.confirmSettlementRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -415,6 +498,66 @@ export class InvoiceApi extends runtime.BaseAPI {
     async getInvoices(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<InvoiceReducedDto>> {
         const response = await this.getInvoicesRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for rejectSettlement without sending the request
+     */
+    async rejectSettlementRequestOpts(requestParameters: RejectSettlementRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling rejectSettlement().'
+            );
+        }
+
+        if (requestParameters['settlementId'] == null) {
+            throw new runtime.RequiredError(
+                'settlementId',
+                'Required parameter "settlementId" was null or undefined when calling rejectSettlement().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/invoice/{id}/settlement/{settlementId}/reject`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{settlementId}', encodeURIComponent(String(requestParameters['settlementId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Reject a payment that waits for the receiver (\"Not received\"). Only the receiver (ToUserId) can reject it. The method deletes the payment. A confirmed payment cannot be rejected and returns 409.
+     */
+    async rejectSettlementRaw(requestParameters: RejectSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.rejectSettlementRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Reject a payment that waits for the receiver (\"Not received\"). Only the receiver (ToUserId) can reject it. The method deletes the payment. A confirmed payment cannot be rejected and returns 409.
+     */
+    async rejectSettlement(requestParameters: RejectSettlementRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.rejectSettlementRaw(requestParameters, initOverrides);
     }
 
     /**

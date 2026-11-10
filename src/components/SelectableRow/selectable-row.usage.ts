@@ -17,7 +17,7 @@ export const RULE_SCOPE: RuleScope = {
 /** When to use the row. */
 export const WHEN_TO_USE: UsageRule[] = [
   {
-    rule: "The user selects more than one item from a list, and a later button uses the selection. SelectPeoplePage, InviteFriendsSheet and SelectTransactionsPage use it.",
+    rule: "The user selects more than one item from a list, and a later button uses the selection. SelectPeoplePage and InviteFriendsSheet use it.",
     title: "A list with several picks",
   },
 ];

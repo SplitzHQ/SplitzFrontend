@@ -81,6 +81,12 @@ export interface SettlementRecordedData {
   invoiceName?: string | null;
   groupId?: string | null;
   groupName?: string | null;
+  /**
+   * `false` when the payer marked the payment as paid and the receiver must still confirm it.
+   * `true` when the receiver confirmed it. An old payload has no field: treat it as `true`,
+   * because the app recorded old payments in one step.
+   */
+  isConfirmed?: boolean;
 }
 
 export interface InvoiceSettledData {
@@ -133,20 +139,21 @@ export function getNotificationRoute(
         params: { groupId: notification.data.groupId, transactionId: notification.data.transactionId },
       };
     }
+    // The backend still calls a settle-up round an invoice, so the round page takes `invoiceId`.
     case "InvoiceCreated":
     case "RelatedInvoiceCreated":
     case "InvoiceSettled":
     case "RelatedInvoiceSettled": {
       return {
-        name: "invoiceDetail",
+        name: "settleUpRound",
         params: { groupId: notification.data.groupId, invoiceId: notification.data.invoiceId },
       };
     }
     case "SettlementRecorded":
     case "RelatedSettlementRecorded": {
-      return notification.data.groupId
+      return notification.data.groupId && notification.data.invoiceId
         ? {
-            name: "invoiceDetail",
+            name: "settleUpRound",
             params: { groupId: notification.data.groupId, invoiceId: notification.data.invoiceId },
           }
         : null;

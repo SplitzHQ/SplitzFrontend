@@ -39,7 +39,7 @@ export const BUTTON_RULES: UsageRule[] = [
     title: "Close",
   },
   {
-    rule: "Show only the close button on the first step of a flow and on a result page, because the back button has no different page to open or must not return to a finished step. Show the back button and the close button on the other steps. CreateGroupPage, EnterAmountPage, SelectTransactionsPage and DonePage have only the close button.",
+    rule: "Show only the close button on the first step of a flow and on a result page, because the back button has no different page to open or must not return to a finished step. Show the back button and the close button on the other steps. CreateGroupPage and EnterAmountPage have only the close button.",
     title: "Flow steps",
   },
   {

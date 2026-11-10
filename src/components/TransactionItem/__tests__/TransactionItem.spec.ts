@@ -5,7 +5,6 @@ import { createMemoryHistory, createRouter } from "vue-router";
 import type { TransactionBalanceDto, TransactionDto } from "@/backend";
 import { LIST_ROW_TEXT } from "@/components/ListRow/list-row";
 import { formatCurrency } from "@/libs/format-currency";
-import SelectableTransactionItem from "@/pages/SettleUpPage/SelectableTransactionItem.vue";
 
 import { balanceOf, findTransactionPayer } from "../transaction-row";
 import TransactionItem from "../TransactionItem.vue";
@@ -60,14 +59,6 @@ async function mountLink(value: TransactionDto) {
       plugins: [router],
     },
     props: { transaction: value },
-  });
-}
-
-/** Mounts a row that the user can select. */
-function mountSelectable(selected: boolean) {
-  return mount(SelectableTransactionItem, {
-    global: { mocks: { $t: (id: string) => id }, stubs: { transition: false } },
-    props: { selected, transaction: transaction([balance("a", "25.00"), balance("b", "-25.00")]) },
   });
 }
 
@@ -178,23 +169,5 @@ describe("TransactionItem", () => {
     const wrapper = await mountLink(transaction([]));
 
     expect(wrapper.get("svg").attributes("aria-hidden")).toBe("true");
-  });
-});
-
-describe("SelectableTransactionItem", () => {
-  it("tells a screen reader the state", () => {
-    expect(mountSelectable(true).get("button").attributes("aria-pressed")).toBe("true");
-    expect(mountSelectable(false).get("button").attributes("aria-pressed")).toBe("false");
-  });
-
-  it("puts the hidden check mark at the end of the row and emits toggle", async () => {
-    const wrapper = mountSelectable(false);
-    const button = wrapper.get("button");
-
-    expect(button.element.lastElementChild?.getAttribute("aria-hidden")).toBe("true");
-    expect(button.element.lastElementChild?.querySelector("svg")).not.toBeNull();
-
-    await button.trigger("click");
-    expect(wrapper.emitted("toggle")).toHaveLength(1);
   });
 });

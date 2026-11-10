@@ -72,12 +72,6 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "The header of a secondary page. It holds the h1 of the page, an optional back button and an optional close button.",
   },
   {
-    components: ["InvoiceStatusPill"],
-    folder: "InvoiceStatusPill",
-    usage: "src/components/InvoiceStatusPill/invoice-status-pill.usage.ts",
-    use: "The status of an invoice.",
-  },
-  {
     components: ["Keyboard"],
     folder: "Keyboard",
     usage: "src/components/Keyboard/keyboard.usage.ts",
