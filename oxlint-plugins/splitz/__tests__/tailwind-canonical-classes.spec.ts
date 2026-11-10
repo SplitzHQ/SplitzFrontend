@@ -48,9 +48,29 @@ new RuleTester().run("tailwind-canonical-classes", tailwindCanonicalClasses, {
       name: "gives the line and column of a class after non-ASCII text",
       output: '// 账单 “一”\nconst a = "h-6.75";',
     },
+    {
+      code: 'const a = (icon?: Element) => (!icon ? "!flex" : `!flex ${"!flex"}`);',
+      errors: [{ message: "`!flex` has a canonical form: `flex!`." }, { message: /`!flex`/ }, { message: /`!flex`/ }],
+      filename: "a.ts",
+      name: "replaces the important modifier in each string next to a negation",
+      output: 'const a = (icon?: Element) => (!icon ? "flex!" : `flex! ${"flex!"}`);',
+    },
   ],
   valid: [
     { code: 'const a = "h-4 w-4";', filename: "a.ts", name: "does not join classes" },
     { code: 'const a = "flex bg-base-bg-primary rounded-05xl";', filename: "a.ts", name: "keeps canonical classes" },
+    {
+      // The line from `HomeHeader.vue`. Tailwind reads `!icon` as `icon` with the important modifier.
+      // The old fix `icon!` made a non-null assertion.
+      code: "function measure(row?: Element, label?: Element, icon?: Element) {\n  if (!row || !label || !icon || !row.id) return;\n}",
+      filename: "a.ts",
+      name: "does not report a negation in code",
+    },
+    {
+      code: "const a = (icon?: Element) => `h-4 ${!icon ? 'flex' : 'grid'}`;\nconst b = (icon?: Element) => !icon ? 1 : 2;",
+      filename: "a.ts",
+      name: "does not report a negation in a template literal expression",
+    },
+    { code: "// w-[26rem]\n/** !flex */\nconst a = 1;", filename: "a.ts", name: "does not report text in comments" },
   ],
 });

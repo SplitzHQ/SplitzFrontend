@@ -6,6 +6,11 @@
  * Oxlint gives a rule only the `<script>` block of a `.vue` file and does not lint CSS files. So this rule checks
  * `.ts` files and Vue `<script>` blocks. It does not check templates, `<style>` blocks or CSS files.
  *
+ * The rule checks only the text in string literals and template literals. Other code can look like a class:
+ * `!icon` is a JS negation, but Tailwind reads it as `icon` with the important modifier and gives `icon!`.
+ * That fix makes a non-null assertion, which changes the logic. lint-staged runs `oxlint --fix` before each commit,
+ * so the change would go into the commit without notice.
+ *
  * `__unstable__loadDesignSystem` is not a stable Tailwind API. If a Tailwind update changes it, the tests of this file fail.
  */
 import { readFileSync } from "node:fs";
@@ -49,6 +54,14 @@ async function loadCanonicalize(cssPath: string): Promise<Canonicalize> {
  */
 export const canonicalize = await loadCanonicalize(TAILWIND_ENTRY);
 
+/** The start and end offsets of a part of the source text. The end is not in the part. */
+type TextRange = readonly [start: number, end: number];
+
+/** Tells if the text from `start` to `end` is fully in one of the ranges. */
+function isInRanges(ranges: readonly TextRange[], start: number, end: number): boolean {
+  return ranges.some(([rangeStart, rangeEnd]) => rangeStart <= start && end <= rangeEnd);
+}
+
 /** Returns the type of file that the scanner reads the code as. The code of a `.vue` file is its `<script>` block. */
 function scannerExtension(filename: string): string {
   const extension = filename.split(".").pop() ?? "";
@@ -57,8 +70,16 @@ function scannerExtension(filename: string): string {
 
 export const tailwindCanonicalClasses: Rule = {
   create(context) {
+    /** The ranges of the string literals and the template literal parts. Only classes in these ranges are reported. */
+    const stringRanges: TextRange[] = [];
+
     return {
-      Program() {
+      Literal(node) {
+        if (typeof node.value === "string") stringRanges.push([node.start, node.end]);
+      },
+      // The scanner reads the full text, so that it splits the words the same way in each string.
+      // The check runs on exit, after the other visitors collect all the string ranges.
+      "Program:exit"() {
         const { sourceCode } = context;
         const { text } = sourceCode;
         const candidates = new Scanner({}).getCandidatesWithPositions({
@@ -70,6 +91,8 @@ export const tailwindCanonicalClasses: Rule = {
           const end = position + candidate.length;
           // The scanner can split or join words in a different way from the file. Do not report a class that is not at its position.
           if (text.slice(position, end) !== candidate) continue;
+          // Code outside a string, such as the negation `!icon`, is not a class.
+          if (!isInRanges(stringRanges, position, end)) continue;
 
           const canonical = canonicalize(candidate);
           if (canonical === candidate) continue;
@@ -81,6 +104,9 @@ export const tailwindCanonicalClasses: Rule = {
             messageId: "canonical",
           });
         }
+      },
+      TemplateElement(node) {
+        stringRanges.push([node.start, node.end]);
       },
     };
   },
