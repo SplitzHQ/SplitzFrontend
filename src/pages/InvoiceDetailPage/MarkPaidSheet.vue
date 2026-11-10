@@ -93,14 +93,11 @@ async function markDebtPaid() {
   <Sheet
     :model-value="modelValue"
     :title="$t('invoice-detail-mark-paid-confirm-title')"
+    :description="$t('invoice-detail-mark-paid-confirm-message')"
     detent="medium"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <div v-if="pendingDebt" class="flex flex-col gap-4">
-      <p class="text-sm text-base-text-secondary">
-        {{ $t("invoice-detail-mark-paid-confirm-message") }}
-      </p>
-
       <!-- Who pays whom -->
       <div class="flex flex-col items-center gap-3 rounded-2xl bg-base-bg-secondary p-4">
         <div class="flex w-full items-center justify-center gap-3">

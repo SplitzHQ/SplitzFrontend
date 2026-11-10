@@ -384,9 +384,12 @@ onMounted(() => {
     </template>
   </Layout>
 
-  <Sheet v-model="showDisableConfirm" :title="$t('two-factor-disable-confirm-title')" detent="medium">
-    <p class="text-sm text-base-text-secondary">{{ $t("two-factor-disable-confirm-body") }}</p>
-
+  <Sheet
+    v-model="showDisableConfirm"
+    :title="$t('two-factor-disable-confirm-title')"
+    :description="$t('two-factor-disable-confirm-body')"
+    detent="medium"
+  >
     <template #actions>
       <Notice v-if="disableFailed" tone="error" announce data-test="two-factor-disable-error">
         <p>{{ $t("two-factor-disable-failed") }}</p>

@@ -67,7 +67,7 @@ export default defineConfig({
         name: "SplitZ",
         short_name: "SplitZ",
         description: "Split expenses with friends and groups",
-        theme_color: "#647C72",
+        theme_color: "#f9fbfa",
         background_color: "#fafbfa",
         display: "standalone",
         icons: [

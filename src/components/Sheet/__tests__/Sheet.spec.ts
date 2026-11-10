@@ -20,7 +20,7 @@ function mountSheet(props: Record<string, unknown> = {}, startOpen = false) {
       setup: () => ({ open, props }),
       template: `
         <button type="button" data-test="opener" @click="open = true">Open</button>
-        <Sheet v-model="open" label="Add friend" v-bind="props">
+        <Sheet v-model="open" aria-label="Add friend" v-bind="props">
           <p data-test="text">Text</p>
           <input data-test="field" />
           <button type="button" data-test="action">Save</button>
@@ -41,8 +41,8 @@ function mountTwoSheets() {
       components: { Sheet },
       setup: () => ({ first, second }),
       template: `
-        <Sheet v-model="first" label="First"><p>First</p></Sheet>
-        <Sheet v-model="second" label="Second"><p>Second</p></Sheet>
+        <Sheet v-model="first" aria-label="First"><p>First</p></Sheet>
+        <Sheet v-model="second" aria-label="Second"><p>Second</p></Sheet>
       `,
     }),
     { attachTo: document.body }
@@ -53,6 +53,11 @@ function mountTwoSheets() {
 /** Returns the panel, or null when no sheet is open. */
 function panel() {
   return document.querySelector<HTMLElement>('[role="dialog"]');
+}
+
+/** Returns the element that describes the panel. */
+function describedBy() {
+  return document.getElementById(panel()!.getAttribute("aria-describedby")!);
 }
 
 /** Returns one element of the content by its test name. */
@@ -109,9 +114,22 @@ describe("Sheet", () => {
 
       const dialog = panel()!;
       expect(dialog.getAttribute("aria-modal")).toBe("true");
-      expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)?.textContent).toBe("Add friend");
+      expect(dialog.getAttribute("aria-label")).toBe("Add friend");
+      expect(dialog.hasAttribute("aria-labelledby")).toBe(false);
       expect(dialog.hasAttribute("aria-describedby")).toBe(false);
       expect(warn).not.toHaveBeenCalled();
+    });
+
+    it("updates aria-label on the dialog when the prop changes", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { "aria-label": "Add friend", modelValue: true },
+      });
+      await flushPromises();
+
+      await wrapper.setProps({ "aria-label": "Invite friend" });
+      expect(panel()!.getAttribute("aria-label")).toBe("Invite friend");
+      expect(panel()!.hasAttribute("aria-labelledby")).toBe(false);
     });
 
     it("draws the title as a heading and gets its name from it", async () => {
@@ -127,9 +145,55 @@ describe("Sheet", () => {
       expect(heading?.textContent?.trim()).toBe("Add friend");
       expect(heading?.hidden).toBe(false);
       expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)).toBe(heading);
+      expect(dialog.hasAttribute("aria-label")).toBe(false);
     });
 
-    it("hides the name of a sheet that has only a label", async () => {
+    it("describes the panel with the line under the title", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "Everyone loses this expense.", modelValue: true, title: "Delete this expense?" },
+      });
+      await flushPromises();
+
+      const dialog = panel()!;
+      const line = document.getElementById(dialog.getAttribute("aria-describedby")!);
+      expect(line?.textContent?.trim()).toBe("Everyone loses this expense.");
+      expect(dialog.querySelector("h2")?.classList.contains("pb-2")).toBe(true);
+    });
+
+    it("adds the gap under the description only when content follows it", async () => {
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "A line.", modelValue: true, title: "Title" },
+      });
+      await flushPromises();
+      expect(describedBy()?.classList.contains("pb-5")).toBe(false);
+      wrapper.unmount();
+
+      wrapper = mount(Sheet, {
+        attachTo: document.body,
+        props: { description: "A line.", modelValue: true, title: "Title" },
+        slots: { default: "<p>Text</p>" },
+      });
+      await flushPromises();
+      expect(describedBy()?.classList.contains("pb-5")).toBe(true);
+    });
+
+    it("gives the title more space than a sheet with no title", async () => {
+      wrapper = mount(Sheet, { attachTo: document.body, props: { modelValue: true, title: "Add friend" } });
+      await flushPromises();
+      const title = panel()!.querySelector("h2")!;
+      expect(title.classList.contains("text-display-xs")).toBe(true);
+      expect(title.classList.contains("pb-5")).toBe(true);
+      expect(panel()!.querySelector(".sheet-content")?.classList.contains("pt-6")).toBe(true);
+      wrapper.unmount();
+
+      mountSheet({}, true);
+      await flushPromises();
+      expect(panel()!.querySelector(".sheet-content")?.classList.contains("pt-4")).toBe(true);
+    });
+
+    it("keeps the compatibility title hidden when aria-label names the sheet", async () => {
       mountSheet({}, true);
       await flushPromises();
 
@@ -139,7 +203,7 @@ describe("Sheet", () => {
     it("keeps the actions out of the content that scrolls", async () => {
       wrapper = mount(Sheet, {
         attachTo: document.body,
-        props: { label: "Add friend", modelValue: true },
+        props: { "aria-label": "Add friend", modelValue: true },
         slots: {
           actions: '<button type="button" data-test="save">Save</button>',
           default: '<p data-test="text">Text</p>',
@@ -161,7 +225,7 @@ describe("Sheet", () => {
       const band = panel()!.querySelector<HTMLElement>(".blur-band.is-top")!.parentElement!;
       expect(band.style.getPropertyValue("--blur-band-strength")).toBe("0");
 
-      content.scrollTop = 22;
+      content.scrollTop = 26;
       content.dispatchEvent(new Event("scroll"));
       expect(band.style.getPropertyValue("--blur-band-strength")).toBe("0.5");
 
@@ -186,7 +250,7 @@ describe("Sheet", () => {
 
       wrapper = mount(Sheet, {
         attachTo: document.body,
-        props: { label: "Add friend", modelValue: true },
+        props: { "aria-label": "Add friend", modelValue: true },
         slots: { actions: '<button type="button">Save</button>', default: "<p>Text</p>" },
       });
       await flushPromises();

@@ -51,11 +51,16 @@ function clearAllFromMenu() {
 </script>
 
 <template>
-  <Sheet v-model="open" :label="$t('notification-title')" detent="large" :show-close-button="true">
-    <div class="flex min-h-0 flex-col gap-3">
-      <!-- The right side of the row stays free for the close button of the sheet. -->
-      <div data-sheet-handle class="flex touch-none items-center justify-between gap-2">
-        <h2 class="text-lg font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
+  <Sheet v-model="open" :aria-label="$t('notification-title')" detent="large" :show-close-button="true">
+    <div class="flex min-h-0 flex-col gap-4.5">
+      <!--
+        This row takes the place of the title that Sheet draws, so the title must start and end on the same lines.
+        The row also holds an icon button, so it is taller than one title line. `pt-1.5` and `gap-4.5` add the difference
+        to the space above and below that Sheet gives its own title. If the size of SIconButton or of the title changes,
+        check this row against a Sheet with `title` again. The right side of the row stays free for the close button.
+      -->
+      <div data-sheet-handle class="flex touch-none items-center justify-between gap-2 pt-1.5">
+        <h2 class="text-display-xs font-semibold text-base-text-primary">{{ $t("notification-title") }}</h2>
         <SIconButton
           v-if="hasRows"
           variant="ghost"
@@ -77,7 +82,7 @@ function clearAllFromMenu() {
     </div>
 
     <!-- A choice list: a tap on a row runs the action and closes the sheet, so it has no close button. -->
-    <Sheet v-model="menuOpen" :label="$t('notification-more')" detent="medium">
+    <Sheet v-model="menuOpen" :aria-label="$t('notification-more')" detent="medium">
       <div class="flex flex-col">
         <button
           v-if="hasUnread"

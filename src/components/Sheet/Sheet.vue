@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useEventListener, useResizeObserver } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
-import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from "reka-ui";
+import { DialogContent, DialogDescription, DialogPortal, DialogRoot, DialogTitle } from "reka-ui";
 import { computed, nextTick, ref, useTemplateRef, watch, watchEffect } from "vue";
 
 import BlurBand from "@/components/BlurBand/BlurBand.vue";
+import { useStatusBarDim } from "@/libs/status-bar-color";
 
 import { lockPageScroll } from "./sheet-scroll-lock";
 import { useSheetStack } from "./sheet-stack";
@@ -17,6 +18,8 @@ import { useSheetStack } from "./sheet-stack";
  * The default slot holds the scrollable content. The `actions` slot stays pinned to the bottom.
  */
 interface SheetBaseProps {
+  /** Vue normalizes `aria-label` to this key at runtime. Templates must use `aria-label`. */
+  ariaLabel?: string;
   /** Initial height cap: `large` is 90% of the dynamic viewport height, and `medium` is 50%. */
   detent?: "large" | "medium";
   /** `maxHeight` lets the sheet shrink to fit its content up to the detent. `height` fixes the sheet at the detent height. */
@@ -29,24 +32,28 @@ interface SheetBaseProps {
   dismissOnDrag?: boolean;
 }
 
-/** A sheet gets its accessible name from its visible `title`, or from `label` when no visible title is rendered. */
+/** A sheet gets its accessible name from its visible `title`, or from `aria-label` when no visible title is rendered. */
 export type SheetProps = SheetBaseProps &
   (
     | {
         /** Visible heading text, also used as the dialog's accessible name. */
         title: string;
-        label?: undefined;
+        /** A short line under the title. A screen reader reads it after the name of the sheet. */
+        description?: string;
+        "aria-label"?: undefined;
       }
     | {
         title?: undefined;
-        /** Screen-reader label required when the sheet has no visible `title`. */
-        label: string;
+        description?: undefined;
+        /** Accessible name required when the sheet has no visible `title`. Pass it as `aria-label` in templates. */
+        "aria-label": string;
       }
   );
 
 const {
   title,
-  label,
+  description,
+  ariaLabel,
   detent = "large",
   detentSizing = "maxHeight",
   showHandle = true,
@@ -59,6 +66,8 @@ const open = defineModel<boolean>({ required: true });
 const { $t } = useFluent();
 
 const { isBehind } = useSheetStack(open);
+
+useStatusBarDim(open);
 
 /** Elements that handle their own pointer gestures and should never initiate a sheet drag. */
 const NON_DRAGGABLE_SELECTOR = "input, textarea, select, [contenteditable='true'], [role='slider']";
@@ -83,7 +92,7 @@ const topBlurBandRef = useTemplateRef<HTMLElement>("topBlurBand");
 const actionsRef = useTemplateRef<HTMLElement>("actions");
 
 /** Scroll distance (px) over which the top blur band ramps from 0 to full strength (top padding + one title line). */
-const TOP_BLUR_SCROLL_RANGE_PX = 44;
+const TOP_BLUR_SCROLL_RANGE_PX = 52;
 /** Extra space between the end of the scrollable content and the floating action bar. */
 const ACTIONS_CLEARANCE_GAP = "1.5rem";
 
@@ -164,6 +173,21 @@ const sheetHeightStyle = computed(() => {
   if (collapsingHeight.value !== null) return { height: `${collapsingHeight.value}px`, maxHeight: "none" };
   return sheetDefaultStyle.value;
 });
+
+/**
+ * Makes the backdrop absolute for its way out, in the same place. iOS 27 holds the color of the status bar while a
+ * full-screen fixed layer stays, and an absolute layer lets the bar return when the way out starts.
+ * This reads the place, because the parent of the layer is the page in the app and a phone frame in the dev tools.
+ */
+function releaseStatusBarHold(element: Element) {
+  const backdrop = element as HTMLElement;
+  const { height, top } = backdrop.getBoundingClientRect();
+  backdrop.style.position = "absolute";
+  backdrop.style.bottom = "auto";
+  backdrop.style.height = `${height}px`;
+  backdrop.style.top = "0";
+  backdrop.style.top = `${top - backdrop.getBoundingClientRect().top}px`;
+}
 
 /** Closes the sheet. */
 function dismiss() {
@@ -276,7 +300,7 @@ watchEffect((onCleanup) => {
 <template>
   <DialogRoot v-model:open="open">
     <DialogPortal>
-      <Transition name="sheet-backdrop">
+      <Transition name="sheet-backdrop" @before-leave="releaseStatusBarHold">
         <!-- Plain backdrop element instead of Reka UI's DialogOverlay, which sets `pointer-events: none` on body and blocks toast clicks. -->
         <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
         <div v-if="open" class="fixed inset-0 z-modalBackdrop bg-base-bg-overlay" @click="dismiss">
@@ -288,7 +312,11 @@ watchEffect((onCleanup) => {
               as-child
               force-mount
               aria-modal="true"
-              :aria-describedby="undefined"
+              :aria-label="ariaLabel"
+              v-bind="{
+                ...(title ? {} : { 'aria-labelledby': undefined }),
+                ...(description ? {} : { 'aria-describedby': undefined }),
+              }"
               :disable-outside-pointer-events="false"
               @interact-outside.prevent
               @open-auto-focus="focusPanel"
@@ -334,7 +362,8 @@ watchEffect((onCleanup) => {
                 <div
                   ref="content"
                   :class="[
-                    'sheet-content min-h-0 flex-1 overflow-y-auto pt-4 px-safe-4',
+                    'sheet-content min-h-0 flex-1 overflow-y-auto px-safe-4',
+                    title ? 'pt-6' : 'pt-4',
                     { 'pb-safe-4': !$slots.actions },
                   ]"
                   :style="$slots.actions ? contentBottomClearanceStyle : undefined"
@@ -347,12 +376,23 @@ watchEffect((onCleanup) => {
                   <DialogTitle
                     v-if="title"
                     :data-sheet-handle="showHandle || undefined"
-                    :class="['pb-4 text-lg font-semibold text-base-text-primary', { 'touch-none': showHandle }]"
+                    :class="[
+                      'text-display-xs font-semibold text-base-text-primary',
+                      description ? 'pb-2' : 'pb-5',
+                      { 'touch-none': showHandle },
+                    ]"
                   >
                     {{ title }}
                   </DialogTitle>
-                  <!-- Hidden DialogTitle provides the accessible dialog name when no visible `title` is used. -->
-                  <DialogTitle v-else hidden>{{ label }}</DialogTitle>
+                  <!-- Reka checks for a DialogTitle even when aria-label names the dialog. -->
+                  <DialogTitle v-else hidden>{{ ariaLabel }}</DialogTitle>
+                  <!-- The gap under the line is for the content, so a sheet with only this line does not get taller. -->
+                  <DialogDescription
+                    v-if="description"
+                    :class="['text-sm text-base-text-secondary', { 'pb-5': $slots.default }]"
+                  >
+                    {{ description }}
+                  </DialogDescription>
                   <slot />
                 </div>
 

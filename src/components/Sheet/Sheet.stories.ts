@@ -6,13 +6,13 @@ import SButton from "@/components/SButton/SButton.vue";
 
 import Sheet, { type SheetProps } from "./Sheet.vue";
 
-/** The props in one flat type. Storybook cannot read the union of `title` and `label`. */
-type SheetArgs = Omit<SheetProps, "label" | "title"> & { label?: string; title?: string };
+/** The props in one flat type. Storybook cannot read the union of `title` and `aria-label`. */
+type SheetArgs = Omit<SheetProps, "aria-label" | "title"> & { "aria-label"?: string; title?: string };
 
 const meta: Meta<SheetArgs> = {
   title: "Components/Sheet",
   component: Sheet,
-  args: { label: "Sheet" },
+  args: { "aria-label": "Sheet" },
   argTypes: {
     detent: {
       control: "radio",
@@ -203,9 +203,42 @@ export const TitleAndActions: Story = {
   }),
   args: {
     detent: "medium",
-    label: undefined,
+    "aria-label": undefined,
     showCloseButton: true,
     title: "Add friend",
+  },
+};
+
+export const TitleAndDescription: Story = {
+  render: (args) => ({
+    components: { SButton, Sheet },
+    setup() {
+      const isOpen = ref(false);
+      return { args, isOpen };
+    },
+    template: `
+      <div class="p-4 text-base-text-primary">
+        <button
+          @click="isOpen = true"
+          class="px-4 py-2 rounded-lg transition-colors"
+        >
+          Open Sheet with Title and Description
+        </button>
+
+        <Sheet v-model="isOpen" v-bind="args">
+          <template #actions>
+            <SButton variant="destructive" size="xl" @click="isOpen = false">Delete expense</SButton>
+            <SButton variant="secondary" size="xl" @click="isOpen = false">Cancel</SButton>
+          </template>
+        </Sheet>
+      </div>
+    `,
+  }),
+  args: {
+    description: "Everyone in the group loses this expense.",
+    detent: "medium",
+    "aria-label": undefined,
+    title: "Delete this expense?",
   },
 };
 
