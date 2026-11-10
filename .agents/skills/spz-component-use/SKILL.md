@@ -16,6 +16,20 @@ Follow these steps before you change UI code. The rules exist because a guess fr
 
 For the logo, an app icon or a brand color, also follow `.agents/skills/spz-brand-use/SKILL.md`.
 
+## Text side by side uses one size
+
+Text in one row uses one font size. This rule applies to these pairs:
+
+- A title and its count, for example `Groups 6`.
+- A number and its unit, for example `6 groups`.
+- A label and its value or count, for example `To do 7/28`.
+
+Show the difference with color or font weight. Do not make one part smaller or larger than the other part.
+
+The rule applies in `src/` and in `devtools/`. Text on two lines is not side by side. For example, a large amount above a small caption is not in this rule.
+
+If the text does not fit in a narrow place with one size, shorten the copy or let the row wrap. Do not make one part smaller to make it fit.
+
 ## When the rules do not decide
 
 Stop and ask the user when one of these conditions is true:
