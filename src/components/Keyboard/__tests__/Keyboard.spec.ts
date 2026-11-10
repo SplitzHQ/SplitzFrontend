@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 
 import Keyboard from "../Keyboard.vue";
@@ -7,15 +7,28 @@ import Keyboard from "../Keyboard.vue";
 vi.mock("fluent-vue", () => ({ useFluent: () => ({ $t: (id: string) => id }) }));
 
 /** Mounts a keyboard that writes the model back, as a parent with `v-model` does. */
-function mountKeyboard(modelValue: number | null = 0, variant: "ghost" | "primary" = "ghost") {
+function mountKeyboard(
+  modelValue: number | null = 0,
+  variant: "ghost" | "primary" = "ghost",
+  limits: { maxDecimals?: number; maxIntegerDigits?: number } = {}
+) {
   const wrapper = mount(Keyboard, {
     props: {
       modelValue,
       "onUpdate:modelValue": (value: number | null | undefined) => wrapper.setProps({ modelValue: value }),
       variant,
+      ...limits,
     },
   });
   return wrapper;
+}
+
+/** Presses keys by name, one after the other. Each click waits for the last one, as a person presses keys in order. */
+function pressKeys(wrapper: ReturnType<typeof mountKeyboard>, names: string[]) {
+  return names.reduce<Promise<unknown>>(
+    (previous, name) => previous.then(() => key(wrapper, name).trigger("click")),
+    Promise.resolve()
+  );
 }
 
 /** Returns the key with this text or this accessible name. */
@@ -144,5 +157,65 @@ describe("Keyboard", () => {
     expect(primary.findAll("button").map((button) => button.classes())).toEqual(
       ghost.findAll("button").map((button) => button.classes())
     );
+  });
+
+  describe("limits", () => {
+    afterEach(() => {
+      Reflect.deleteProperty(navigator, "vibrate");
+    });
+
+    it("accepts seven digits and two decimal places by default", async () => {
+      const wrapper = mountKeyboard();
+
+      await pressKeys(wrapper, ["1", "2", "3", "4", "5", "6", "7", "8"]);
+      expect(line(wrapper)).toBe("1234567");
+
+      await wrapper.setProps({ modelValue: 0 });
+      await pressKeys(wrapper, ["1", "keyboard-decimal", "2", "3", "4"]);
+      expect(line(wrapper)).toBe("1.23");
+      expect(wrapper.props("modelValue")).toBe(1.23);
+    });
+
+    it("blocks the dot key when `maxDecimals` is 0", async () => {
+      const wrapper = mountKeyboard(0, "ghost", { maxDecimals: 0 });
+
+      await pressKeys(wrapper, ["5", "keyboard-decimal", "5"]);
+
+      expect(line(wrapper)).toBe("55");
+    });
+
+    it("writes a rounded value to the model", async () => {
+      const wrapper = mountKeyboard();
+
+      await pressKeys(wrapper, ["1", "0", "keyboard-divide", "3"]);
+
+      expect(wrapper.props("modelValue")).toBe(3.33);
+    });
+
+    it("vibrates and keeps the model when a key goes over a limit", async () => {
+      const vibrate = vi.fn();
+      // jsdom has no `navigator.vibrate`, so the test adds one.
+      Object.defineProperty(navigator, "vibrate", { configurable: true, value: vibrate });
+      const wrapper = mountKeyboard(0, "ghost", { maxIntegerDigits: 2 });
+
+      await pressKeys(wrapper, ["9", "9"]);
+      expect(vibrate).not.toHaveBeenCalled();
+
+      await pressKeys(wrapper, ["9"]);
+      expect(vibrate).toHaveBeenCalledTimes(1);
+      expect(wrapper.props("modelValue")).toBe(99);
+    });
+
+    it("shakes the line when a key goes over a limit", async () => {
+      const animate = vi.fn();
+      Element.prototype.animate = animate;
+      const wrapper = mountKeyboard(0, "ghost", { maxIntegerDigits: 1 });
+
+      await pressKeys(wrapper, ["9", "9"]);
+
+      expect(animate).toHaveBeenCalledTimes(1);
+      expect(animate.mock.instances[0]).toBe(wrapper.get("[data-test='keyboard-expression']").element);
+      delete (Element.prototype as Partial<Element>).animate;
+    });
   });
 });

@@ -111,3 +111,63 @@ describe("useTransactionStore receipt recognition", () => {
     expect(store.previewPhotoBase64).toBeUndefined();
   });
 });
+
+/** Makes a draft that three members split equally. The first member paid. */
+function splitAmongThree(amount: number, currency: string) {
+  const store = useTransactionStore();
+  store.transaction = { amount, currency, groupId: "g1", userId: "u1" };
+  store.members = [
+    { id: "u1", userName: "A" },
+    { id: "u2", userName: "B" },
+    { id: "u3", userName: "C" },
+  ];
+  store.paidBy = "u1";
+  for (const id of ["u1", "u2", "u3"]) store.addToIncludedMembers(id);
+  return store;
+}
+
+describe("useTransactionStore currency decimal places", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+    transactionApiMock.addTransaction.mockImplementation(({ transactionInputDto }) =>
+      Promise.resolve({ ...transactionInputDto!, balances: [], transactionId: "t1" })
+    );
+  });
+
+  it("splits a JPY amount in whole yen", () => {
+    const store = splitAmongThree(1000, "JPY");
+
+    expect(store.amountDecimals).toBe(0);
+    expect(store.finalSplitAmount).toEqual({ u1: 334, u2: 333, u3: 333 });
+    expect(store.isUserInputValid).toBe(true);
+  });
+
+  it("splits a USD amount in cents", () => {
+    const store = splitAmongThree(10, "USD");
+
+    expect(store.amountDecimals).toBe(2);
+    expect(Object.values(store.finalSplitAmount).map((value) => value.toFixed(2))).toEqual(["3.34", "3.33", "3.33"]);
+  });
+
+  it("saves a JPY expense with no decimal places", async () => {
+    const store = splitAmongThree(1000, "JPY");
+
+    await store.saveTransaction();
+
+    const input = transactionApiMock.addTransaction.mock.calls[0][0].transactionInputDto!;
+    expect(input.amount).toBe("1000");
+    expect(input.name).toBe("Expense - JPY 1000");
+    expect(input.balances?.map((entry) => entry.balance)).toEqual(["666", "-333", "-333"]);
+  });
+
+  it("saves a KWD expense with three decimal places", async () => {
+    const store = splitAmongThree(1.5, "KWD");
+
+    await store.saveTransaction();
+
+    const input = transactionApiMock.addTransaction.mock.calls[0][0].transactionInputDto!;
+    expect(input.amount).toBe("1.500");
+    expect(input.balances?.map((entry) => entry.balance)).toEqual(["1.000", "-0.500", "-0.500"]);
+  });
+});

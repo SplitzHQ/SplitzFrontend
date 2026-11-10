@@ -75,22 +75,22 @@ function applyReceiptToTxn(recognition: ReceiptDto) {
           <Transition name="receipt-hint">
             <div
               v-if="receiptId"
-              class="flex items-center gap-2 rounded-full bg-util-alpha-black-5 py-1 pr-3 pl-1"
+              class="flex items-center gap-2 rounded-full bg-base-bg-subtle py-1 pr-3 pl-1"
               data-test="scan-applied"
             >
               <img
                 v-if="previewPhotoBase64"
                 :src="previewPhotoBase64"
                 alt=""
-                class="size-7 rounded-full border border-base-border-primary object-cover"
+                class="size-7 rounded-full border border-base-border-default object-cover"
               />
-              <span class="text-xs text-base-text-tertiary">
+              <span class="text-xs text-base-text-secondary">
                 {{ $t("new-expense-scan-from-receipt", { name: transaction.name ?? "" }) }}
               </span>
             </div>
           </Transition>
         </div>
-        <Keyboard v-model="transaction.amount" variant="ghost" />
+        <Keyboard v-model="transaction.amount" variant="ghost" :max-decimals="transactionStore.amountDecimals" />
         <div class="grid grid-cols-2 items-center gap-3 py-3">
           <SButton variant="secondary" size="xl">{{ $t("new-expense-actions-skip") }}</SButton>
           <SLinkButton variant="primary" size="xl" href="/new-expense/select-people">

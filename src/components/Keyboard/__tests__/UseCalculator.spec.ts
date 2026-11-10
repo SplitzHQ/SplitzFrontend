@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import useCalculator, { type CalculatorInput } from "../UseCalculator";
+import useCalculator, { type CalculatorInput, type CalculatorLimits } from "../UseCalculator";
 
 type Calculator = ReturnType<typeof useCalculator>;
 
@@ -21,9 +21,9 @@ function press(calculator: Calculator, keys: string) {
   }
 }
 
-/** Returns a new calculator after the key presses. */
-function after(keys: string, start: number | null = null) {
-  const calculator = useCalculator();
+/** Returns a new calculator after the key presses. With `limits`, the calculator blocks the keys over the limits. */
+function after(keys: string, start: number | null = null, limits?: CalculatorLimits) {
+  const calculator = useCalculator(limits ? { limits: () => limits } : {});
   calculator.initialize(start);
   press(calculator, keys);
   return calculator;
@@ -226,6 +226,69 @@ describe("useCalculator", () => {
     it("is empty for a value that is not finite", () => {
       expect(line(after("", Number.POSITIVE_INFINITY))).toBe("");
       expect(line(after("", Number.NaN))).toBe("");
+    });
+  });
+
+  describe("limits", () => {
+    const usd: CalculatorLimits = { maxDecimals: 2, maxIntegerDigits: 7 };
+    const jpy: CalculatorLimits = { maxDecimals: 0, maxIntegerDigits: 7 };
+
+    it("blocks the eighth digit before the dot", () => {
+      const calculator = after("12345678", null, usd);
+
+      expect(line(calculator)).toBe("1234567");
+      expect(calculator.result.value).toBe(1_234_567);
+    });
+
+    it("blocks a third decimal place", () => {
+      const calculator = after("1.239", null, usd);
+
+      expect(line(calculator)).toBe("1.23");
+    });
+
+    it("blocks the dot when the currency has no decimal places", () => {
+      const calculator = after("12.5", null, jpy);
+
+      expect(line(calculator)).toBe("125");
+      expect(calculator.result.value).toBe(125);
+    });
+
+    it("blocks a digit that makes the value too large", () => {
+      const calculator = after("5000 × 5000", null, usd);
+
+      expect(line(calculator)).toBe("5000 × 500");
+      expect(calculator.result.value).toBe(2_500_000);
+    });
+
+    it("returns false for a blocked key and true for an accepted key", () => {
+      const calculator = after("1234567", null, usd);
+
+      expect(calculator.input(8)).toBe(false);
+      expect(calculator.plus()).toBe(true);
+      expect(calculator.input(1)).toBe(true);
+    });
+
+    it("rounds the value half up to the decimal places", () => {
+      expect(after("10 ÷ 3", null, usd).result.value).toBe(3.33);
+      expect(after("2 ÷ 3", null, usd).result.value).toBe(0.67);
+      expect(after("10 ÷ 4", null, jpy).result.value).toBe(3);
+    });
+
+    it("keeps a negative adjustment in the limits", () => {
+      const calculator = after("- 12345678", null, usd);
+
+      expect(line(calculator)).toBe("0 - 1234567");
+      expect(calculator.result.value).toBe(-1_234_567);
+    });
+
+    it("always accepts backspace", () => {
+      const calculator = after("back", 123_456_789, usd);
+
+      expect(line(calculator)).toBe("12345678");
+    });
+
+    it("has no limits without the option", () => {
+      expect(line(after("123456789.123"))).toBe("123456789.123");
     });
   });
 });

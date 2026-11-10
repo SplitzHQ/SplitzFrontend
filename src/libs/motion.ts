@@ -60,6 +60,24 @@ export function easingPoints(easing: MotionEasing): [number, number, number, num
   return [x1, y1, x2, y2];
 }
 
+/** The sideways offsets of a shake. Each move is smaller than the last, so the element stops softly. */
+const SHAKE_OFFSETS = [0, -3, 2, -1, 0];
+
+/**
+ * Shakes an element sideways one time, to show that the app did not accept an input.
+ * TextInput shakes a field with a new error, and Keyboard shakes its line when a key goes over a limit.
+ * Reduced motion makes the duration 0, so the element does not move.
+ */
+export function shakeElement(element: Element | null | undefined): void {
+  const duration = motionMs("container");
+  if (!element || duration === 0) return;
+  // `animate` is missing in jsdom, so the optional call keeps the tests quiet.
+  element.animate?.(
+    SHAKE_OFFSETS.map((offset) => ({ translate: `${offset}px 0` })),
+    { duration, easing: MOTION_EASING.standard }
+  );
+}
+
 /** Returns the scroll behavior for `scrollTo` and `scrollIntoView`: smooth unless motion is reduced. */
 export function scrollBehavior(): ScrollBehavior {
   return prefersReducedMotion() ? "auto" : "smooth";

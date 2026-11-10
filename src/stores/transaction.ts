@@ -14,16 +14,20 @@ import {
 import config from "@/backend/config";
 import { resolveAssetUrl } from "@/libs/asset-url";
 import { getCategory } from "@/libs/categories";
+import { currencyFractionDigits } from "@/libs/format-currency";
 import type { SplitMethod } from "@/types/split-method";
 
-const ROUNDING_TOLERANCE = 0.01;
+/** The allowed error of the percentage sum, in percentage points. */
+const PERCENTAGE_TOLERANCE = 0.01;
 const FLOAT_COMPARE_TOLERANCE = 0.001;
 
-const floor = (value: number) => {
-  return Math.floor(value / ROUNDING_TOLERANCE) * ROUNDING_TOLERANCE;
+/** Rounds a value down to a multiple of `unit`, the smallest amount of the currency. */
+const floor = (value: number, unit: number) => {
+  return Math.floor(value / unit) * unit;
 };
-const round = (value: number) => {
-  return Math.round(value / ROUNDING_TOLERANCE) * ROUNDING_TOLERANCE;
+/** Rounds a value to the nearest multiple of `unit`, the smallest amount of the currency. */
+const round = (value: number, unit: number) => {
+  return Math.round(value / unit) * unit;
 };
 
 export const useTransactionStore = defineStore("transaction", () => {
@@ -71,6 +75,14 @@ export const useTransactionStore = defineStore("transaction", () => {
     }
   };
 
+  /**
+   * The decimal places of the currency of the draft: 0 for JPY, 2 for USD. The split, the save and the keyboard use it,
+   * so a JPY expense has no fractions of a yen.
+   */
+  const amountDecimals = computed(() => currencyFractionDigits(transaction.value.currency ?? "USD"));
+  /** The smallest amount of the currency, for example 0.01 for USD and 1 for JPY. */
+  const amountUnit = computed(() => 10 ** -amountDecimals.value);
+
   const members = ref<SplitzUserReducedDto[]>([]);
   const paidBy = ref<string>();
   const includedMembersId = ref<string[]>([]);
@@ -101,12 +113,13 @@ export const useTransactionStore = defineStore("transaction", () => {
     const totalAmount = transaction.value.amount ?? 0;
     const memberIds = sortedIncludedMembersId.value;
     if (memberIds.length === 0) return {};
+    const unit = amountUnit.value;
 
     const result: Record<string, number> = {};
 
     switch (splitMethod.value) {
       case "equally": {
-        const baseAmount = floor(totalAmount / memberIds.length);
+        const baseAmount = floor(totalAmount / memberIds.length, unit);
         memberIds.forEach((memberId) => {
           result[memberId] = baseAmount;
         });
@@ -116,7 +129,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         memberIds.forEach((memberId) => {
           const defaultPercentage = 100 / memberIds.length;
           const percentage = splitByPercentageDetails.value[memberId] ?? defaultPercentage;
-          result[memberId] = floor((percentage / 100) * totalAmount);
+          result[memberId] = floor((percentage / 100) * totalAmount, unit);
         });
         break;
       }
@@ -126,7 +139,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         }, 0);
         memberIds.forEach((memberId) => {
           const shares = splitBySharesDetails.value[memberId] ?? 1;
-          result[memberId] = floor((shares / totalShares) * totalAmount);
+          result[memberId] = floor((shares / totalShares) * totalAmount, unit);
         });
         break;
       }
@@ -134,7 +147,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         const totalAdjustment = memberIds.reduce((sum, memberId) => {
           return sum + (splitByAdjustmentDetails.value[memberId] ?? 0);
         }, 0);
-        const baseAmount = floor((totalAmount - totalAdjustment) / memberIds.length);
+        const baseAmount = floor((totalAmount - totalAdjustment) / memberIds.length, unit);
         memberIds.forEach((memberId) => {
           result[memberId] = baseAmount + (splitByAdjustmentDetails.value[memberId] ?? 0);
         });
@@ -153,10 +166,10 @@ export const useTransactionStore = defineStore("transaction", () => {
     const remainder = totalAmount - currentTotal;
 
     if (Math.abs(remainder) > FLOAT_COMPARE_TOLERANCE) {
-      // calculate the amount to distribute, assume equal distribution with a minimum of ROUNDING_TOLERANCE
+      // calculate the amount to distribute, assume equal distribution with a minimum of one currency unit
       // to avoid too small amounts that cannot be distributed
       const remainderPerMember =
-        Math.sign(remainder) * Math.max(Math.abs(round(remainder / memberIds.length)), ROUNDING_TOLERANCE);
+        Math.sign(remainder) * Math.max(Math.abs(round(remainder / memberIds.length, unit)), unit);
       let distributedRemainder = 0;
 
       // Distribute the remainder to members, starting with the first member
@@ -165,7 +178,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         const memberId = memberIds[i];
         if (i === memberIds.length - 1) {
           // Give the last member any remaining amount to ensure exact total
-          result[memberId] = round(result[memberId] + remainder - distributedRemainder);
+          result[memberId] = round(result[memberId] + remainder - distributedRemainder, unit);
         } else {
           result[memberId] = result[memberId] + remainderPerMember;
           distributedRemainder += remainderPerMember;
@@ -210,7 +223,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       return sum + (splitAmounts[memberId] ?? 0);
     }, 0);
 
-    const sumIsCorrect = Math.abs(totalSplitAmount - totalAmount) < ROUNDING_TOLERANCE;
+    const sumIsCorrect = Math.abs(totalSplitAmount - totalAmount) < amountUnit.value;
 
     if (!sumIsCorrect) {
       return false;
@@ -226,8 +239,8 @@ export const useTransactionStore = defineStore("transaction", () => {
           const defaultPercentage = 100 / sortedIncludedMembersId.value.length;
           return sum + (splitByPercentageDetails.value[memberId] ?? defaultPercentage);
         }, 0);
-        // Allow for small rounding errors (within ROUNDING_TOLERANCE%)
-        return Math.abs(totalPercentage - 100) < ROUNDING_TOLERANCE;
+        // Allow for small rounding errors (within PERCENTAGE_TOLERANCE%)
+        return Math.abs(totalPercentage - 100) < PERCENTAGE_TOLERANCE;
       }
       case "shares": {
         // All shares must be positive integers
@@ -243,7 +256,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         // Total adjustments shouldn't exceed the transaction amount
         // and the remaining amount should be positive
         const remainingAmount = totalAmount - totalAdjustment;
-        return remainingAmount >= ROUNDING_TOLERANCE; // Allow for small amounts
+        return remainingAmount >= amountUnit.value; // Allow for small amounts
       }
       case "custom": {
         // custom split method - already validated that amounts are positive and sum correctly
@@ -289,7 +302,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     if (!transaction.value.name || transaction.value.name.trim() === "") {
       const amount = transaction.value.amount ?? 0;
       const currency = transaction.value.currency ?? "USD";
-      transaction.value.name = `Expense - ${currency} ${amount.toFixed(2)}`;
+      transaction.value.name = `Expense - ${currency} ${amount.toFixed(amountDecimals.value)}`;
     }
 
     // Create the API instance with configuration
@@ -299,7 +312,9 @@ export const useTransactionStore = defineStore("transaction", () => {
     // Positive balance = creditor (paid more than share), negative = debtor (owes money)
     const balances: TransactionBalanceInputDto[] = Object.entries(finalSplitAmount.value).map(([userId, balance]) => {
       return {
-        balance: ((paidBy.value === userId ? (transaction.value.amount ?? 0) : 0) - balance).toFixed(2),
+        balance: ((paidBy.value === userId ? (transaction.value.amount ?? 0) : 0) - balance).toFixed(
+          amountDecimals.value
+        ),
         transactionId: transactionId.value,
         userId,
       };
@@ -311,7 +326,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     // Construct the TransactionInputDto using data from the transaction store
     const transactionInput: TransactionInputDto = {
-      amount: transaction.value.amount.toFixed(2),
+      amount: transaction.value.amount.toFixed(amountDecimals.value),
       balances,
       createTime: transaction.value.createTime ?? new Date(),
       currency: transaction.value.currency ?? "USD",
@@ -390,6 +405,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   return {
     addToIncludedMembers,
+    amountDecimals,
     applyReceiptRecognition,
     decreaseSplitByShares,
     excludedMembersId,

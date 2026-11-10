@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { PhBackspace, PhDivide, PhMinus, PhPlus, PhX } from "@phosphor-icons/vue";
 import { useFluent } from "fluent-vue";
-import { computed, watch } from "vue";
+import { computed, useTemplateRef, watch } from "vue";
 
 import SButton from "@/components/SButton/SButton.vue";
+import { shakeElement } from "@/libs/motion";
 
 import useCalculator, { type CalculatorInput, type Operator } from "./UseCalculator";
 
@@ -17,13 +18,24 @@ export interface KeyboardProps {
    * `ghost` has no fill, for a keyboard that is part of the page. The keys are the same in both.
    */
   variant: "ghost" | "primary";
+  /** The most digits before the dot, in each number and in the value. The default is 7. */
+  maxIntegerDigits?: number;
+  /**
+   * The most digits after the dot. The value is rounded to this count, and 0 blocks the dot key. The default is 2.
+   * For an amount, pass `currencyFractionDigits` of the currency.
+   */
+  maxDecimals?: number;
 }
 
+/** The vibration length of a key that goes over a limit. It is short, so it feels like a tap and not like an alert. */
+const REJECT_VIBRATION_MS = 20;
+
 const model = defineModel<number | null>();
-defineProps<KeyboardProps>();
+const { maxIntegerDigits = 7, maxDecimals = 2 } = defineProps<KeyboardProps>();
 
 const { $t } = useFluent();
-const calculator = useCalculator();
+const calculator = useCalculator({ limits: () => ({ maxDecimals, maxIntegerDigits }) });
+const lineEl = useTemplateRef("line");
 
 calculator.initialize(model.value ?? null);
 
@@ -39,29 +51,38 @@ watch(
 
 const expression = computed(() => calculator.expression.value.join(" "));
 
-/** Runs one key press and writes the new value to the model. */
-const input = (value: CalculatorInput | Operator | "." | "backspace") => {
+/** Runs one key press and returns false when the key goes over a limit. Backspace is always accepted. */
+const press = (value: CalculatorInput | Operator | "." | "backspace"): boolean => {
   switch (value) {
     case "backspace":
       calculator.backspace();
-      break;
+      return true;
     case ".":
-      calculator.dot();
-      break;
+      return calculator.dot();
     case "+":
-      calculator.plus();
-      break;
+      return calculator.plus();
     case "-":
-      calculator.minus();
-      break;
+      return calculator.minus();
     case "×":
-      calculator.times();
-      break;
+      return calculator.times();
     case "÷":
-      calculator.div();
-      break;
+      return calculator.div();
     default:
-      calculator.input(value);
+      return calculator.input(value);
+  }
+};
+
+/**
+ * Runs one key press and writes the new value to the model.
+ * A key over a limit changes nothing. The line shakes and the phone vibrates, so the user does not think that the key
+ * is broken. Reduced motion stops the shake but not the vibration, because a vibration does not move the screen.
+ * iOS Safari has no `navigator.vibrate`, so an iPhone shows only the shake.
+ */
+const input = (value: CalculatorInput | Operator | "." | "backspace") => {
+  if (!press(value)) {
+    shakeElement(lineEl.value);
+    navigator.vibrate?.(REJECT_VIBRATION_MS);
+    return;
   }
 
   model.value = calculator.result.value;
@@ -77,6 +98,7 @@ const input = (value: CalculatorInput | Operator | "." | "backspace") => {
   >
     <!-- A screen reader reads the line after each key press. The value itself is on the screen of the caller. -->
     <div
+      ref="line"
       class="flex h-7 items-center justify-center text-lg font-normal text-base-text-brand"
       aria-live="polite"
       aria-atomic="true"

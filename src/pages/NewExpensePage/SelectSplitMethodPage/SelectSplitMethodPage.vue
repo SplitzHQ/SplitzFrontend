@@ -19,7 +19,7 @@ const { $t } = useFluent();
 
 // transaction store
 const transactionStore = useTransactionStore();
-const { keyboardValue, focusedInputUserId, setFocusedInputUserId } = useKeyboardControl();
+const { keyboardValue, keyboardDecimals, focusedInputUserId, setFocusedInputUserId } = useKeyboardControl();
 
 // Handle click outside to close the keyboard
 const handleClickOutside = () => {
@@ -66,16 +66,16 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
           <div class="flex grow flex-col gap-4 pb-4">
             <div class="flex items-center gap-4">
               <PaidByButton />
-              <div class="h-6 w-px bg-base-border-secondary" />
+              <div class="h-6 w-px bg-base-border-subtle" />
               <SplitMethodButton />
             </div>
             <div class="flex flex-col gap-1">
               <div class="flex items-center justify-between">
-                <div class="text-sm font-medium text-base-text-tertiary">
+                <div class="text-sm font-medium text-base-text-secondary">
                   {{ $t("new-expense-split-summary-included", { count: transactionStore.includedMembersId.length }) }}
                 </div>
                 <div class="flex items-start justify-start gap-1">
-                  <div class="justify-start text-sm leading-tight font-medium text-base-text-quaternary">
+                  <div class="justify-start text-sm leading-tight font-medium text-base-text-muted">
                     {{ $t("new-expense-split-summary-total-amount") }}
                   </div>
                   <div class="justify-start text-sm leading-tight font-medium text-base-text-primary">
@@ -88,7 +88,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
                   </div>
                   <div
                     v-if="!transactionStore.isUserInputValid"
-                    class="justify-start text-sm leading-tight font-medium text-base-text-error"
+                    class="justify-start text-sm leading-tight font-medium text-base-text-danger"
                     role="alert"
                     aria-live="polite"
                   >
@@ -100,7 +100,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
             </div>
             <div class="flex flex-col gap-1">
               <div class="flex items-center justify-between">
-                <div class="text-sm font-medium text-base-text-tertiary">
+                <div class="text-sm font-medium text-base-text-secondary">
                   {{
                     $t("new-expense-split-summary-not-included", { count: transactionStore.excludedMembersId.length })
                   }}
@@ -130,6 +130,7 @@ const { height: keyboardHeight } = useElementSize(keyboardContainer);
                 <Keyboard
                   :key="focusedInputUserId"
                   v-model="keyboardValue"
+                  :max-decimals="keyboardDecimals"
                   class="px-safe-4 pb-safe-4"
                   variant="primary"
                 />
