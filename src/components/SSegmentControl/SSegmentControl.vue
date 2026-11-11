@@ -5,180 +5,184 @@ import { computed, nextTick, onMounted, shallowRef, useTemplateRef, watch } from
 import { scrollBehavior } from "@/libs/motion";
 
 import type { SegmentSize } from "./segment";
-import { followLeft } from "./segment-scroll";
+import { calculateRevealScrollLeft } from "./segment-scroll";
 import SSegment from "./SSegment.vue";
 
 /**
- * A choice of one item from a short list on one row. See `segment-control.usage.ts` for when to use it.
- * Set `aria-label` to name the group for a screen reader.
+ * Single-choice segmented control displayed in a horizontal row. See `segment-control.usage.ts` for usage guidelines.
+ * Pass `aria-label` to name the radio group for screen readers.
  */
 export interface SegmentControlProps {
-  /** The size of each segment. */
+  /** Size variant applied to each segment. */
   size: SegmentSize;
-  /** The text of each segment. The default slot can draw the text with other markup. */
+  /** Labels for each segment. Use the default slot to render custom content instead. */
   items: string[];
-  /** Puts the segments that do not fit on more rows, and the track does not scroll. Only `devtools/` uses it. */
+  /** Wraps overflowing segments onto multiple rows instead of scrolling horizontally. Used only in `devtools/`. */
   wrap?: boolean;
 }
 const { size, items, wrap = false } = defineProps<SegmentControlProps>();
-// `aria-label` goes to the radiogroup inside the track. All other attributes, such as `class`, go to the track.
+// Forward `aria-label` to the inner radiogroup; apply all other fallthrough attributes (like `class`) to the outer track.
 defineOptions({ inheritAttrs: false });
-/** The index of the selected item. */
+/** Zero-based index of the selected item. */
 const model = defineModel<number>({ required: true });
 
-/** The change of the selected index for each arrow key, as in the WAI-ARIA radio group pattern. */
-const ARROW_STEPS: Record<string, number> = { ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1 };
-/** A mouse must move this far before a press becomes a drag, in pixels. */
-const DRAG_THRESHOLD = 4;
-/** The widest edge fade, in pixels. */
-const FADE_WIDTH = 40;
+/** Index offset for each arrow key, following the WAI-ARIA radio group pattern. */
+const ARROW_KEY_OFFSETS: Record<string, number> = { ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1 };
+/** Minimum pointer movement in pixels before a mouse press is treated as a drag scroll. */
+const DRAG_THRESHOLD_PX = 4;
+/** Maximum width of the overflow fade mask at each edge, in pixels. */
+const MAX_EDGE_FADE_PX = 40;
 
-const scroller = useTemplateRef<HTMLElement>("scroller");
-const content = useTemplateRef<HTMLElement>("content");
+const scrollerEl = useTemplateRef<HTMLElement>("scroller");
+const contentEl = useTemplateRef<HTMLElement>("content");
 
-const pressed = shallowRef(false);
-const selectionBox = shallowRef({ height: 0, left: 0, top: 0, width: 0 });
-// The background must not slide from the corner when the control appears, so the transition starts after the first measure.
-const selectionMoves = shallowRef(false);
-const fadeStart = shallowRef(0);
-const fadeEnd = shallowRef(0);
+const isPressed = shallowRef(false);
+const indicatorRect = shallowRef({ height: 0, left: 0, top: 0, width: 0 });
+// Disable the indicator transition until after the initial layout measurement so it doesn't animate in from (0, 0) on mount.
+const isIndicatorTransitionEnabled = shallowRef(false);
+const leftFadeWidth = shallowRef(0);
+const rightFadeWidth = shallowRef(0);
 
-// An edge fades only on a side that has more segments. A control that fits has no mask.
-const scrollerStyle = computed(() =>
-  fadeStart.value === 0 && fadeEnd.value === 0
+// Fade only the edges that have overflowing content scrolled out of view.
+const scrollerMaskStyle = computed(() =>
+  leftFadeWidth.value === 0 && rightFadeWidth.value === 0
     ? undefined
     : {
-        maskImage: `linear-gradient(to right, transparent, #000 ${fadeStart.value}px, #000 calc(100% - ${fadeEnd.value}px), transparent)`,
+        maskImage: `linear-gradient(to right, transparent, #000 ${leftFadeWidth.value}px, #000 calc(100% - ${rightFadeWidth.value}px), transparent)`,
       }
 );
 
-const selectionStyle = computed(() => ({
-  height: `${selectionBox.value.height}px`,
-  transform: `translate(${selectionBox.value.left}px, ${selectionBox.value.top}px)`,
-  width: `${selectionBox.value.width}px`,
+const indicatorStyle = computed(() => ({
+  height: `${indicatorRect.value.height}px`,
+  transform: `translate(${indicatorRect.value.left}px, ${indicatorRect.value.top}px)`,
+  width: `${indicatorRect.value.width}px`,
 }));
 
-/** Returns the segments in the order of the items. */
-function radios(): HTMLElement[] {
-  return [...(content.value?.querySelectorAll<HTMLElement>('[role="radio"]') ?? [])];
+/** Returns all segment radio elements in DOM order. */
+function getSegmentElements(): HTMLElement[] {
+  return [...(contentEl.value?.querySelectorAll<HTMLElement>('[role="radio"]') ?? [])];
 }
 
-/** Puts the selected background on the selected segment. A transform does not change `offsetLeft`, so a press has no effect. */
-function measureSelection(): void {
-  const radio = radios()[model.value];
-  if (!radio) return;
-  selectionBox.value = {
-    height: radio.offsetHeight,
-    left: radio.offsetLeft,
-    top: radio.offsetTop,
-    width: radio.offsetWidth,
+/**
+ * Syncs the active indicator's size and position with the selected segment element.
+ * Uses `offsetLeft`/`offsetTop` so CSS `transform: scale()` on the pressed track doesn't skew measurements.
+ */
+function updateIndicatorRect(): void {
+  const selectedEl = getSegmentElements()[model.value];
+  if (!selectedEl) return;
+  indicatorRect.value = {
+    height: selectedEl.offsetHeight,
+    left: selectedEl.offsetLeft,
+    top: selectedEl.offsetTop,
+    width: selectedEl.offsetWidth,
   };
 }
 
-/** Sets the width of each edge fade from the distance that the track can still scroll on that side. */
-function measureEdges(): void {
-  if (!scroller.value) return;
-  const { clientWidth, scrollLeft, scrollWidth } = scroller.value;
-  fadeStart.value = Math.min(scrollLeft, FADE_WIDTH);
-  fadeEnd.value = Math.min(Math.max(scrollWidth - clientWidth - scrollLeft, 0), FADE_WIDTH);
+/** Updates the left and right edge fade widths based on the remaining scrollable distance on each side. */
+function updateEdgeFades(): void {
+  if (!scrollerEl.value) return;
+  const { clientWidth, scrollLeft, scrollWidth } = scrollerEl.value;
+  leftFadeWidth.value = Math.min(scrollLeft, MAX_EDGE_FADE_PX);
+  rightFadeWidth.value = Math.min(Math.max(scrollWidth - clientWidth - scrollLeft, 0), MAX_EDGE_FADE_PX);
 }
 
-/** Returns the scroll position that shows the selected segment and the segments on each side of it. */
-function followTarget(): number {
-  const { clientWidth = 0, scrollLeft = 0 } = scroller.value ?? {};
-  const boxes = radios().map((radio) => ({ left: radio.offsetLeft, width: radio.offsetWidth }));
-  return followLeft(boxes, model.value, scrollLeft, clientWidth, content.value?.offsetWidth ?? 0);
+/** Computes the horizontal scroll offset that keeps the selected segment and its immediate neighbors visible. */
+function getTargetScrollLeft(): number {
+  const { clientWidth = 0, scrollLeft = 0 } = scrollerEl.value ?? {};
+  const boxes = getSegmentElements().map((el) => ({ left: el.offsetLeft, width: el.offsetWidth }));
+  return calculateRevealScrollLeft(boxes, model.value, scrollLeft, clientWidth, contentEl.value?.offsetWidth ?? 0);
 }
 
-function measure(): void {
-  measureSelection();
-  measureEdges();
+function updateLayout(): void {
+  updateIndicatorRect();
+  updateEdgeFades();
 }
 
 onMounted(async () => {
-  measureSelection();
-  if (scroller.value) scroller.value.scrollLeft = followTarget();
-  measureEdges();
+  updateIndicatorRect();
+  if (scrollerEl.value) scrollerEl.value.scrollLeft = getTargetScrollLeft();
+  updateEdgeFades();
   await nextTick();
-  // This read makes the browser apply the first position with no transition.
-  void content.value?.offsetWidth;
-  selectionMoves.value = true;
+  // Force a synchronous reflow so the browser paints the initial indicator position before transitions are enabled.
+  void contentEl.value?.offsetWidth;
+  isIndicatorTransitionEnabled.value = true;
 });
-useResizeObserver(content, measure);
-useResizeObserver(scroller, measureEdges);
+useResizeObserver(contentEl, updateLayout);
+useResizeObserver(scrollerEl, updateEdgeFades);
 
 watch(
   () => [items, size] as const,
   async () => {
     await nextTick();
-    measure();
+    updateLayout();
   }
 );
 watch(model, async () => {
   await nextTick();
-  measureSelection();
-  const left = followTarget();
-  if (scroller.value && left !== scroller.value.scrollLeft) {
-    scroller.value.scrollTo({ behavior: scrollBehavior(), left });
+  updateIndicatorRect();
+  const targetLeft = getTargetScrollLeft();
+  if (scrollerEl.value && targetLeft !== scrollerEl.value.scrollLeft) {
+    scrollerEl.value.scrollTo({ behavior: scrollBehavior(), left: targetLeft });
   }
 });
 
-/** An arrow key selects the next or the previous segment and moves the focus to it. The list wraps at each end. */
-function onKeydown(event: KeyboardEvent): void {
-  const step = ARROW_STEPS[event.key];
-  if (step === undefined || items.length === 0) return;
+/** Selects and focuses the previous or next segment on arrow key press, wrapping around at either end. */
+function handleKeydown(event: KeyboardEvent): void {
+  const offset = ARROW_KEY_OFFSETS[event.key];
+  if (offset === undefined || items.length === 0) return;
   event.preventDefault();
-  const next = (model.value + step + items.length) % items.length;
-  model.value = next;
-  // The watcher above scrolls the track, so the focus must not scroll it also.
-  radios()[next]?.focus({ preventScroll: true });
+  const nextIndex = (model.value + offset + items.length) % items.length;
+  model.value = nextIndex;
+  // Prevent the browser's default focus scroll so the `model` watcher can smoothly scroll the track with neighbor padding.
+  getSegmentElements()[nextIndex]?.focus({ preventScroll: true });
 }
 
-let dragStart: { pointerId: number; scrollLeft: number; x: number } | null = null;
-let dragged = false;
+let mouseDragOrigin: { pointerId: number; startScrollLeft: number; startX: number } | null = null;
+let isMouseDragging = false;
 
-/** Starts the press of the track. A mouse press can also start a drag, because a mouse has no native drag scroll. */
-function onPointerDown(event: PointerEvent): void {
+/** Marks the track as pressed and records the starting coordinates for desktop mouse drag-to-scroll. */
+function handlePointerDown(event: PointerEvent): void {
   if (event.button !== 0) return;
-  pressed.value = true;
-  dragged = false;
-  const canScroll = scroller.value && scroller.value.scrollWidth > scroller.value.clientWidth;
-  dragStart =
-    event.pointerType === "mouse" && canScroll
-      ? { pointerId: event.pointerId, scrollLeft: scroller.value.scrollLeft, x: event.clientX }
+  isPressed.value = true;
+  isMouseDragging = false;
+  const isScrollable = scrollerEl.value && scrollerEl.value.scrollWidth > scrollerEl.value.clientWidth;
+  mouseDragOrigin =
+    event.pointerType === "mouse" && isScrollable
+      ? { pointerId: event.pointerId, startScrollLeft: scrollerEl.value.scrollLeft, startX: event.clientX }
       : null;
 }
 
-/** Scrolls the track with a mouse after a small move. Pointer capture keeps the drag when the mouse leaves the track. */
-function onPointerMove(event: PointerEvent): void {
-  if (!dragStart || !scroller.value) return;
-  const distance = event.clientX - dragStart.x;
-  if (!dragged && Math.abs(distance) < DRAG_THRESHOLD) return;
-  if (!dragged) {
-    dragged = true;
-    scroller.value.setPointerCapture(dragStart.pointerId);
+/** Scrolls the track during a mouse drag once movement exceeds the drag threshold. Captures the pointer so dragging continues outside the track. */
+function handlePointerMove(event: PointerEvent): void {
+  if (!mouseDragOrigin || !scrollerEl.value) return;
+  const deltaX = event.clientX - mouseDragOrigin.startX;
+  if (!isMouseDragging && Math.abs(deltaX) < DRAG_THRESHOLD_PX) return;
+  if (!isMouseDragging) {
+    isMouseDragging = true;
+    scrollerEl.value.setPointerCapture(mouseDragOrigin.pointerId);
   }
-  scroller.value.scrollLeft = dragStart.scrollLeft - distance;
+  scrollerEl.value.scrollLeft = mouseDragOrigin.startScrollLeft - deltaX;
 }
 
 /**
- * Ends the press, unless a touch pan has started. The browser sends `pointercancel` and `pointerleave` when it takes a
- * pan, and the finger is still on the track. `onTouchEnd` ends the press in that case.
+ * Clears the mouse drag state and releases the pressed state.
+ * During a touch scroll, the browser fires `pointercancel` and `pointerleave` as soon as it takes over panning,
+ * even though the user's finger is still on the screen. Ignore those events for touch so the track stays pressed until `touchend`.
  */
-function onPointerEnd(event: PointerEvent): void {
-  dragStart = null;
-  if (event.pointerType !== "touch" || event.type === "pointerup") pressed.value = false;
+function handlePointerEnd(event: PointerEvent): void {
+  mouseDragOrigin = null;
+  if (event.pointerType !== "touch" || event.type === "pointerup") isPressed.value = false;
 }
 
-/** Ends the press when the finger lifts. The scroll can continue with its momentum. */
-function onTouchEnd(): void {
-  pressed.value = false;
+/** Releases the pressed state when the user's finger leaves the screen, even if momentum scrolling continues. */
+function handleTouchEnd(): void {
+  isPressed.value = false;
 }
 
-/** Stops the click at the end of a mouse drag, so a drag does not select a segment. */
-function onClickCapture(event: MouseEvent): void {
-  if (!dragged) return;
-  dragged = false;
+/** Suppresses the click event after a mouse drag so releasing the mouse button doesn't accidentally select a segment under the cursor. */
+function suppressClickAfterDrag(event: MouseEvent): void {
+  if (!isMouseDragging) return;
+  isMouseDragging = false;
   event.stopPropagation();
 }
 </script>
@@ -187,9 +191,9 @@ function onClickCapture(event: MouseEvent): void {
   <div
     v-bind="{ ...$attrs, 'aria-label': undefined }"
     class="track w-fit max-w-full min-w-0 rounded-full border border-core-alpha-brand-5 bg-core-alpha-brand-5"
-    :data-pressed="pressed ? '' : undefined"
+    :data-pressed="isPressed ? '' : undefined"
   >
-    <!-- The browser owns the touch scroll, so the momentum and the edge bounce are native. -->
+    <!-- Native touch scrolling preserves platform momentum and rubber-band overscroll behavior. -->
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="scroller"
@@ -199,28 +203,28 @@ function onClickCapture(event: MouseEvent): void {
         'touch-manipulation [scrollbar-width:none] overscroll-x-contain [-webkit-touch-callout:none] [&::-webkit-scrollbar]:hidden',
         wrap ? 'overflow-visible' : 'overflow-x-auto overflow-y-hidden rounded-full',
       ]"
-      :style="scrollerStyle"
-      @click.capture="onClickCapture"
-      @keydown="onKeydown"
-      @pointercancel="onPointerEnd"
-      @pointerdown="onPointerDown"
-      @pointerleave="onPointerEnd"
-      @pointermove="onPointerMove"
-      @pointerup="onPointerEnd"
-      @scroll.passive="measureEdges"
-      @touchcancel.passive="onTouchEnd"
-      @touchend.passive="onTouchEnd"
+      :style="scrollerMaskStyle"
+      @click.capture="suppressClickAfterDrag"
+      @keydown="handleKeydown"
+      @pointercancel="handlePointerEnd"
+      @pointerdown="handlePointerDown"
+      @pointerleave="handlePointerEnd"
+      @pointermove="handlePointerMove"
+      @pointerup="handlePointerEnd"
+      @scroll.passive="updateEdgeFades"
+      @touchcancel.passive="handleTouchEnd"
+      @touchend.passive="handleTouchEnd"
     >
       <div ref="content" :class="['relative flex gap-1 p-1', wrap ? 'flex-wrap' : 'w-max']">
-        <!-- The background is in the scrolling content, so it moves with the segments during a scroll. -->
+        <!-- Placed inside the scrollable content container so the active pill scrolls naturally alongside the segments. -->
         <span
           v-if="items[model] !== undefined"
           data-segment-selection
           :class="[
             'absolute top-0 left-0 rounded-full bg-core-alpha-brand-20',
-            selectionMoves && 'transition-[transform,width,height] duration-state ease-standard',
+            isIndicatorTransitionEnabled && 'transition-[transform,width,height] duration-state ease-standard',
           ]"
-          :style="selectionStyle"
+          :style="indicatorStyle"
         />
         <SSegment
           v-for="(item, index) in items"
@@ -238,8 +242,9 @@ function onClickCapture(event: MouseEvent): void {
 
 <style scoped>
 /*
- * A press changes only the look of the track, so the page under it does not move. `will-change` stays on, so a press does
- * not make a new layer around the scroller. A new layer could stop a pan that has just started on iOS Safari.
+ * Scale the track visually on press without affecting surrounding layout.
+ * Keep `will-change: transform` permanently promoted so pressing the track doesn't create a new compositing layer
+ * mid-gesture, which would abort an active horizontal touch pan in iOS Safari.
  */
 .track {
   transition: transform var(--motion-duration-sheet) var(--motion-easing-sheet);
@@ -251,7 +256,7 @@ function onClickCapture(event: MouseEvent): void {
   transition: transform var(--motion-duration-container) var(--motion-easing-standard);
 }
 
-/* The two rules are the same. The second rule lets a developer test reduced motion with no system setting. */
+/* Disable the press scale when reduced motion is enabled via the OS preference or the `:root[data-reduce-motion]` dev toggle. */
 @media (prefers-reduced-motion: reduce) {
   .track[data-pressed] {
     transform: none;
