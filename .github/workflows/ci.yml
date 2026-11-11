@@ -1,0 +1,73 @@
+name: Frontend CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  HUSKY: "0"
+  VITE_SPLITZ_API_BASE_URL: http://localhost:5119
+  VITE_SPLITZ_ASSETS_BASE_URL: http://localhost:5119
+
+jobs:
+  check:
+    name: Check, build, and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check formatting
+        run: bun run format:check
+
+      - name: Lint without changing files
+        run: bun x --no-install oxlint --type-aware --deny-warnings
+
+      - name: Type-check and build
+        run: bun run build
+
+      - name: Install Playwright browsers
+        run: bun x --no-install playwright install --with-deps chromium firefox webkit
+
+      - name: Run unit and Storybook browser tests
+        run: bun run test:unit --run
+
+      - name: Run end-to-end tests
+        run: bun run test:e2e
+
+      - name: Upload Playwright report and traces
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-results
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
