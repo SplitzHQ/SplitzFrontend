@@ -8,13 +8,12 @@ import "./assets/color.css";
 import { createApp } from "vue";
 
 import { createAppFluent } from "@/libs/fluent";
+import { preventPageZoom } from "@/libs/prevent-page-zoom";
 
 import App from "./App.vue";
 import router from "./router";
 
-// iOS Safari can still start a pinch zoom when `touch-action` does not stop it, for example during a scroll. Only Safari
-// sends `gesturestart`. See the viewport tag in `index.html`.
-document.addEventListener("gesturestart", (event) => event.preventDefault());
+preventPageZoom();
 
 const app = createApp(App);
 

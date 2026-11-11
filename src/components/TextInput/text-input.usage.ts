@@ -135,7 +135,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Screen reader",
   },
   {
-    text: "The app does not zoom, like a native app. The user decided this on 2026-11-11, after a review of PR 60. The viewport has `maximum-scale=1` and `user-scalable=no`. They stop the pinch zoom on Android, and they stop the zoom of iOS when an input with text under 16px gets the focus. iOS 10 and later ignore them for the pinch zoom, so `touch-action: pan-x pan-y` on `html` stops it from iOS 13, and `main.ts` cancels `gesturestart` for Safari. So an input can have text under 16px. The `outlined` text is `text-base`, and the `plain` text is `text-sm`. Do not scale an input to change its text size.",
+    text: "The app does not zoom, like a native app. The user decided this on 2026-11-11, after a review of PR 60. The viewport has `maximum-scale=1` and `user-scalable=no`. They stop the pinch zoom on Android, and they stop the zoom of iOS when an input with text under 16px gets the focus. iOS 10 and later ignore them for the pinch zoom, so `touch-action: pan-x pan-y` on `html` stops it from iOS 13, and `preventPageZoom` in `src/libs/prevent-page-zoom.ts` cancels the zoom gesture of Safari and a move with two or more fingers. No source tested these layers on iOS 18 or later, so test the zoom on a real iPhone after a change. So an input can have text under 16px. The `outlined` text is `text-base`, and the `plain` text is `text-sm`. Do not scale an input to change its text size.",
     title: "Zoom",
   },
   {
