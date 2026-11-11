@@ -43,7 +43,7 @@ export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
     title: "outlined",
   },
   plain: {
-    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-base` and scaled to look like `text-sm`, so it fits a row of `text-sm` text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-sm`, so it fits a row of `text-sm` text. The input is the root element and fills the width of its parent. A class on the component goes to the input. A long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
     title: "plain",
   },
 };
@@ -135,8 +135,8 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Screen reader",
   },
   {
-    text: "Each input that a person can type in has a computed text size of at least 16px, because a focused input under 16px makes iOS zoom the page. This includes HomeSearchBar and a raw `<input>` or `<textarea>`. A placeholder has the same size as the text. The `outlined` text is `text-base`. The `plain` text is `text-base` and scaled to look like `text-sm`. A real iPhone did not zoom for HomeSearchBar or for this scaled input (2026-11-04). Do not use `maximum-scale` in the viewport, because it can stop pinch zoom.",
-    title: "Zoom on iOS",
+    text: "The app does not zoom, like a native app. The user decided this on 2026-11-11, after a review of PR 60. The viewport has `maximum-scale=1` and `user-scalable=no`. They stop the pinch zoom on Android, and they stop the zoom of iOS when an input with text under 16px gets the focus. iOS 10 and later ignore them for the pinch zoom, so `touch-action: pan-x pan-y` on `html` stops it from iOS 13, and `main.ts` cancels `gesturestart` for Safari. So an input can have text under 16px. The `outlined` text is `text-base`, and the `plain` text is `text-sm`. Do not scale an input to change its text size.",
+    title: "Zoom",
   },
   {
     text: "The empty border, the placeholder and the dark hint are below the WCAG minimum in the contrast tables. See the open questions.",

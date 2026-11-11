@@ -73,6 +73,14 @@
 }
 
 @layer base {
+  /*
+   * The page can scroll but cannot zoom. iOS ignores `maximum-scale` in the viewport for the pinch zoom, but it obeys
+   * this value from iOS 13. It also stops the double-tap zoom. See the viewport tag in `index.html`.
+   */
+  html {
+    touch-action: pan-x pan-y;
+  }
+
   body,
   #app,
   .layout {

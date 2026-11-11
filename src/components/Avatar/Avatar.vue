@@ -28,11 +28,73 @@ export interface AvatarProps {
 /** The grid has room for this number of pictures. Callers can pass all the members of a group. */
 const MAX_GRID_IMAGES = 4;
 
+/** The classes of one avatar size. */
+interface SizeClasses {
+  /** The frame of one picture. */
+  frame: string;
+  /** The frame of a grid. */
+  groupFrame: string;
+  /** The picture or the tile when the avatar has one picture. */
+  single: string;
+  /** Each picture or tile in a grid. */
+  multiple: string;
+}
+
+/*
+ * The `icon-*` size of the initial follows the side of its tile. In a grid, the corner of the frame is the corner of a
+ * tile plus the padding, so the two curves stay parallel. The `xxs` grid has no caller, and its tiles have no room for an
+ * initial. The `header` size shows only one picture, so it has no grid classes.
+ */
+const SIZE_CLASSES: Record<AvatarProps["size"], SizeClasses> = {
+  header: {
+    frame: "size-8 rounded-lg",
+    groupFrame: "size-8 rounded-lg",
+    multiple: "",
+    single: "size-8 rounded-lg icon-3.5",
+  },
+  lg: {
+    frame: "size-16 rounded-2xl",
+    groupFrame: "size-16 rounded-xl",
+    multiple: "size-6.75 rounded-lg icon-3",
+    single: "size-16 rounded-2xl icon-7.25",
+  },
+  sm: {
+    frame: "size-12 rounded-xl",
+    groupFrame: "size-12 rounded-05xl",
+    multiple: "size-5 rounded-[0.4375rem] icon-2.5",
+    single: "size-12 rounded-xl icon-5.5",
+  },
+  xs: {
+    frame: "size-10 rounded-05xl",
+    groupFrame: "size-10 rounded-lg",
+    multiple: "size-4 rounded-[0.3125rem] icon-2.5",
+    single: "size-10 rounded-05xl icon-4.5",
+  },
+  xxs: {
+    frame: "size-5 rounded-md",
+    groupFrame: "size-5 rounded-md",
+    multiple: "size-1 rounded-sm icon-0",
+    single: "size-5 rounded-md icon-2.5",
+  },
+};
+
+/*
+ * The edge of a photo can have the same color as the background, so a photo has a faint line inside its edge. An outline
+ * follows the corners and does not change the size. A tile with an initial has no line, because its fill is already
+ * different from the background. See `avatar.usage.ts`.
+ */
+const PICTURE_LINE_CLASS =
+  "outline -outline-offset-1 outline-core-alpha-black-5 in-[.dark]:outline-core-alpha-white-10";
+
 const { images, size } = defineProps<AvatarProps>();
 
 const failedSources = shallowReactive(new Set<string>());
 
 const isGroup = computed(() => images.length > 1);
+
+const sizeClasses = computed(() => SIZE_CLASSES[size]);
+/** The classes of each picture or tile. */
+const tileClass = computed(() => (isGroup.value ? sizeClasses.value.multiple : sizeClasses.value.single));
 
 /** The pictures to show. A missing picture and a picture that failed to load have a null source and show a tile. */
 const shownImages = computed(() =>
@@ -66,9 +128,7 @@ function onImageError(src: string) {
 <template>
   <div
     :class="[
-      'img-container',
-      size,
-      isGroup && 'is-group',
+      isGroup ? sizeClasses.groupFrame : sizeClasses.frame,
       'flex shrink-0 items-center justify-center bg-core-alpha-brand-10',
     ]"
     :role="gridLabel ? 'img' : undefined"
@@ -79,17 +139,14 @@ function onImageError(src: string) {
       <template v-for="(image, index) in shownImages" :key="index">
         <img
           v-if="image.src"
-          :class="[isGroup ? 'image-count-multiple' : 'image-count-single', 'picture-line block object-cover']"
+          :class="[tileClass, PICTURE_LINE_CLASS, 'block object-cover']"
           :src="image.src"
           :alt="isGroup ? '' : image.alt"
           @error="onImageError(image.src!)"
         />
         <div
           v-else
-          :class="[
-            isGroup ? 'image-count-multiple' : 'image-count-single',
-            'flex items-center justify-center leading-none font-semibold select-none',
-          ]"
+          :class="[tileClass, 'flex items-center justify-center leading-none font-semibold select-none']"
           :style="AVATAR_TONE_STYLES[image.tone]"
           :role="!isGroup && image.alt ? 'img' : undefined"
           :aria-label="!isGroup && image.alt ? image.alt : undefined"
@@ -102,94 +159,3 @@ function onImageError(src: string) {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-@reference '../../assets/base.css';
-
-/*
- * The edge of a photo can have the same color as the background, so a photo has a faint line inside its edge. An outline
- * follows the corners and does not change the size. A tile with an initial has no line, because its fill is already
- * different from the background. See `avatar.usage.ts`.
- */
-.picture-line {
-  outline: 1px solid var(--core-alpha-black-5);
-  outline-offset: -1px;
-}
-
-.dark .picture-line {
-  outline-color: var(--core-alpha-white-10);
-}
-
-/*
- * The `icon-*` size of the initial follows the side of its tile. In a group, the corner of the frame is the corner of a
- * tile plus the padding, so the two curves stay parallel.
- */
-.img-container.xxs {
-  @apply h-5 w-5 rounded-md;
-
-  .image-count-single {
-    @apply h-5 w-5 rounded-md icon-2.5;
-  }
-
-  /* No caller uses this grid, and its tiles have no room for an initial. */
-  .image-count-multiple {
-    @apply h-1 w-1 rounded-sm icon-0;
-  }
-}
-
-.img-container.header {
-  @apply h-8 w-8 rounded-lg;
-
-  .image-count-single {
-    @apply h-8 w-8 rounded-lg icon-3.5;
-  }
-}
-
-.img-container.xs {
-  @apply h-10 w-10 rounded-05xl;
-
-  &.is-group {
-    @apply rounded-lg;
-  }
-
-  .image-count-single {
-    @apply h-10 w-10 rounded-05xl icon-4.5;
-  }
-
-  .image-count-multiple {
-    @apply h-4 w-4 rounded-[0.3125rem] icon-2.5;
-  }
-}
-
-.img-container.sm {
-  @apply h-12 w-12 rounded-xl;
-
-  &.is-group {
-    @apply rounded-05xl;
-  }
-
-  .image-count-single {
-    @apply h-12 w-12 rounded-xl icon-5.5;
-  }
-
-  .image-count-multiple {
-    @apply h-5 w-5 rounded-[0.4375rem] icon-2.5;
-  }
-}
-
-.img-container.lg {
-  @apply h-16 w-16 rounded-2xl;
-
-  &.is-group {
-    @apply rounded-xl;
-  }
-
-  .image-count-single {
-    @apply h-16 w-16 rounded-2xl icon-7.25;
-  }
-
-  .image-count-multiple {
-    @apply h-6.75 w-6.75 rounded-lg icon-3;
-  }
-}
-</style>

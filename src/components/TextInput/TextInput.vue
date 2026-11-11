@@ -102,7 +102,6 @@ const iconClass = computed(() => {
 
 const textClass = computed(() => (isInvalid.value ? "text-base-text-error" : "text-base-text-primary"));
 
-const inputEl = useTemplateRef<HTMLInputElement>("input");
 const fieldEl = useTemplateRef<HTMLElement>("field");
 const messageEl = useTemplateRef<HTMLElement>("message");
 
@@ -130,48 +129,27 @@ watch(
     );
   }
 );
-
-/** Returns true when a press hits the input or the reveal button, which handle the press themselves. */
-function hitsOwnControl(target: EventTarget | null): boolean {
-  return target instanceof Element && target.closest("input, button") !== null;
-}
-
-/** A press on the padding or the icon does not take the focus away, so a phone keeps its keyboard open. */
-function onFieldMouseDown(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) event.preventDefault();
-}
-
-/** The whole field is the touch target, but only the input takes the focus. `click` counts as a user gesture on iOS. */
-function onFieldClick(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) inputEl.value?.focus();
-}
 </script>
 
 <template>
-  <!--
-    The input uses `text-base`, because iOS zooms the page when a focused input has text under 16px. The scale makes the
-    text look like the `text-sm` text of its row. The width and the height are larger by the same ratio, so the input fills
-    its container and keeps its tap area. The page counts the width before the scale when it scrolls, so the box around the
-    input clips the extra width.
-  -->
-  <div v-if="variant === 'plain'" class="overflow-x-clip">
-    <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-    <input
-      :id="inputId"
-      v-model="model"
-      :name="name"
-      :type="resolvedType"
-      :placeholder="placeholder"
-      :autocomplete="autocomplete"
-      :inputmode="inputmode"
-      :required="required"
-      :disabled="disabled"
-      :aria-label="label"
-      :aria-invalid="isInvalid ? 'true' : undefined"
-      :aria-describedby="describedByIds"
-      class="h-[calc(--spacing(11)/0.875)] w-[calc(100%/0.875)] origin-left scale-[0.875] bg-transparent text-base font-normal text-ellipsis text-base-text-primary placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
-    />
-  </div>
+  <!-- The `text-sm` text fits a row of `text-sm` text. The viewport stops the zoom of iOS, so the text can be under 16px. -->
+  <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+  <input
+    v-if="variant === 'plain'"
+    :id="inputId"
+    v-model="model"
+    :name="name"
+    :type="resolvedType"
+    :placeholder="placeholder"
+    :autocomplete="autocomplete"
+    :inputmode="inputmode"
+    :required="required"
+    :disabled="disabled"
+    :aria-label="label"
+    :aria-invalid="isInvalid ? 'true' : undefined"
+    :aria-describedby="describedByIds"
+    class="h-11 w-full bg-transparent text-sm font-normal text-ellipsis text-base-text-primary placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
+  />
 
   <div v-else class="flex flex-col">
     <div class="flex flex-col gap-1.5">
@@ -184,55 +162,61 @@ function onFieldClick(event: MouseEvent): void {
         {{ label }}
       </label>
 
-      <!--
-        The whole field is the tap target, but the input is smaller than the field. Without these handlers, a tap on the
-        padding or the icon does nothing.
-        - `mousedown` stops the browser from moving the focus away from the input, so a phone keeps its keyboard open.
-        - `click` then gives the focus to the input. iOS opens the keyboard only in a user gesture, and `click` is one.
-        - A press on a control in the field, for example the password button, goes to that control. See `hitsOwnControl`.
-        The handlers are only for a pointer. The input stays in the tab order and the label names it, so a keyboard or a
-        screen reader does not use this `div`. That is why the `div` has no role or key handlers.
-      -->
       <!-- The ring is `ring-0` and inset in each state, so it can fade. A ring that exists only on focus would change at once. -->
-      <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
       <div
         ref="field"
         :class="[
-          'flex w-full items-center gap-2 rounded-xl border p-3 ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-exit ease-standard ring-inset has-[input:focus]:ring-1',
-          disabled ? 'cursor-not-allowed' : 'cursor-text',
+          'flex w-full items-center gap-2 rounded-xl border ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-exit ease-standard ring-inset has-[input:focus]:ring-1',
+          isPassword && 'pr-3',
           containerClass,
         ]"
-        @mousedown="onFieldMouseDown"
-        @click="onFieldClick"
       >
-        <span
-          v-if="$slots.icon"
+        <!--
+          The whole field is the tap target, but the input is smaller than the field. This `<label>` holds the padding, the
+          icon and the input, so a tap on the padding or the icon gives the focus to the input. The password button is
+          outside it, so the button keeps its own press and does not add its name to the name of the input.
+          `mousedown.self.prevent` keeps the focus in the input during a press on the padding or the icon, so a phone keeps
+          its keyboard open. Without it, the focus leaves the input at `mousedown` and comes back at `click`. A press on the
+          input is not on the label itself, so the caret can still move. The icon has `pointer-events-none`, so a press on
+          the icon is on the label itself.
+        -->
+        <label
+          :for="inputId"
           :class="[
-            'flex size-5 shrink-0 items-center justify-center transition-colors duration-exit ease-standard [&>svg]:size-5',
-            iconClass,
+            'flex min-w-0 flex-1 items-center gap-2 py-3 pl-3',
+            !isPassword && 'pr-3',
+            disabled ? 'cursor-not-allowed' : 'cursor-text',
           ]"
+          @mousedown.self.prevent
         >
-          <slot name="icon" />
-        </span>
+          <span
+            v-if="$slots.icon"
+            :class="[
+              'pointer-events-none flex size-5 shrink-0 items-center justify-center transition-colors duration-exit ease-standard [&>svg]:size-5',
+              iconClass,
+            ]"
+          >
+            <slot name="icon" />
+          </span>
 
-        <input
-          :id="inputId"
-          ref="input"
-          v-model="model"
-          :name="name"
-          :type="resolvedType"
-          :placeholder="placeholder"
-          :autocomplete="autocomplete"
-          :inputmode="inputmode"
-          :required="required"
-          :disabled="disabled"
-          :aria-invalid="isInvalid ? 'true' : undefined"
-          :aria-describedby="describedByIds"
-          :class="[
-            'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-exit ease-standard placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
-            textClass,
-          ]"
-        />
+          <input
+            :id="inputId"
+            v-model="model"
+            :name="name"
+            :type="resolvedType"
+            :placeholder="placeholder"
+            :autocomplete="autocomplete"
+            :inputmode="inputmode"
+            :required="required"
+            :disabled="disabled"
+            :aria-invalid="isInvalid ? 'true' : undefined"
+            :aria-describedby="describedByIds"
+            :class="[
+              'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-exit ease-standard placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
+              textClass,
+            ]"
+          />
+        </label>
 
         <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
         <!--

@@ -2,6 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { reactive } from "vue";
 
+import Avatar from "@/components/Avatar/Avatar.vue";
 import NotificationBadge from "@/components/Notification/NotificationBadge.vue";
 import NotificationItem from "@/components/Notification/NotificationItem.vue";
 import NotificationList from "@/components/Notification/NotificationList.vue";
@@ -140,7 +141,7 @@ describe("NotificationItem", () => {
     });
     const wrapper = mount(NotificationItem, { global, props: { notification } });
 
-    expect(wrapper.get(".img-container").attributes("aria-hidden")).toBe("true");
+    expect(wrapper.getComponent(Avatar).attributes("aria-hidden")).toBe("true");
   });
 });
 

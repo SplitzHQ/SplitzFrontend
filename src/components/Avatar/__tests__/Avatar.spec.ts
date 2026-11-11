@@ -52,8 +52,8 @@ describe("Avatar", () => {
       { alt: "Bo", src: null },
     ]);
 
-    expect(wrapper.get("img").classes()).toContain("picture-line");
-    expect(wrapper.findAll(".picture-line")).toHaveLength(1);
+    expect(wrapper.get("img").classes()).toContain("outline-core-alpha-black-5");
+    expect(wrapper.findAll(".outline-core-alpha-black-5")).toHaveLength(1);
   });
 
   it("gives the same name the same color", () => {

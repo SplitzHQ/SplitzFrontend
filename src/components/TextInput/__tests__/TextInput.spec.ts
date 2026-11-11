@@ -15,9 +15,14 @@ function mountField(props: Partial<TextInputProps> = {}, modelValue?: string) {
   });
 }
 
-/** Returns the box around the input. */
-function fieldOf(wrapper: ReturnType<typeof mountField>) {
+/** Returns the label in the field. It holds the padding, the icon and the input. */
+function tapAreaOf(wrapper: ReturnType<typeof mountField>) {
   return wrapper.get("input").element.parentElement!;
+}
+
+/** Returns the box with the border around the input. */
+function fieldOf(wrapper: ReturnType<typeof mountField>) {
+  return tapAreaOf(wrapper).parentElement!;
 }
 
 describe("TextInput", () => {
@@ -25,27 +30,27 @@ describe("TextInput", () => {
     document.body.innerHTML = "";
   });
 
-  it("focuses the input after a press on the padding of the field", () => {
+  // jsdom does not move the focus when a label gets a click, so these tests check the link. A browser does the rest.
+  it("puts the padding and the icon in a label of the input, so a press on them focuses the input", () => {
     const wrapper = mountField();
+    const tapArea = tapAreaOf(wrapper);
 
-    fieldOf(wrapper).click();
-
-    expect(document.activeElement).toBe(wrapper.get("input").element);
+    expect(tapArea).toBeInstanceOf(HTMLLabelElement);
+    expect((tapArea as HTMLLabelElement).control).toBe(wrapper.get("input").element);
+    expect(tapArea.contains(wrapper.get("[data-testid='icon']").element)).toBe(true);
   });
 
-  it("focuses the input after a press on the icon", async () => {
-    const wrapper = mountField();
+  it("keeps the password button out of the label, so its name is not part of the name of the input", () => {
+    const wrapper = mountField({ type: "password" });
 
-    await wrapper.get("[data-testid='icon']").trigger("click");
-
-    expect(document.activeElement).toBe(wrapper.get("input").element);
+    expect(tapAreaOf(wrapper).contains(wrapper.get("button").element)).toBe(false);
   });
 
   it("keeps the focus in the input during a press on the padding", () => {
     const wrapper = mountField();
     const event = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
 
-    fieldOf(wrapper).dispatchEvent(event);
+    tapAreaOf(wrapper).dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(true);
   });
@@ -71,7 +76,7 @@ describe("TextInput", () => {
   it("does not focus a disabled input", async () => {
     const wrapper = mountField({ disabled: true });
 
-    fieldOf(wrapper).click();
+    tapAreaOf(wrapper).click();
     await nextTick();
 
     expect(document.activeElement).not.toBe(wrapper.get("input").element);
@@ -211,21 +216,28 @@ describe("TextInput", () => {
       expect(mountField().get("input").classes()).toContain("text-base");
     });
 
-    it("gives the plain text the 16px class and scales it to look like 14px", () => {
+    it("gives the plain text the 14px class of its row, with no scale", () => {
       const classes = mountField({ variant: "plain" }).get("input").classes();
-      expect(classes).toContain("text-base");
-      expect(classes).toContain("scale-[0.875]");
-      expect(classes.join(" ")).not.toContain("text-sm");
+      expect(classes).toContain("text-sm");
+      expect(classes.join(" ")).not.toContain("scale-");
     });
   });
 
   describe("plain variant", () => {
-    it("clips its extra width and ends a long placeholder with an ellipsis", () => {
-      const input = mountField({ variant: "plain" }).get("input");
+    it("has no box around the input and ends a long placeholder with an ellipsis", () => {
+      const wrapper = mountField({ variant: "plain" });
 
-      // The input is wider than its box before its scale. With no clip, the page can scroll sideways.
-      expect(input.element.parentElement?.classList).toContain("overflow-x-clip");
-      expect(input.classes()).toContain("text-ellipsis");
+      expect(wrapper.find("div").exists()).toBe(false);
+      expect(wrapper.get("input").classes()).toContain("text-ellipsis");
+    });
+
+    it("gives a class on the component to the input", () => {
+      const wrapper = mount(TextInput, {
+        attrs: { class: "w-full" },
+        props: { placeholder: "Search", variant: "plain" },
+      });
+
+      expect(wrapper.get("input").classes()).toContain("w-full");
     });
 
     it("uses the label as the name of the input, and shows no label element", () => {
