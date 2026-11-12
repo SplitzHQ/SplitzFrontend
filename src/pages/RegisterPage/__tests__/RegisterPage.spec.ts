@@ -51,22 +51,39 @@ describe("RegisterPage", () => {
     vi.useRealTimers();
   });
 
-  it("shows a password mismatch under the confirm field, and does not submit or show a toast", async () => {
+  it("shows the password rule under the field, and does not submit or show a toast", async () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Different1!");
+    await wrapper.find('input[name="password"]').setValue("short1");
     await wrapper.find("form").trigger("submit");
 
-    expect(wrapper.get("#confirm-password-error").text()).toBe("auth-register-password-mismatch");
-    expect(wrapper.get('input[name="confirm-password"]').attributes("aria-describedby")).toBe("confirm-password-error");
+    expect(wrapper.get("#password-error").text()).toBe("auth-password-policy");
+    expect(wrapper.find('[data-test="register-error"]').exists()).toBe(false);
     expect(userStoreMock.register).not.toHaveBeenCalled();
     expect(toastMock.error).not.toHaveBeenCalled();
+  });
 
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+  it("has one password field, and links it to the checklist", () => {
+    const wrapper = mount(RegisterPage);
 
-    expect(wrapper.find("#confirm-password-error").exists()).toBe(false);
+    expect(wrapper.find('input[name="confirm-password"]').exists()).toBe(false);
+    expect(wrapper.get('input[name="password"]').attributes("aria-describedby")).toBe("password-rules");
+    expect(wrapper.find("#password-rules").exists()).toBe(true);
+  });
+
+  it("shows a password error from the backend under the field", async () => {
+    const body = JSON.stringify({ errors: { PasswordRequiresUpper: ["Needs an upper case letter."] } });
+    userStoreMock.register.mockRejectedValue(new ResponseError(new Response(body, { status: 400 })));
+    const wrapper = mount(RegisterPage);
+
+    await wrapper.find('input[name="email"]').setValue("person@example.com");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
+    await wrapper.find("form").trigger("submit");
+    await flushPromises();
+
+    expect(wrapper.get("#password-error").text()).toBe("auth-password-policy");
+    expect(wrapper.find('[data-test="register-error"]').exists()).toBe(false);
   });
 
   it("tells users to check email after registration when email is enabled", async () => {
@@ -75,8 +92,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
 
     await flushPromises();
@@ -91,8 +107,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
 
     expect(toastMock.success).toHaveBeenCalledWith("auth-register-success");
@@ -106,8 +121,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
 
     expect(wrapper.text()).not.toContain("auth-register-failed");
@@ -120,8 +134,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
@@ -146,8 +159,7 @@ describe("RegisterPage", () => {
       const wrapper = mount(RegisterPage);
 
       await wrapper.find('input[name="email"]').setValue("person@example.com");
-      await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-      await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+      await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
       await wrapper.find("form").trigger("submit");
       await flushPromises();
 
@@ -161,7 +173,6 @@ describe("RegisterPage", () => {
   );
 
   it.each([
-    [400, JSON.stringify({ errors: { PasswordTooShort: ["Too short."] } })],
     [400, "not json"],
     [400, "null"],
     [400, "{}"],
@@ -171,8 +182,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
@@ -191,8 +201,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.get('[data-test="register-submit"]').trigger("click");
     await wrapper.find("form").trigger("submit");
 
@@ -210,8 +219,7 @@ describe("RegisterPage", () => {
     const wrapper = mount(RegisterPage);
 
     await wrapper.find('input[name="email"]').setValue("person@example.com");
-    await wrapper.find('input[name="password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Passw0rd!");
+    await wrapper.find('input[name="password"]').setValue("SplitDinner2026");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
