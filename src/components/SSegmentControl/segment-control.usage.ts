@@ -11,7 +11,8 @@ export const RULE_SCOPE: RuleScope = {
   app: "All rules in this file apply to `src/`.",
   devtools: [
     "These rules apply: when not to use a segment control, the label and accessibility.",
-    "The size rules apply: the tools use sm. The prototype kit has `SegmentPicker`.",
+    "The size rules apply: the tools use sm. The prototype kit has `SegmentPicker`, which uses `wrap`.",
+    "Only `devtools/` uses `wrap`. A tool panel can have long lists, and a mouse cannot easily scroll a track sideways.",
     "A demo on a design-system page or a comparison frame in a prototype shows options on purpose. No rule applies to it.",
     "When a rule does not decide a devtools control, choose and continue. Do not stop to ask, and do not add the choice to this file.",
   ],
@@ -19,7 +20,7 @@ export const RULE_SCOPE: RuleScope = {
 
 /** When to use a segment control. */
 export const WHEN_TO_USE: UsageRule[] = [
-  { rule: "The user chooses one item from a short list, and all items must stay visible.", title: "One of a few" },
+  { rule: "The user chooses one item from a short list on one row.", title: "One of a few" },
   { rule: "One item is always selected. The control has no empty state.", title: "Always a value" },
 ];
 
@@ -29,14 +30,14 @@ export const NOT_A_SEGMENT_CONTROL: UseInsteadRule[] = [
   { use: "SButton", when: "The tap runs one action and does not keep a value." },
 ];
 
-/** What each size is for. The heights are measured from the rendered segment. The track adds about 9px. */
+/** What each size is for. */
 export const SIZE_GUIDE: Record<SegmentSize, UsageRule> = {
   md: {
-    rule: "40px high, 14px text. Use it for each control in `src/`, for example the tabs of GroupDetailPage. Do not add padding in the slot.",
+    rule: "The default size in `src/`, for example the tabs of GroupDetailPage. The track is high enough for the tap area of 44px. Do not add padding in the slot.",
     title: "md",
   },
   sm: {
-    rule: "32px high, 14px text. Use it only in `devtools/`: the toolbars, the panels and `SegmentPicker`.",
+    rule: "The compact size. When the track can scroll, it clips the tap area to 40px high. Use it in `src/` when the layout needs a compact control, for example in a row with other controls. The `devtools/` toolbars, panels and `SegmentPicker` also use it.",
     title: "sm",
   },
 };
@@ -44,16 +45,16 @@ export const SIZE_GUIDE: Record<SegmentSize, UsageRule> = {
 /** How to place a control. */
 export const LAYOUT_RULES: UsageRule[] = [
   {
-    rule: "Add `self-start` in a column, because the segments do not fill a wider track.",
+    rule: "The track has the width of its segments. The width of the parent is the limit. A caller does not add `self-start`.",
     title: "Width",
   },
   {
-    rule: "Leave free space above and below the track when the segment is under 44px high, because the tap area goes past the segment.",
-    title: "Tap area",
+    rule: "The track does not wrap in `src/`. When the segments do not fit, they scroll inside the track. The edge fades on each side that has more segments. A page does not add its own scroll or fade. The four English tabs of GroupDetailPage fit on a 375px screen, and they scroll on a 320px screen.",
+    title: "Segments that do not fit",
   },
   {
-    rule: "The track does not wrap or scroll. Check the longest locale. The four English tabs of GroupDetailPage are 339px wide, and that page has 359px of free width on a 375px screen.",
-    title: "Long labels",
+    rule: "A tap on a segment also shows the segment on each side of it. The track moves only when one of these segments is hidden.",
+    title: "Scroll after a tap",
   },
 ];
 
@@ -80,7 +81,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Keyboard",
   },
   {
-    text: "Each segment has a tap area of at least 44px high and 44px wide, from an invisible box. The look does not change.",
+    text: "Each segment has a tap area of at least 44px wide, from an invisible box. The look does not change. The target height is 44px, and md has it. With sm, the tap area is 44px high when the track does not scroll and 40px high when it can scroll. 40px is accepted when the layout needs sm.",
     title: "Tap area",
   },
   {
@@ -92,12 +93,16 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Focus ring",
   },
   {
-    text: "The selected background slides with the motion tokens. Under reduced motion it moves at once.",
-    title: "Reduced motion",
+    text: "An arrow key moves the focus and scrolls the track, so the focused segment and its neighbors are visible.",
+    title: "Scroll with a keyboard",
   },
   {
-    text: "Each control has its own moving background, so a page can show more than one control.",
-    title: "More than one control",
+    text: "While a finger or a mouse is on the track, the track looks larger with `--motion-scale-track-press`. A scroll does not end this. The track keeps its layout box, so the page under it does not move.",
+    title: "Press",
+  },
+  {
+    text: "The selected background slides with the motion tokens. Under reduced motion it moves at once, the track does not grow on a press, and the scroll has no animation.",
+    title: "Reduced motion",
   },
 ];
 
@@ -107,5 +112,4 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  */
 export const OPEN_QUESTIONS = [
   "What do the group detail tabs do? They do not change the content yet, and they stay in the radio role. When they get panels, should the control offer the tablist role? The old audit (G1) also says that Export does not look like a view.",
-  "What happens on a screen under 375px? The four English tabs are 339px wide, and a 320px screen has 304px of free width. The control overflows. The Chinese tabs are 260px wide and fit.",
 ];

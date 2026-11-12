@@ -14,12 +14,15 @@
   --motion-duration-state: calc(200ms * var(--motion-slow));
   --motion-duration-container: calc(250ms * var(--motion-slow));
   --motion-duration-sheet: calc(500ms * var(--motion-slow));
+  --motion-duration-loop: calc(1200ms * var(--motion-slow));
   --motion-scale-sheet-back: 0.98;
+  --motion-scale-track-press: 1.015;
   --motion-easing-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --motion-easing-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-easing-exit: cubic-bezier(0.32, 0, 0.67, 0);
   --motion-easing-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --motion-easing-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-easing-loop: cubic-bezier(0, 0, 1, 1);
 }
 
 /* `inline` makes each class read the token directly, so the slow-motion factor and reduced motion still apply. */
@@ -50,6 +53,7 @@
     --motion-duration-state: 0ms;
     --motion-duration-container: 0ms;
     --motion-duration-sheet: 0ms;
+    --motion-duration-loop: 0ms;
   }
 }
 
@@ -60,4 +64,5 @@
   --motion-duration-state: 0ms;
   --motion-duration-container: 0ms;
   --motion-duration-sheet: 0ms;
+  --motion-duration-loop: 0ms;
 }

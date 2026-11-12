@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { PhEye, PhEyeSlash } from "@phosphor-icons/vue";
+import { useResizeObserver } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
-import { computed, ref, useId, useTemplateRef } from "vue";
+import { computed, ref, useId, useTemplateRef, watch } from "vue";
+
+import { MOTION_EASING, motionMs } from "@/libs/motion";
 
 /** A text field with an optional label and hint. See `text-input.usage.ts` for when to use it. */
 export interface TextInputProps {
@@ -85,7 +88,9 @@ const containerClass = computed(() => {
   if (disabled) return "border-base-border-disabled_subtle bg-base-bg-disabled_subtle";
   if (isInvalid.value) return "border-base-border-error-solid has-[input:focus]:ring-base-border-error-solid";
   const restBorder = hasValue.value ? "border-base-border-primary" : "border-base-border-secondary";
-  return `${restBorder} hover:border-base-border-brand-solid focus-within:border-base-border-brand-solid has-[input:focus]:ring-base-border-brand-solid`;
+  // A transition uses the time of the state that it goes to. So these two classes make hover and focus faster than the return to rest.
+  const enterTime = "hover:duration-hover-in has-[input:focus]:duration-hover-in";
+  return `${restBorder} ${enterTime} hover:border-base-border-brand-solid focus-within:border-base-border-brand-solid has-[input:focus]:ring-base-border-brand-solid`;
 });
 
 const iconClass = computed(() => {
@@ -97,26 +102,37 @@ const iconClass = computed(() => {
 
 const textClass = computed(() => (isInvalid.value ? "text-base-text-error" : "text-base-text-primary"));
 
-const inputEl = useTemplateRef<HTMLInputElement>("input");
+const fieldEl = useTemplateRef<HTMLElement>("field");
+const messageEl = useTemplateRef<HTMLElement>("message");
 
-/** Returns true when a press hits the input or the reveal button, which handle the press themselves. */
-function hitsOwnControl(target: EventTarget | null): boolean {
-  return target instanceof Element && target.closest("input, button") !== null;
-}
+const messageHeight = ref<number>();
+useResizeObserver(messageEl, () => {
+  messageHeight.value = messageEl.value?.offsetHeight;
+});
 
-/** A press on the padding or the icon does not take the focus away, so a phone keeps its keyboard open. */
-function onFieldMouseDown(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) event.preventDefault();
-}
+const messageEnterClass = computed(() =>
+  ["transition-[opacity,translate] duration-state ease-enter", hint ? "delay-(--motion-duration-exit)" : ""].join(" ")
+);
 
-/** The whole field is the touch target, but only the input takes the focus. `click` counts as a user gesture on iOS. */
-function onFieldClick(event: MouseEvent): void {
-  if (!hitsOwnControl(event.target)) inputEl.value?.focus();
-}
+/** The offsets of the shake in pixels. Each move is smaller than the last, so the field stops softly. */
+const SHAKE_OFFSETS = [0, -3, 2, -1, 0];
+
+// A new error shakes the field one time. A change from one error to another error does not. Reduced motion makes the time 0.
+watch(
+  () => error,
+  (next, previous) => {
+    const duration = motionMs("container");
+    if (!next || previous || duration === 0) return;
+    fieldEl.value?.animate?.(
+      SHAKE_OFFSETS.map((offset) => ({ translate: `${offset}px 0` })),
+      { duration, easing: MOTION_EASING.standard }
+    );
+  }
+);
 </script>
 
 <template>
-  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
+  <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
   <input
     v-if="variant === 'plain'"
     :id="inputId"
@@ -131,73 +147,124 @@ function onFieldClick(event: MouseEvent): void {
     :aria-label="label"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-describedby="describedByIds"
-    class="h-11 bg-transparent text-sm font-normal text-base-text-primary placeholder:text-sm placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
+    class="h-11 w-full bg-transparent text-sm font-normal text-ellipsis text-base-text-primary placeholder:font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden"
   />
 
-  <div v-else class="flex flex-col gap-1.5">
-    <label v-if="label" :for="inputId" :class="hideLabel ? 'sr-only' : 'text-sm font-semibold text-base-text-primary'">
-      {{ label }}
-    </label>
-
-    <!--
-      The whole field is the tap target, but the input is smaller than the field. Without these handlers, a tap on the
-      padding or the icon does nothing.
-      - `mousedown` stops the browser from moving the focus away from the input, so a phone keeps its keyboard open.
-      - `click` then gives the focus to the input. iOS opens the keyboard only in a user gesture, and `click` is one.
-      - A press on a control in the field, for example the password button, goes to that control. See `hitsOwnControl`.
-      The handlers are only for a pointer. The input stays in the tab order and the label names it, so a keyboard or a
-      screen reader does not use this `div`. That is why the `div` has no role or key handlers.
-    -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events, vuejs-accessibility/no-static-element-interactions -->
-    <div
-      :class="[
-        'flex w-full items-center gap-2 rounded-xl border p-3 has-[input:focus]:ring-1 has-[input:focus]:ring-inset',
-        disabled ? 'cursor-not-allowed' : 'cursor-text',
-        containerClass,
-      ]"
-      @mousedown="onFieldMouseDown"
-      @click="onFieldClick"
-    >
-      <span v-if="$slots.icon" :class="['flex size-5 shrink-0 items-center justify-center [&>svg]:size-5', iconClass]">
-        <slot name="icon" />
-      </span>
-
-      <input
-        :id="inputId"
-        ref="input"
-        v-model="model"
-        :name="name"
-        :type="resolvedType"
-        :placeholder="placeholder"
-        :autocomplete="autocomplete"
-        :inputmode="inputmode"
-        :required="required"
-        :disabled="disabled"
-        :aria-invalid="isInvalid ? 'true' : undefined"
-        :aria-describedby="describedByIds"
-        :class="[
-          'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
-          textClass,
-        ]"
-      />
-
-      <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
-      <!-- The button is 24px. An invisible box around it makes the tap area 44px. -->
-      <button
-        v-if="isPassword"
-        type="button"
-        class="relative flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
-        :disabled="disabled"
-        @click="revealed = !revealed"
+  <div v-else class="flex flex-col">
+    <div class="flex flex-col gap-1.5">
+      <!-- The side space is the padding and the border of the field, so the label, the icon and the text under the field line up. -->
+      <label
+        v-if="label"
+        :for="inputId"
+        :class="hideLabel ? 'sr-only' : 'px-3.25 text-sm font-semibold text-base-text-primary'"
       >
-        <PhEyeSlash v-if="revealed" />
-        <PhEye v-else />
-        <span class="sr-only">{{ revealed ? $t("text-input-hide-password") : $t("text-input-show-password") }}</span>
-      </button>
+        {{ label }}
+      </label>
+
+      <!-- The ring is `ring-0` and inset in each state, so it can fade. A ring that exists only on focus would change at once. -->
+      <div
+        ref="field"
+        :class="[
+          'flex w-full items-center gap-2 rounded-xl border ring-0 ring-transparent transition-[border-color,box-shadow,background-color] duration-exit ease-standard ring-inset has-[input:focus]:ring-1',
+          isPassword && 'pr-3',
+          containerClass,
+        ]"
+      >
+        <label
+          :for="inputId"
+          :class="[
+            'flex min-w-0 flex-1 items-center gap-2 py-3 pl-3',
+            !isPassword && 'pr-3',
+            disabled ? 'cursor-not-allowed' : 'cursor-text',
+          ]"
+          @mousedown.self.prevent
+        >
+          <span
+            v-if="$slots.icon"
+            :class="[
+              'pointer-events-none flex size-5 shrink-0 items-center justify-center transition-colors duration-exit ease-standard [&>svg]:size-5',
+              iconClass,
+            ]"
+          >
+            <slot name="icon" />
+          </span>
+
+          <input
+            :id="inputId"
+            v-model="model"
+            :name="name"
+            :type="resolvedType"
+            :placeholder="placeholder"
+            :autocomplete="autocomplete"
+            :inputmode="inputmode"
+            :required="required"
+            :disabled="disabled"
+            :aria-invalid="isInvalid ? 'true' : undefined"
+            :aria-describedby="describedByIds"
+            :class="[
+              'min-w-0 flex-1 bg-transparent text-base leading-6 font-normal transition-colors duration-exit ease-standard placeholder:text-base-text-placeholder focus-visible:outline-hidden disabled:text-base-text-disabled',
+              textClass,
+            ]"
+          />
+        </label>
+
+        <!--
+          An invisible box around the button makes the tap area larger than the button. The button and the icon have empty
+          space around the ink, so the negative margin moves the ink of the icon onto the same line as the start icon, on
+          the other side of the field.
+        -->
+        <button
+          v-if="isPassword"
+          type="button"
+          class="relative mr-[-3.25px] flex size-6 shrink-0 items-center justify-center rounded-full text-base-fg-quaternary after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 hover:text-base-fg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid [&>svg]:size-5"
+          :disabled="disabled"
+          @click="revealed = !revealed"
+        >
+          <PhEyeSlash v-if="revealed" />
+          <PhEye v-else />
+          <span class="sr-only">{{ revealed ? $t("text-input-hide-password") : $t("text-input-show-password") }}</span>
+        </button>
+      </div>
     </div>
 
-    <!-- The error appears after the first render, so `role="alert"` makes a screen reader read it. -->
-    <p v-if="error" :id="errorId" role="alert" class="px-1 text-xs text-base-text-error">{{ error }}</p>
-    <p v-else-if="hint" :id="hintId" class="px-1 text-xs text-base-text-quaternary">{{ hint }}</p>
+    <!-- The area changes its height smoothly, so the content below does not jump. The first height comes from `auto`, with no motion. -->
+    <div
+      class="overflow-hidden transition-[height] duration-container ease-enter"
+      :style="messageHeight === undefined ? undefined : { height: `${messageHeight}px` }"
+    >
+      <div ref="message" class="relative">
+        <!--
+          The text leaves in `absolute` position, so the area gets its new height at the start of the leave. A hint and an
+          error swap in one place, so the new text waits until the old text has left.
+          `will-change` keeps the text on its own layer at all times. Without it, Windows draws the text differently during
+          the fade and after it, and the color seems to jump from a bright red to a dark red at the end.
+        -->
+        <Transition
+          :enter-active-class="messageEnterClass"
+          enter-from-class="-translate-y-1 opacity-0"
+          leave-active-class="absolute inset-x-0 top-0 transition-opacity duration-exit ease-exit"
+          leave-to-class="opacity-0"
+        >
+          <!-- The error appears after the first render, so `role="alert"` makes a screen reader read it. -->
+          <p
+            v-if="error"
+            :id="errorId"
+            key="error"
+            role="alert"
+            class="px-3.25 pt-1.5 text-xs text-base-text-error will-change-[opacity]"
+          >
+            {{ error }}
+          </p>
+          <p
+            v-else-if="hint"
+            :id="hintId"
+            key="hint"
+            class="px-3.25 pt-1.5 text-xs text-base-text-quaternary will-change-[opacity]"
+          >
+            {{ hint }}
+          </p>
+        </Transition>
+      </div>
+    </div>
   </div>
 </template>

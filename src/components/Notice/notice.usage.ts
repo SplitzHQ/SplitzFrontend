@@ -90,19 +90,27 @@ export const ANNOUNCE_RULES: UsageRule[] = [
 /** How to fill a notice. */
 export const CONTENT_RULES: UsageRule[] = [
   {
-    rule: "Every tone has a tinted surface in the surface rule of `button.usage.ts`. So a next action in a notice uses `outline`, not `secondary`. LoginPage does this with `outline` and `md`.",
+    rule: "Put the button in the `action` slot. The notice puts it below the message, on the right, as RequestCard does. Do not add a layout class to the button.",
     title: "Button in a notice",
   },
   {
-    rule: "Put the action at the start of the line with `self-start`. Put the text and the action in a `flex flex-col gap-2` block, because the slot has a gap of only 4px.",
-    title: "Action layout",
+    rule: "The notice has no prop for the variant. Set `variant` on the button. Use `outline`, because every tone has a tinted surface in the surface rule of `button.usage.ts`. Use `primary` only when the action is the one main action of the screen. Do not use `secondary`.",
+    title: "Button variant",
+  },
+  {
+    rule: "An `outline` action uses `sm`. LoginPage and TwoFactorSetupPage do this. A `primary` action uses `md`, because `SIZE_DECISION` in `button.usage.ts` says that the one main action of a screen is never smaller than `md`.",
+    title: "Button size",
+  },
+  {
+    rule: "The default slot has only a small gap. When the message has a second block, for example a countdown, put the blocks in a `flex flex-col gap-2` block. LoginPage does this.",
+    title: "More than one block of text",
   },
   {
     rule: "Each tone has a default icon: `PhInfo` for info, `PhCheckCircle` for success, `PhWarning` for warning and `PhWarningCircle` for error. Leave the `icon` slot empty, unless another icon tells more about this message. LoginPage uses `PhPaperPlaneTilt` for the confirmation email. A notice always has an icon.",
     title: "Icon",
   },
   {
-    rule: "An icon in the slot takes no size. The notice sets 18px and centers the icon on the first line of text. The icon is decorative, so the text must give the full message.",
+    rule: "An icon in the slot takes no size. The notice sets the size and centers the icon on the first line of text. The icon is decorative, so the text must give the full message.",
     title: "Icon size",
   },
   {
@@ -142,4 +150,5 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
 export const OPEN_QUESTIONS = [
   "When does a failed form submit use a notice, and when a toast? LoginPage and RegisterPage use a toast. ResetPasswordPage uses a notice. ForgotPasswordPage uses both with the same text, so a screen reader reads the message two times.",
   "Does the app need the success tone? No caller uses it. Success results use a toast or a StatusBadge screen.",
+  "Does a `primary` action on the error tone need a neutral fill? The fill of `primary` is the brand color, on a red surface. The user has not decided this. No caller uses `primary` in a notice today. Keep the actions on the error tone `outline` until then.",
 ];

@@ -25,15 +25,27 @@ export const RULE_SCOPE: RuleScope = {
 
 /** When to use a text input. */
 export const WHEN_TO_USE: UsageRule[] = [
-  { rule: "The user types one line of text, for example a name, an email address or a code.", title: "One line" },
+  {
+    rule: "The user types one line of text, for example a name, an email address or a code.",
+    title: "One line",
+  },
   { rule: "The user searches a list on the same screen.", title: "Search" },
 ];
 
 /** The cases with another component. */
 export const NOT_A_TEXT_INPUT: UseInsteadRule[] = [
-  { use: "Keyboard", when: "The user enters an amount of money on the new expense screen." },
-  { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
-  { use: "HomeSearchBar", when: "The field is the search field in the header of the home page." },
+  {
+    use: "Keyboard",
+    when: "The user enters an amount of money on the new expense screen.",
+  },
+  {
+    use: "SSegmentControl",
+    when: "The user chooses one item from a short list, and the items are all visible.",
+  },
+  {
+    use: "HomeSearchBar",
+    when: "The field is the search field in the header of the home page.",
+  },
 ];
 
 /** What each variant is for. */
@@ -43,7 +55,7 @@ export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
     title: "outlined",
   },
   plain: {
-    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is 14px. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-sm`, so it fits a row of `text-sm` text. The input is the root element and fills the width of its parent. A class on the component goes to the input. A long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
     title: "plain",
   },
 };
@@ -78,6 +90,10 @@ export const LABEL_RULES: UsageRule[] = [
     rule: "If a control must sit between the label and the field, write a `<label>` with `for`, and give the field the same `id`. AddExpenseDetailsSheet does this for the category button and the location button.",
     title: "A label outside the field",
   },
+  {
+    rule: "The label, the text under the field and the text in the field line up with the icon in the field. The ink of the password icon ends on the same line at the other side, so its button has a small negative margin. This is the padding and the border of the field. A `<label>` outside the field uses `px-3.25` for the same line. The field keeps the edge of the page, so the label does not line up with the title of a section.",
+    title: "Alignment",
+  },
 ];
 
 /** How to show help and errors. */
@@ -91,7 +107,7 @@ export const MESSAGE_RULES: UsageRule[] = [
     title: "Text outside the field",
   },
   {
-    rule: "When the value of one field is wrong, put the text in `error`. The text shows directly under the field, replaces the hint and sets the error colors. RegisterPage and ResetPasswordPage do this.",
+    rule: "When the value of one field is wrong, put the text in `error`. The text shows directly under the field, replaces the hint and sets the error colors. RegisterPage and ResetPasswordPage do this for a password that breaks the rules.",
     title: "Error",
   },
   {
@@ -107,28 +123,28 @@ export const MESSAGE_RULES: UsageRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The `outlined` field is about 50px high. A tap anywhere on it moves the focus to the input, and the keyboard of a phone stays open when the input already has the focus.",
+    text: "A tap anywhere on the `outlined` field moves the focus to the input, and the keyboard of a phone stays open when the input already has the focus.",
     title: "Tap area",
   },
   {
-    text: "The show and hide button is 24px. An invisible box makes the tap area 44px. Its name follows the state, and the name comes from the locale files.",
+    text: "An invisible box around the show and hide button makes the tap area 44px. Its name follows the state, and the name comes from the locale files.",
     title: "Password button",
   },
   {
-    text: "The `plain` input is 44px high. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
+    text: "The `plain` input is as high as its tap area. Put it in a row with a fixed height and free space above and below, as SearchBar does.",
     title: "Plain tap area",
   },
   {
-    text: "The brand border and an inset ring of 1px show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
+    text: "The brand border and a thin inset ring show the focus. An invalid field keeps the error border, so only the ring shows the focus. The `plain` input shows only the caret. See the open questions.",
     title: "Focus",
+  },
+  {
+    text: "All motion in the `outlined` field uses the motion tokens, so reduced motion turns it off. Hover and focus colors use `hover-in`, and the return to rest uses `exit`, so the return is slower. The text under the field fades, and the content below moves smoothly. A new error also shakes the field one time, by a small distance. A change from one error to another error does not shake it. Do not add another shake on a page.",
+    title: "Motion",
   },
   {
     text: '`label` names the input. In the `plain` variant it is the `aria-label`. `hint`, `error` and `described-by` set `aria-describedby`. `error` and `invalid` set `aria-invalid`. The `error` text has `role="alert"`, so a screen reader reads it when it appears.',
     title: "Screen reader",
-  },
-  {
-    text: "Text under 16px in a focused input makes iOS zoom the page. The `outlined` text is 16px. The `plain` text is 14px. See the open questions.",
-    title: "Zoom on iOS",
   },
   {
     text: "The empty border, the placeholder and the dark hint are below the WCAG minimum in the contrast tables. See the open questions.",
@@ -142,7 +158,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
  * A prototype will decide the first question.
  */
 export const OPEN_QUESTIONS = [
-  "How does the search field on SelectPeoplePage look? `plain` has 14px text, so iOS zooms the page, and it has no focus style except the caret. The other text in that row is smaller than 16px, so 16px adds one more font size. HomeSearchBar also has 14px text.",
+  "How does the search field on SelectPeoplePage show focus, and how dense is its row? `plain` has no focus style except the caret.",
   "Is the contrast of the quiet parts acceptable? The empty border is about 1.3:1, and the filled border is also below 3:1. WCAG 1.4.11 asks for 3:1. The placeholder is about 3:1 in both themes, and the hint is about 3.3:1 in dark mode. WCAG 1.4.3 asks for 4.5:1. A change affects all fields.",
   "Does a tap on the password button keep the keyboard of a phone open? Now the button takes the focus from the input, so the keyboard can close. A tap on the padding of the field does not do this.",
   "The notes field of AddExpenseDetailsSheet is a raw `<textarea>` with its own outline. It does not show the states of TextInput. Does the app need a multi-line field?",

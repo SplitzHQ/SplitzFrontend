@@ -123,6 +123,10 @@ export const PICTURE_RULES: UsageRule[] = [
     title: "No picture",
   },
   {
+    rule: "A photo has a thin line inside its edge, so a photo with a pale or dark edge stays separate from the background. The line is a dark alpha color in the light theme and a light alpha color in the dark theme. A tile with an initial has no line, because its fill is already different from the background. In a grid, each photo has its own line and the frame has none.",
+    title: "Line on a photo",
+  },
+  {
     rule: "The color family comes from the name, so a person has one color on all pages. The families are brand, leaf, waterblue, purple, magenta, rosered and yellow. The size of the initial follows the side of the tile.",
     title: "Color and size of the initial",
   },
