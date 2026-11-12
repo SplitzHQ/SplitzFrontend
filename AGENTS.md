@@ -29,6 +29,14 @@
 
 - When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.
 
+## Testing rules
+
+- Do not add test that check on a specific implementation detail. Focus on testing the behavior and output of the code instead.
+
+- Do not rely on implementation details that may change frequently, such as private methods or internal state.
+
+- Do not check a css class or style in tests.
+
 ## Devtools rules
 
 - This repository is public. The private dev tools are in `devtools/`, which is a separate repository that this repository ignores. Commit tool changes there. Do not move tool files, tool docs or backlog notes into this repository. Component usage files are not tool docs: they stay next to the component in this repository. A clone without `devtools/` must build and run.

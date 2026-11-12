@@ -25,15 +25,27 @@ export const RULE_SCOPE: RuleScope = {
 
 /** When to use a text input. */
 export const WHEN_TO_USE: UsageRule[] = [
-  { rule: "The user types one line of text, for example a name, an email address or a code.", title: "One line" },
+  {
+    rule: "The user types one line of text, for example a name, an email address or a code.",
+    title: "One line",
+  },
   { rule: "The user searches a list on the same screen.", title: "Search" },
 ];
 
 /** The cases with another component. */
 export const NOT_A_TEXT_INPUT: UseInsteadRule[] = [
-  { use: "Keyboard", when: "The user enters an amount of money on the new expense screen." },
-  { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
-  { use: "HomeSearchBar", when: "The field is the search field in the header of the home page." },
+  {
+    use: "Keyboard",
+    when: "The user enters an amount of money on the new expense screen.",
+  },
+  {
+    use: "SSegmentControl",
+    when: "The user chooses one item from a short list, and the items are all visible.",
+  },
+  {
+    use: "HomeSearchBar",
+    when: "The field is the search field in the header of the home page.",
+  },
 ];
 
 /** What each variant is for. */
@@ -133,10 +145,6 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
     text: '`label` names the input. In the `plain` variant it is the `aria-label`. `hint`, `error` and `described-by` set `aria-describedby`. `error` and `invalid` set `aria-invalid`. The `error` text has `role="alert"`, so a screen reader reads it when it appears.',
     title: "Screen reader",
-  },
-  {
-    text: "The app does not zoom, like a native app. The user decided this on 2026-11-11, after a review of PR 60. The viewport has `maximum-scale=1` and `user-scalable=no`. They stop the pinch zoom on Android, and they stop the zoom of iOS when an input with text under 16px gets the focus. iOS 10 and later ignore them for the pinch zoom, so `touch-action: pan-x pan-y` on `html` stops it from iOS 13, and `preventPageZoom` in `src/libs/prevent-page-zoom.ts` cancels the zoom gesture of Safari and a move with two or more fingers. No source tested these layers on iOS 18 or later, so test the zoom on a real iPhone after a change. So an input can have text under 16px. The `outlined` text is `text-base`, and the `plain` text is `text-sm`. Do not scale an input to change its text size.",
-    title: "Zoom",
   },
   {
     text: "The empty border, the placeholder and the dark hint are below the WCAG minimum in the contrast tables. See the open questions.",

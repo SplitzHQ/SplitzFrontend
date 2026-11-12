@@ -132,7 +132,6 @@ watch(
 </script>
 
 <template>
-  <!-- The `text-sm` text fits a row of `text-sm` text. The viewport stops the zoom of iOS, so the text can be under 16px. -->
   <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
   <input
     v-if="variant === 'plain'"
@@ -171,15 +170,6 @@ watch(
           containerClass,
         ]"
       >
-        <!--
-          The whole field is the tap target, but the input is smaller than the field. This `<label>` holds the padding, the
-          icon and the input, so a tap on the padding or the icon gives the focus to the input. The password button is
-          outside it, so the button keeps its own press and does not add its name to the name of the input.
-          `mousedown.self.prevent` keeps the focus in the input during a press on the padding or the icon, so a phone keeps
-          its keyboard open. Without it, the focus leaves the input at `mousedown` and comes back at `click`. A press on the
-          input is not on the label itself, so the caret can still move. The icon has `pointer-events-none`, so a press on
-          the icon is on the label itself.
-        -->
         <label
           :for="inputId"
           :class="[
@@ -218,7 +208,6 @@ watch(
           />
         </label>
 
-        <!-- The label lives in visually hidden text (not aria-label) so label-based lookups only match the input. -->
         <!--
           An invisible box around the button makes the tap area larger than the button. The button and the icon have empty
           space around the ink, so the negative margin moves the ink of the icon onto the same line as the start icon, on

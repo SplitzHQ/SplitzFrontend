@@ -8,12 +8,9 @@ import "./assets/color.css";
 import { createApp } from "vue";
 
 import { createAppFluent } from "@/libs/fluent";
-import { preventPageZoom } from "@/libs/prevent-page-zoom";
 
 import App from "./App.vue";
 import router from "./router";
-
-preventPageZoom();
 
 const app = createApp(App);
 

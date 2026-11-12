@@ -3,18 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import Avatar, { type AvatarProps } from "../Avatar.vue";
 
-vi.mock("@/libs/asset-url", () => ({ resolveAssetUrl: (url: string | null | undefined) => url }));
+vi.mock("@/libs/asset-url", () => ({
+  resolveAssetUrl: (url: string | null | undefined) => url,
+}));
 
 /** Mounts an avatar with the given pictures at the `xs` size. */
 function mountAvatar(images: AvatarProps["images"]) {
   return mount(Avatar, { props: { images, size: "xs" } });
-}
-
-/** Returns the inline style of the tile of a person with no picture. */
-function tileStyle(alt: string) {
-  return mountAvatar([{ alt, src: null }])
-    .get('[role="img"]')
-    .attributes("style");
 }
 
 afterEach(() => {
@@ -44,22 +39,6 @@ describe("Avatar", () => {
 
     expect(wrapper.find("img").exists()).toBe(false);
     expect(wrapper.text()).toBe("A");
-  });
-
-  it("puts the line on a photo and not on a tile with an initial", () => {
-    const wrapper = mountAvatar([
-      { alt: "Alex", src: "/alex.png" },
-      { alt: "Bo", src: null },
-    ]);
-
-    expect(wrapper.get("img").classes()).toContain("outline-core-alpha-black-5");
-    expect(wrapper.findAll(".outline-core-alpha-black-5")).toHaveLength(1);
-  });
-
-  it("gives the same name the same color", () => {
-    expect(tileStyle("Alex")).toBe(tileStyle("Alex"));
-    expect(tileStyle("Alex")).toContain("-500)");
-    expect(tileStyle("Alex")).toContain("-100)");
   });
 
   it("shows a silhouette and no name when the name is empty", () => {
