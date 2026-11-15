@@ -14,6 +14,9 @@ new-expense-sections-friends = 好友
 new-expense-select-people-title = 选择分摊对象
 new-expense-select-people-with = 参与人：
 new-expense-select-people-search-placeholder = 搜索姓名、@用户名、邮箱或手机号
+new-expense-select-people-remove = 移除 { $name }
+new-expense-select-people-show-more = 再显示 { $count } 人
+new-expense-select-people-show-fewer = 收起
 
 new-expense-split-title = 分摊方式
 new-expense-split-paid-by = 付款人：{ $username }

@@ -14,6 +14,9 @@ new-expense-sections-friends = Friends
 new-expense-select-people-title = Select people or group
 new-expense-select-people-with = With:
 new-expense-select-people-search-placeholder = Search by name, @username, email, or phone
+new-expense-select-people-remove = Remove { $name }
+new-expense-select-people-show-more = Show { $count } more
+new-expense-select-people-show-fewer = Show fewer
 
 new-expense-split-title = Split options
 new-expense-split-paid-by = Paid by { $username }

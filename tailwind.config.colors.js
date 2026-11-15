@@ -327,6 +327,7 @@ export default {
   "comp-switch-track-off-disabled": "var(--comp-switch-track-off-disabled)",
   "comp-switch-track-on": "var(--comp-switch-track-on)",
   "comp-switch-track-on-disabled": "var(--comp-switch-track-on-disabled)",
+  "comp-user-tag-border": "var(--comp-user-tag-border)",
   "comp-status-badge-brand-core": "var(--comp-status-badge-brand-core)",
   "comp-status-badge-brand-halo": "var(--comp-status-badge-brand-halo)",
   "comp-status-badge-brand-icon": "var(--comp-status-badge-brand-icon)",

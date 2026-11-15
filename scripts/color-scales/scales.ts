@@ -350,6 +350,7 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-switch-track-off-disabled": "base-bg-disabled",
   "comp-switch-track-on": "util-color-brand-700",
   "comp-switch-track-on-disabled": "core-alpha-brand-40",
+  "comp-user-tag-border": neutralAlpha(10),
   ...statusBadgeTone("brand", {
     core: "core-alpha-brand-10",
     halo: "core-alpha-brand-5",
