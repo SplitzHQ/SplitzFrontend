@@ -3,6 +3,7 @@ import type { Meta, StoryFn } from "@storybook/vue3-vite";
 import { WORDMARK_SIZES } from "./brand-wordmark";
 import BrandWordmark from "./BrandWordmark.vue";
 
+/** Storybook stories for `BrandWordmark` across its named surface sizes. */
 export default {
   title: "Components/BrandWordmark",
   component: BrandWordmark,
@@ -19,6 +20,7 @@ const Template: StoryFn<typeof BrandWordmark> = (args) => ({
   template: '<BrandWordmark v-bind="args" />',
 });
 
+/** Interactive story for previewing `BrandWordmark` at each `WordmarkSize`. */
 export const Playground = Template.bind({});
 Playground.args = {
   size: "header",

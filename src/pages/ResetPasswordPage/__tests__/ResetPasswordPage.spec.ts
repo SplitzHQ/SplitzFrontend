@@ -65,17 +65,12 @@ describe("ResetPasswordPage", () => {
     expect(wrapper.text()).toContain("auth-reset-password-forgot-link");
   });
 
-  it("validates password confirmation before submit", async () => {
+  it("has one password field, and links it to the checklist", () => {
     routeMock.query = { email: "person@example.com", resetCode: "reset-code" };
     const wrapper = mount(ResetPasswordPage);
 
-    await wrapper.find('input[name="new-password"]').setValue("Passw0rd!");
-    await wrapper.find('input[name="confirm-password"]').setValue("Different1!");
-    await wrapper.find("form").trigger("submit");
-
-    expect(userStoreMock.resetPassword).not.toHaveBeenCalled();
-    expect(wrapper.get("#confirm-password-error").text()).toBe("auth-reset-password-mismatch");
-    expect(wrapper.find("#new-password-error").exists()).toBe(false);
+    expect(wrapper.find('input[name="confirm-password"]').exists()).toBe(false);
+    expect(wrapper.get('input[name="new-password"]').attributes("aria-describedby")).toBe("password-rules");
   });
 
   it("validates the configured password policy before submit", async () => {
@@ -83,12 +78,10 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("short1");
-    await wrapper.find('input[name="confirm-password"]').setValue("short1");
     await wrapper.find("form").trigger("submit");
 
     expect(userStoreMock.resetPassword).not.toHaveBeenCalled();
-    expect(wrapper.get("#new-password-error").text()).toBe("auth-reset-password-policy");
-    expect(wrapper.find("#confirm-password-error").exists()).toBe(false);
+    expect(wrapper.get("#new-password-error").text()).toBe("auth-password-policy");
   });
 
   it("submits reset and routes to login with success feedback", async () => {
@@ -97,7 +90,6 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("Password1234");
-    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
@@ -117,7 +109,6 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("Password1234");
-    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
@@ -135,11 +126,10 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("longenough1x");
-    await wrapper.find('input[name="confirm-password"]').setValue("longenough1x");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
-    expect(wrapper.text()).toContain("auth-reset-password-policy");
+    expect(wrapper.text()).toContain("auth-password-policy");
     expect(wrapper.text()).not.toContain("auth-reset-password-error");
   });
 
@@ -154,7 +144,6 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("Password1234");
-    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 
@@ -185,7 +174,6 @@ describe("ResetPasswordPage", () => {
     const wrapper = mount(ResetPasswordPage);
 
     await wrapper.find('input[name="new-password"]').setValue("Password1234");
-    await wrapper.find('input[name="confirm-password"]').setValue("Password1234");
     await wrapper.find("form").trigger("submit");
     await flushPromises();
 

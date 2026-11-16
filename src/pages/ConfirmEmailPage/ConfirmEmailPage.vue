@@ -5,10 +5,10 @@ import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
 import AuthShell from "@/components/AuthShell/AuthShell.vue";
+import AuthStatusIcon from "@/components/AuthShell/AuthStatusIcon.vue";
 import RateLimitCountdown from "@/components/RateLimitCountdown/RateLimitCountdown.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SLinkButton from "@/components/SButton/SLinkButton.vue";
-import StatusBadge from "@/components/StatusBadge/StatusBadge.vue";
 import { useRateLimitCooldown } from "@/libs/use-rate-limit-cooldown";
 import { useUserStore } from "@/stores/user";
 
@@ -83,53 +83,57 @@ function getSingleQueryValue(value: unknown): string | undefined {
 </script>
 
 <template>
-  <AuthShell centered :title="$t(copy.title)" :subtitle="$t(copy.body)">
-    <template #hero>
-      <div class="flex justify-center">
-        <StatusBadge v-if="state === 'loading'" tone="brand">
-          <PhCircleNotch class="animate-spin" />
-        </StatusBadge>
-        <StatusBadge v-else-if="state === 'success'" tone="success">
-          <PhCheck weight="bold" />
-        </StatusBadge>
-        <StatusBadge v-else-if="state === 'rateLimited'" tone="warning">
-          <PhHourglassMedium weight="duotone" />
-        </StatusBadge>
-        <StatusBadge v-else tone="error">
-          <PhLinkBreak weight="duotone" />
-        </StatusBadge>
-      </div>
+  <AuthShell is-result-page :title="$t(copy.title)" :subtitle="$t(copy.body)">
+    <template #icon>
+      <AuthStatusIcon v-if="state === 'loading'" tone="brand">
+        <PhCircleNotch class="animate-spin" />
+      </AuthStatusIcon>
+      <AuthStatusIcon v-else-if="state === 'success'" tone="success">
+        <PhCheck weight="bold" />
+      </AuthStatusIcon>
+      <AuthStatusIcon v-else-if="state === 'rateLimited'" tone="warning">
+        <PhHourglassMedium weight="duotone" />
+      </AuthStatusIcon>
+      <AuthStatusIcon v-else tone="error">
+        <PhLinkBreak weight="duotone" />
+      </AuthStatusIcon>
     </template>
 
-    <div v-if="state === 'success'" class="flex flex-col items-stretch">
-      <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
-        {{ $t("auth-confirm-email-login-link") }}
-      </SLinkButton>
-    </div>
+    <div v-if="state !== 'loading'" class="flex flex-1 flex-col gap-6">
+      <div v-if="state === 'rateLimited'" class="flex flex-col gap-4">
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="confirmationCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="confirmation-rate-limit"
+        />
+      </div>
 
-    <div v-else-if="state === 'rateLimited'" class="flex flex-col items-center gap-4">
-      <RateLimitCountdown
-        :seconds="confirmationCooldown.remainingSeconds.value"
-        message-key="auth-rate-limit-countdown"
-        data-test="confirmation-rate-limit"
-      />
-      <SButton
-        variant="primary"
-        size="xl"
-        class="w-full"
-        :disabled="confirmationCooldown.isActive.value"
-        :loading="requestPending"
-        data-test="confirmation-retry"
-        @click="confirmEmail"
-      >
-        {{ $t("auth-confirm-email-retry") }}
-      </SButton>
+      <div class="mt-auto flex flex-col gap-3">
+        <SLinkButton v-if="state === 'success'" variant="primary" size="xl" class="w-full" href="/login">
+          {{ $t("auth-confirm-email-login-link") }}
+        </SLinkButton>
+
+        <SButton
+          v-else-if="state === 'rateLimited'"
+          variant="primary"
+          size="xl"
+          class="w-full"
+          :disabled="confirmationCooldown.isActive.value"
+          :loading="requestPending"
+          data-test="confirmation-retry"
+          @click="confirmEmail"
+        >
+          {{ $t("auth-confirm-email-retry") }}
+        </SButton>
+
+        <SLinkButton v-else variant="primary" size="xl" class="w-full" href="/login" data-test="confirmation-resend">
+          {{ $t("auth-confirm-email-resend-link") }}
+        </SLinkButton>
+      </div>
     </div>
 
     <template v-if="state === 'invalid' || state === 'error'" #footer>
-      <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
-        {{ $t("auth-confirm-email-resend-link") }}
-      </RouterLink>
       <RouterLink :to="{ name: 'register' }" class="text-base-text-brand hover:text-base-text-brand_hover">
         {{ $t("auth-confirm-email-register-link") }}
       </RouterLink>

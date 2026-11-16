@@ -3,6 +3,7 @@ import fs from "node:fs";
 import process from "node:process";
 import { fileURLToPath, URL } from "node:url";
 
+import bcd from "@mdn/browser-compat-data" with { type: "json" };
 import vue from "@vitejs/plugin-vue";
 import { ExternalFluentPlugin, SFCFluentPlugin } from "unplugin-fluent-vue/vite";
 import { defineConfig, normalizePath, type Plugin, runnerImport, type ViteDevServer } from "vite";
@@ -13,6 +14,10 @@ const isStorybookOrTestProcess =
   process.env.npm_lifecycle_event === "storybook" ||
   process.env.npm_lifecycle_event === "build-storybook" ||
   process.env.VITEST === "true";
+
+const { __compat: interactiveWidgetCompat } =
+  bcd.html.elements.meta.name.viewport["interactive-widget"]["resizes-content"];
+if (!interactiveWidgetCompat) throw new Error("MDN data is missing interactive-widget=resizes-content support.");
 
 /**
  * Starts the server code of the private dev tools. The tools are in `devtools/`, which is a separate repository that
@@ -42,6 +47,10 @@ function optionalDevtools(): Plugin {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Keep the full MDN database in the build process, not in the browser bundle.
+  define: {
+    INTERACTIVE_WIDGET_SUPPORT: JSON.stringify(interactiveWidgetCompat.support),
+  },
   plugins: [
     vue(),
     // incompatible with Storybook for now
