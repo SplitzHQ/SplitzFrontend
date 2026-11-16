@@ -123,11 +123,11 @@ function getSingleQueryValue(value: unknown): string | undefined {
       </AuthStatusIcon>
     </template>
 
-    <template #actions>
+    <div class="mt-auto flex flex-col gap-3">
       <SLinkButton variant="primary" size="xl" class="w-full" href="/forgot-password">
         {{ $t("auth-reset-password-forgot-link") }}
       </SLinkButton>
-    </template>
+    </div>
 
     <template #footer>
       <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">
@@ -136,52 +136,50 @@ function getSingleQueryValue(value: unknown): string | undefined {
     </template>
   </AuthShell>
 
-  <AuthShell
-    v-else
-    :title="$t('auth-reset-password-title')"
-    :subtitle="$t('auth-reset-password-body')"
-    @submit="handleResetPassword"
-  >
-    <div class="flex flex-col gap-3">
-      <TextInput
-        id="new-password"
-        v-model="newPassword"
-        name="new-password"
-        type="password"
-        autocomplete="new-password"
-        required
-        described-by="password-rules"
-        :label="$t('auth-new-password-label')"
-        placeholder=""
-        :error="errorMessageKey === POLICY_ERROR ? $t(POLICY_ERROR) : undefined"
-      />
-      <PasswordChecklist id="password-rules" :password="newPassword" />
-    </div>
+  <AuthShell v-else :title="$t('auth-reset-password-title')" :subtitle="$t('auth-reset-password-body')">
+    <form class="flex flex-1 flex-col gap-6" @submit.prevent="handleResetPassword">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3">
+          <TextInput
+            id="new-password"
+            v-model="newPassword"
+            name="new-password"
+            type="password"
+            autocomplete="new-password"
+            required
+            described-by="password-rules"
+            :label="$t('auth-new-password-label')"
+            placeholder=""
+            :error="errorMessageKey === POLICY_ERROR ? $t(POLICY_ERROR) : undefined"
+          />
+          <PasswordChecklist id="password-rules" :password="newPassword" />
+        </div>
 
-    <Notice v-if="noticeErrorKey" tone="error" announce>
-      <p>{{ $t(noticeErrorKey) }}</p>
-    </Notice>
+        <Notice v-if="noticeErrorKey" tone="error" announce>
+          <p>{{ $t(noticeErrorKey) }}</p>
+        </Notice>
 
-    <RateLimitCountdown
-      class="px-3.25"
-      :seconds="resetCooldown.remainingSeconds.value"
-      message-key="auth-rate-limit-countdown"
-      data-test="reset-password-rate-limit"
-    />
-
-    <template #actions>
-      <SButton
-        type="submit"
-        variant="primary"
-        size="xl"
-        :disabled="resetCooldown.isActive.value"
-        :loading="loading"
-        class="w-full"
-        data-test="reset-password-submit"
-      >
-        {{ $t("auth-reset-password-action") }}
-      </SButton>
-    </template>
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="resetCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="reset-password-rate-limit"
+        />
+      </div>
+      <div class="mt-auto flex flex-col gap-3">
+        <SButton
+          type="submit"
+          variant="primary"
+          size="xl"
+          :disabled="resetCooldown.isActive.value"
+          :loading="loading"
+          class="w-full"
+          data-test="reset-password-submit"
+        >
+          {{ $t("auth-reset-password-action") }}
+        </SButton>
+      </div>
+    </form>
 
     <template #footer>
       <!-- A link that expired cannot work again, so the page offers a new one. -->

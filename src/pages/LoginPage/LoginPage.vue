@@ -107,113 +107,116 @@ async function isIdentityNotAllowedError(error: unknown): Promise<boolean> {
 </script>
 
 <template>
-  <AuthShell :title="$t('auth-login-title')" @submit="handleLogin">
-    <TextInput
-      id="email-address"
-      v-model="email"
-      name="email"
-      type="email"
-      autocomplete="email"
-      inputmode="email"
-      required
-      :label="$t('auth-email-label')"
-      :placeholder="$t('auth-email-placeholder')"
-    />
-
-    <TextInput
-      id="password"
-      v-model="password"
-      name="password"
-      type="password"
-      autocomplete="current-password"
-      required
-      :label="$t('auth-password-label')"
-      placeholder=""
-    />
-
-    <TextInput
-      v-if="showTwoFactor"
-      id="2fa-code"
-      v-model="twoFactorCode"
-      name="2fa-code"
-      type="text"
-      autocomplete="one-time-code"
-      inputmode="numeric"
-      :label="$t('auth-two-factor-label')"
-      :placeholder="$t('auth-two-factor-placeholder')"
-    />
-
-    <RateLimitCountdown
-      class="px-3.25"
-      :seconds="loginCooldown.remainingSeconds.value"
-      message-key="auth-rate-limit-countdown"
-      data-test="login-rate-limit"
-    />
-
-    <Notice v-if="loginFailed" tone="error" announce data-test="login-error">
-      <p>{{ $t("auth-login-failed") }}</p>
-    </Notice>
-
-    <Notice v-if="showResendConfirmation" tone="info" :title="$t('auth-login-unconfirmed-title')" announce>
-      <template #icon>
-        <PhPaperPlaneTilt />
-      </template>
-      <div class="flex flex-col gap-2">
-        <p>{{ $t(resendMessageKey) }}</p>
-        <RateLimitCountdown
-          :seconds="resendCooldown.remainingSeconds.value"
-          message-key="auth-rate-limit-countdown"
-          data-test="resend-rate-limit"
+  <AuthShell :title="$t('auth-login-title')">
+    <form class="flex flex-1 flex-col gap-6" @submit.prevent="handleLogin">
+      <div class="flex flex-col gap-4">
+        <TextInput
+          id="email-address"
+          v-model="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          :label="$t('auth-email-label')"
+          :placeholder="$t('auth-email-placeholder')"
         />
+
+        <TextInput
+          id="password"
+          v-model="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          :label="$t('auth-password-label')"
+          placeholder=""
+        />
+
+        <TextInput
+          v-if="showTwoFactor"
+          id="2fa-code"
+          v-model="twoFactorCode"
+          name="2fa-code"
+          type="text"
+          autocomplete="one-time-code"
+          inputmode="numeric"
+          :label="$t('auth-two-factor-label')"
+          :placeholder="$t('auth-two-factor-placeholder')"
+        />
+
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="loginCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="login-rate-limit"
+        />
+
+        <Notice v-if="loginFailed" tone="error" announce data-test="login-error">
+          <p>{{ $t("auth-login-failed") }}</p>
+        </Notice>
+
+        <Notice v-if="showResendConfirmation" tone="info" :title="$t('auth-login-unconfirmed-title')" announce>
+          <template #icon>
+            <PhPaperPlaneTilt />
+          </template>
+          <div class="flex flex-col gap-2">
+            <p>{{ $t(resendMessageKey) }}</p>
+            <RateLimitCountdown
+              :seconds="resendCooldown.remainingSeconds.value"
+              message-key="auth-rate-limit-countdown"
+              data-test="resend-rate-limit"
+            />
+          </div>
+          <template #action>
+            <SButton
+              variant="outline"
+              size="sm"
+              :disabled="resendCooldown.isActive.value"
+              :loading="resendLoading"
+              data-test="resend-confirmation"
+              @click="handleResendConfirmation"
+            >
+              {{ $t("auth-resend-confirmation-action") }}
+            </SButton>
+          </template>
+        </Notice>
       </div>
-      <template #action>
+      <div class="mt-auto flex flex-col gap-3">
         <SButton
-          variant="outline"
-          size="sm"
-          :disabled="resendCooldown.isActive.value"
-          :loading="resendLoading"
-          data-test="resend-confirmation"
-          @click="handleResendConfirmation"
+          type="submit"
+          variant="primary"
+          size="xl"
+          :disabled="loginCooldown.isActive.value"
+          :loading="loading"
+          class="w-full"
+          data-test="login-submit"
         >
-          {{ $t("auth-resend-confirmation-action") }}
+          {{ $t("auth-sign-in-action") }}
         </SButton>
-      </template>
-    </Notice>
 
-    <template #actions>
-      <SButton
-        type="submit"
-        variant="primary"
-        size="xl"
-        :disabled="loginCooldown.isActive.value"
-        :loading="loading"
-        class="w-full"
-        data-test="login-submit"
-      >
-        {{ $t("auth-sign-in-action") }}
-      </SButton>
-
-      <!-- An invisible box around each action makes the tap area 44px high. The gaps around the row hold the box. -->
-      <div
-        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3.25 text-sm font-medium *:relative *:after:absolute *:after:top-1/2 *:after:left-0 *:after:h-11 *:after:w-full *:after:-translate-y-1/2"
-      >
-        <button
-          type="button"
-          class="text-base-text-tertiary hover:text-base-text-secondary"
-          data-test="toggle-two-factor"
-          @click="showTwoFactor = !showTwoFactor"
+        <!-- An invisible box around each action makes the tap area 44px high. The gaps around the row hold the box. -->
+        <div
+          class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3.25 text-sm font-medium *:relative *:after:absolute *:after:top-1/2 *:after:left-0 *:after:h-11 *:after:w-full *:after:-translate-y-1/2"
         >
-          {{ showTwoFactor ? $t("auth-hide-two-factor") : $t("auth-show-two-factor") }}
-        </button>
-        <RouterLink
-          :to="{ name: 'forgotPassword' }"
-          class="text-base-text-brand hover:text-base-text-brand_hover"
-          data-test="forgot-password-link"
-        >
-          {{ $t("auth-forgot-password-link") }}
-        </RouterLink>
+          <button
+            type="button"
+            class="text-base-text-tertiary hover:text-base-text-secondary"
+            data-test="toggle-two-factor"
+            @click="showTwoFactor = !showTwoFactor"
+          >
+            {{ showTwoFactor ? $t("auth-hide-two-factor") : $t("auth-show-two-factor") }}
+          </button>
+          <RouterLink
+            :to="{ name: 'forgotPassword' }"
+            class="text-base-text-brand hover:text-base-text-brand_hover"
+            data-test="forgot-password-link"
+          >
+            {{ $t("auth-forgot-password-link") }}
+          </RouterLink>
+        </div>
       </div>
-    </template>
+    </form>
 
     <template #footer>
       <RouterLink :to="{ name: 'register' }" class="flex gap-1 text-base-text-brand hover:text-base-text-brand_hover">

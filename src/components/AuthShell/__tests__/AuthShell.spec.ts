@@ -1,10 +1,15 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
+import { h, type VNode } from "vue";
 
 import AuthShell, { type AuthShellProps } from "../AuthShell.vue";
 
 /** Mounts the shell. The logo is not part of these tests. */
-function mountShell(props: Partial<AuthShellProps> = {}, footer?: string, slots: Record<string, string> = {}) {
+function mountShell(
+  props: Partial<AuthShellProps> = {},
+  footer?: string,
+  slots: Record<string, string | (() => VNode)> = {}
+) {
   return mount(AuthShell, {
     global: { stubs: { BrandTapMark: true } },
     props: { title: "Sign in", ...props },
@@ -50,23 +55,24 @@ describe("AuthShell", () => {
     expect(wrapper.find("p span").exists()).toBe(false);
   });
 
-  it("makes the content and the actions one form when the page handles submit", async () => {
-    const onSubmit = vi.fn();
-    const wrapper = mountShell({ onSubmit }, undefined, {
-      actions: "<button type='submit'>Go</button>",
-      default: "<input />",
+  it("renders the page-owned form without intercepting its submit event", async () => {
+    const onSubmit = vi.fn<(event: Event) => void>();
+    const wrapper = mountShell({}, undefined, {
+      default: () => h("form", { onSubmit }, [h("input"), h("button", { type: "submit" }, "Go")]),
     });
 
     const form = wrapper.get("form");
+    expect(wrapper.findAll("form")).toHaveLength(1);
     expect(form.find("input").exists()).toBe(true);
     expect(form.find("button").exists()).toBe(true);
 
     await form.trigger("submit");
     expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0].defaultPrevented).toBe(false);
   });
 
-  it("has no form on a page with no submit", () => {
-    const wrapper = mountShell({}, undefined, { actions: "<a href='/login'>Sign in</a>" });
+  it("renders status actions in the default slot without adding a form", () => {
+    const wrapper = mountShell({ status: true }, undefined, { default: "<a href='/login'>Sign in</a>" });
 
     expect(wrapper.find("form").exists()).toBe(false);
     expect(wrapper.find("a").exists()).toBe(true);

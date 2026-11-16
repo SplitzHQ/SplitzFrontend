@@ -6,9 +6,8 @@ import { useKeyboardFreeHeight } from "@/libs/use-keyboard-free-height";
 
 /**
  * The page frame of a sign-in or account page. See `auth-shell.usage.ts`.
- * Distance makes three groups: the title, the content and the actions. The actions stay at the bottom of the screen.
- * Slots: `icon` goes above the title on a status page, the default slot holds the content, `actions` holds the main
- * button and its links, and `footer` holds the links to other account pages.
+ * Slots: `icon` goes above the title on a status page, the default slot holds the page-owned content and actions,
+ * and `footer` holds the links to other account pages. The page owns its form and submit handler.
  */
 export interface AuthShellProps {
   /** Rendered as the page's only h1. */
@@ -19,11 +18,9 @@ export interface AuthShellProps {
   highlight?: string;
   /** A page that shows a result. It has no logo, and a screen reader reads a change of the title. */
   status?: boolean;
-  /** Makes the content and the actions one form, so the Return key of the keyboard submits it. */
-  onSubmit?: () => void;
 }
 
-const { title, subtitle, highlight, status, onSubmit } = defineProps<AuthShellProps>();
+const { title, subtitle, highlight, status } = defineProps<AuthShellProps>();
 
 /** The subtitle in parts. Without the highlighted text in it, the whole subtitle is the first part. */
 const subtitleParts = computed(() => {
@@ -64,19 +61,7 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
           </div>
         </div>
 
-        <component
-          :is="onSubmit ? 'form' : 'div'"
-          v-if="$slots.default || $slots.actions"
-          class="flex flex-1 flex-col gap-6"
-          @submit.prevent="onSubmit?.()"
-        >
-          <div v-if="$slots.default" class="flex flex-col gap-4">
-            <slot />
-          </div>
-          <div v-if="$slots.actions" class="mt-auto flex flex-col gap-3">
-            <slot name="actions" />
-          </div>
-        </component>
+        <slot />
       </section>
 
       <!-- An invisible box around each link makes the tap area 44px high. The space around the footer holds the box. -->
