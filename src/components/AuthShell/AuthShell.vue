@@ -5,24 +5,32 @@ import BrandTapMark from "@/components/BrandWordmark/BrandTapMark.vue";
 import { useKeyboardFreeHeight } from "@/libs/use-keyboard-free-height";
 
 /**
- * The page frame of a sign-in or account page. See `auth-shell.usage.ts`.
- * Slots: `icon` goes above the title on a status page, the default slot holds the page-owned content and actions,
- * and `footer` holds the links to other account pages. The page owns its form and submit handler.
+ * Shared layout shell for signed-out authentication pages (sign in, register, password reset, email confirmation).
+ * See `auth-shell.usage.ts` for full usage and layout rules.
+ *
+ * Slots:
+ * - `icon`: Status icon shown above the title on result pages.
+ * - `default`: Page body and primary actions. Pages with a form render their own `<form>` and submit handler here.
+ * - `footer`: Secondary navigation links to other auth pages, pinned to the bottom.
  */
 export interface AuthShellProps {
-  /** Rendered as the page's only h1. */
+  /** Main page heading (`<h1>`). */
   title: string;
-  /** One sentence under the title. */
+  /** Short supporting sentence displayed below the title. */
   subtitle?: string;
-  /** A part of the subtitle in a stronger color, for example the email address of the person. */
+  /** Exact substring inside `subtitle` to emphasize in bold primary text (such as the user's email address). */
   highlight?: string;
-  /** A page that shows a result. It has no logo, and a screen reader reads a change of the title. */
-  status?: boolean;
+  /**
+   * Renders the shell as a result screen (such as "Check your email" or "Email confirmed") instead of a form screen.
+   * Hides the top brand logo so an `AuthStatusIcon` can take its place, and enables `aria-live="polite"` on the
+   * heading block so screen readers announce in-place state updates.
+   */
+  isResultPage?: boolean;
 }
 
-const { title, subtitle, highlight, status } = defineProps<AuthShellProps>();
+const { title, subtitle, highlight, isResultPage } = defineProps<AuthShellProps>();
 
-/** The subtitle in parts. Without the highlighted text in it, the whole subtitle is the first part. */
+/** Splits `subtitle` around `highlight` so the matched substring can be styled inline. */
 const subtitleParts = computed(() => {
   const [before = "", after = ""] = highlight ? (subtitle ?? "").split(highlight) : [subtitle ?? ""];
   return { after, before, hasHighlight: Boolean(highlight && subtitle?.includes(highlight)) };
@@ -32,27 +40,27 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
 </script>
 
 <template>
-  <!-- The parts rise from below during the entry. The clip stops this motion from making the page scroll for a moment. -->
+  <!-- Clip overflow so the upward entrance animation does not briefly create a page scrollbar. -->
   <main
     class="flex min-h-dvh flex-col overflow-hidden bg-base-bg-primary"
     :style="keyboardFreeHeight === undefined ? undefined : { minHeight: `${keyboardFreeHeight}px` }"
   >
-    <!-- A wide screen has no thumb to help. The column then has the height of a phone, in the center of the screen. -->
+    <!-- Fill the viewport on mobile; on `sm+` screens, center a phone-sized column instead of stretching edge to edge. -->
     <div
       class="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 pt-safe-10 px-safe-5 pb-safe-6 sm:my-auto sm:min-h-176 sm:flex-none"
     >
-      <!-- The side space is the padding and the border of a field, so the mark and the title line up with its text. -->
-      <header v-if="!status" class="auth-reveal flex items-center px-3.25">
+      <!-- `px-3.25` matches `TextInput`'s horizontal inset (12px padding + 1px border) so the logo aligns with input text. -->
+      <header v-if="!isResultPage" class="auth-reveal flex items-center px-3.25">
         <BrandTapMark class="text-util-color-brand-700" />
       </header>
 
       <section class="auth-reveal flex flex-1 flex-col gap-10">
-        <!-- A status page changes this text without a new page, so a screen reader must read the change. -->
-        <div class="flex flex-col gap-4 px-3.25" :aria-live="status ? 'polite' : undefined">
+        <!-- Result pages can transition between loading, success, and error in place; announce heading updates to screen readers. -->
+        <div class="flex flex-col gap-4 px-3.25" :aria-live="isResultPage ? 'polite' : undefined">
           <slot name="icon" />
           <div class="flex flex-col gap-2">
             <h1 class="text-display-sm font-semibold tracking-tight text-base-text-primary">{{ title }}</h1>
-            <!-- No space around the highlight: the text of the subtitle already has its spaces. -->
+            <!-- Keep the `<span>` tight against `before` and `after` because those slices already preserve surrounding spaces. -->
             <p v-if="subtitle" class="text-base text-base-text-tertiary">
               {{ subtitleParts.before
               }}<span v-if="subtitleParts.hasHighlight" class="font-medium text-base-text-primary">{{ highlight }}</span
@@ -64,7 +72,7 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
         <slot />
       </section>
 
-      <!-- An invisible box around each link makes the tap area 44px high. The space around the footer holds the box. -->
+      <!-- Give each footer child an invisible 44px-tall `::after` hit area to meet touch target size guidelines without adding visual height. -->
       <footer
         v-if="$slots.footer"
         class="auth-reveal flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium *:relative *:after:absolute *:after:top-1/2 *:after:left-0 *:after:h-11 *:after:w-full *:after:-translate-y-1/2"
@@ -77,8 +85,8 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
 
 <style scoped>
 /*
- * The steps start one after the other, in the order of the three parts. At normal speed, one part takes 550ms and
- * the next part starts 90ms later. The values come from a token, so they are 0 under reduced motion.
+ * Staggered entrance animation for the header, content section, and footer (550ms duration, 90ms stagger at default speed).
+ * Derived from `--motion-duration-container`, which resolves to 0ms when reduced motion is enabled.
  */
 .auth-reveal {
   --auth-reveal-duration: calc(var(--motion-duration-container) * 2.2);

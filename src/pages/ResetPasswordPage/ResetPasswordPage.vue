@@ -113,7 +113,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
 <template>
   <AuthShell
     v-if="isInvalidLink"
-    status
+    is-result-page
     :title="$t('auth-reset-password-invalid-title')"
     :subtitle="$t('auth-reset-password-invalid-help')"
   >

@@ -101,7 +101,7 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
 <template>
   <AuthShell
     v-if="registrationComplete"
-    status
+    is-result-page
     :title="$t('auth-register-complete-title')"
     :subtitle="$t('auth-register-sent-body', { email })"
     :highlight="email"

@@ -40,11 +40,11 @@ export const PART_RULES: UsageRule[] = [
     title: "Highlight",
   },
   {
-    rule: "Set `status` on a page that shows a result and has no form. It hides the logo, because the icon takes its place.",
-    title: "Status",
+    rule: "Set `isResultPage` on a page that shows a result and has no form. It hides the logo, because the icon takes its place.",
+    title: "Result page",
   },
   {
-    rule: "Put one `AuthStatusIcon` in this slot. Only a status page uses this slot.",
+    rule: "Put one `AuthStatusIcon` in this slot. Only a result page uses this slot.",
     title: "Icon",
   },
   {

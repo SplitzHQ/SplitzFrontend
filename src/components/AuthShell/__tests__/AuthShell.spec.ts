@@ -27,18 +27,18 @@ describe("AuthShell", () => {
     expect(wrapper.text()).toContain("Welcome back");
   });
 
-  it("reads a change of the title aloud only on a status page", () => {
+  it("reads a change of the title aloud only on a result page", () => {
     expect(mountShell().find("[aria-live]").exists()).toBe(false);
 
-    const live = mountShell({ status: true }).get("[aria-live]");
+    const live = mountShell({ isResultPage: true }).get("[aria-live]");
 
     expect(live.attributes("aria-live")).toBe("polite");
     expect(live.find("h1").exists()).toBe(true);
   });
 
-  it("shows the logo only on a page that is not a status page", () => {
+  it("shows the logo only on a page that is not a result page", () => {
     expect(mountShell().find("header").exists()).toBe(true);
-    expect(mountShell({ status: true }).find("header").exists()).toBe(false);
+    expect(mountShell({ isResultPage: true }).find("header").exists()).toBe(false);
   });
 
   it("shows the highlighted part of the subtitle in its own element, with the spaces of the text", () => {
@@ -72,7 +72,7 @@ describe("AuthShell", () => {
   });
 
   it("renders status actions in the default slot without adding a form", () => {
-    const wrapper = mountShell({ status: true }, undefined, { default: "<a href='/login'>Sign in</a>" });
+    const wrapper = mountShell({ isResultPage: true }, undefined, { default: "<a href='/login'>Sign in</a>" });
 
     expect(wrapper.find("form").exists()).toBe(false);
     expect(wrapper.find("a").exists()).toBe(true);

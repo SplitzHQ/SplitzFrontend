@@ -63,7 +63,7 @@ async function handleForgotPassword() {
 <template>
   <AuthShell
     v-if="state === 'submitted'"
-    status
+    is-result-page
     :title="$t('auth-forgot-password-success-title')"
     :subtitle="$t('auth-forgot-password-success-body', { email })"
     :highlight="email"

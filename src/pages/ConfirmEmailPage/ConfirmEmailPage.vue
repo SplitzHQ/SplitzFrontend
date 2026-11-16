@@ -83,7 +83,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
 </script>
 
 <template>
-  <AuthShell status :title="$t(copy.title)" :subtitle="$t(copy.body)">
+  <AuthShell is-result-page :title="$t(copy.title)" :subtitle="$t(copy.body)">
     <template #icon>
       <AuthStatusIcon v-if="state === 'loading'" tone="brand">
         <PhCircleNotch class="animate-spin" />
