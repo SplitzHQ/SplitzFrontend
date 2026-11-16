@@ -24,7 +24,7 @@ export const WHEN_TO_USE: UsageRule[] = [
 /** The cases with another component. */
 export const NOT_AN_AUTH_SHELL: UseInsteadRule[] = [
   { use: "Layout", when: "The page is for a signed-in user, for example two-factor setup." },
-  { use: "BrandTapMark", when: "The page must show the logo. AuthShell already shows it." },
+  { use: "BrandTapGlyph", when: "The page must show the logo. AuthShell already shows it." },
   { use: "StatusBadge", when: "A signed-in page shows one result, for example JoinGroupPage." },
 ];
 

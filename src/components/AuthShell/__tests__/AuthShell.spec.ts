@@ -11,7 +11,7 @@ function mountShell(
   slots: Record<string, string | (() => VNode)> = {}
 ) {
   return mount(AuthShell, {
-    global: { stubs: { BrandTapMark: true } },
+    global: { stubs: { BrandTapGlyph: true } },
     props: { title: "Sign in", ...props },
     slots: footer ? { footer, ...slots } : slots,
   });

@@ -23,7 +23,7 @@
 
 - Use flex gap (preferred) / grid gap instead of margin for spacing between elements.
 
-- Add animations where appropriate. Check `ui-animation` skill.
+- Add animations where appropriate. Check `ui-animation` skill. Prefer to use `motion-v` package if it make code simpler.
 
 - Run format and test after code changes.
 

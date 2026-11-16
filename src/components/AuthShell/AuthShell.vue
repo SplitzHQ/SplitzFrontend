@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import BrandTapMark from "@/components/BrandWordmark/BrandTapMark.vue";
+import BrandTapGlyph from "@/components/BrandWordmark/BrandTapGlyph.vue";
 import { useKeyboardFreeHeight } from "@/libs/use-keyboard-free-height";
 
 /**
@@ -51,7 +51,7 @@ const keyboardFreeHeight = useKeyboardFreeHeight();
     >
       <!-- `px-3.25` matches `TextInput`'s horizontal inset (12px padding + 1px border) so the logo aligns with input text. -->
       <header v-if="!isResultPage" class="auth-reveal flex items-center px-3.25">
-        <BrandTapMark class="text-util-color-brand-700" />
+        <BrandTapGlyph class="text-util-color-brand-700" />
       </header>
 
       <section class="auth-reveal flex flex-1 flex-col gap-10">

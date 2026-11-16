@@ -238,7 +238,7 @@ export function useStatusBarDim(open: Readonly<Ref<boolean>>): void {
  * Returns a release function to call when the layer begins its exit animation.
  *
  * Note for iOS 27: iOS locks onto the layer's color while a full-screen `position: fixed` element remains on screen,
- * so the layer must stop using `position: fixed` as soon as its exit animation starts (see `BrandOpening.vue`).
+ * so the layer must stop using `position: fixed` as soon as its exit animation starts (see `BrandOpeningOverlay.vue`).
  * @param token - CSS color variable name (for example, `--base-bg-primary`).
  */
 export function holdStatusBarColor(token: string): () => void {
