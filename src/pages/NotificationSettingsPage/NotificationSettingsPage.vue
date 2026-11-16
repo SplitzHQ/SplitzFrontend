@@ -188,7 +188,7 @@ async function resetGroupNotificationPreferences() {
                   :inherited="row.inherited"
                   :disabled="resetting"
                   :busy="optimisticUpdateOverlay.has(row.type)"
-                  :label="$t(`notification-type-${row.type}`)"
+                  :aria-label="$t(`notification-type-${row.type}`)"
                   @update:model-value="setEnabled(row.type, $event)"
                 />
               </div>

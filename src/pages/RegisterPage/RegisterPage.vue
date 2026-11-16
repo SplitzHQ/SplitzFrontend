@@ -101,7 +101,7 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
 <template>
   <AuthShell
     v-if="registrationComplete"
-    status
+    is-result-page
     :title="$t('auth-register-complete-title')"
     :subtitle="$t('auth-register-sent-body', { email })"
     :highlight="email"
@@ -112,71 +112,69 @@ async function getRegistrationErrorMessageKey(error: unknown): Promise<string> {
       </AuthStatusIcon>
     </template>
 
-    <template #actions>
+    <div class="mt-auto flex flex-col gap-3">
       <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
         {{ $t("auth-register-login-link") }}
       </SLinkButton>
-    </template>
+    </div>
   </AuthShell>
 
-  <AuthShell
-    v-else
-    :title="$t('auth-register-title')"
-    :subtitle="$t('auth-register-subtitle')"
-    @submit="handleRegister"
-  >
-    <TextInput
-      id="email-address"
-      v-model="email"
-      name="email"
-      type="email"
-      autocomplete="email"
-      inputmode="email"
-      required
-      :label="$t('auth-email-label')"
-      :placeholder="$t('auth-email-placeholder')"
-    />
+  <AuthShell v-else :title="$t('auth-register-title')" :subtitle="$t('auth-register-subtitle')">
+    <form class="flex flex-1 flex-col gap-6" @submit.prevent="handleRegister">
+      <div class="flex flex-col gap-4">
+        <TextInput
+          id="email-address"
+          v-model="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          :label="$t('auth-email-label')"
+          :placeholder="$t('auth-email-placeholder')"
+        />
 
-    <div class="flex flex-col gap-3">
-      <TextInput
-        id="password"
-        v-model="password"
-        name="password"
-        type="password"
-        autocomplete="new-password"
-        required
-        described-by="password-rules"
-        :label="$t('auth-password-label')"
-        placeholder=""
-        :error="errorKey === POLICY_ERROR ? $t(POLICY_ERROR) : undefined"
-      />
-      <PasswordChecklist id="password-rules" :password="password" />
-    </div>
+        <div class="flex flex-col gap-3">
+          <TextInput
+            id="password"
+            v-model="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            described-by="password-rules"
+            :label="$t('auth-password-label')"
+            placeholder=""
+            :error="errorKey === POLICY_ERROR ? $t(POLICY_ERROR) : undefined"
+          />
+          <PasswordChecklist id="password-rules" :password="password" />
+        </div>
 
-    <RateLimitCountdown
-      class="px-3.25"
-      :seconds="registrationCooldown.remainingSeconds.value"
-      message-key="auth-rate-limit-countdown"
-      data-test="register-rate-limit"
-    />
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="registrationCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="register-rate-limit"
+        />
 
-    <Notice v-if="noticeErrorKey" tone="error" announce data-test="register-error">
-      <p>{{ $t(noticeErrorKey) }}</p>
-    </Notice>
-
-    <template #actions>
-      <SButton
-        type="submit"
-        variant="primary"
-        size="xl"
-        :disabled="registrationCooldown.isActive.value"
-        :loading="loading"
-        class="w-full"
-        data-test="register-submit"
-      >
-        {{ $t("auth-register-action") }}
-      </SButton>
-    </template>
+        <Notice v-if="noticeErrorKey" tone="error" announce data-test="register-error">
+          <p>{{ $t(noticeErrorKey) }}</p>
+        </Notice>
+      </div>
+      <div class="mt-auto flex flex-col gap-3">
+        <SButton
+          type="submit"
+          variant="primary"
+          size="xl"
+          :disabled="registrationCooldown.isActive.value"
+          :loading="loading"
+          class="w-full"
+          data-test="register-submit"
+        >
+          {{ $t("auth-register-action") }}
+        </SButton>
+      </div>
+    </form>
 
     <template #footer>
       <RouterLink :to="{ name: 'login' }" class="flex gap-1 text-base-text-brand hover:text-base-text-brand_hover">

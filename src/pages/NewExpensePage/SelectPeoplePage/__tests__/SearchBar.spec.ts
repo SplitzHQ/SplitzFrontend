@@ -1,10 +1,10 @@
 import { mount } from "@vue/test-utils";
 import type * as VueUse from "@vueuse/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { nextTick, ref } from "vue";
+import { computed, type MaybeRefOrGetter, nextTick, ref, toValue } from "vue";
 
-import { fitCount } from "../fit-count";
 import SearchBar from "../SearchBar.vue";
+import { countFittingTags } from "../use-tag-overflow";
 import UserTag from "../UserTag.vue";
 
 vi.mock("fluent-vue", () => ({
@@ -13,10 +13,14 @@ vi.mock("fluent-vue", () => ({
   }),
 }));
 
-// jsdom has no layout. The row is 343px wide, as on a 375px phone, and each measured item is 40px wide.
+// jsdom has no layout engine. Mock a 343px row (375px phone minus page padding) and 40px measured items.
+// The "With" label is the only observed element that holds the label text, so its text tells it apart from the row.
 vi.mock("@vueuse/core", async (original) => ({
   ...(await original<typeof VueUse>()),
-  useElementSize: () => ({ height: ref(26), width: ref(343) }),
+  useElementSize: (target: MaybeRefOrGetter<HTMLElement | null>) => ({
+    height: ref(26),
+    width: computed(() => (toValue(target)?.textContent?.trim() === "new-expense-select-people-with" ? 40 : 343)),
+  }),
 }));
 
 const USERS = ["Alex", "Mei", "Sam", "Jordan", "Priya", "Noah"].map((userName) => ({
@@ -25,128 +29,117 @@ const USERS = ["Alex", "Mei", "Sam", "Jordan", "Priya", "Noah"].map((userName) =
   userName,
 }));
 
-/** Mounts the row and waits for the first measure. */
-async function mountRow(count: number) {
+/** Mounts SearchBar and waits for initial width measurement to settle. */
+async function mountSearchBar(count: number) {
   const wrapper = mount(SearchBar, { props: { selectedUsers: USERS.slice(0, count) } });
   await nextTick();
   await nextTick();
   return wrapper;
 }
 
-/** Returns the names on the tags that a person sees. The hidden copy has its own tags. */
-function shownTags(wrapper: Awaited<ReturnType<typeof mountRow>>) {
-  return wrapper.findAll("[data-row-tag] button").map((tag) => tag.attributes("aria-label"));
+/** Returns aria-labels of visible user tags (excluding the offscreen measurement row). */
+function getVisibleTagLabels(wrapper: Awaited<ReturnType<typeof mountSearchBar>>) {
+  return wrapper.findAll("[data-user-tag] button").map((tag) => tag.attributes("aria-label"));
 }
 
 beforeEach(() => {
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({ height: 26, width: 40 } as DOMRect);
+  // jsdom has no Web Animations API. The row fades the `+N` button and the search input when it expands or collapses.
+  Element.prototype.animate = vi.fn();
+  Element.prototype.getAnimations = () => [];
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
+  Reflect.deleteProperty(Element.prototype, "animate");
+  Reflect.deleteProperty(Element.prototype, "getAnimations");
 });
 
-describe("fitCount", () => {
-  const ROW = { chipWidth: 30, gap: 8, inputWidth: 80 };
+describe("countFittingTags", () => {
+  const BASE_OPTIONS = { gap: 8, minInputWidth: 80, overflowButtonWidth: 30 };
 
-  it("shows all tags and no button when they fit next to the field", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [60, 60, 60] })).toBe(3);
+  it("shows all tags and no button when they fit next to the search input", () => {
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 300, tagWidths: [60, 60, 60] })).toBe(3);
   });
 
-  it("uses the exact width as a fit", () => {
-    expect(fitCount({ ...ROW, available: 60 + 8 + 80, tagWidths: [60] })).toBe(1);
+  it("treats an exact width match as fitting", () => {
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 60 + 8 + 80, tagWidths: [60] })).toBe(1);
   });
 
-  it("keeps the space of the button when some tags stay out", () => {
-    // Two tags fit with the field only when the row has no button: 2 * 68 + 80 = 216, and the button needs 38 more.
-    expect(fitCount({ ...ROW, available: 220, tagWidths: [60, 60, 60] })).toBe(1);
+  it("reserves space for the overflow button when not all tags fit", () => {
+    // Two tags fit with the input only without the button: 2 * 68 + 80 = 216, while the `+N` button needs 38px more.
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 220, tagWidths: [60, 60, 60] })).toBe(1);
   });
 
-  it("shows only the button when no tag fits", () => {
-    expect(fitCount({ ...ROW, available: 140, tagWidths: [120, 120] })).toBe(0);
+  it("shows only the overflow button when no tag fits", () => {
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 140, tagWidths: [120, 120] })).toBe(0);
   });
 
-  it("does not show a person with no width yet", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [60, Infinity] })).toBe(1);
+  it("hides an unmeasured tag whose width is Infinity", () => {
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 300, tagWidths: [60, Infinity] })).toBe(1);
   });
 
-  it("shows no tags and no error when nobody is selected", () => {
-    expect(fitCount({ ...ROW, available: 300, tagWidths: [] })).toBe(0);
+  it("returns 0 when no users are selected", () => {
+    expect(countFittingTags({ ...BASE_OPTIONS, availableWidth: 300, tagWidths: [] })).toBe(0);
   });
 });
 
 describe("SearchBar", () => {
-  it("shows all tags and no button when they fit", async () => {
-    const wrapper = await mountRow(3);
+  it("shows all tags and no overflow button when they fit", async () => {
+    const wrapper = await mountSearchBar(3);
 
-    expect(shownTags(wrapper)).toHaveLength(3);
-    expect(wrapper.find("[data-row-fade] button").exists()).toBe(false);
+    expect(getVisibleTagLabels(wrapper)).toHaveLength(3);
+    expect(wrapper.find("[data-fade-on-toggle] button").exists()).toBe(false);
   });
 
-  it("folds the tags that do not fit into a button that says how many", async () => {
-    const wrapper = await mountRow(6);
-    const button = wrapper.get("[data-row-fade] button");
+  it("collapses overflowing tags into a +N button", async () => {
+    const wrapper = await mountSearchBar(6);
+    const button = wrapper.get("[data-fade-on-toggle] button");
 
-    // 343 - 40 - 8 leaves 295px. Three tags take 144px, the button takes 48px and the field keeps 80px.
-    expect(shownTags(wrapper)).toHaveLength(3);
+    // 343 - 40 - 8 leaves 295px: 3 tags take 144px, the `+3` button takes 48px, and the search input reserves 80px.
+    expect(getVisibleTagLabels(wrapper)).toHaveLength(3);
     expect(button.text()).toBe("+3");
     expect(button.attributes("aria-label")).toBe("new-expense-select-people-show-more 3");
     expect(button.attributes("aria-expanded")).toBe("false");
   });
 
-  it("opens to all tags, and closes again from the same button", async () => {
-    const wrapper = await mountRow(6);
+  it("expands to show all tags and collapses again from the toggle button", async () => {
+    const wrapper = await mountSearchBar(6);
 
-    await wrapper.get("[data-row-fade] button").trigger("click");
-    const open = wrapper.get("[data-row-fade] button");
+    await wrapper.get("[data-fade-on-toggle] button").trigger("click");
+    const collapseButton = wrapper.get("[data-fade-on-toggle] button");
 
-    expect(shownTags(wrapper)).toHaveLength(6);
-    expect(open.attributes("aria-expanded")).toBe("true");
-    expect(open.attributes("aria-label")).toBe("new-expense-select-people-show-fewer");
-    expect(open.text()).toBe("");
+    expect(getVisibleTagLabels(wrapper)).toHaveLength(6);
+    expect(collapseButton.attributes("aria-expanded")).toBe("true");
+    expect(collapseButton.attributes("aria-label")).toBe("new-expense-select-people-show-fewer");
+    expect(collapseButton.text()).toBe("");
 
-    await open.trigger("click");
+    await collapseButton.trigger("click");
 
-    expect(shownTags(wrapper)).toHaveLength(3);
+    expect(getVisibleTagLabels(wrapper)).toHaveLength(3);
   });
 
-  it("closes the open row when everyone fits in one line", async () => {
-    const wrapper = await mountRow(6);
-    await wrapper.get("[data-row-fade] button").trigger("click");
+  it("auto-collapses when all remaining tags fit on one line", async () => {
+    const wrapper = await mountSearchBar(6);
+    await wrapper.get("[data-fade-on-toggle] button").trigger("click");
 
     await wrapper.setProps({ selectedUsers: USERS.slice(0, 2) });
     await nextTick();
     await nextTick();
 
-    expect(wrapper.find("[data-row-fade] button").exists()).toBe(false);
+    expect(wrapper.find("[data-fade-on-toggle] button").exists()).toBe(false);
   });
 
-  it("emits the ID of the person on the tag", async () => {
-    const wrapper = await mountRow(2);
+  it("emits the removed user ID when a tag is clicked", async () => {
+    const wrapper = await mountSearchBar(2);
 
-    await wrapper.findAll("[data-row-tag] button")[1].trigger("click");
+    await wrapper.findAll("[data-user-tag] button")[1].trigger("click");
 
     expect(wrapper.emitted("remove")).toEqual([["id-Mei"]]);
   });
 
-  it("moves the focus after a keyboard removes a tag, and leaves it after a tap", async () => {
-    const wrapper = await mountRow(2);
-    const focus = vi.spyOn(HTMLElement.prototype, "focus");
-
-    // A tap has `detail` 1.
-    wrapper.findAll("[data-row-tag] button")[0].element.dispatchEvent(new MouseEvent("click", { detail: 1 }));
-    await nextTick();
-    expect(focus).not.toHaveBeenCalled();
-
-    // A key press on a button makes a click with `detail` 0.
-    wrapper.findAll("[data-row-tag] button")[0].element.dispatchEvent(new MouseEvent("click", { detail: 0 }));
-    await nextTick();
-    await nextTick();
-    expect(focus).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not put the hidden copy in the tab order", async () => {
-    const wrapper = await mountRow(6);
+  it("keeps the offscreen measurement row inert and hidden from assistive tech", async () => {
+    const wrapper = await mountSearchBar(6);
 
     expect(wrapper.get("[inert]").attributes("aria-hidden")).toBe("true");
     expect(wrapper.get("[inert]").findAll("button")).toHaveLength(6);
@@ -159,21 +152,5 @@ describe("UserTag", () => {
 
     expect(button.attributes("type")).toBe("button");
     expect(button.attributes("aria-label")).toBe("new-expense-select-people-remove Mei");
-  });
-
-  it("cuts a long name and keeps a tap area of 44px", () => {
-    const wrapper = mount(UserTag, { props: { name: "Alexandria Montgomery-Whitfield", photo: null } });
-
-    expect(wrapper.get("span.truncate").classes()).toContain("max-w-28");
-    expect(wrapper.get("button").classes()).toContain("after:h-11");
-  });
-
-  it("uses the token of the tag for the border", () => {
-    const classes = mount(UserTag, { props: { name: "Mei", photo: null } })
-      .get("button")
-      .classes();
-
-    expect(classes).toContain("border-comp-user-tag-border");
-    expect(classes).not.toContain("border-base-border-brand-subtle");
   });
 });

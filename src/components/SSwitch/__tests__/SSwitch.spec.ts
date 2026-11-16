@@ -5,7 +5,7 @@ import SSwitch, { type SSwitchProps } from "../SSwitch.vue";
 
 /** Mounts a switch and returns it with the values that it emits. */
 function mountSwitch(modelValue: boolean, props: Partial<SSwitchProps> = {}) {
-  return mount(SSwitch, { props: { label: "Reminders", modelValue, ...props } });
+  return mount(SSwitch, { attrs: { "aria-label": "Reminders" }, props: { modelValue, ...props } });
 }
 
 describe("SSwitch", () => {

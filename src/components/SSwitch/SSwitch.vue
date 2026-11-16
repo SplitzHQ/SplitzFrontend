@@ -2,10 +2,9 @@
 /**
  * A setting that is on or off. See `switch.usage.ts` for when to use it.
  * An invisible box around the track makes the tap area 44px high.
+ * Set `aria-label` to the text of the visible label of the row, because the switch has no text.
  */
 export interface SSwitchProps {
-  /** The name for a screen reader. Use the text of the visible label of the row. */
-  label: string;
   /** Blocks the switch because another action is in progress. A disabled switch loses the keyboard focus. */
   disabled?: boolean;
   /**
@@ -18,7 +17,7 @@ export interface SSwitchProps {
 }
 
 const model = defineModel<boolean>({ required: true });
-const { label, disabled = false, busy = false, inherited = false } = defineProps<SSwitchProps>();
+const { disabled = false, busy = false, inherited = false } = defineProps<SSwitchProps>();
 
 /** Changes the value, except while a change saves. A busy switch is not natively disabled, so it still gets clicks. */
 function toggle() {
@@ -32,7 +31,6 @@ function toggle() {
     type="button"
     role="switch"
     :aria-checked="model"
-    :aria-label="label"
     :aria-busy="busy ? 'true' : undefined"
     :aria-disabled="busy ? 'true' : undefined"
     :disabled="disabled"

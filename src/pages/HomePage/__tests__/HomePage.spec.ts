@@ -44,8 +44,8 @@ function mountPage() {
     global: {
       stubs: {
         AvatarMenu: true,
-        BrandOpening: true,
-        BrandTapLogo: true,
+        BrandOpeningOverlay: true,
+        BrandTapWordmark: true,
         Layout: { template: "<div><slot name='header' /><slot /></div>" },
         NotificationBell: true,
         RouterLink: RouterLinkStub,

@@ -1,377 +1,460 @@
 import { MOTION_EASING } from "@/libs/motion";
 
-import { WORDMARK_TITTLE_SHAPE } from "./brand-wordmark";
+import { BRAND_GLYPH, BRAND_GLYPH_BOX, BRAND_GLYPH_DIAMOND_SQUARE } from "./brand-glyph";
+import { WORDMARK_LETTERS, WORDMARK_TITTLE_GEOMETRY } from "./brand-wordmark";
 
 /**
- * The motion of the logo on HomePage: the full-screen opening, and the small motion when a person taps the word mark.
- * The values are the picks in the `2026-11-04-logo-opening` prototype. The rules are in `brand-wordmark.usage.ts`.
+ * Shared Web Animations timelines and playback helpers for the Splitz brand animations:
+ * 1. `OPENING_GLYPH_STEPS`: Full-screen cold-start opening overlay (`BrandOpeningOverlay`).
+ * 2. `WORDMARK_TAP_STEPS`: HomePage header wordmark tap animation (`BrandTapWordmark`).
+ * 3. `GLYPH_TAP_STEPS`: AuthShell standalone glyph tap animation (`BrandTapGlyph`).
  *
- * In the small motion, one circle becomes two small circles. One goes to the place of the dot. The other goes to the
- * place of the diamond and changes into the diamond. The bar grows between them.
+ * All three animations share the same glyph assembly sequence (`buildGlyphAssemblySteps`): a single merged circle
+ * pops in at the center of the glyph, shrinks, splits into two circles that slide to the dot and diamond positions,
+ * sharpens the bottom-right circle's corners into a diamond, and grows the diagonal bar between them.
  *
- * A distance in a step is in the units of `brand-glyph.ts`.
+ * Translation distances in glyph steps use `brand-glyph.ts` SVG coordinates; wordmark steps use `brand-wordmark.ts`
+ * coordinates. See `brand-wordmark.usage.ts` for behavioral rules.
  */
 
-/** One Web Animation on all elements with one `data-part`. */
+/** Single Web Animation track targeting every descendant element with `data-part="<part>"`. */
 export interface MotionStep {
+  /** Value of the target element's `data-part` attribute. */
   part: string;
+  /** Web Animations keyframes. Leave empty when `cornerRadius` drives an SVG `<rect>` `rx` attribute instead. */
   keyframes: Keyframe[];
-  /** The start, in milliseconds at normal speed. */
-  at: number;
-  ms: number;
+  /** Start offset on the sequence timeline in milliseconds (at `1x` speed). */
+  startMs: number;
+  /** Duration of this step in milliseconds (at `1x` speed). */
+  durationMs: number;
+  /** Default CSS easing curve applied between keyframes that do not specify their own `easing`. */
   easing?: string;
-  /** Moves the corner radius of a `<rect>` from the first value to the second. See `playSteps`. */
-  rx?: [number, number];
+  /** Interpolates an SVG `<rect>`'s `rx` attribute from `from` to `to` over the step. See `animateRectCornerRadius`. */
+  cornerRadius?: [from: number, to: number];
 }
 
 const { enter: ENTER, exit: EXIT, pop: POP, sheet: SHEET, standard: STANDARD } = MOTION_EASING;
 
 /**
- * The place of the mark on the word after a tap, in the units of the word. At the header size, the mark has the same
- * size as the word. Its bottom is below the baseline, so that its center is on the center of the capitals.
+ * Placement of the animated glyph inside `WORDMARK_LAYOUT` (`100` units = `1em`, baseline at `y = 0`, capital letters
+ * centered near `y = -36`). Extending a `100×100` glyph `14` units below the baseline (`y = -86..14`) aligns its
+ * vertical center (`y = -36`) with the capital letters.
  */
-export const TAP_MARK = { belowBaseline: 14, size: 100 } as const;
-
-/** The size of the mark in the opening, in pixels. */
-export const OPENING_MARK_PX = 48;
-/** The time factor of the small motion in the opening. */
-const OPENING_FACTOR = 0.65;
-/** How long the mark stays after its motion in the opening, before the layer fades. */
-const OPENING_REST_MS = 450;
-/** The time of the fade of the opening. */
-export const OPENING_FADE_MS = 300;
-
-/** The time factor of the small motion after a tap. */
-const TAP_FACTOR = 0.6;
-/** The times of a tap, in milliseconds. */
-const TAP = {
-  letterIn: 180,
-  letterOut: 80,
-  /** How long the finished mark stays before it leaves. */
-  markHold: 280,
-  markOut: 120,
-  /** The time between two letters. */
-  stagger: 18,
-  /** The time from the start of the exit of the mark to the return of the word. The mark is gone first. */
-  wordBackGap: 120,
+export const WORDMARK_GLYPH_ALIGNMENT = {
+  belowBaselineUnits: 14,
+  sizeUnits: 100,
 } as const;
 
-/** The radius of the one circle at the start. */
-const WHOLE_RADIUS = 90;
-/** The center of the glyph, where the one circle stands. */
-const CENTER = 300;
-/** The center and the radius of the dot in `brand-glyph.ts`. */
-const DOT_CENTER = 200;
-const DOT_RADIUS = 50;
-/** The center of the diamond in `brand-glyph.ts`. */
-export const DIAMOND_CENTER = 393.1;
-/** Half of a side of the square that is the diamond when it turns 45 degrees. */
-export const DIAMOND_HALF_SIDE = 40.24;
+/** Rendered width and height (in CSS pixels) of the glyph on `BrandOpeningOverlay`. */
+export const OPENING_GLYPH_SIZE_PX = 48;
+/** Multiplier applied to base glyph assembly durations during `BrandOpeningOverlay`. */
+const OPENING_DURATION_SCALE = 0.65;
+/** Milliseconds the assembled glyph holds on screen before `BrandOpeningOverlay` begins fading out. */
+const OPENING_HOLD_MS = 450;
+/** Fade-out duration (in milliseconds at `1x` speed) of `BrandOpeningOverlay`. */
+export const OPENING_FADE_MS = 300;
 
-/** The times of the small motion at normal speed. */
-const CIRCLE_MS = 900;
-const OFFSETS = { arrive: 0.2, part: 0.26, small: 0.46, smallEnd: 0.54 } as const;
-const BAR_AT = 500;
-const BAR_MS = 300;
-const CORNERS_AT = 480;
-const CORNERS_MS = 420;
-/** The time until the small motion is complete at normal speed. */
-const MARK_MS = Math.max(CIRCLE_MS, BAR_AT + BAR_MS, CORNERS_AT + CORNERS_MS);
+/** Multiplier applied to base glyph assembly durations during tap animations. */
+const TAP_DURATION_SCALE = 0.6;
 
-/** Scales the bar on its own axis, which turns -45 degrees from the x axis. */
-const barLength = (scale: number) => `rotate(-45deg) scaleX(${scale}) rotate(45deg)`;
+/** Shared letter and glyph transition durations (in milliseconds at `1x` speed) for tap animations. */
+const TAP_TIMING_MS = {
+  /** Duration for a resting or assembled glyph to shrink and fade out. */
+  glyphExit: 120,
+  /** Hold time after the glyph finishes assembling in `BrandTapWordmark` before it shrinks away. */
+  glyphHold: 280,
+  /** Duration for each letter to rise into view. */
+  letterEnter: 180,
+  /** Duration for each letter to fade out. */
+  letterExit: 80,
+  /** Start-time stagger between adjacent letters. */
+  letterStagger: 18,
+  /** Hold time in `BrandTapGlyph` while the full wordmark stays visible beside the glyph so the user can read it. */
+  wordReadHold: 800,
+} as const;
 
-/** Returns the keyframes of one circle: it arrives, gets small, and moves to its place. */
-function circleKeyframes(place: (scale: number, moved?: boolean) => string, whole: number, small: number): Keyframe[] {
-  return [
-    { easing: POP, offset: 0, opacity: 0, transform: place(whole * 0.6) },
-    { offset: OFFSETS.arrive, opacity: 1, transform: place(whole) },
-    { offset: OFFSETS.part, opacity: 1, transform: place(whole) },
-    { offset: OFFSETS.small, opacity: 1, transform: place(small) },
-    { offset: OFFSETS.smallEnd, opacity: 1, transform: place(small) },
-    { offset: 1, opacity: 1, transform: place(1, true) },
-  ];
-}
+/** Radius of the initial merged circle at the glyph center before it shrinks and splits into dot + diamond. */
+const MERGED_CIRCLE_RADIUS = 90;
 
-/** Returns the steps of the small motion from `at`. `factor` scales its times, and `at` stays as it is. */
-function markSteps(at: number, factor: number): MotionStep[] {
-  const dotFrom = CENTER - DOT_CENTER;
-  const diamondFrom = CENTER - DIAMOND_CENTER;
-  const dotAt = (scale: number, moved = false) => {
-    const distance = moved ? 0 : dotFrom;
-    return `translate(${distance}px, ${distance}px) scale(${scale})`;
-  };
-  const diamondAt = (scale: number, moved = false) => {
-    const distance = moved ? 0 : diamondFrom;
-    return `translate(${distance}px, ${distance}px) rotate(45deg) scale(${scale})`;
-  };
-  const ms = CIRCLE_MS * factor;
-  return [
-    {
-      at,
-      easing: STANDARD,
-      keyframes: circleKeyframes(dotAt, WHOLE_RADIUS / DOT_RADIUS, 1),
-      ms,
-      part: "dot",
-    },
-    {
-      at,
-      easing: STANDARD,
-      // At the small size, the second circle has the radius of the dot, so the two small circles are equal.
-      keyframes: circleKeyframes(diamondAt, WHOLE_RADIUS / DIAMOND_HALF_SIDE, DOT_RADIUS / DIAMOND_HALF_SIDE),
-      ms,
-      part: "diamond",
-    },
-    {
-      at: at + CORNERS_AT * factor,
-      // This curve changes the corners evenly. The enter curve ends most of the change in its first third.
-      easing: STANDARD,
-      keyframes: [],
-      ms: CORNERS_MS * factor,
-      part: "diamond",
-      rx: [DIAMOND_HALF_SIDE, 0],
-    },
-    {
-      at: at + BAR_AT * factor,
-      easing: ENTER,
-      keyframes: [
-        { offset: 0, opacity: 0, transform: barLength(0) },
-        { offset: 0.2, opacity: 1 },
-        { offset: 1, opacity: 1, transform: barLength(1) },
-      ],
-      ms: BAR_MS * factor,
-      part: "bar",
-    },
-  ];
-}
+/** Base timing (in milliseconds at `1x` speed) of the glyph assembly sequence before `durationScale` is applied. */
+const GLYPH_ASSEMBLY_TIMING_MS = {
+  barDelay: 500,
+  barDuration: 300,
+  circleDuration: 900,
+  diamondCornersDelay: 480,
+  diamondCornersDuration: 420,
+} as const;
 
-/** The steps of the mark in the opening. */
-export const OPENING_STEPS: MotionStep[] = markSteps(0, OPENING_FACTOR);
-/** The time from the start of the opening to the start of its fade. */
-export const OPENING_STAY_MS = Math.round(MARK_MS * OPENING_FACTOR) + OPENING_REST_MS;
+/** Normalized keyframe offsets (`0..1`) within `GLYPH_ASSEMBLY_TIMING_MS.circleDuration`. */
+const SPLIT_CIRCLE_OFFSETS = {
+  mergedHoldEnd: 0.26,
+  popInEnd: 0.2,
+  shrinkEnd: 0.46,
+  shrunkHoldEnd: 0.54,
+} as const;
 
-const LETTER_COUNT = 6;
-/** The index of the i. The diamond on the word moves with it. */
-const LETTER_I = 3;
-
-/** Returns the steps of each letter: it leaves from right to left and comes back from left to right. */
-export function letterSteps(backAt: number): MotionStep[] {
-  const last = LETTER_COUNT - 1;
-  const steps = Array.from({ length: LETTER_COUNT }, (_, letter): MotionStep => {
-    const outEnd = (last - letter) * TAP.stagger + TAP.letterOut;
-    const inAt = backAt + letter * TAP.stagger;
-    const ms = inAt + TAP.letterIn;
-    return {
-      at: 0,
-      easing: EXIT,
-      // One element runs one animation here, so the exit and the return are in one list.
-      keyframes: [
-        { offset: 0, opacity: 1, transform: "translateY(0)" },
-        { offset: (outEnd - TAP.letterOut) / ms, opacity: 1, transform: "translateY(0)" },
-        { offset: outEnd / ms, opacity: 0, transform: "translateY(0)" },
-        { easing: ENTER, offset: inAt / ms, opacity: 0, transform: "translateY(12px)" },
-        { offset: 1, opacity: 1, transform: "translateY(0)" },
-      ],
-      ms,
-      part: `letter-${letter}`,
-    };
-  });
-  return [...steps, { ...steps[LETTER_I], part: "tittle" }];
-}
-
-/** The times of the diamond when the word comes back, in milliseconds, and the size of the small circle. */
-export interface TittleTiming {
-  /** The circle starts this long before the last letter ends. That letter has almost stopped by then. */
-  lead: number;
-  /** The small circle comes from nothing. */
-  appear: number;
-  /** The circle grows and its corners become square. */
-  grow: number;
-  /** The square stays, so a person can see it. */
-  hold: number;
-  /** The square turns into the diamond. */
-  turn: number;
-  /** The size of the small circle. 1 is the full size. */
-  small: number;
-}
-
-/** The times that the user picked in the prototype `2026-11-04-wordmark-split-glyph`. */
-export const TITTLE_TIMING: TittleTiming = { appear: 80, grow: 150, hold: 20, lead: 110, small: 0.45, turn: 260 };
-
-/** Half of a side of the square that is the diamond on the word when it turns 45 degrees. */
-export const TITTLE_HALF_SIDE = WORDMARK_TITTLE_SHAPE.half * Math.SQRT1_2;
+/** Total duration of the glyph assembly sequence at `1x` speed. */
+const GLYPH_ASSEMBLY_DURATION_MS = Math.max(
+  GLYPH_ASSEMBLY_TIMING_MS.circleDuration,
+  GLYPH_ASSEMBLY_TIMING_MS.barDelay + GLYPH_ASSEMBLY_TIMING_MS.barDuration,
+  GLYPH_ASSEMBLY_TIMING_MS.diamondCornersDelay + GLYPH_ASSEMBLY_TIMING_MS.diamondCornersDuration
+);
 
 /**
- * Returns the steps of the diamond on the word. It leaves with the i. When the word comes back, a small circle comes over
- * the i as the last letter settles. The circle grows, its corners become square, and the square turns 45 degrees.
- *
- * A path cannot change from a circle to a square in all browsers, so a `<rect>` with the part `tittle-shape` draws these
- * shapes. The rect ends on the place of the path, and the path comes back in the last frame.
+ * Scales the `-45°` diagonal bar along its length without changing its thickness:
+ * rotates `+45°` onto the horizontal axis, applies `scaleX`, then rotates `-45°` back to its diagonal angle.
  */
-function tittleSteps(letters: MotionStep[], timing: TittleTiming): MotionStep[] {
-  const letter = letters[LETTER_I];
-  const wordEnd = Math.max(...letters.map(({ at, ms }) => at + ms));
-  const startAt = wordEnd - timing.lead;
-  const growAt = startAt + timing.appear;
-  const turnAt = growAt + timing.grow + timing.hold;
-  const total = turnAt + timing.turn;
-  const shapeMs = total - startAt;
-  const offset = (time: number) => (time - startAt) / shapeMs;
+const scaleBarAlongAxis = (lengthScale: number) => `rotate(-45deg) scaleX(${lengthScale}) rotate(45deg)`;
+
+/**
+ * Builds keyframes for one half of the splitting circle (`dot` or `diamond`):
+ * pops in as part of the merged center circle, holds, shrinks to dot size at the center, holds briefly, then slides
+ * to its final glyph coordinates at `scale(1)`.
+ */
+function buildSplitCircleKeyframes(
+  formatTransform: (scale: number, atFinalPosition?: boolean) => string,
+  mergedScale: number,
+  shrunkScale: number
+): Keyframe[] {
+  return [
+    { easing: POP, offset: 0, opacity: 0, transform: formatTransform(mergedScale * 0.6) },
+    { offset: SPLIT_CIRCLE_OFFSETS.popInEnd, opacity: 1, transform: formatTransform(mergedScale) },
+    { offset: SPLIT_CIRCLE_OFFSETS.mergedHoldEnd, opacity: 1, transform: formatTransform(mergedScale) },
+    { offset: SPLIT_CIRCLE_OFFSETS.shrinkEnd, opacity: 1, transform: formatTransform(shrunkScale) },
+    { offset: SPLIT_CIRCLE_OFFSETS.shrunkHoldEnd, opacity: 1, transform: formatTransform(shrunkScale) },
+    { offset: 1, opacity: 1, transform: formatTransform(1, true) },
+  ];
+}
+
+/**
+ * Builds the four `MotionStep` tracks that assemble `BrandAnimatedGlyphParts` starting at `startMs`, with internal
+ * durations scaled by `durationScale` (`startMs` itself is preserved as passed).
+ */
+function buildGlyphAssemblySteps(startMs: number, durationScale: number): MotionStep[] {
+  const dotRadius = BRAND_GLYPH.dot.r;
+  const dotOffsetToCenter = BRAND_GLYPH_BOX.center - BRAND_GLYPH.dot.cx;
+  const diamondOffsetToCenter = BRAND_GLYPH_BOX.center - BRAND_GLYPH_DIAMOND_SQUARE.center;
+  const diamondHalfSide = BRAND_GLYPH_DIAMOND_SQUARE.halfSide;
+
+  const formatDotTransform = (scale: number, atFinalPosition = false) => {
+    const offset = atFinalPosition ? 0 : dotOffsetToCenter;
+    return `translate(${offset}px, ${offset}px) scale(${scale})`;
+  };
+  const formatDiamondTransform = (scale: number, atFinalPosition = false) => {
+    const offset = atFinalPosition ? 0 : diamondOffsetToCenter;
+    return `translate(${offset}px, ${offset}px) rotate(45deg) scale(${scale})`;
+  };
+
+  const circleDurationMs = GLYPH_ASSEMBLY_TIMING_MS.circleDuration * durationScale;
+  return [
+    {
+      durationMs: circleDurationMs,
+      easing: STANDARD,
+      keyframes: buildSplitCircleKeyframes(formatDotTransform, MERGED_CIRCLE_RADIUS / dotRadius, 1),
+      part: "dot",
+      startMs,
+    },
+    {
+      durationMs: circleDurationMs,
+      easing: STANDARD,
+      // Match `dotRadius` while shrunk at the center so both circles look identical right as they separate.
+      keyframes: buildSplitCircleKeyframes(
+        formatDiamondTransform,
+        MERGED_CIRCLE_RADIUS / diamondHalfSide,
+        dotRadius / diamondHalfSide
+      ),
+      part: "diamond",
+      startMs,
+    },
+    {
+      cornerRadius: [diamondHalfSide, 0],
+      durationMs: GLYPH_ASSEMBLY_TIMING_MS.diamondCornersDuration * durationScale,
+      // `STANDARD` sharpens the corners smoothly across the full step (`ENTER` would finish most of it too early).
+      easing: STANDARD,
+      keyframes: [],
+      part: "diamond",
+      startMs: startMs + GLYPH_ASSEMBLY_TIMING_MS.diamondCornersDelay * durationScale,
+    },
+    {
+      durationMs: GLYPH_ASSEMBLY_TIMING_MS.barDuration * durationScale,
+      easing: ENTER,
+      keyframes: [
+        { offset: 0, opacity: 0, transform: scaleBarAlongAxis(0) },
+        { offset: 0.2, opacity: 1 },
+        { offset: 1, opacity: 1, transform: scaleBarAlongAxis(1) },
+      ],
+      part: "bar",
+      startMs: startMs + GLYPH_ASSEMBLY_TIMING_MS.barDelay * durationScale,
+    },
+  ];
+}
+
+/** Glyph assembly steps played on `BrandOpeningOverlay`. */
+export const OPENING_GLYPH_STEPS: MotionStep[] = buildGlyphAssemblySteps(0, OPENING_DURATION_SCALE);
+
+/** Milliseconds `BrandOpeningOverlay` stays fully opaque (glyph assembly + hold) before fading out. */
+export const OPENING_OPAQUE_MS = Math.round(GLYPH_ASSEMBLY_DURATION_MS * OPENING_DURATION_SCALE) + OPENING_HOLD_MS;
+
+const LETTER_COUNT = WORDMARK_LETTERS.length;
+/** Zero-based index of the dotless lowercase `i` in `"Splitz"`, paired with the diamond tittle. */
+const LETTER_I_INDEX = 3;
+
+/**
+ * Builds one combined exit-and-return step per wordmark letter (`letter-0`..`letter-5`):
+ * letters fade out right-to-left starting at `0ms`, stay hidden while the glyph plays, then rise back in left-to-right
+ * starting at `returnStartMs`.
+ */
+export function buildLetterExitAndReturnSteps(returnStartMs: number): MotionStep[] {
+  const lastLetterIndex = LETTER_COUNT - 1;
+  return Array.from({ length: LETTER_COUNT }, (_, letterIndex): MotionStep => {
+    const exitEndMs = (lastLetterIndex - letterIndex) * TAP_TIMING_MS.letterStagger + TAP_TIMING_MS.letterExit;
+    const enterStartMs = returnStartMs + letterIndex * TAP_TIMING_MS.letterStagger;
+    const durationMs = enterStartMs + TAP_TIMING_MS.letterEnter;
+    return {
+      durationMs,
+      easing: EXIT,
+      // Combine exit and return into a single keyframe list so each `<path>` runs one Web Animation per tap.
+      keyframes: [
+        { offset: 0, opacity: 1, transform: "translateY(0)" },
+        { offset: (exitEndMs - TAP_TIMING_MS.letterExit) / durationMs, opacity: 1, transform: "translateY(0)" },
+        { offset: exitEndMs / durationMs, opacity: 0, transform: "translateY(0)" },
+        { easing: ENTER, offset: enterStartMs / durationMs, opacity: 0, transform: "translateY(12px)" },
+        { offset: 1, opacity: 1, transform: "translateY(0)" },
+      ],
+      part: `letter-${letterIndex}`,
+      startMs: 0,
+    };
+  });
+}
+
+/** Timing parameters and initial scale for the diamond tittle morph at the end of `BrandTapWordmark`. */
+export interface TittleTiming {
+  /** Milliseconds before the last letter finishes settling when the circle starts popping in above the `i`. */
+  leadMs: number;
+  /** Duration (ms) for the small circle to pop in from `scale(0)` to `initialCircleScale`. */
+  popInMs: number;
+  /** Duration (ms) for the circle to expand to full size while its corners sharpen into a square. */
+  expandToSquareMs: number;
+  /** Brief pause (ms) as an unrotated square so the intermediate square state reads clearly. */
+  squareHoldMs: number;
+  /** Duration (ms) for the square to rotate 45° into the final diamond. */
+  rotateToDiamondMs: number;
+  /** Initial circle scale (`0..1`) right after popping in, where `1` is the full square size. */
+  initialCircleScale: number;
+}
+
+/** Default tittle morph timing used by `BrandTapWordmark`. */
+export const TITTLE_TIMING: TittleTiming = {
+  expandToSquareMs: 150,
+  initialCircleScale: 0.45,
+  leadMs: 110,
+  popInMs: 80,
+  rotateToDiamondMs: 260,
+  squareHoldMs: 20,
+};
+
+/** Half the side length of the unrotated `<rect>` that matches `WORDMARK_TITTLE` once rotated 45°. */
+export const TITTLE_SQUARE_HALF_SIDE = WORDMARK_TITTLE_GEOMETRY.halfDiagonal * Math.SQRT1_2;
+
+/**
+ * Builds the steps for the diamond tittle above the `i` during a wordmark tap:
+ * 1. `tittle` (`<path>`): fades out alongside `letter-3` (`i`), stays hidden during the morph, and snaps back on the
+ *    final frame when `tittle-morph` finishes in the exact same diamond pose.
+ * 2. `tittle-morph` (`<rect>`): pops in as a small circle while the last letter settles, expands into a sharp-cornered
+ *    square (`rx` animated to `0`), holds briefly, and rotates 45° into the diamond. Using `<rect>` works in every
+ *    browser without relying on SVG `<path d>` morphing.
+ */
+function buildTittleMorphSteps(letterSteps: MotionStep[], timing: TittleTiming): MotionStep[] {
+  const letterIStep = letterSteps[LETTER_I_INDEX];
+  const wordReturnEndMs = Math.max(...letterSteps.map(({ durationMs, startMs }) => startMs + durationMs));
+  const morphStartMs = wordReturnEndMs - timing.leadMs;
+  const expandStartMs = morphStartMs + timing.popInMs;
+  const rotateStartMs = expandStartMs + timing.expandToSquareMs + timing.squareHoldMs;
+  const totalDurationMs = rotateStartMs + timing.rotateToDiamondMs;
+  const morphDurationMs = totalDurationMs - morphStartMs;
+  const morphOffsetAt = (timeMs: number) => (timeMs - morphStartMs) / morphDurationMs;
 
   return [
     {
-      at: 0,
+      durationMs: totalDurationMs,
       easing: EXIT,
       keyframes: [
-        // The exit is the exit of the i, at the same times.
-        ...letter.keyframes
+        // Re-map the first three keyframes of `letter-3` so `tittle` fades out at the exact same timestamps as `i`.
+        ...letterIStep.keyframes
           .slice(0, 3)
-          .map((frame) => ({ ...frame, offset: (Number(frame.offset) * letter.ms) / total })),
+          .map((frame) => ({ ...frame, offset: (Number(frame.offset) * letterIStep.durationMs) / totalDurationMs })),
         { offset: 0.9999, opacity: 0, transform: "none" },
         { offset: 1, opacity: 1, transform: "none" },
       ],
-      ms: total,
       part: "tittle",
+      startMs: 0,
     },
     {
-      at: startAt,
+      durationMs: morphDurationMs,
       keyframes: [
         { easing: POP, offset: 0, opacity: 0, transform: "scale(0) rotate(0deg)" },
-        { easing: STANDARD, offset: offset(growAt), opacity: 1, transform: `scale(${timing.small}) rotate(0deg)` },
-        { easing: "linear", offset: offset(growAt + timing.grow), opacity: 1, transform: "scale(1) rotate(0deg)" },
-        { easing: SHEET, offset: offset(turnAt), opacity: 1, transform: "scale(1) rotate(0deg)" },
+        {
+          easing: STANDARD,
+          offset: morphOffsetAt(expandStartMs),
+          opacity: 1,
+          transform: `scale(${timing.initialCircleScale}) rotate(0deg)`,
+        },
+        {
+          easing: "linear",
+          offset: morphOffsetAt(expandStartMs + timing.expandToSquareMs),
+          opacity: 1,
+          transform: "scale(1) rotate(0deg)",
+        },
+        { easing: SHEET, offset: morphOffsetAt(rotateStartMs), opacity: 1, transform: "scale(1) rotate(0deg)" },
         { offset: 1, opacity: 1, transform: "scale(1) rotate(45deg)" },
       ],
-      ms: shapeMs,
-      part: "tittle-shape",
+      part: "tittle-morph",
+      startMs: morphStartMs,
     },
     {
-      at: growAt,
+      cornerRadius: [TITTLE_SQUARE_HALF_SIDE, 0],
+      durationMs: timing.expandToSquareMs,
       easing: STANDARD,
       keyframes: [],
-      ms: timing.grow,
-      part: "tittle-shape",
-      rx: [TITTLE_HALF_SIDE, 0],
+      part: "tittle-morph",
+      startMs: expandStartMs,
     },
   ];
 }
 
 /**
- * Returns the steps of a tap: the letters leave, the small motion plays, the mark leaves, the letters come back, and the
- * diamond forms on the i.
+ * Builds the full `BrandTapWordmark` sequence:
+ * letters fade out right-to-left → glyph assembles, holds, and shrinks out → letters rise back in left-to-right →
+ * diamond tittle morphs from a circle into a 45° rotated square above the `i`.
  */
-export function tapSteps(timing: TittleTiming = TITTLE_TIMING): MotionStep[] {
-  // The small motion starts when the last letter is gone, so the word and the mark never overlap.
-  const start = (LETTER_COUNT - 1) * TAP.stagger + TAP.letterOut;
-  const leaveAt = start + Math.round(MARK_MS * TAP_FACTOR) + TAP.markHold;
-  const leaveEnd = leaveAt + TAP.markOut;
-  const letters = letterSteps(leaveAt + TAP.wordBackGap).filter(({ part }) => part !== "tittle");
+export function buildWordmarkTapSteps(timing: TittleTiming = TITTLE_TIMING): MotionStep[] {
+  // Start glyph assembly only after the leftmost letter (`S`) has finished fading out so wordmark and glyph never overlap.
+  const glyphStartMs = (LETTER_COUNT - 1) * TAP_TIMING_MS.letterStagger + TAP_TIMING_MS.letterExit;
+  const glyphExitStartMs =
+    glyphStartMs + Math.round(GLYPH_ASSEMBLY_DURATION_MS * TAP_DURATION_SCALE) + TAP_TIMING_MS.glyphHold;
+  const glyphExitEndMs = glyphExitStartMs + TAP_TIMING_MS.glyphExit;
+  const letterSteps = buildLetterExitAndReturnSteps(glyphExitEndMs);
+
   return [
-    ...letters,
-    ...tittleSteps(letters, timing),
-    ...markSteps(start, TAP_FACTOR),
+    ...letterSteps,
+    ...buildTittleMorphSteps(letterSteps, timing),
+    ...buildGlyphAssemblySteps(glyphStartMs, TAP_DURATION_SCALE),
     {
-      at: 0,
+      durationMs: glyphExitEndMs,
       easing: EXIT,
       keyframes: [
         { offset: 0, opacity: 0, transform: "scale(1)" },
-        { offset: (start - 1) / leaveEnd, opacity: 0, transform: "scale(1)" },
-        { offset: start / leaveEnd, opacity: 1, transform: "scale(1)" },
-        { offset: leaveAt / leaveEnd, opacity: 1, transform: "scale(1)" },
+        { offset: (glyphStartMs - 1) / glyphExitEndMs, opacity: 0, transform: "scale(1)" },
+        { offset: glyphStartMs / glyphExitEndMs, opacity: 1, transform: "scale(1)" },
+        { offset: glyphExitStartMs / glyphExitEndMs, opacity: 1, transform: "scale(1)" },
         { offset: 1, opacity: 0, transform: "scale(0.8)" },
       ],
-      ms: leaveEnd,
-      part: "mark",
+      part: "glyph",
+      startMs: 0,
     },
   ];
 }
 
-/** The steps of a tap on the word mark. */
-export const TAP_STEPS: MotionStep[] = tapSteps();
-
-/** The time that the glyph at rest takes to leave after a tap on the glyph alone. */
-const REST_OUT_MS = 120;
-/** How long the mark and the whole word stay together, so a person can read the word. */
-const WORD_HOLD_MS = 800;
+/** Pre-built steps for `BrandTapWordmark` using `TITTLE_TIMING`. */
+export const WORDMARK_TAP_STEPS: MotionStep[] = buildWordmarkTapSteps();
 
 /**
- * Returns the steps of each letter for a visit: the letters come in from left to right, stay, and leave from right to
- * left. The first letter starts at `inAt`.
+ * Builds temporary reveal-and-exit steps for the wordmark letters and tittle in `BrandTapGlyph`:
+ * letters rise in left-to-right starting at `enterStartMs`, stay readable for `TAP_TIMING_MS.wordReadHold`, and fade
+ * out right-to-left.
  */
-export function letterVisitSteps(inAt: number): MotionStep[] {
-  const last = LETTER_COUNT - 1;
-  const leaveAt = inAt + last * TAP.stagger + TAP.letterIn + WORD_HOLD_MS;
-  const steps = Array.from({ length: LETTER_COUNT }, (_, letter): MotionStep => {
-    const at = inAt + letter * TAP.stagger;
-    const outAt = leaveAt + (last - letter) * TAP.stagger;
-    const ms = outAt + TAP.letterOut - at;
+export function buildWordmarkRevealAndExitSteps(enterStartMs: number): MotionStep[] {
+  const lastLetterIndex = LETTER_COUNT - 1;
+  const exitWaveStartMs =
+    enterStartMs +
+    lastLetterIndex * TAP_TIMING_MS.letterStagger +
+    TAP_TIMING_MS.letterEnter +
+    TAP_TIMING_MS.wordReadHold;
+  const letterSteps = Array.from({ length: LETTER_COUNT }, (_, letterIndex): MotionStep => {
+    const startMs = enterStartMs + letterIndex * TAP_TIMING_MS.letterStagger;
+    const letterExitStartMs = exitWaveStartMs + (lastLetterIndex - letterIndex) * TAP_TIMING_MS.letterStagger;
+    const durationMs = letterExitStartMs + TAP_TIMING_MS.letterExit - startMs;
     return {
-      at,
+      durationMs,
       easing: ENTER,
-      // One element runs one animation here, so the entry and the exit are in one list.
+      // Combine entrance, hold, and exit into one keyframe list per letter.
       keyframes: [
         { offset: 0, opacity: 0, transform: "translateY(12px)" },
-        { offset: TAP.letterIn / ms, opacity: 1, transform: "translateY(0)" },
-        { easing: EXIT, offset: (outAt - at) / ms, opacity: 1, transform: "translateY(0)" },
+        { offset: TAP_TIMING_MS.letterEnter / durationMs, opacity: 1, transform: "translateY(0)" },
+        { easing: EXIT, offset: (letterExitStartMs - startMs) / durationMs, opacity: 1, transform: "translateY(0)" },
         { offset: 1, opacity: 0, transform: "translateY(0)" },
       ],
-      ms,
-      part: `letter-${letter}`,
+      part: `letter-${letterIndex}`,
+      startMs,
     };
   });
-  return [...steps, { ...steps[LETTER_I], part: "tittle" }];
+  return [...letterSteps, { ...letterSteps[LETTER_I_INDEX], part: "tittle" }];
 }
 
 /**
- * The steps of a tap on the glyph alone: the glyph at rest leaves, the small motion plays, the whole word comes in next
- * to the mark, and the word leaves again. The motion ends on the shapes of the glyph, so the swap back to the glyph at
- * rest does not show.
+ * Full tap sequence for `BrandTapGlyph`:
+ * resting glyph shrinks out → animated glyph parts assemble in its place → wordmark reveals beside the glyph, holds,
+ * and fades away. Because the animated glyph parts finish on the exact geometry of `BRAND_GLYPH`, cancelling the
+ * animations at the end restores `resting-glyph` without a visible jump.
  */
-export const MARK_TAP_STEPS: MotionStep[] = [
+export const GLYPH_TAP_STEPS: MotionStep[] = [
   {
-    at: 0,
+    durationMs: TAP_TIMING_MS.glyphExit,
     easing: EXIT,
     keyframes: [
       { offset: 0, opacity: 1, transform: "scale(1)" },
       { offset: 1, opacity: 0, transform: "scale(0.8)" },
     ],
-    ms: REST_OUT_MS,
-    part: "rest",
+    part: "resting-glyph",
+    startMs: 0,
   },
-  ...markSteps(REST_OUT_MS, TAP_FACTOR),
-  ...letterVisitSteps(REST_OUT_MS + Math.round(MARK_MS * TAP_FACTOR)),
+  ...buildGlyphAssemblySteps(TAP_TIMING_MS.glyphExit, TAP_DURATION_SCALE),
+  ...buildWordmarkRevealAndExitSteps(
+    TAP_TIMING_MS.glyphExit + Math.round(GLYPH_ASSEMBLY_DURATION_MS * TAP_DURATION_SCALE)
+  ),
 ];
 
 /**
- * Moves the corner radius of a `<rect>` with the progress of an empty animation. Safari cannot animate `rx` or the `d`
- * of a path with CSS, and this works in all browsers. The empty animation keeps the delay, the speed and the cancel in
- * one place with the other steps.
+ * Drives an SVG `<rect>`'s `rx` attribute on each animation frame using the progress of an empty Web Animation.
+ * Safari does not animate SVG `rx` via CSS or WAAPI keyframes, whereas reading `getComputedTiming().progress` works
+ * across all browsers while keeping delay, easing, speed scaling, and cancellation unified with the other animations.
  */
-function driveRadius(element: Element, clock: Animation, [from, to]: [number, number]): void {
-  const tick = (): void => {
-    if (clock.playState === "idle") return;
-    const progress = clock.effect?.getComputedTiming().progress ?? 0;
-    element.setAttribute("rx", String(from + (to - from) * progress));
-    if (clock.playState !== "finished") requestAnimationFrame(tick);
+function animateRectCornerRadius(
+  element: Element,
+  timingAnimation: Animation,
+  [fromRadius, toRadius]: [number, number]
+): void {
+  const updateRadiusOnFrame = (): void => {
+    if (timingAnimation.playState === "idle") return;
+    const progress = timingAnimation.effect?.getComputedTiming().progress ?? 0;
+    element.setAttribute("rx", String(fromRadius + (toRadius - fromRadius) * progress));
+    if (timingAnimation.playState !== "finished") requestAnimationFrame(updateRadiusOnFrame);
   };
-  tick();
+  updateRadiusOnFrame();
 }
 
 /**
- * Plays steps on the parts inside `root`. Each animation keeps its first frame before its delay and its last frame until
- * `cancelWhenDone` cancels it. The attributes of the elements then hold the rest state again.
- * @param slow - The factor on all times. See `motionSlow`.
+ * Starts Web Animations for `steps` on matching `[data-part]` descendants inside `root`.
+ *
+ * Uses `fill: "both"` so each element holds its initial frame during `delay` and its final frame until
+ * `cancelAnimationsWhenFinished` cancels all tracks together, returning elements to their resting SVG attributes.
+ * @param durationScale - Multiplier applied to every `startMs` and `durationMs` (see `motionSlow`).
  */
-export function playSteps(root: Element, steps: MotionStep[], slow: number): Animation[] {
-  return steps.flatMap(({ at, easing = "linear", keyframes, ms, part, rx }) =>
+export function playMotionSteps(root: Element, steps: MotionStep[], durationScale: number): Animation[] {
+  return steps.flatMap(({ cornerRadius, durationMs, easing = "linear", keyframes, part, startMs }) =>
     [...root.querySelectorAll(`[data-part="${part}"]`)].map((element) => {
-      const timing = { delay: at * slow, duration: ms * slow, fill: "both" as const };
-      if (rx) {
-        const clock = element.animate([], { ...timing, easing });
-        driveRadius(element, clock, rx);
-        return clock;
+      const timing = {
+        delay: startMs * durationScale,
+        duration: durationMs * durationScale,
+        fill: "both" as const,
+      };
+      if (cornerRadius) {
+        const timingAnimation = element.animate([], { ...timing, easing });
+        animateRectCornerRadius(element, timingAnimation, cornerRadius);
+        return timingAnimation;
       }
-      // The curve goes on each keyframe. On the options, it would stretch over the whole step and move its holds.
+      // Attach `easing` to each individual keyframe instead of `timing`: top-level WAAPI `easing` warps progress
+      // across the entire animation and shifts intermediate hold offsets.
       return element.animate(
         keyframes.map((keyframe) => ({ easing, ...keyframe })),
         timing
@@ -380,23 +463,24 @@ export function playSteps(root: Element, steps: MotionStep[], slow: number): Ani
   );
 }
 
-/** Cancels all animations when the last one has ended. A cancel before the end also ends the wait. */
-export async function cancelWhenDone(animations: Animation[]): Promise<void> {
+/** Waits until every animation finishes (or is cancelled early), then cancels all of them to release `fill: "both"`. */
+export async function cancelAnimationsWhenFinished(animations: Animation[]): Promise<void> {
   await Promise.allSettled(animations.map(({ finished }) => finished));
   animations.forEach((animation) => {
     animation.cancel();
   });
 }
 
-/** True after this run of the app has claimed the opening. A new run of the JavaScript starts at false. */
-let openingClaimed = false;
+/** Tracks whether the cold-start opening overlay has already played during the current JavaScript runtime. */
+let hasPlayedOpening = false;
 
 /**
- * Returns true one time for each run of the app. So the opening plays after a cold start, and it does not play when a
- * person comes back from another page or from another app. This flag is in memory, so it needs no storage.
+ * Claims the single cold-start opening play for the current app session.
+ * Returns `true` on the first call after page load and `false` on subsequent route navigations while the SPA stays
+ * in memory.
  */
-export function claimOpening(): boolean {
-  if (openingClaimed) return false;
-  openingClaimed = true;
+export function claimOpeningPlay(): boolean {
+  if (hasPlayedOpening) return false;
+  hasPlayedOpening = true;
   return true;
 }

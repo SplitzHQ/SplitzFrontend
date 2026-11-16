@@ -1,37 +1,43 @@
-/** The place of one segment inside the scrolling content, in pixels. */
+/** Horizontal position and width of a segment inside the scrollable content, in pixels. */
 export interface SegmentBox {
   left: number;
   width: number;
 }
 
-/** The space between the revealed items and the edge of the track, in pixels. */
+/** Minimum padding to keep between the revealed segments and the viewport edge, in pixels. */
 const FOLLOW_INSET = 8;
 
 /**
- * Returns the scroll position that shows the selected segment and the segment on each side of it.
+ * Calculates the horizontal scroll offset (`scrollLeft`) needed to keep the selected segment
+ * and its immediate neighbors in view.
  *
- * The position changes as little as possible, and it does not change when these segments are already visible. When the
- * three segments do not fit, the selected segment goes to the middle. The result stays inside the scroll range.
+ * Scrolls only when those segments are partially hidden. If all three are wider than the viewport,
+ * centers the selected segment instead. The returned offset is clamped to the valid scroll range.
  */
-export function followLeft(
+export function calculateRevealScrollLeft(
   boxes: readonly SegmentBox[],
   index: number,
   scrollLeft: number,
   viewport: number,
   contentWidth: number
 ): number {
-  const box = boxes[index];
-  if (!box) return scrollLeft;
+  const selectedBox = boxes[index];
+  if (!selectedBox) return scrollLeft;
 
-  const before = boxes[index - 1];
-  const after = boxes[index + 1];
-  const start = (before ? before.left : 0) - FOLLOW_INSET;
-  const end = (after ? after.left + after.width : contentWidth) + FOLLOW_INSET;
+  const prevBox = boxes[index - 1];
+  const nextBox = boxes[index + 1];
+  const revealStart = (prevBox ? prevBox.left : 0) - FOLLOW_INSET;
+  const revealEnd = (nextBox ? nextBox.left + nextBox.width : contentWidth) + FOLLOW_INSET;
 
-  let target = scrollLeft;
-  if (end - start > viewport) target = box.left + box.width / 2 - viewport / 2;
-  else if (end - scrollLeft > viewport) target = end - viewport;
-  else if (start < scrollLeft) target = start;
+  let targetScrollLeft = scrollLeft;
+  if (revealEnd - revealStart > viewport) {
+    targetScrollLeft = selectedBox.left + selectedBox.width / 2 - viewport / 2;
+  } else if (revealEnd - scrollLeft > viewport) {
+    targetScrollLeft = revealEnd - viewport;
+  } else if (revealStart < scrollLeft) {
+    targetScrollLeft = revealStart;
+  }
 
-  return Math.min(Math.max(target, 0), Math.max(contentWidth - viewport, 0));
+  const maxScrollLeft = Math.max(contentWidth - viewport, 0);
+  return Math.min(Math.max(targetScrollLeft, 0), maxScrollLeft);
 }

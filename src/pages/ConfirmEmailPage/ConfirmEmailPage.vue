@@ -83,7 +83,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
 </script>
 
 <template>
-  <AuthShell status :title="$t(copy.title)" :subtitle="$t(copy.body)">
+  <AuthShell is-result-page :title="$t(copy.title)" :subtitle="$t(copy.body)">
     <template #icon>
       <AuthStatusIcon v-if="state === 'loading'" tone="brand">
         <PhCircleNotch class="animate-spin" />
@@ -99,40 +99,39 @@ function getSingleQueryValue(value: unknown): string | undefined {
       </AuthStatusIcon>
     </template>
 
-    <template v-if="state === 'rateLimited'" #default>
-      <RateLimitCountdown
-        class="px-3.25"
-        :seconds="confirmationCooldown.remainingSeconds.value"
-        message-key="auth-rate-limit-countdown"
-        data-test="confirmation-rate-limit"
-      />
-    </template>
+    <div v-if="state !== 'loading'" class="flex flex-1 flex-col gap-6">
+      <div v-if="state === 'rateLimited'" class="flex flex-col gap-4">
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="confirmationCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="confirmation-rate-limit"
+        />
+      </div>
 
-    <template v-if="state === 'success'" #actions>
-      <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
-        {{ $t("auth-confirm-email-login-link") }}
-      </SLinkButton>
-    </template>
+      <div class="mt-auto flex flex-col gap-3">
+        <SLinkButton v-if="state === 'success'" variant="primary" size="xl" class="w-full" href="/login">
+          {{ $t("auth-confirm-email-login-link") }}
+        </SLinkButton>
 
-    <template v-else-if="state === 'rateLimited'" #actions>
-      <SButton
-        variant="primary"
-        size="xl"
-        class="w-full"
-        :disabled="confirmationCooldown.isActive.value"
-        :loading="requestPending"
-        data-test="confirmation-retry"
-        @click="confirmEmail"
-      >
-        {{ $t("auth-confirm-email-retry") }}
-      </SButton>
-    </template>
+        <SButton
+          v-else-if="state === 'rateLimited'"
+          variant="primary"
+          size="xl"
+          class="w-full"
+          :disabled="confirmationCooldown.isActive.value"
+          :loading="requestPending"
+          data-test="confirmation-retry"
+          @click="confirmEmail"
+        >
+          {{ $t("auth-confirm-email-retry") }}
+        </SButton>
 
-    <template v-else-if="state === 'invalid' || state === 'error'" #actions>
-      <SLinkButton variant="primary" size="xl" class="w-full" href="/login" data-test="confirmation-resend">
-        {{ $t("auth-confirm-email-resend-link") }}
-      </SLinkButton>
-    </template>
+        <SLinkButton v-else variant="primary" size="xl" class="w-full" href="/login" data-test="confirmation-resend">
+          {{ $t("auth-confirm-email-resend-link") }}
+        </SLinkButton>
+      </div>
+    </div>
 
     <template v-if="state === 'invalid' || state === 'error'" #footer>
       <RouterLink :to="{ name: 'register' }" class="text-base-text-brand hover:text-base-text-brand_hover">

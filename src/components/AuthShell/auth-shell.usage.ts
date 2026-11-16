@@ -24,7 +24,7 @@ export const WHEN_TO_USE: UsageRule[] = [
 /** The cases with another component. */
 export const NOT_AN_AUTH_SHELL: UseInsteadRule[] = [
   { use: "Layout", when: "The page is for a signed-in user, for example two-factor setup." },
-  { use: "BrandTapMark", when: "The page must show the logo. AuthShell already shows it." },
+  { use: "BrandTapGlyph", when: "The page must show the logo. AuthShell already shows it." },
   { use: "StatusBadge", when: "A signed-in page shows one result, for example JoinGroupPage." },
 ];
 
@@ -40,23 +40,23 @@ export const PART_RULES: UsageRule[] = [
     title: "Highlight",
   },
   {
-    rule: "Set `status` on a page that shows a result and has no form. It hides the logo, because the icon takes its place.",
-    title: "Status",
+    rule: "Set `isResultPage` on a page that shows a result and has no form. It hides the logo, because the icon takes its place.",
+    title: "Result page",
   },
   {
-    rule: "Put one `AuthStatusIcon` in this slot. Only a status page uses this slot.",
+    rule: "Put one `AuthStatusIcon` in this slot. Only a result page uses this slot.",
     title: "Icon",
   },
   {
-    rule: "Put the fields and their messages in the default slot, in this order: fields, rate limit, Notice. The text of a rate limit uses `px-3.25`.",
+    rule: "Put the whole content area in the default slot, including the form or status content and its actions. The page owns the markup and layout. Put fields and their messages in this order: fields, rate limit, Notice. The text of a rate limit uses `px-3.25`.",
     title: "Default slot",
   },
   {
-    rule: "Put the main button first, then the row of links that belong to the action. Each page with an action has one main button here. A status page also has one, unless it is waiting for a result.",
+    rule: "Put the actions inside the default slot. Put the main button first, then the row of links that belong to the action. Each page with an action has one main button. A status page also has one, unless it is waiting for a result.",
     title: "Actions",
   },
   {
-    rule: "Handle `submit` on a page with a form. AuthShell then makes the default slot and the actions one form, so the Return key submits it. The main button has `type` submit.",
+    rule: "Put a form with `@submit.prevent` in the default slot on a page with a form. Include the fields and the main button in it, so the Return key submits it. The main button has `type` submit. AuthShell does not create a form or handle submission.",
     title: "Submit",
   },
   {
@@ -72,7 +72,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "One content line",
   },
   {
-    rule: "Distance makes the groups. The gap in a group is small. The gap between the title and the content is the largest, and the gap between the content and the actions is between the two. AuthShell sets these gaps. Do not add a gap that makes two groups look like one.",
+    rule: "Distance makes the groups. AuthShell sets the gap between the title and the content. In the default slot, use `flex flex-1 flex-col gap-6` for the form or content area, `flex flex-col gap-4` for fields and messages, and `mt-auto flex flex-col gap-3` for actions. Do not add a gap that makes two groups look like one.",
     title: "Groups",
   },
   {

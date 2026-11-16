@@ -63,7 +63,7 @@ async function handleForgotPassword() {
 <template>
   <AuthShell
     v-if="state === 'submitted'"
-    status
+    is-result-page
     :title="$t('auth-forgot-password-success-title')"
     :subtitle="$t('auth-forgot-password-success-body', { email })"
     :highlight="email"
@@ -74,67 +74,65 @@ async function handleForgotPassword() {
       </AuthStatusIcon>
     </template>
 
-    <template #actions>
+    <div class="mt-auto flex flex-col gap-3">
       <SLinkButton variant="primary" size="xl" class="w-full" href="/login">
         {{ $t("auth-forgot-password-login-link") }}
       </SLinkButton>
-    </template>
+    </div>
   </AuthShell>
 
-  <AuthShell
-    v-else
-    :title="$t('auth-forgot-password-title')"
-    :subtitle="$t('auth-forgot-password-body')"
-    @submit="handleForgotPassword"
-  >
-    <TextInput
-      id="forgot-password-email"
-      v-model="email"
-      name="email"
-      type="email"
-      autocomplete="email"
-      inputmode="email"
-      required
-      :disabled="inputDisabled"
-      :invalid="errorMessageKey !== null"
-      :described-by="errorMessageKey ? 'forgot-password-error' : undefined"
-      :label="$t('auth-email-label')"
-      :placeholder="$t('auth-email-placeholder')"
-    />
+  <AuthShell v-else :title="$t('auth-forgot-password-title')" :subtitle="$t('auth-forgot-password-body')">
+    <form class="flex flex-1 flex-col gap-6" @submit.prevent="handleForgotPassword">
+      <div class="flex flex-col gap-4">
+        <TextInput
+          id="forgot-password-email"
+          v-model="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          :disabled="inputDisabled"
+          :invalid="errorMessageKey !== null"
+          :described-by="errorMessageKey ? 'forgot-password-error' : undefined"
+          :label="$t('auth-email-label')"
+          :placeholder="$t('auth-email-placeholder')"
+        />
 
-    <Notice
-      v-if="state === 'unavailable'"
-      tone="warning"
-      :title="$t('auth-forgot-password-unavailable-title')"
-      announce
-    >
-      <p>{{ $t("auth-forgot-password-unavailable-body") }}</p>
-    </Notice>
+        <Notice
+          v-if="state === 'unavailable'"
+          tone="warning"
+          :title="$t('auth-forgot-password-unavailable-title')"
+          announce
+        >
+          <p>{{ $t("auth-forgot-password-unavailable-body") }}</p>
+        </Notice>
 
-    <Notice v-if="errorMessageKey" id="forgot-password-error" tone="error" announce>
-      <p>{{ $t(errorMessageKey) }}</p>
-    </Notice>
+        <Notice v-if="errorMessageKey" id="forgot-password-error" tone="error" announce>
+          <p>{{ $t(errorMessageKey) }}</p>
+        </Notice>
 
-    <RateLimitCountdown
-      class="px-3.25"
-      :seconds="recoveryCooldown.remainingSeconds.value"
-      message-key="auth-rate-limit-countdown"
-      data-test="recovery-rate-limit"
-    />
-
-    <template #actions>
-      <SButton
-        type="submit"
-        variant="primary"
-        size="xl"
-        :disabled="submitDisabled"
-        :loading="loading"
-        class="w-full"
-        data-test="forgot-password-submit"
-      >
-        {{ $t("auth-forgot-password-action") }}
-      </SButton>
-    </template>
+        <RateLimitCountdown
+          class="px-3.25"
+          :seconds="recoveryCooldown.remainingSeconds.value"
+          message-key="auth-rate-limit-countdown"
+          data-test="recovery-rate-limit"
+        />
+      </div>
+      <div class="mt-auto flex flex-col gap-3">
+        <SButton
+          type="submit"
+          variant="primary"
+          size="xl"
+          :disabled="submitDisabled"
+          :loading="loading"
+          class="w-full"
+          data-test="forgot-password-submit"
+        >
+          {{ $t("auth-forgot-password-action") }}
+        </SButton>
+      </div>
+    </form>
 
     <template #footer>
       <RouterLink :to="{ name: 'login' }" class="text-base-text-brand hover:text-base-text-brand_hover">

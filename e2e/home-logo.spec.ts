@@ -2,15 +2,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * The logo of HomePage: the full-screen opening and the small motion after a tap. The API is mocked, so the test needs
- * no backend and no account.
+ * E2E tests for the `HomePage` brand elements (`BrandOpeningOverlay` and `BrandTapWordmark`).
+ * API requests are mocked so these tests run without a backend or user account.
  */
 test.use({ hasTouch: true, viewport: { height: 812, width: 375 } });
 
 const ME = { id: "me", photo: null, userName: "Ada" };
 
 const OPENING = '[data-test="brand-opening"]';
-const LOGO = '[data-test="brand-tap-logo"]';
+const LOGO = '[data-test="brand-tap-wordmark"]';
 
 async function mockSignedIn(page: Page) {
   await page.addInitScript(() => localStorage.setItem("accessToken", "test-token"));
@@ -47,7 +47,7 @@ test.describe("home logo", () => {
     await expect(page.getByRole("img", { name: "Splitz" })).toBeVisible();
   });
 
-  test("plays the small motion after a tap, and comes back to the word", async ({ page }) => {
+  test("plays the tap animation and returns to the wordmark", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(OPENING)).toHaveCount(0, { timeout: 5000 });
     expect(await logoAnimations(page)).toBe(0);
@@ -56,7 +56,7 @@ test.describe("home logo", () => {
     expect(await logoAnimations(page)).toBeGreaterThan(0);
 
     await expect.poll(() => logoAnimations(page), { timeout: 5000 }).toBe(0);
-    await expect(page.locator(`${LOGO} [data-part="mark"]`)).toHaveAttribute("opacity", "0");
+    await expect(page.locator(`${LOGO} [data-part="glyph"]`)).toHaveAttribute("opacity", "0");
   });
 
   test("shows no opening and no motion under reduced motion", async ({ page }) => {

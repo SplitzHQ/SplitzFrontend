@@ -23,11 +23,19 @@
 
 - Use flex gap (preferred) / grid gap instead of margin for spacing between elements.
 
-- Add animations where appropriate. Check `ui-animation` skill.
+- Add animations where appropriate. Check `ui-animation` skill. Prefer to use `motion-v` package if it make code simpler.
 
 - Run format and test after code changes.
 
 - When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.
+
+## Testing rules
+
+- Do not add test that check on a specific implementation detail. Focus on testing the behavior and output of the code instead.
+
+- Do not rely on implementation details that may change frequently, such as private methods or internal state.
+
+- Do not check a css class or style in tests.
 
 ## Devtools rules
 

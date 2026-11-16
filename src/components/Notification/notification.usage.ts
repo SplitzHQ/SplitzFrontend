@@ -1,6 +1,6 @@
 /**
- * The usage rules of the Notification family: NotificationBell, NotificationPanel, NotificationSheet, NotificationItem,
- * NotificationBadge, AvatarMenu and RequestCard. This file is the one place for these rules.
+ * The usage rules of the Notification family: NotificationBell, NotificationPanel, NotificationSheet, NotificationList,
+ * NotificationItem, NotificationBadge, AvatarMenu and RequestCard. This file is the one place for these rules.
  * The design-system Notification page renders them, and agents read them through the `spz-component-use` skill.
  * The app does not import this file, so the rules do not go into the app bundle.
  */
@@ -11,12 +11,13 @@ export type NotificationPart =
   | "NotificationBell"
   | "NotificationPanel"
   | "NotificationSheet"
+  | "NotificationList"
   | "NotificationItem"
   | "NotificationBadge"
   | "AvatarMenu"
   | "RequestCard";
 
-/** The states of the list in NotificationPanel. */
+/** The states of NotificationList. */
 export type NotificationPanelState = "loading" | "error" | "empty" | "list";
 
 /** Where the rules apply. */
@@ -48,12 +49,16 @@ export const PARTS: Record<NotificationPart, UsageRule> = {
     rule: "One row of activity. A tap marks it as read and opens its page. It shows the picture from the notification, or an icon tile.",
     title: "NotificationItem",
   },
+  NotificationList: {
+    rule: "The activity rows with the loading, error and empty states. It has no header. Only NotificationPanel and NotificationSheet use it. It reads the store.",
+    title: "NotificationList",
+  },
   NotificationPanel: {
-    rule: "The activity list with its title and its actions. It reads the store. Set `inSheet` only in NotificationSheet.",
+    rule: "NotificationList in the popover of NotificationBell on a desktop, with the desktop header. It reads the store.",
     title: "NotificationPanel",
   },
   NotificationSheet: {
-    rule: "NotificationPanel in a sheet on a phone, with Clear all and Mark all read at the bottom. It reads the store.",
+    rule: "NotificationList in a sheet on a phone, with the phone header, the second sheet and Clear all and Mark all read at the bottom. It reads the store.",
     title: "NotificationSheet",
   },
   RequestCard: {
@@ -96,14 +101,14 @@ export const PLACEMENT_RULES: UsageRule[] = [
   },
 ];
 
-/** What the panel shows in each state. A Record makes the type check fail when a new state has no rule. */
+/** What NotificationList shows in each state. A Record makes the type check fail when a new state has no rule. */
 export const PANEL_STATES: Record<NotificationPanelState, UsageRule> = {
   empty: {
     rule: "The request finished and the list has no rows. The empty message shows.",
     title: "Empty",
   },
   error: {
-    rule: "The request failed and the list has no rows. The message and a Retry button show. A screen reader reads the message. When a later request fails, the old rows stay and the panel shows no error.",
+    rule: "The request failed and the list has no rows. The message and a Retry button show. A screen reader reads the message. When a later request fails, the old rows stay and the list shows no error.",
     title: "Error",
   },
   list: {
@@ -116,7 +121,7 @@ export const PANEL_STATES: Record<NotificationPanelState, UsageRule> = {
   },
 };
 
-/** Where the actions of the panel go. The user chose this layout in a prototype. */
+/** Where the actions of NotificationPanel and NotificationSheet go. The user chose this layout in a prototype. */
 export const HEADER_RULES: UsageRule[] = [
   {
     rule: "The header has the title, Mark all read, Clear all and the settings icon in one row. A popover has no close button, so the row has space for them.",
