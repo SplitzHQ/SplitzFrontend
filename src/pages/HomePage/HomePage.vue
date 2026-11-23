@@ -18,7 +18,7 @@ import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { formatCurrency } from "@/libs/format-currency";
 import { useStatusBarTopColor } from "@/libs/status-bar-color";
-import { CONTENT_FADE_IN, useLoadFeedback } from "@/libs/use-load-feedback";
+import { useLoadFeedback } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
@@ -172,7 +172,11 @@ const userBalances = computed(() => {
 
         <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
         <div ref="content" tabindex="-1" class="outline-none">
-          <Transition v-bind="CONTENT_FADE_IN">
+          <Transition
+            enter-active-class="transition-opacity duration-state ease-enter"
+            enter-from-class="opacity-0"
+            leave-active-class="hidden"
+          >
             <div v-if="hasGroups" class="flex flex-col gap-1 pt-3 pb-4">
               <Transition
                 enter-active-class="transition-opacity duration-state ease-enter"
@@ -283,7 +287,6 @@ const userBalances = computed(() => {
               </div>
             </div>
 
-            <!-- Transition needs one root element, and HomeEmptyState has two. -->
             <div v-else-if="showEmptyState">
               <HomeEmptyState @add-expense="addExpense" @create-group="createGroup" />
             </div>

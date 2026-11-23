@@ -21,13 +21,15 @@ const PENDING: QueryState = { data: undefined, status: "pending" };
 
 /** Makes the parts of a query result that the page reads. */
 function makeRequest() {
-  return { asyncStatus: shallowRef("idle"), refetch: vi.fn(() => Promise.resolve()), state: ref(PENDING) };
+  return { asyncStatus: shallowRef("idle"), state: ref(PENDING) };
 }
 
 const requests: Record<string, ReturnType<typeof makeRequest>> = vi.hoisted(() => ({}));
+const invalidateQueries = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 
 vi.mock("@pinia/colada", () => ({
   useQuery: ({ key }: { key: () => string[] }) => requests[key()[0] ?? ""],
+  useQueryCache: () => ({ invalidateQueries }),
 }));
 
 vi.mock("fluent-vue", () => ({
@@ -69,6 +71,7 @@ function mountPage() {
 describe("GroupDetailPage load states", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    invalidateQueries.mockClear();
     requests.getGroup = makeRequest();
     requests.getGroupTransactions = makeRequest();
     requests.getGroupInvoices = makeRequest();
@@ -110,15 +113,15 @@ describe("GroupDetailPage load states", () => {
     expect(wrapper.find("balance-card-stub").exists()).toBe(true);
   });
 
-  it("requests again only what failed", async () => {
-    setStates(SUCCESS_GROUP, FAILED, SUCCESS_LIST);
+  it("retries only the current group's failed queries that have no cached data", async () => {
+    setStates(FAILED, FAILED, { data: SUCCESS_LIST.data, status: "error" });
     const wrapper = mountPage();
 
     await wrapper.get(`${LOAD_ERROR} button`).trigger("click");
 
-    expect(requests.getGroupTransactions.refetch).toHaveBeenCalledOnce();
-    expect(requests.getGroup.refetch).not.toHaveBeenCalled();
-    expect(requests.getGroupInvoices.refetch).not.toHaveBeenCalled();
+    expect(invalidateQueries).toHaveBeenCalledTimes(2);
+    expect(invalidateQueries).toHaveBeenCalledWith({ exact: true, key: ["getGroup", "group-1"] });
+    expect(invalidateQueries).toHaveBeenCalledWith({ exact: true, key: ["getGroupTransactions", "group-1"] });
   });
 
   it("keeps the notice and shows the loading button during a retry", async () => {

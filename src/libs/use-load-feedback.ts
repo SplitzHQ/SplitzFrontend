@@ -1,14 +1,4 @@
-import {
-  nextTick,
-  onMounted,
-  shallowRef,
-  toValue,
-  watch,
-  type MaybeRefOrGetter,
-  type Ref,
-  type ShallowRef,
-  type TransitionProps,
-} from "vue";
+import { nextTick, onMounted, shallowRef, toValue, watch, type MaybeRefOrGetter, type Ref, type ShallowRef } from "vue";
 
 /**
  * Screen-reader feedback, focus recovery, and content transitions for pages that load data asynchronously.
@@ -58,16 +48,6 @@ export interface UseLoadFeedbackReturn {
    */
   retry: (refetch: () => Promise<unknown>) => Promise<void>;
 }
-
-/**
- * `<Transition>` props for swapping loading skeletons and page content.
- * Hides the outgoing element immediately so the incoming content can fade in without layout overlap.
- */
-export const CONTENT_FADE_IN = {
-  enterActiveClass: "transition-opacity duration-state ease-enter",
-  enterFromClass: "opacity-0",
-  leaveActiveClass: "hidden",
-} as const satisfies TransitionProps;
 
 /**
  * Manages screen-reader status announcements and retry focus recovery for a page that loads data.

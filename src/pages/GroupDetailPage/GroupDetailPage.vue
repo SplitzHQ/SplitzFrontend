@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhGearSix, PhPlus } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
+import { useQuery, useQueryCache } from "@pinia/colada";
 import { useFluent } from "fluent-vue";
 import { computed, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -15,7 +15,7 @@ import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import SSegmentControl from "@/components/SSegmentControl/SSegmentControl.vue";
 import { getGroupAvatarImages } from "@/libs/group-avatar";
-import { CONTENT_FADE_IN, useLoadFeedback, type LoadPhase } from "@/libs/use-load-feedback";
+import { useLoadFeedback } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
@@ -39,6 +39,7 @@ const showSettings = ref(false);
 const showInvite = ref(false);
 
 const groupApi = new GroupApi(config);
+const queryCache = useQueryCache();
 
 const groupRequest = useQuery({
   key: () => ["getGroup", groupId.value],
@@ -55,7 +56,11 @@ const invoicesRequest = useQuery({
   query: () => groupApi.getGroupInvoices({ groupId: groupId.value }),
 });
 
-const requests = [groupRequest, transactionsRequest, invoicesRequest];
+const requests = [
+  { key: ["getGroup", groupId.value], request: groupRequest },
+  { key: ["getGroupTransactions", groupId.value], request: transactionsRequest },
+  { key: ["getGroupInvoices", groupId.value], request: invoicesRequest },
+];
 
 const groupInvoices = computed(() => invoicesRequest.state.value.data ?? []);
 
@@ -63,7 +68,7 @@ const group = computed(() => groupRequest.state.value.data);
 const transactions = computed(() => transactionsRequest.state.value.data ?? []);
 
 /** True when a request failed and has no data. A failed refresh keeps the old data, and the page shows that data. */
-function hasFailed(request: (typeof requests)[number]) {
+function hasFailed(request: (typeof requests)[number]["request"]) {
   const { data, status } = request.state.value;
   return status === "error" && data === undefined;
 }
@@ -78,13 +83,8 @@ const listsPending = computed(
   () => transactionsRequest.state.value.status === "pending" || invoicesRequest.state.value.status === "pending"
 );
 const isRetrying = computed(() =>
-  requests.some((request) => hasFailed(request) && request.asyncStatus.value === "loading")
+  requests.some(({ request }) => hasFailed(request) && request.asyncStatus.value === "loading")
 );
-
-const loadPhase = computed<LoadPhase>(() => {
-  if (groupPending.value || listsPending.value || isRetrying.value) return "loading";
-  return loadFailed.value ? "failed" : "ready";
-});
 
 /** The message of the notice. A failed group request hides the lists, so its message covers all of the page. */
 const loadErrorMessage = computed(() => {
@@ -101,12 +101,19 @@ const { announcement, retry } = useLoadFeedback({
     loaded: () => $t("group-detail-status-loaded"),
     loading: () => $t("group-detail-status-loading"),
   },
-  phase: loadPhase,
+  phase: () =>
+    groupPending.value || listsPending.value || isRetrying.value ? "loading" : loadFailed.value ? "failed" : "ready",
 });
 
-/** Requests again only what failed, so the data that loaded stays on the page. */
+/** Invalidates failed queries without data so the cache refetches them. */
 const retryFailedRequests = () =>
-  retry(() => Promise.all(requests.filter((request) => hasFailed(request)).map((request) => request.refetch())));
+  retry(() =>
+    Promise.all(
+      requests
+        .filter(({ request }) => hasFailed(request))
+        .map(({ key }) => queryCache.invalidateQueries({ exact: true, key }))
+    )
+  );
 
 const avatarImages = computed(() => getGroupAvatarImages(group.value));
 
@@ -174,10 +181,18 @@ const settleUp = () => {
 
         <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
         <div ref="content" tabindex="-1" class="flex flex-col gap-5 outline-none">
-          <Transition v-bind="CONTENT_FADE_IN">
+          <Transition
+            enter-active-class="transition-opacity duration-state ease-enter"
+            enter-from-class="opacity-0"
+            leave-active-class="hidden"
+          >
             <div v-if="!groupFailed" class="flex flex-col gap-3">
               <!-- Balance Card -->
-              <Transition v-bind="CONTENT_FADE_IN">
+              <Transition
+                enter-active-class="transition-opacity duration-state ease-enter"
+                enter-from-class="opacity-0"
+                leave-active-class="hidden"
+              >
                 <BalanceCardSkeleton v-if="groupPending" />
                 <div v-else-if="group" class="flex flex-col gap-3">
                   <BalanceCard
@@ -211,7 +226,11 @@ const settleUp = () => {
             </template>
           </Notice>
 
-          <Transition v-bind="CONTENT_FADE_IN">
+          <Transition
+            enter-active-class="transition-opacity duration-state ease-enter"
+            enter-from-class="opacity-0"
+            leave-active-class="hidden"
+          >
             <TransactionListSkeleton v-if="listsPending && !groupFailed" />
             <div v-else-if="!groupFailed" class="flex flex-col gap-5">
               <!-- Invoices -->
