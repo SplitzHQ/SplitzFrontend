@@ -9,6 +9,8 @@ vi.mock("fluent-vue", () => ({
   }),
 }));
 
+const CLEAR_BUTTON = '[data-testid="home-search-clear"]';
+
 describe("HomeSearchBar", () => {
   it("renders a search input with the localized placeholder", () => {
     const wrapper = mount(HomeSearchBar);
@@ -53,5 +55,60 @@ describe("HomeSearchBar", () => {
     const updates = wrapper.emitted<[string]>("update:modelValue") ?? [];
 
     expect(updates[updates.length - 1]).toEqual(["paris"]);
+  });
+
+  it("shows the clear button only while the field has text", async () => {
+    const wrapper = mount(HomeSearchBar, { props: { modelValue: "" } });
+
+    expect(wrapper.find(CLEAR_BUTTON).exists()).toBe(false);
+
+    await wrapper.setProps({ modelValue: "paris" });
+
+    expect(wrapper.get(CLEAR_BUTTON).attributes("aria-label")).toBe("home-button-clear-search");
+  });
+
+  it("shows the clear button outside the label, before the action", () => {
+    const wrapper = mount(HomeSearchBar, {
+      props: { modelValue: "paris" },
+      slots: { action: '<button type="button">Filter</button>' },
+    });
+
+    expect(wrapper.find(`label ${CLEAR_BUTTON}`).exists()).toBe(false);
+    expect(wrapper.findAll("button").map((button) => button.text() || button.attributes("aria-label"))).toEqual([
+      "home-button-clear-search",
+      "Filter",
+    ]);
+  });
+
+  it("keeps the text clear of each button at the right end", async () => {
+    const withAction = mount(HomeSearchBar, {
+      props: { modelValue: "" },
+      slots: { action: '<button type="button">Filter</button>' },
+    });
+
+    expect(withAction.get("label").classes()).toContain("pr-11");
+
+    await withAction.setProps({ modelValue: "paris" });
+
+    expect(withAction.get("label").classes()).toContain("pr-20");
+    expect(
+      mount(HomeSearchBar, { props: { modelValue: "paris" } })
+        .get("label")
+        .classes()
+    ).toContain("pr-11");
+    expect(mount(HomeSearchBar).get("label").classes().join(" ")).not.toMatch(/\bpr-/);
+  });
+
+  it("empties the field and keeps the focus when the user clears it", async () => {
+    const wrapper = mount(HomeSearchBar, { attachTo: document.body, props: { modelValue: "paris" } });
+
+    await wrapper.get(CLEAR_BUTTON).trigger("click");
+
+    const updates = wrapper.emitted<[string]>("update:modelValue") ?? [];
+
+    expect(updates[updates.length - 1]).toEqual([""]);
+    expect(document.activeElement).toBe(wrapper.get("input").element);
+
+    wrapper.unmount();
   });
 });
