@@ -44,6 +44,7 @@ export interface UseLoadFeedbackReturn {
   announcement: Readonly<ShallowRef<string>>;
   /**
    * Runs `refetch` and moves focus to `content` if a successful retry unmounts the focused retry button.
+   * The query reports failures through `phase`. A rejected refetch does not move focus.
    * Leaves focus untouched if the user moved focus elsewhere while waiting.
    */
   retry: (refetch: () => Promise<unknown>) => Promise<void>;
@@ -92,7 +93,12 @@ export function useLoadFeedback({ content, messages, phase }: UseLoadFeedbackOpt
 
   async function retry(refetch: () => Promise<unknown>): Promise<void> {
     const focusedBeforeRetry = document.activeElement;
-    await refetch();
+    try {
+      await refetch();
+    } catch {
+      // The query state already drives the error notice and its announcement.
+      return;
+    }
     await nextTick();
 
     if (toValue(phase) !== "ready") return;

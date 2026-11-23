@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { defineComponent, nextTick, ref, useTemplateRef } from "vue";
 
 import { useLoadFeedback, type LoadPhase } from "../use-load-feedback";
@@ -101,7 +101,7 @@ describe("useLoadFeedback", () => {
     const button = wrapper.get("button").element;
     button.focus();
 
-    await retry(vi.fn(() => Promise.resolve()));
+    await retry(() => Promise.reject(new Error("Request failed")));
 
     expect(document.activeElement).toBe(button);
   });
