@@ -1,82 +1,128 @@
-import { nextTick, onMounted, shallowRef, toValue, watch, type MaybeRefOrGetter, type Ref } from "vue";
+import {
+  nextTick,
+  onMounted,
+  shallowRef,
+  toValue,
+  watch,
+  type MaybeRefOrGetter,
+  type Ref,
+  type ShallowRef,
+  type TransitionProps,
+} from "vue";
 
 /**
- * The state of the data that a page loads.
- * - `loading`: The first request, or a retry, is in progress.
- * - `failed`: A request failed and the page has no data to show for it.
- * - `ready`: The page shows its data.
+ * Screen-reader feedback, focus recovery, and content transitions for pages that load data asynchronously.
+ */
+
+/**
+ * Data-loading state of a page.
+ * - `loading`: The initial load or a retry is in progress.
+ * - `failed`: A request failed and the page has no data to display.
+ * - `ready`: Data finished loading, or cached data remains on screen.
  */
 export type LoadPhase = "failed" | "loading" | "ready";
 
-/** The texts that a screen reader reads for each change of phase. */
+/** Localized status messages announced to screen readers when `LoadPhase` changes. */
 export interface LoadMessages {
+  /** Announced when a retry fails while the error `Notice` is already on screen. */
   failed: () => string;
+  /** Announced when loading finishes and the page enters the `ready` phase. */
   loaded: () => string;
+  /** Announced when the initial load or a retry starts. */
   loading: () => string;
 }
 
-/** The props of the `Transition` between a skeleton and the content. The skeleton goes at once, the content fades in. */
+/** Options for `useLoadFeedback`. */
+export interface UseLoadFeedbackOptions {
+  /**
+   * Container element that receives focus when a successful retry unmounts the retry button.
+   * Must have `tabindex="-1"` so programmatic focus works without adding a tab stop.
+   */
+  content: Readonly<Ref<HTMLElement | null>>;
+  /** Getters that return localized status messages for screen readers. */
+  messages: LoadMessages;
+  /** Current data-loading phase of the page. */
+  phase: MaybeRefOrGetter<LoadPhase>;
+}
+
+/** Reactive state and actions returned by `useLoadFeedback`. */
+export interface UseLoadFeedbackReturn {
+  /**
+   * Text for a persistent `role="status"` live region.
+   * Keep that element mounted across all phases because browsers only announce text changes inside an existing live region.
+   */
+  announcement: Readonly<ShallowRef<string>>;
+  /**
+   * Runs `refetch` and moves focus to `content` if a successful retry unmounts the focused retry button.
+   * Leaves focus untouched if the user moved focus elsewhere while waiting.
+   */
+  retry: (refetch: () => Promise<unknown>) => Promise<void>;
+}
+
+/**
+ * `<Transition>` props for swapping loading skeletons and page content.
+ * Hides the outgoing element immediately so the incoming content can fade in without layout overlap.
+ */
 export const CONTENT_FADE_IN = {
   enterActiveClass: "transition-opacity duration-state ease-enter",
   enterFromClass: "opacity-0",
   leaveActiveClass: "hidden",
-} as const;
+} as const satisfies TransitionProps;
 
 /**
- * Gives a page that loads data the text for its `role="status"` region and the action for its retry button.
- * The page must keep the region in the DOM for all phases, because a browser reads only a change in an existing region.
+ * Manages screen-reader status announcements and retry focus recovery for a page that loads data.
  *
- * The text is empty for the first failure, because the Notice with `announce` reads that failure when it appears. The
- * Notice stays on the page during a retry and does not read again, so the region reads a second failure.
+ * The live region stays silent on the first failure because `<Notice announce>` mounts with `role="alert"` and
+ * announces that error itself. Because the error `Notice` remains mounted during a retry, `announcement` takes over
+ * for any subsequent failure.
  */
-export function useLoadFeedback(options: {
-  /** The block that gets the focus when a retry succeeds and removes the retry button. It needs `tabindex="-1"`. */
-  content: Ref<HTMLElement | null>;
-  messages: LoadMessages;
-  phase: MaybeRefOrGetter<LoadPhase>;
-}) {
-  const { content, messages, phase } = options;
-
+export function useLoadFeedback({ content, messages, phase }: UseLoadFeedbackOptions): UseLoadFeedbackReturn {
   const announcement = shallowRef("");
-  let noticeIsVisible = false;
+  let isErrorNoticeMounted = false;
 
-  /** Sets the text of the region for the new phase. */
-  function announce(next: LoadPhase) {
-    if (next === "loading") {
-      announcement.value = messages.loading();
-    } else if (next === "ready") {
-      noticeIsVisible = false;
-      announcement.value = messages.loaded();
-    } else {
-      announcement.value = noticeIsVisible ? messages.failed() : "";
-      noticeIsVisible = true;
+  /** Updates the `role="status"` text to match `nextPhase`. */
+  function updateAnnouncement(nextPhase: LoadPhase): void {
+    switch (nextPhase) {
+      case "loading":
+        announcement.value = messages.loading();
+        break;
+      case "ready":
+        isErrorNoticeMounted = false;
+        announcement.value = messages.loaded();
+        break;
+      case "failed":
+        announcement.value = isErrorNoticeMounted ? messages.failed() : "";
+        isErrorNoticeMounted = true;
+        break;
     }
   }
 
-  // The text changes after the mount, because a browser does not read the first text of a new region.
+  // Set the initial loading message after mount. Browsers ignore the initial text of a new `role="status"` live
+  // region and only announce later text changes.
   onMounted(() => {
-    const current = toValue(phase);
-    if (current === "loading") announce(current);
-    if (current === "failed") noticeIsVisible = true;
+    const initialPhase = toValue(phase);
+    if (initialPhase === "loading") {
+      updateAnnouncement("loading");
+    } else if (initialPhase === "failed") {
+      isErrorNoticeMounted = true;
+    }
   });
 
-  watch(
-    () => toValue(phase),
-    (next) => {
-      announce(next);
-    }
-  );
+  watch(() => toValue(phase), updateAnnouncement);
 
-  /**
-   * Runs a retry. When the retry succeeds, the button goes away and the focus would go to the page body, so this
-   * function moves the focus to the content. It does not move a focus that the user put on another element.
-   */
-  async function retry(refetch: () => Promise<unknown>) {
-    const focused = document.activeElement;
+  async function retry(refetch: () => Promise<unknown>): Promise<void> {
+    const focusedBeforeRetry = document.activeElement;
     await refetch();
     await nextTick();
-    const focusIsLost = document.activeElement === focused || document.activeElement === document.body;
-    if (toValue(phase) === "ready" && focusIsLost) content.value?.focus({ preventScroll: true });
+
+    if (toValue(phase) !== "ready") return;
+
+    // Unmounting the retry button resets focus to `<body>` (or leaves it on the button until its leave transition
+    // ends). Move focus to `content` only in those two cases so user focus changes are preserved.
+    const activeElement = document.activeElement;
+    if (activeElement === focusedBeforeRetry || activeElement === document.body) {
+      content.value?.focus({ preventScroll: true });
+    }
   }
 
   return { announcement, retry };
