@@ -268,6 +268,10 @@ export const ICON_RULES: UsageRule[] = [
     title: "Header icons",
   },
   {
+    rule: 'The filter icon button inside `HomeSearchBar` uses `SIconButton` (`variant="ghost"`, `size="sm"`) with `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, giving it a brand icon and translucent `comp-search-filter-*` fill. Keep the adjacent clear button as a plain `ghost` button, and do not apply this style elsewhere without user approval.',
+    title: "Search filter",
+  },
+  {
     rule: "Put a forward arrow and an expand arrow on the right. Put all other icons on the left.",
     title: "Side",
   },

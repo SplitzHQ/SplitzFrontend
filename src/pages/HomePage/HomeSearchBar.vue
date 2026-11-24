@@ -6,17 +6,14 @@ import { computed, useId, useSlots, useTemplateRef } from "vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 
 /**
- * Search field for the home page header.
+ * Pill-shaped group search input for the `HomePage` header.
  *
- * This is a pill-shaped input with a light fill and a magnifying glass on
- * the left. It differs from the shared TextInput component, so the home
- * page uses this component instead. The field has a muted border at rest,
- * because the fill alone is hard to see on the header. With the focus, it
- * shows the same brand border as an outlined TextInput. A clear button shows while the field has text. The `action`
- * slot holds one small icon button at the right end of the field.
+ * Uses a custom pill frame rather than `TextInput`: rests with `border-base-border-muted` so the input stays distinct
+ * against the frosted header, transitions to the brand focus ring on `:focus-within`, reveals a clear button while
+ * non-empty, and accepts a trailing `#action` icon button slot.
  */
 export interface HomeSearchBarProps {
-  /** Text shown while the field is empty. Defaults to the localized "Search groups" string. */
+  /** Placeholder copy shown while empty. Defaults to localized `"home-search-placeholder"`. */
   placeholder?: string;
 }
 
@@ -28,57 +25,56 @@ const { $t } = useFluent();
 const slots = useSlots();
 
 const inputId = useId();
-const input = useTemplateRef("input");
+const inputElement = useTemplateRef("inputElement");
 
 const hasText = computed(() => model.value.length > 0);
 
-/**
- * Keeps the text clear of the buttons at the right end of the field.
- * `pr-11` leaves room for one button and its gap, and `pr-20` leaves room for two buttons.
- */
-const trailingPadding = computed(() => {
+/** Reserves right padding so typed text never runs underneath the clear or `#action` icon buttons. */
+const trailingPaddingClass = computed(() => {
   if (slots.action && hasText.value) return "pr-20";
   return slots.action || hasText.value ? "pr-11" : undefined;
 });
 
-/** Removes the text and keeps the focus in the field, so the user can type a new word at once. */
-function clear() {
+/** Clears the query and keeps focus inside `<input>` so the user can type a replacement immediately. */
+function clearSearch(): void {
   model.value = "";
-  input.value?.focus();
+  inputElement.value?.focus();
 }
 </script>
 
 <template>
   <div class="relative w-full">
     <!--
-      The buttons are not in the label, because a click on them must not focus the field through the label.
-      The padding is smaller than `p-2.5` by the width of the border, so the field has the same height as a field with
-      no border.
-      The ring is inset and `ring-0` at rest. A box shadow cannot blend an inset shadow with no shadow, and the global color
-      transition does not cover a box shadow. So the field names `box-shadow`, and the ring fades with the border.
+      Keep trailing buttons outside `<label>` so tapping them does not forward focus to `<input>`.
+      Subtract `1px` from `p-2.5` to offset the border width, and include `box-shadow` in `transition` with a resting
+      `ring-0 ring-inset` so the focus ring fades in alongside `border-color`.
     -->
     <label
       :for="inputId"
       :class="[
         'flex w-full items-center gap-2 rounded-full border border-base-border-muted bg-base-bg-primary_alt p-[calc(--spacing(2.5)-1px)] text-base-fg-placeholder ring-0 ring-transparent transition-[color,background-color,border-color,box-shadow] ring-inset focus-within:border-base-border-brand-solid focus-within:ring-1 focus-within:ring-base-border-brand-solid',
-        trailingPadding,
+        trailingPaddingClass,
       ]"
     >
       <PhMagnifyingGlass class="size-5 shrink-0" aria-hidden="true" />
       <span class="sr-only">{{ placeholder ?? $t("home-search-placeholder") }}</span>
       <input
         :id="inputId"
-        ref="input"
+        ref="inputElement"
         v-model="model"
         type="search"
         enterkeyhint="search"
         autocomplete="off"
         :placeholder="placeholder ?? $t('home-search-placeholder')"
-        class="min-w-0 flex-1 bg-transparent text-base leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
+        class="min-w-0 flex-1 appearance-none bg-transparent text-base leading-5 font-normal text-base-text-primary placeholder:text-base-text-placeholder focus-visible:outline-hidden [&::-webkit-search-cancel-button]:hidden"
       />
     </label>
-    <div class="absolute top-1 right-1 flex gap-1">
-      <!-- The span takes the motion classes, because the button has its own transition. -->
+    <!--
+      Center trailing buttons vertically across the full pill (`inset-y-0`) rather than pinning to `top`, preventing
+      misalignment if iOS Safari renders `<input type="search">` taller than 20px (`appearance-none` strips native chrome).
+    -->
+    <div class="absolute inset-y-0 right-1 flex items-center gap-1">
+      <!-- Wrap `SIconButton` in a `<span>` so enter/leave scale transitions do not conflict with the button's own CSS transition. -->
       <Transition
         enter-active-class="transition-[opacity,scale] duration-state ease-enter"
         enter-from-class="scale-75 opacity-0"
@@ -91,7 +87,7 @@ function clear() {
             size="sm"
             :aria-label="$t('home-button-clear-search')"
             data-testid="home-search-clear"
-            @click="clear"
+            @click="clearSearch"
           >
             <PhX />
           </SIconButton>

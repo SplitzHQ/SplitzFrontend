@@ -44,8 +44,12 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Focus ring",
   },
   {
-    rule: "`TRANSACTION_ROW_CLASS` has `-mx-2 px-2`. The pressed fill (`base-bg-secondary_hover`) extends 8px past the content on each side, and the content stays in its place. The parent must have 8px of free space on each side. Do not add `w-full`, because the row then does not extend on the right. Put the row in a flex column, which stretches it. A scroll area cuts the fill, so give the scroll area `-mx-2 px-2`.",
-    title: "Pressed fill",
+    rule: "`TRANSACTION_ROW_CLASS` uses `-mx-2 px-2` so its hover and pressed fill (`comp-row-bg-hover` / `comp-row-bg-pressed`, one step lighter than `base-bg-hover`) extends 8px past the content on each side without shifting alignment, and scales to 98% on press unless reduced motion is active. Parent containers must leave 8px of horizontal room (add `-mx-2 px-2` on clipping scroll containers), and rows must sit in a block or flex-column parent without `w-full` so both negative margins take effect.",
+    title: "Hover and pressed fill",
+  },
+  {
+    rule: "Group rows and the Create group row on `HomePage` also apply `TRANSACTION_ROW_CLASS` so interactive rows share uniform hover and press feedback.",
+    title: "Other rows",
   },
   {
     rule: "Put a date label or a section title above a group of rows, with `flex flex-col gap-1`. TransactionList and InvoiceDetailPage do this.",
@@ -92,8 +96,8 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Focus ring",
   },
   {
-    text: "The row has no hover color, so a tap on a phone cannot leave a stuck color. The press color uses the motion tokens and changes at once when the system asks for reduced motion.",
-    title: "Press and reduced motion",
+    text: "Hover background uses Tailwind's `hover:` variant (`@media (hover: hover)`), preventing stuck hover fills after touch taps on mobile. Background transitions follow motion tokens and become instant when reduced motion is enabled.",
+    title: "Hover, press and reduced motion",
   },
   {
     text: "A row in a button must give its state to a screen reader. SelectableTransactionItem uses `aria-pressed`, and its check marks have `aria-hidden`.",

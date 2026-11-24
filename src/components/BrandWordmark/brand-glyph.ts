@@ -4,7 +4,7 @@
  *
  * Within the 600×600 icon canvas, the glyph occupies the centered 300×300 box from `(150, 150)` to `(450, 450)`.
  * The diamond sits at the same perpendicular gap from the diagonal bar as the top-left dot, with its outer tips
- * flush against the `450` right and bottom edges. See `brand-wordmark.usage.ts` for usage rules.
+ * flush against the `450` right and bottom edges. See `brand.usage.ts` for the brand rules.
  */
 export const BRAND_GLYPH = {
   bar: "M400 150L450 200L200 450L150 400Z",
@@ -33,10 +33,10 @@ export const BRAND_GLYPH_DIAMOND_SQUARE = {
 } as const;
 
 /**
- * Hex value for `--core-color-brand-600` (the brand plate background).
+ * Hex value for `--core-color-brand-700` (the brand plate background).
  * Exported for static SVGs, canvases, and inline styles that cannot read CSS custom properties.
  */
-export const BRAND_COLOR = "#647C72";
+export const BRAND_COLOR = "#4F635A";
 
 /** Hex value for `--core-color-brand-50` (the light foreground drawn on top of `BRAND_COLOR`). */
 export const LIGHT_COLOR = "#F2F5F3";

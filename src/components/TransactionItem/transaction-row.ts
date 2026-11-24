@@ -1,13 +1,22 @@
 import type { SplitzUserReducedDto, TransactionBalanceDto } from "@/backend";
 
 /**
- * The classes of an element that holds `TransactionItemContent` and reacts to a press: a link or a button.
- * The pressed fill extends 8px past the content on each side, and the content stays in its place. The parent must have
- * this space. See `transaction-item.usage.ts`.
- * The caller adds the offset of the focus ring, because the ring must fit in the scroll area of the screen.
+ * Shared Tailwind classes for interactive list rows (links or buttons) wrapping `TransactionItemContent` or `HomePage`
+ * group rows.
+ * Negative horizontal margins (`-mx-2 px-2`) extend the hover and pressed background 8px past the aligned content on
+ * both sides, so parent containers must leave 8px of horizontal clearance (see `transaction-item.usage.ts`).
+ * Pressing scales the row down to 98% (`container` duration with `standard` easing on press-in, `sheet` duration and
+ * easing on release, matching `SSegmentControl`) while keeping `hover-in` timing on background color. Scaling is
+ * disabled when reduced motion is active. Callers supply `focus-visible:outline-offset-*` to fit their scroll container.
  */
-export const TRANSACTION_ROW_CLASS =
-  "-mx-2 flex items-center gap-3 rounded-2xl px-2 py-2 touch-manipulation transition-colors duration-hover-in ease-standard active:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-base-border-brand-solid";
+export const TRANSACTION_ROW_CLASS = [
+  "-mx-2 flex items-center gap-3 rounded-2xl px-2 py-2 touch-manipulation",
+  "[transition:background-color_var(--motion-duration-hover-in)_var(--motion-easing-standard),scale_var(--motion-duration-sheet)_var(--motion-easing-sheet)]",
+  "active:[transition:background-color_var(--motion-duration-hover-in)_var(--motion-easing-standard),scale_var(--motion-duration-container)_var(--motion-easing-standard)]",
+  "hover:bg-comp-row-bg-hover active:bg-comp-row-bg-pressed active:scale-98",
+  "motion-reduce:active:scale-100 [:root[data-reduce-motion]_&]:active:scale-100",
+  "focus-visible:outline-2 focus-visible:outline-base-border-brand-solid",
+].join(" ");
 
 /**
  * Returns the user who paid for a transaction, or null when the balances do not show it.

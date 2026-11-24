@@ -19,4 +19,10 @@ home-button-record-expense = Record new expense
 home-button-create-group = Create group
 home-create-group-hint = Start a group to split expenses with others
 home-filter = Filter
-
+home-no-expenses = No expenses
+home-sort-title = Sort by
+home-sort-button = Sort by { $sort }
+home-sort-recent = Recent activity
+home-sort-unsettled = Unsettled first
+home-sort-amount = Largest amount
+home-sort-name = Name

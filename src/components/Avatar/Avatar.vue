@@ -54,19 +54,19 @@ const SIZE_CLASSES: Record<AvatarProps["size"], SizeClasses> = {
   },
   lg: {
     frame: "size-16 rounded-2xl",
-    groupFrame: "size-16 rounded-xl",
+    groupFrame: "size-16 rounded-xl [--pair-shift:1.5px]",
     multiple: "size-6.75 rounded-lg icon-3",
     single: "size-16 rounded-2xl icon-7.25",
   },
   sm: {
     frame: "size-12 rounded-xl",
-    groupFrame: "size-12 rounded-05xl",
+    groupFrame: "size-12 rounded-05xl [--pair-shift:1px]",
     multiple: "size-5 rounded-[0.4375rem] icon-2.5",
     single: "size-12 rounded-xl icon-5.5",
   },
   xs: {
     frame: "size-10 rounded-05xl",
-    groupFrame: "size-10 rounded-lg",
+    groupFrame: "size-10 rounded-lg [--pair-shift:0.5px]",
     multiple: "size-4 rounded-[0.3125rem] icon-2.5",
     single: "size-10 rounded-05xl icon-4.5",
   },
@@ -92,12 +92,16 @@ const failedSources = shallowReactive(new Set<string>());
 
 const isGroup = computed(() => images.length > 1);
 
+/**
+ * Places a two-member group on the grid diagonal (top-left and bottom-right) instead of a single centered row,
+ * avoiding empty horizontal bands while nudging both tiles slightly inward. See `avatar.usage.ts`.
+ */
+const isDiagonalPair = computed(() => images.length === 2);
 const sizeClasses = computed(() => SIZE_CLASSES[size]);
-/** The classes of each picture or tile. */
 const tileClass = computed(() => (isGroup.value ? sizeClasses.value.multiple : sizeClasses.value.single));
 
-/** The pictures to show. A missing picture and a picture that failed to load have a null source and show a tile. */
-const shownImages = computed(() =>
+/** Normalized avatar items (capped at `MAX_GRID_IMAGES`), falling back to `null` `src` when missing or errored. */
+const displayedImages = computed(() =>
   images.slice(0, MAX_GRID_IMAGES).map(({ alt, src }) => {
     const resolved = resolveAssetUrl(src);
     return {
@@ -109,17 +113,17 @@ const shownImages = computed(() =>
   })
 );
 
-/** A grid is one picture for a screen reader, with one name. A single picture uses its own `alt`. */
+/** Combined accessible label for multi-member grids; single avatars expose their own `alt` directly. */
 const gridLabel = computed(() =>
   isGroup.value
-    ? shownImages.value
+    ? displayedImages.value
         .map(({ alt }) => alt)
         .filter(Boolean)
         .join(", ") || undefined
     : undefined
 );
 
-/** Replaces a picture that failed to load with the tile. */
+/** Marks a failed image URL so its tile falls back to an initial. */
 function onImageError(src: string) {
   failedSources.add(src);
 }
@@ -134,19 +138,31 @@ function onImageError(src: string) {
     :role="gridLabel ? 'img' : undefined"
     :aria-label="gridLabel"
   >
-    <div class="flex flex-wrap justify-center gap-0.5">
-      <!-- The position is the key, because two people with no picture have the same source. -->
-      <template v-for="(image, index) in shownImages" :key="index">
+    <div
+      :class="[isDiagonalPair ? 'grid grid-cols-2' : 'flex flex-wrap justify-center', 'gap-0.5']"
+      :data-pair="isDiagonalPair || undefined"
+    >
+      <!-- Key by index because multiple members without photos share `src: null`. -->
+      <template v-for="(image, index) in displayedImages" :key="index">
         <img
           v-if="image.src"
-          :class="[tileClass, PICTURE_LINE_CLASS, 'block object-cover']"
+          :class="[
+            tileClass,
+            isDiagonalPair && index === 1 && 'col-start-2 row-start-2',
+            PICTURE_LINE_CLASS,
+            'block object-cover',
+          ]"
           :src="image.src"
           :alt="isGroup ? '' : image.alt"
           @error="onImageError(image.src!)"
         />
         <div
           v-else
-          :class="[tileClass, 'flex items-center justify-center leading-none font-semibold select-none']"
+          :class="[
+            tileClass,
+            isDiagonalPair && index === 1 && 'col-start-2 row-start-2',
+            'flex items-center justify-center leading-none font-semibold select-none',
+          ]"
           :style="AVATAR_TONE_STYLES[image.tone]"
           :role="!isGroup && image.alt ? 'img' : undefined"
           :aria-label="!isGroup && image.alt ? image.alt : undefined"
@@ -159,3 +175,14 @@ function onImageError(src: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+[data-pair] > :first-child {
+  translate: var(--pair-shift, 0px) var(--pair-shift, 0px);
+}
+
+[data-pair] > :last-child {
+  --shift-back: calc(-1 * var(--pair-shift, 0px));
+  translate: var(--shift-back) var(--shift-back);
+}
+</style>

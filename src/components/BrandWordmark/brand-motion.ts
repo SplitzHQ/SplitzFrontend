@@ -14,7 +14,7 @@ import { WORDMARK_LETTERS, WORDMARK_TITTLE_GEOMETRY } from "./brand-wordmark";
  * sharpens the bottom-right circle's corners into a diamond, and grows the diagonal bar between them.
  *
  * Translation distances in glyph steps use `brand-glyph.ts` SVG coordinates; wordmark steps use `brand-wordmark.ts`
- * coordinates. See `brand-wordmark.usage.ts` for behavioral rules.
+ * coordinates. See `brand.usage.ts` for the motion principles and `brand-wordmark.usage.ts` for component rules.
  */
 
 /** Single Web Animation track targeting every descendant element with `data-part="<part>"`. */

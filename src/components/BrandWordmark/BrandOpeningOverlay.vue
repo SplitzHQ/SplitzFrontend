@@ -26,7 +26,7 @@ import BrandAnimatedGlyphParts from "./BrandAnimatedGlyphParts.vue";
  */
 
 /** CSS color variable matching `BRAND_COLOR` for syncing the phone status bar. */
-const OPENING_STATUS_BAR_TOKEN = "--core-color-brand-600";
+const OPENING_STATUS_BAR_TOKEN = "--core-color-brand-700";
 
 const isVisible = shallowRef(claimOpeningPlay() && !prefersReducedMotion());
 /** Switches positioning from `fixed` to `absolute` once fade-out begins so iOS 27 releases the status bar color. */

@@ -7,7 +7,8 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     ".claude/hooks/*.ts",
-    "oxlint-plugins/**/*.ts"
+    "oxlint-plugins/**/*.ts",
+    "src/components/component-index.ts"
   ],
   "compilerOptions": {
     "composite": true,

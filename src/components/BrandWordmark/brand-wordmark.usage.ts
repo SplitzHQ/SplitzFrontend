@@ -1,6 +1,6 @@
 /**
- * Usage rules for the `BrandWordmark` component family. Keep all brand logo rules in this file so components and docs
- * point to one source of truth.
+ * Usage rules for the `BrandWordmark` component family. See `brand.usage.ts` for logo geometry, colorways, app icons,
+ * and motion principles.
  * Agents read this file through the `spz-component-use` skill; app code never imports it, so it stays out of the
  * production bundle.
  */
@@ -24,7 +24,7 @@ export interface WordmarkSizeGuide {
 // Using `Record` causes a type error whenever a new `WordmarkSize` is added without a usage rule.
 const SIZE_RULES: Record<WordmarkSize, string> = {
   auth: "Unused in `src/` right now (`AuthShell` renders `BrandTapGlyph` instead).",
-  header: "Used by `BrandTapWordmark` in the `HomePage` header, and by header previews in prototypes.",
+  header: "Used by `BrandHomeLogo` in the `HomePage` header, and by header previews in prototypes.",
   hero: "Reserved for splash or landing screens (no screen in `src/` uses it yet).",
 };
 
@@ -35,12 +35,15 @@ export const SIZE_GUIDE: WordmarkSizeGuide[] = WORDMARK_SIZES.map((size) => ({ s
 export const COMPONENT_RULES = {
   BrandAnimatedGlyphParts:
     "Internal helper used by `BrandOpeningOverlay`, `BrandTapWordmark`, and `BrandTapGlyph`. Renders bare `<circle>`, `<path>`, and `<rect>` elements inside an existing glyph `<svg>`. Do not mount directly on a page.",
+  BrandHomeLogo:
+    "`HomePage` header only. Exposes `scrub(progress)` (`0..1`) so the collapsing header can scrub smoothly between the resting wordmark and the 18px standalone glyph.",
   BrandOpeningOverlay:
     "`HomePage` only. Plays the full-screen brand opening overlay once per cold app start. Mount it on a single page because the first mount consumes the session's only play.",
   BrandTapGlyph:
     "`AuthShell` only. Rests as the standalone glyph; tapping reassembles the glyph, briefly reveals the `" +
     'Splitz" wordmark beside it, and returns to the glyph alone.',
-  BrandTapWordmark: "`HomePage` header only. Wraps `BrandWordmark` in a button that plays the tap animation.",
+  BrandTapWordmark:
+    "`HomePage` header only. Use inside `BrandHomeLogo`. Wraps `BrandWordmark` in a button that plays the tap animation.",
   BrandWordmark:
     "Every surface outside `HomePage`'s header and `AuthShell` that displays the brand wordmark. Shows the `" +
     'Splitz" wordmark outlines with the diamond tittle on the `i`, without a leading glyph.',
@@ -48,6 +51,7 @@ export const COMPONENT_RULES = {
 
 /** Behavioral rules for the brand animations defined in `brand-motion.ts`. */
 export const MOTION_RULES = [
+  "`BrandHomeLogo` scrubs a single paused Web Animations timeline forward and backward as the header collapses or expands, and disables wordmark tap animations while `progress > 0`.",
   "`BrandTapWordmark` and `BrandTapGlyph` animate only when tapped, and ignore extra taps until the active animation finishes.",
   "In `BrandTapGlyph`, the revealed wordmark uses `1em` equal to the glyph height (matching the glyph-to-em ratio in `BrandTapWordmark`) and sits out of flow (`position: absolute`) so the page layout never shifts.",
   'The diamond tittle above the `i` has its own `data-part="tittle"`, so every wordmark animation sequence must explicitly include a step for `tittle`.',
@@ -87,7 +91,7 @@ export const GLYPH_RULES = [
 /** Accessibility requirements enforced by the brand components. */
 export const ACCESSIBILITY_NOTES = [
   '`BrandWordmark` sets `role="img"` and `aria-label="Splitz"`. Do not place duplicate screen-reader text beside it.',
-  "When a screen uses the brand logo as its primary page heading (such as `HomePage`), wrap `BrandTapWordmark` inside the `<h1>`.",
+  "When a screen uses the brand logo as its primary page heading (such as `HomePage`), wrap `BrandHomeLogo` inside the `<h1>`.",
   '`BrandTapWordmark` renders a `<button>` named "Splitz" inside `HomePage`\'s `<h1>`, with an invisible `::after` hit area taller than 44px so the header bar keeps its compact height.',
   '`BrandOpeningOverlay` sets `aria-hidden="true"` because the interactive page underneath is already present in the accessibility tree.',
 ];

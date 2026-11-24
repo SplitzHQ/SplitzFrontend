@@ -132,6 +132,12 @@ const router = createRouter({
       path: "/group/:groupId/settle-up/done",
     },
   ],
+  /*
+   * Return `false` so Vue Router enables manual scroll restoration and records each history entry's scroll coordinates
+   * in `history.state.scroll`, while deferring actual window scrolling to `usePageTransition` in `App.vue` until the
+   * slide transition finishes.
+   */
+  scrollBehavior: () => false,
 });
 
 router.beforeEach((to, from, next) => {

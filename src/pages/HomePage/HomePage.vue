@@ -1,33 +1,39 @@
 <script setup lang="ts">
-import { PhArrowsDownUp, PhPlus, PhSlidersHorizontal, PhUsers } from "@phosphor-icons/vue";
+import { PhPlus, PhUsers } from "@phosphor-icons/vue";
 import { useQuery, useQueryCache } from "@pinia/colada";
+import { useLocalStorage } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
-import { computed, ref, useTemplateRef } from "vue";
-import { useRouter } from "vue-router";
+import { twMerge } from "tailwind-merge";
+import { computed, type ComponentPublicInstance, ref, useTemplateRef, watch } from "vue";
+import { RouterLink, useRouter } from "vue-router";
 
 import { GroupApi } from "@/backend";
 import config from "@/backend/config";
 import Avatar from "@/components/Avatar/Avatar.vue";
-import BrandOpeningOverlay from "@/components/BrandWordmark/BrandOpeningOverlay.vue";
-import BrandTapWordmark from "@/components/BrandWordmark/BrandTapWordmark.vue";
 import Layout from "@/components/Layout/Layout.vue";
 import Notice from "@/components/Notice/Notice.vue";
-import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
-import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
-import { formatCurrency } from "@/libs/format-currency";
+import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
+import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useStatusBarTopColor } from "@/libs/status-bar-color";
 import { useLoadFeedback } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
+import { HOME_SORTS, mostUsedCurrency, settledState, sortGroups, type HomeSort } from "./home-balances";
+import HomeAmount from "./HomeAmount.vue";
 import HomeEmptyState from "./HomeEmptyState.vue";
 import HomeGroupsSkeleton from "./HomeGroupsSkeleton.vue";
+import HomeHeader from "./HomeHeader.vue";
 import HomeNoResults from "./HomeNoResults.vue";
-import HomeSearchBar from "./HomeSearchBar.vue";
+import HomeSortButton from "./HomeSortButton.vue";
+import HomeTotalBalance from "./HomeTotalBalance.vue";
 
 useStatusBarTopColor("--base-bg-secondary_alt");
+
+/** Group list row classes: `TRANSACTION_ROW_CLASS` with taller `py-3` vertical padding matching `HomeGroupsSkeleton`. */
+const GROUP_ROW_CLASS = twMerge(TRANSACTION_ROW_CLASS, "py-3 focus-visible:outline-offset-2");
 
 const { $t } = useFluent();
 const router = useRouter();
@@ -44,42 +50,57 @@ const { asyncStatus: groupsAsyncStatus, state: groupsQuery } = useQuery({
   query: () => groupApi.getGroups(),
 });
 
-const groups = computed(() => {
-  return groupsQuery.value.data ?? [];
-});
+const groups = computed(() => groupsQuery.value.data ?? []);
 
-const groupWithExtraInfo = computed(() => {
-  return groups.value.map((group) => {
+// Refresh `userStore` balances whenever `getGroups` refetches after its initial response (`userStore` already fetches
+// user info on startup, so skipping the initial `undefined -> data` transition avoids a duplicate request).
+watch(
+  () => groupsQuery.value.data,
+  (_data, previous) => {
+    if (previous) void userStore.fetchUserInfo();
+  }
+);
+
+const groupsWithBalanceSummary = computed(() =>
+  groups.value.map((group) => {
     const myBalances = group.balances
-      .filter((b) => b.user.id === userStore.user?.id)
-      .map((b) => ({
-        ...b,
-        amount: Number.parseFloat(b.balance),
+      .filter((entry) => entry.user.id === userStore.user?.id)
+      .map((entry) => ({
+        ...entry,
+        amount: Number.parseFloat(entry.balance),
       }));
-    const myBalanceNegative = myBalances.filter((b) => b.amount < 0);
-    const myBalancePositive = myBalances.filter((b) => b.amount > 0);
-    const myBalanceSettled = myBalances.every((b) => b.amount === 0);
-    const groupSettled = group.balances.every((b) => b.balance === "0");
-    return { ...group, groupSettled, myBalanceNegative, myBalancePositive, myBalanceSettled, myBalances };
-  });
-});
+    const owedByMeBalances = myBalances.filter((entry) => entry.amount < 0);
+    const owedToMeBalances = myBalances.filter((entry) => entry.amount > 0);
+    const settled = settledState(group.transactionCount, myBalances, group.balances);
+    return { ...group, myBalances, owedByMeBalances, owedToMeBalances, settled };
+  })
+);
 
 const trimmedKeyword = computed(() => searchKeyword.value.trim());
 
+/** Persisted sort key in `localStorage`; unknown or retired sort names safely fall back to `"recent"`. */
+const storedSort = useLocalStorage<string>("home-group-sort", "recent");
+const selectedSort = computed<HomeSort>({
+  get: () => HOME_SORTS.find((option) => option === storedSort.value) ?? "recent",
+  set: (nextSort) => (storedSort.value = nextSort),
+});
+/** Most frequent open-balance currency across groups, shared by `HomeTotalBalance` and `"amount"` sorting. */
+const primaryCurrency = computed(() => mostUsedCurrency(sortGroups(groupsWithBalanceSummary.value, "recent")));
+
 const visibleGroups = computed(() => {
   const keyword = trimmedKeyword.value.toLowerCase();
-  const filtered = keyword
-    ? groupWithExtraInfo.value.filter((g) => g.name.toLowerCase().includes(keyword))
-    : groupWithExtraInfo.value;
-  return [...filtered].sort((a, b) => b.lastActivityTime.getTime() - a.lastActivityTime.getTime());
+  const matchingGroups = keyword
+    ? groupsWithBalanceSummary.value.filter((group) => group.name.toLowerCase().includes(keyword))
+    : groupsWithBalanceSummary.value;
+  return sortGroups(matchingGroups, selectedSort.value);
 });
 
-// These two read the list before the search filter. A search with no result must not look like a new user.
+// Check `groups` before search filtering so an empty search match renders `HomeNoResults` instead of `HomeEmptyState`.
 const hasGroups = computed(() => groups.value.length > 0);
 const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
-// '& !hasGroups.value' ensures that a failed refresh keeps the old data, so the list stays and the page shows no error.
+// Preserve cached group rows on background refresh failures rather than replacing the list with an error notice.
 const showErrorState = computed(() => groupsQuery.value.status === "error" && !hasGroups.value);
 const isRetrying = computed(() => showErrorState.value && groupsAsyncStatus.value === "loading");
 
@@ -94,6 +115,29 @@ const { announcement, retry } = useLoadFeedback({
   phase: () => (showLoadingState.value || isRetrying.value ? "loading" : showErrorState.value ? "failed" : "ready"),
 });
 
+const groupList = useTemplateRef<ComponentPublicInstance>("groupList");
+/** Pre-update `offsetTop` per `groupId` so simultaneously leaving rows stay pinned instead of collapsing to `top: 0`. */
+const rowOffsetTopByGroupId = new Map<string, number>();
+
+watch(
+  visibleGroups,
+  () => {
+    rowOffsetTopByGroupId.clear();
+    const rowElements = (groupList.value?.$el as HTMLElement | undefined)?.children ?? [];
+    for (const row of rowElements) {
+      const { groupId } = (row as HTMLElement).dataset;
+      if (groupId) rowOffsetTopByGroupId.set(groupId, (row as HTMLElement).offsetTop);
+    }
+  },
+  { flush: "pre" }
+);
+
+/** Pins a leaving `<li>` (`position: absolute`) to its pre-removal vertical offset during fade-out. */
+const pinLeavingRow = (row: Element) => {
+  const element = row as HTMLElement;
+  element.style.top = `${rowOffsetTopByGroupId.get(element.dataset.groupId ?? "") ?? element.offsetTop}px`;
+};
+
 const addExpense = () => {
   routerHistoryStore.takeSnapshot();
   void router.push({ name: "newExpense" });
@@ -104,51 +148,27 @@ const createGroup = () => {
   void router.push({ name: "createGroup" });
 };
 
-const userBalances = computed(() => {
-  const balances = new Map<string, { amount: number; currency: string }>();
+const currencyTotals = computed(() => {
+  const totalsByCurrency = new Map<string, { amount: number; currency: string }>();
   for (const userBalance of userStore.user?.balances ?? []) {
-    const existing = balances.get(userBalance.currency);
+    const existing = totalsByCurrency.get(userBalance.currency);
     if (existing) {
       existing.amount += Number.parseFloat(userBalance.balance);
     } else {
-      balances.set(userBalance.currency, {
+      totalsByCurrency.set(userBalance.currency, {
         amount: Number.parseFloat(userBalance.balance),
         currency: userBalance.currency,
       });
     }
   }
-  return [...balances.values()];
+  return [...totalsByCurrency.values()];
 });
 </script>
 
 <template>
   <Layout>
     <template #header>
-      <div
-        class="flex flex-col gap-3 border-b border-base-border-quaternary bg-base-bg-secondary_alt px-4 pt-safe-4 pb-4"
-      >
-        <!-- Header -->
-        <div class="flex w-full items-center justify-between">
-          <BrandOpeningOverlay />
-          <h1><BrandTapWordmark /></h1>
-          <div class="flex items-center gap-1">
-            <NotificationBell />
-            <!-- The slot has the width of the bell, so the 32px avatar has the same space on each side. -->
-            <div class="flex size-10 items-center justify-center">
-              <AvatarMenu />
-            </div>
-          </div>
-        </div>
-
-        <!-- Search Bar -->
-        <HomeSearchBar v-model="searchKeyword">
-          <template #action>
-            <SIconButton variant="ghost" size="sm" :aria-label="$t('home-filter')">
-              <PhSlidersHorizontal />
-            </SIconButton>
-          </template>
-        </HomeSearchBar>
-      </div>
+      <HomeHeader v-model="searchKeyword" />
     </template>
 
     <template #default="layoutAttrs">
@@ -167,17 +187,20 @@ const userBalances = computed(() => {
         <p role="status" class="sr-only">
           {{ showNoResults ? $t("home-no-results-title", { keyword: trimmedKeyword }) : "" }}
         </p>
-
         <p role="status" class="sr-only">{{ announcement }}</p>
 
-        <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
+        <!-- Focus fallback target when a successful retry unmounts the focused retry button. -->
         <div ref="content" tabindex="-1" class="outline-none">
           <Transition
             enter-active-class="transition-opacity duration-state ease-enter"
             enter-from-class="opacity-0"
-            leave-active-class="hidden"
+            enter-to-class="opacity-100"
           >
-            <div v-if="hasGroups" class="flex flex-col gap-1 pt-3 pb-4">
+            <!--
+              `pb-28` clears the floating `+` button; `pt-4` above and `pb-3` below `HomeTotalBalance` optically center
+              spacing against the 32px-tall `HomeSortButton` row.
+            -->
+            <div v-if="hasGroups" class="flex flex-col pb-28" :class="showNoResults ? 'gap-1 pt-3' : 'pt-4'">
               <Transition
                 enter-active-class="transition-opacity duration-state ease-enter"
                 enter-from-class="opacity-0"
@@ -185,106 +208,86 @@ const userBalances = computed(() => {
                 <HomeNoResults v-if="showNoResults" :keyword="trimmedKeyword" @clear="searchKeyword = ''" />
               </Transition>
 
-              <!-- Section Header -->
-              <div v-if="!showNoResults" class="flex items-center justify-between px-1">
-                <p class="text-sm font-semibold text-base-text-quaternary">{{ $t("home-all-groups") }}</p>
-                <div v-if="userBalances.length > 0" class="flex items-center gap-1 text-sm font-medium">
-                  <PhArrowsDownUp class="icon-4 text-base-text-quinary" />
-                  <span class="text-base-text-quinary">{{ $t("home-total-balance") }}</span>
-                  <template v-for="userBalance in userBalances" :key="userBalance.currency">
-                    <span v-if="userBalance.amount > 0" class="text-base-text-success">
-                      {{ formatCurrency(userBalance.amount, userBalance.currency) }}
-                    </span>
-                    <span v-else-if="userBalance.amount < 0" class="text-base-text-error">
-                      {{ formatCurrency(-userBalance.amount, userBalance.currency) }}
-                    </span>
-                    <span v-else class="text-base-text-quinary">
-                      {{ formatCurrency(0, userBalance.currency) }}
-                    </span>
-                  </template>
+              <template v-if="!showNoResults">
+                <div class="pb-3">
+                  <HomeTotalBalance :totals="currencyTotals" :common-currency="primaryCurrency" />
                 </div>
-              </div>
+                <div class="flex min-h-8 items-center">
+                  <HomeSortButton v-model="selectedSort" />
+                </div>
+              </template>
 
-              <!-- Group List -->
-              <div class="flex flex-col">
-                <button
-                  v-for="group in visibleGroups"
-                  :key="group.groupId"
-                  type="button"
-                  class="flex w-full items-center gap-3 py-2 text-left"
-                  @click="router.push({ name: 'groupDetail', params: { groupId: group.groupId } })"
-                >
-                  <Avatar
-                    v-if="group.photo"
-                    size="lg"
-                    :images="[{ src: group.photo, alt: group.name }]"
-                    aria-hidden="true"
-                  />
-                  <Avatar
-                    v-else
-                    size="lg"
-                    :images="group.members.slice(0, 4).map((m) => ({ src: m.photo ?? null, alt: m.userName }))"
-                    aria-hidden="true"
-                  />
-
-                  <div class="min-w-0 flex-1">
-                    <p class="truncate text-base font-semibold text-base-text-primary">
-                      {{ group.name }}
-                    </p>
-
-                    <div class="mt-1 flex items-center gap-1 text-sm font-medium">
-                      <template v-if="group.myBalancePositive.length > 0">
-                        <span class="text-base-text-quinary">{{ $t("home-you-lent") }}</span>
-                        <span
-                          v-for="balance in group.myBalancePositive"
-                          :key="balance.currency"
-                          class="text-base-text-success"
-                        >
-                          {{ formatCurrency(balance.amount, balance.currency) }}
-                        </span>
-                      </template>
-                      <template v-if="group.myBalanceNegative.length > 0">
-                        <span class="text-base-text-quinary">{{ $t("home-you-owe") }}</span>
-                        <span
-                          v-for="balance in group.myBalanceNegative"
-                          :key="balance.currency"
-                          class="text-base-text-error"
-                        >
-                          {{ formatCurrency(balance.amount, balance.currency) }}
-                        </span>
-                      </template>
-                      <span v-if="group.groupSettled" class="text-core-alpha-brand-80">
-                        {{ $t("home-all-settled-up") }}
-                      </span>
-                      <span v-else-if="group.myBalanceSettled" class="text-core-alpha-brand-80">
-                        {{ $t("home-you-are-settled-up") }}
-                      </span>
-                    </div>
-                  </div>
-                </button>
-
-                <!-- Create Group row. Keeps group creation reachable when the user already has groups. -->
-                <button
-                  type="button"
-                  class="flex w-full items-center gap-3 py-2 text-left"
-                  data-testid="home-create-group"
-                  @click="createGroup"
-                >
-                  <div
-                    class="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-base-border-secondary text-util-color-brand-700"
+              <TransitionGroup ref="groupList" tag="ul" name="group-row" class="relative" @before-leave="pinLeavingRow">
+                <li v-for="group in visibleGroups" :key="group.groupId" :data-group-id="group.groupId">
+                  <RouterLink
+                    :to="{ name: 'groupDetail', params: { groupId: group.groupId } }"
+                    :class="GROUP_ROW_CLASS"
                   >
-                    <PhUsers class="size-7" />
-                  </div>
-                  <div class="min-w-0 flex-1">
-                    <p class="truncate text-base font-semibold text-base-text-primary">
+                    <Avatar size="sm" :images="getGroupAvatarImages(group)" aria-hidden="true" />
+
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-base font-semibold text-base-text-primary">
+                        {{ group.name }}
+                      </p>
+
+                      <!--
+                        Place owed-to-you and owed-by-you balances on separate lines with subtle status pills so green
+                        and red amounts stay visually distinct from the primary group name without breaking mid-token.
+                      -->
+                      <div class="mt-0.5 flex flex-col gap-0.5 text-sm font-medium">
+                        <p v-if="group.owedToMeBalances.length > 0" class="flex flex-wrap items-center gap-1">
+                          <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-lent") }}</span>
+                          <span
+                            v-for="balance in group.owedToMeBalances"
+                            :key="balance.currency"
+                            class="rounded-md bg-base-bg-success-subtle px-1 whitespace-nowrap text-base-text-success"
+                          >
+                            <HomeAmount :amount="balance.amount" :currency="balance.currency" />
+                          </span>
+                        </p>
+                        <p v-if="group.owedByMeBalances.length > 0" class="flex flex-wrap items-center gap-1">
+                          <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-owe") }}</span>
+                          <span
+                            v-for="balance in group.owedByMeBalances"
+                            :key="balance.currency"
+                            class="rounded-md bg-base-bg-error px-1 whitespace-nowrap text-base-text-error"
+                          >
+                            <HomeAmount :amount="balance.amount" :currency="balance.currency" />
+                          </span>
+                        </p>
+                        <span v-if="group.settled === 'none'" class="text-base-text-quaternary">
+                          {{ $t("home-no-expenses") }}
+                        </span>
+                        <span v-else-if="group.settled === 'all'" class="text-base-text-quaternary">
+                          {{ $t("home-all-settled-up") }}
+                        </span>
+                        <span v-else-if="group.settled === 'you'" class="text-base-text-quaternary">
+                          {{ $t("home-you-are-settled-up") }}
+                        </span>
+                      </div>
+                    </div>
+                  </RouterLink>
+                </li>
+
+                <!-- Trailing Create group row keeps group creation accessible once `HomeEmptyState` is no longer shown. -->
+                <li key="create-group">
+                  <RouterLink
+                    :to="{ name: 'createGroup' }"
+                    :class="GROUP_ROW_CLASS"
+                    data-testid="home-create-group"
+                    @click="routerHistoryStore.takeSnapshot()"
+                  >
+                    <div
+                      class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-dashed border-base-border-secondary text-util-color-brand-700"
+                    >
+                      <PhUsers class="size-5" />
+                    </div>
+                    <p class="min-w-0 flex-1 truncate text-base font-semibold text-base-text-primary">
                       {{ $t("home-button-create-group") }}
                     </p>
-                    <p class="mt-1 text-sm font-medium text-base-text-quinary">
-                      {{ $t("home-create-group-hint") }}
-                    </p>
-                  </div>
-                </button>
-              </div>
+                  </RouterLink>
+                </li>
+              </TransitionGroup>
             </div>
 
             <div v-else-if="showEmptyState">
@@ -314,3 +317,32 @@ const userBalances = computed(() => {
     </template>
   </Layout>
 </template>
+
+<style scoped>
+/* Leaving rows fade out in place without horizontal slide so rapid search typing stays calm. */
+.group-row-move {
+  transition: transform var(--motion-duration-container) var(--motion-easing-standard);
+}
+
+.group-row-enter-active {
+  transition:
+    opacity var(--motion-duration-state) var(--motion-easing-enter),
+    transform var(--motion-duration-state) var(--motion-easing-enter);
+}
+
+.group-row-leave-active {
+  position: absolute;
+  width: 100%;
+  pointer-events: none;
+  transition: opacity var(--motion-duration-exit) var(--motion-easing-exit);
+}
+
+.group-row-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.group-row-leave-to {
+  opacity: 0;
+}
+</style>

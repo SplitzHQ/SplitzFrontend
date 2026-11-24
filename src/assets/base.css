@@ -5,9 +5,18 @@
 
 @config "../../tailwind.config.js";
 
+/*
+ * Default duration and easing for Tailwind `transition*` utilities without an explicit `duration-*` or `ease-*` class,
+ * including the global `transition-colors` rule below. Referencing motion tokens ensures slow-motion and reduced-motion
+ * overrides apply automatically.
+ */
+@theme {
+  --default-transition-duration: var(--motion-duration-feedback);
+  --default-transition-timing-function: var(--motion-easing-standard);
+}
+
 @utility skeleton {
   @apply animate-pulse rounded-md bg-base-bg-secondary;
-  /* This is 2s, the default of `animate-pulse`. The loop token is 0 with reduced motion, so the pulse stops. */
   animation-duration: calc(var(--motion-duration-loop) * 5 / 3);
 }
 

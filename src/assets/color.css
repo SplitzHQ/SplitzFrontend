@@ -320,6 +320,11 @@
   --comp-button-secondary-bg: var(--core-alpha-brand-20);
   --comp-button-secondary-bg-hover: var(--core-alpha-brand-30);
   --comp-button-secondary-bg-pressed: var(--core-alpha-brand-40);
+  --comp-row-bg-hover: var(--base-bg-secondary);
+  --comp-row-bg-pressed: var(--base-bg-secondary);
+  --comp-search-filter-bg: var(--core-alpha-brand-10);
+  --comp-search-filter-bg-hover: var(--core-alpha-brand-20);
+  --comp-search-filter-bg-pressed: var(--core-alpha-brand-30);
   --comp-segment-hover: var(--core-alpha-brand-10);
   --comp-segment-selected: var(--core-alpha-brand-20);
   --comp-segment-track: var(--core-alpha-brand-5);
@@ -640,6 +645,7 @@
   --core-scale-warning-11: #7f5612;
   --core-scale-warning-12: #51380b;
   --core-alpha-white-0: #ffffff00;
+  --core-alpha-white-3: #ffffff08;
   --core-alpha-white-5: #ffffff0c;
   --core-alpha-white-10: #ffffff19;
   --core-alpha-white-20: #ffffff33;
@@ -653,6 +659,7 @@
   --core-alpha-white-95: #fffffff2;
   --core-alpha-white-100: #ffffff;
   --core-alpha-black-0: #00000000;
+  --core-alpha-black-3: #00000008;
   --core-alpha-black-5: #0000000c;
   --core-alpha-black-10: #00000019;
   --core-alpha-black-20: #00000033;
@@ -1118,6 +1125,11 @@
   --comp-button-secondary-bg: var(--core-alpha-brand-20);
   --comp-button-secondary-bg-hover: var(--core-alpha-brand-30);
   --comp-button-secondary-bg-pressed: var(--core-alpha-brand-40);
+  --comp-row-bg-hover: var(--core-alpha-white-3);
+  --comp-row-bg-pressed: var(--core-alpha-white-3);
+  --comp-search-filter-bg: var(--core-alpha-brand-10);
+  --comp-search-filter-bg-hover: var(--core-alpha-brand-20);
+  --comp-search-filter-bg-pressed: var(--core-alpha-brand-30);
   --comp-segment-hover: var(--core-alpha-brand-10);
   --comp-segment-selected: var(--core-alpha-brand-20);
   --comp-segment-track: var(--core-alpha-brand-5);
@@ -1438,6 +1450,7 @@
   --core-scale-warning-11: #df9e33;
   --core-scale-warning-12: #eac17b;
   --core-alpha-white-0: #ffffff00;
+  --core-alpha-white-3: #ffffff08;
   --core-alpha-white-5: #ffffff0c;
   --core-alpha-white-10: #ffffff19;
   --core-alpha-white-20: #ffffff33;
@@ -1451,6 +1464,7 @@
   --core-alpha-white-95: #fffffff2;
   --core-alpha-white-100: #ffffff;
   --core-alpha-black-0: #00000000;
+  --core-alpha-black-3: #00000008;
   --core-alpha-black-5: #0000000c;
   --core-alpha-black-10: #00000019;
   --core-alpha-black-20: #00000033;

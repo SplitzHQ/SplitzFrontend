@@ -13,7 +13,7 @@
 
 - Before any UI change in `src/` or `devtools/`, follow `.agents/skills/spz-component-use/SKILL.md`. Choose the component first, then read its usage file. If the rules do not decide, ask the user and write the decision into the usage file.
 
-- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file.
+- When you change a component in `src/components/`, check its usage file and update it in the same change when needed. A new component needs a usage file and an entry in `src/components/component-index.ts`.
 
 - Use tailwindcss classes for styling. Use scss for custom styles only when using tailwindcss makes it too complex or impossible.
 
@@ -23,7 +23,9 @@
 
 - Use flex gap (preferred) / grid gap instead of margin for spacing between elements.
 
-- Add animations where appropriate. Check `ui-animation` skill. Prefer to use `motion-v` package if it make code simpler.
+- Do not place tables inside cards across `src/`, `devtools/`, or prototypes. Avoid rounded bordered table frames, tinted header rows, or colored header bands, which read as generic AI chrome. Render tables directly on the page surface with a bottom rule under the header, row dividers, and zero outer horizontal padding on the first and last columns. In `devtools/`, use `DocTable` and the `ds-table` class instead of building custom table frames.
+
+- Add animations where appropriate. Check `ui-animation` skill. Prefer `motion-v` when it simplifies the code.
 
 - Run format and test after code changes.
 
