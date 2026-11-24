@@ -1,40 +1,40 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Router } from "vue-router";
 
-import { usePageTransition } from "../page-transition";
+import { getPageScrollState, usePageTransition } from "../page-transition";
 
-/** A router that only keeps the `afterEach` hook, which the page change reads. */
-function fakeRouter() {
-  let hook: (() => void) | undefined;
+/** Minimal router stub capturing the registered `afterEach` callback. */
+function createMockRouter() {
+  let afterEachHook: (() => void) | undefined;
   const router = {
     afterEach: (callback: () => void) => {
-      hook = callback;
+      afterEachHook = callback;
     },
   } as unknown as Router;
-  return { navigate: () => hook?.(), router };
+  return { navigate: () => afterEachHook?.(), router };
 }
 
-/** Sets the history state that vue-router writes for the current entry. */
-function setEntry(position: number, scrollTop: number | null): void {
+/** Writes Vue Router's `position` and `scroll` fields into `window.history.state`. */
+function setHistoryEntry(position: number, scrollTop: number | null): void {
   history.replaceState({ position, scroll: scrollTop === null ? null : { left: 0, top: scrollTop } }, "");
 }
 
-/** Returns a page element, as `App.vue` renders it. */
-function page(): HTMLElement {
-  const el = document.createElement("div");
-  el.className = "page";
-  document.body.append(el);
-  return el;
+/** Appends a `.page` wrapper element matching `App.vue`'s transition container. */
+function appendPageElement(): HTMLElement {
+  const element = document.createElement("div");
+  element.className = "page";
+  document.body.append(element);
+  return element;
 }
 
-/** Calls a hook of the transition, which Vue types as a hook or a list of hooks. */
-function call(hook: unknown, el: Element): void {
-  (hook as (el: Element) => void)(el);
+/** Invokes a single `<Transition>` lifecycle hook (typed by Vue as a function or function array). */
+function invokeTransitionHook(hook: unknown, element: Element): void {
+  (hook as (el: Element) => void)(element);
 }
 
 describe("usePageTransition", () => {
   beforeEach(() => {
-    setEntry(1, null);
+    setHistoryEntry(1, null);
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   });
 
@@ -43,62 +43,67 @@ describe("usePageTransition", () => {
     document.body.replaceChildren();
   });
 
-  it("goes forward on a push and back on a back step", () => {
-    const { navigate, router } = fakeRouter();
+  it("slides forward on history push and back on history pop", () => {
+    const { navigate, router } = createMockRouter();
     const { direction } = usePageTransition(router);
 
-    setEntry(2, null);
+    setHistoryEntry(2, null);
     navigate();
     expect(direction.value).toBe("forward");
 
-    setEntry(1, 300);
+    setHistoryEntry(1, 300);
     navigate();
     expect(direction.value).toBe("back");
   });
 
-  it("keeps the old page where the person left it, as a fixed layer", () => {
-    const { router } = fakeRouter();
+  it("pins the outgoing page as a fixed layer at its current window scroll offset", () => {
+    const { router } = createMockRouter();
     const { hooks } = usePageTransition(router);
-    const old = page();
+    const outgoingPage = appendPageElement();
+    const childInsidePage = document.createElement("div");
+    outgoingPage.append(childInsidePage);
     vi.spyOn(window, "scrollY", "get").mockReturnValue(240);
 
-    call(hooks.onBeforeLeave, old);
+    expect(getPageScrollState(childInsidePage)).toEqual({ isPinned: false, scrollTop: 240 });
 
-    expect(old.style.position).toBe("fixed");
-    expect(old.style.overflow).toBe("hidden");
-    expect(old.scrollTop).toBe(240);
+    invokeTransitionHook(hooks.onBeforeLeave, outgoingPage);
+
+    expect(outgoingPage.style.position).toBe("fixed");
+    expect(outgoingPage.style.overflow).toBe("hidden");
+    expect(outgoingPage.scrollTop).toBe(240);
+    expect(getPageScrollState(childInsidePage)).toEqual({ isPinned: true, scrollTop: 240 });
   });
 
-  it("opens a new page at the top, and a page after a back step at its saved place", () => {
-    const { navigate, router } = fakeRouter();
+  it("starts forward navigations at the top and restores saved scroll offsets on back navigations", () => {
+    const { navigate, router } = createMockRouter();
     const { hooks } = usePageTransition(router);
 
-    setEntry(2, null);
+    setHistoryEntry(2, null);
     navigate();
-    const next = page();
-    call(hooks.onEnter, next);
-    call(hooks.onAfterEnter, next);
+    const incomingPage = appendPageElement();
+    invokeTransitionHook(hooks.onEnter, incomingPage);
+    invokeTransitionHook(hooks.onAfterEnter, incomingPage);
     expect(window.scrollTo).toHaveBeenLastCalledWith({ behavior: "instant", top: 0 });
 
-    setEntry(1, 300);
+    setHistoryEntry(1, 300);
     navigate();
-    const earlier = page();
-    call(hooks.onEnter, earlier);
-    expect(earlier.style.position).toBe("fixed");
-    call(hooks.onAfterEnter, earlier);
-    expect(earlier.style.position).toBe("");
+    const restoredPage = appendPageElement();
+    invokeTransitionHook(hooks.onEnter, restoredPage);
+    expect(restoredPage.style.position).toBe("fixed");
+    invokeTransitionHook(hooks.onAfterEnter, restoredPage);
+    expect(restoredPage.style.position).toBe("");
     expect(window.scrollTo).toHaveBeenLastCalledWith({ behavior: "instant", top: 300 });
   });
 
-  it("puts a page back into the flow when its change stops early", () => {
-    const { router } = fakeRouter();
+  it("unpins the incoming page when an enter transition is cancelled early", () => {
+    const { router } = createMockRouter();
     const { hooks } = usePageTransition(router);
-    const next = page();
+    const incomingPage = appendPageElement();
 
-    call(hooks.onEnter, next);
-    call(hooks.onEnterCancelled, next);
+    invokeTransitionHook(hooks.onEnter, incomingPage);
+    invokeTransitionHook(hooks.onEnterCancelled, incomingPage);
 
-    expect(next.style.position).toBe("");
-    expect(next.style.inset).toBe("");
+    expect(incomingPage.style.position).toBe("");
+    expect(incomingPage.style.inset).toBe("");
   });
 });

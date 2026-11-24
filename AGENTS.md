@@ -23,7 +23,7 @@
 
 - Use flex gap (preferred) / grid gap instead of margin for spacing between elements.
 
-- Do not put a table in a card. This rule applies in `src/` and in `devtools/`, prototypes too. A table must not have a rounded frame with a border, a tinted header row, or a band of color behind the header. These parts give the generic AI look. Put the table on the page: a line under the header, a line between rows, and no outer padding on the first and the last column. In `devtools/`, use `DocTable` and the `ds-table` rule. Do not make a table frame by hand.
+- Do not place tables inside cards across `src/`, `devtools/`, or prototypes. Avoid rounded bordered table frames, tinted header rows, or colored header bands, which read as generic AI chrome. Render tables directly on the page surface with a bottom rule under the header, row dividers, and zero outer horizontal padding on the first and last columns. In `devtools/`, use `DocTable` and the `ds-table` class instead of building custom table frames.
 
 - Add animations where appropriate. Check `ui-animation` skill. Prefer `motion-v` when it simplifies the code.
 

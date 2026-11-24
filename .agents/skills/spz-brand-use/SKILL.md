@@ -1,49 +1,49 @@
 ---
 name: spz-brand-use
-description: Read the Splitz brand rules before you change the logo, the glyph, an app icon, a brand color, the logo motion or a brand pattern. Use this skill for every change to `src/components/BrandWordmark/`, `public/favicon.svg`, the PNG and ICO icons in `public/`, `pwa-assets.config.ts` or the brand tokens in `src/assets/`. Also use it when a page starts to show the logo or a pattern, and when you add a splash screen, a store image or another surface with the brand. Use it even when the change looks small.
+description: Read the Splitz brand rules before changing the logo, glyph, app icons, brand colors, logo motion, or brand patterns. Use this skill for every change to `src/components/BrandWordmark/`, `public/favicon.svg`, the PNG and ICO icons in `public/`, `pwa-assets.config.ts`, or the brand tokens in `src/assets/`. Also use it when adding the logo or a brand pattern to a screen, splash view, store graphic, or exported image, even when the change looks small.
 ---
 
 # Brand use
 
-The brand rules are in `src/components/BrandWordmark/brand.usage.ts`. This file is the one place for them: the parts of the logo, the logo forms, the colorways, the brand colors, the clear space, the minimum size, the misuse, the source files, the app icons, the principles of the motion and the brand patterns.
+`src/components/BrandWordmark/brand.usage.ts` is the single source of truth for Splitz brand rules: logo anatomy, logo forms, colorways, brand colors, clear space, minimum sizes, misuse cases, source files, app icons, motion principles, and brand patterns.
 
-The rules for the logo components are in `src/components/BrandWordmark/brand-wordmark.usage.ts`: the sizes, the component for each page, the motion inside each component and the accessibility.
+`src/components/BrandWordmark/brand-wordmark.usage.ts` holds the component-level rules: size presets, which component to mount on each screen, internal motion behavior, and accessibility requirements.
 
 ## Before a change
 
-1. Read `src/components/BrandWordmark/brand.usage.ts`. Find the part that the change touches.
-2. If the change uses a logo component, read `src/components/BrandWordmark/brand-wordmark.usage.ts`.
-3. Read `OPEN_QUESTIONS` in both files. If the change depends on an open question, ask the user before you start.
-4. Follow the rules. For the rest of the UI, follow `.agents/skills/spz-component-use/SKILL.md`.
-5. After a visible change, look at the logo in the browser at phone width, in the light and the dark theme.
+1. Read `src/components/BrandWordmark/brand.usage.ts` and locate the section affected by your change.
+2. When mounting or editing a logo component, also read `src/components/BrandWordmark/brand-wordmark.usage.ts`.
+3. Check `OPEN_QUESTIONS` in both files. Ask the user before proceeding if the change depends on an unresolved question.
+4. Follow the rules, and follow `.agents/skills/spz-component-use/SKILL.md` for surrounding UI components.
+5. After any visible change, inspect the logo in the browser at mobile width in both light and dark themes.
 
 ## Common changes
 
-| Change                        | What to do                                                                                                                                                                                                      |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Show the logo on a page       | Use `BrandWordmark` with a size from `SIZE_GUIDE`. Keep the clear space and the minimum size. Do not write the name as text in place of the logo.                                                              |
-| Change the shape of the glyph | Change `brand-glyph.ts`, the numbers in `brand-motion.ts` and `public/favicon.svg` together. Then run `bun run generate-pwa-assets`. The full list is in `GLYPH_RULES`.                                         |
-| Change a brand color          | Change all files in the "Change a value" rule of `COLOR_RULES` together. Then generate the icons again.                                                                                                        |
-| Change an app icon            | Change only `public/favicon.svg`, then run `bun run generate-pwa-assets`. Keep the glyph in the maskable safe zone. Tell the user to check the icon on a phone, because iOS keeps an icon that a person added. |
-| Show a brand pattern          | Read `PATTERN_USE_GUIDE` and `PATTERN_RULES`. Pick the use that fits the surface and start from its preset. Make the pattern in the Patterns tool of the dev tools, which shows each use on a sample screen. If no use fits, ask the user. |
-| Change the logo motion        | Change `brand-motion.ts`. The opening and the two taps use one small motion, so change them together. Keep the principles in `MOTION_RULES`.                                                                   |
+| Change                        | What to do                                                                                                                                                                                                                   |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Show the logo on a page       | Use `BrandWordmark` with a size from `SIZE_GUIDE`, respecting clear space and minimum size. Never render the brand logo as plain HTML text.                                                                                  |
+| Change the shape of the glyph | Update `brand-glyph.ts`, the matching metrics in `brand-motion.ts`, and `public/favicon.svg` together, then run `bun run generate-pwa-assets` (see `GLYPH_RULES`).                                                           |
+| Change a brand color          | Update every file listed in the "Change a value" rule of `COLOR_RULES` together, then regenerate the PWA icons.                                                                                                              |
+| Change an app icon            | Edit only `public/favicon.svg`, then run `bun run generate-pwa-assets`. Keep the glyph inside the maskable safe zone, and remind the user to re-add the home-screen shortcut on iOS because iOS caches existing icons.       |
+| Show a brand pattern          | Read `PATTERN_USE_GUIDE` and `PATTERN_RULES`, start from the matching preset in the devtools Patterns tool, and ask the user if no existing use case fits.                                                                   |
+| Change the logo motion        | Update `brand-motion.ts`. Because the cold-start opening and both tap animations share the same glyph assembly sequence, keep them synchronized and follow `MOTION_RULES`.                                                   |
 
 ## When the rules do not decide
 
-Stop and ask the user when one of these conditions is true:
+Stop and ask the user when any of these apply:
 
 - No rule covers the case.
 - Two rules conflict.
-- A rule looks wrong for this surface.
-- The rule depends on an item in `OPEN_QUESTIONS`.
+- A rule looks wrong for the target surface.
+- The rule depends on an entry in `OPEN_QUESTIONS`.
 
-In the question, name the rule, the case and your recommendation. After the user decides, write the decision into the usage file in the same change, and remove the question from `OPEN_QUESTIONS`. Do not write a new rule without the decision of the user.
+State the relevant rule, the specific case, and your recommendation. Once the user decides, record the decision in the usage file and remove any resolved item from `OPEN_QUESTIONS` in the same change. Never invent a new rule without user confirmation.
 
-If the user corrects a brand choice and the rules do not explain the correction, ask whether the correction is a rule. If it is a rule, write it into the usage file.
+If the user corrects a brand choice that is not yet covered, ask whether the correction should become a rule, and record it in the usage file if so.
 
-## When you change the rules
+## Updating the rules
 
-- Keep each rule in one usage file. Other comments point to the file and do not repeat the rule.
-- Use `Record<Option, Rule>` for an option list, for example the forms, the colorways and the misuse cases. The type check then fails when a new option has no rule.
-- Do not import a usage file in app code.
-- If `devtools/` exists, check the Brand page of the dev tools. The page reads `brand.usage.ts`.
+- Keep every rule in a single usage file; reference that file from code comments instead of duplicating rules.
+- Type option maps as `Record<Option, Rule>` (for logo forms, colorways, and misuse cases) so TypeScript catches missing rules when new options are added.
+- Never import `*.usage.ts` files from application runtime code.
+- When `devtools/` is present, verify the Brand page in devtools, which renders `brand.usage.ts` directly.

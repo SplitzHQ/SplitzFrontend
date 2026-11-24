@@ -1,76 +1,103 @@
-import { shallowRef, type TransitionProps } from "vue";
+import { shallowRef, type ShallowRef, type TransitionProps } from "vue";
 import type { Router } from "vue-router";
 
 /**
- * The change between two pages of the app. The new page slides in from the right over the old page, and the
- * old page moves 30% to the left, as on iOS. A back navigation plays the same motion in reverse. The user picked this
- * look in the prototype `2026-11-05-home-motion`. The classes are in `App.vue`.
+ * Directional iOS-style slide transitions between full-screen routes.
+ * Advancing slides the incoming page in from the right over the outgoing page while shifting the outgoing page 30%
+ * left; navigating back plays the reverse. Matching CSS classes live in `App.vue`.
  *
- * The window scrolls the page, so two pages cannot both scroll it while they move. During the motion each page is a
- * fixed layer of the size of the screen and scrolls itself: the old page keeps the place where the person left it, and
- * the new page starts at the top, or at its saved place after a back navigation. A fixed child, for example the plus
- * button, stays in its place, because the layer is its containing block. After the motion the new page goes back into
- * the flow and the window gets its scroll position.
+ * Because `window` can only hold one scroll offset at a time, both the outgoing and incoming `.page` wrappers are
+ * temporarily pinned as viewport-sized `position: fixed` containers during the transition: the outgoing page preserves
+ * the user's scroll position, and the incoming page starts at `0` on forward navigation or at its saved history offset
+ * on back navigation. Fixed descendants (such as floating action buttons) stay anchored because the transformed `.page`
+ * wrapper acts as their containing block. Once the enter transition finishes, the incoming page returns to normal
+ * document flow and `window` receives its scroll offset.
  */
 
-/** The direction of a page change. */
+/** Navigation direction driving the active `<Transition>` class prefix (`page-forward` or `page-back`). */
 export type PageDirection = "forward" | "back";
 
-/** The fields that vue-router writes to the history state of each entry. */
+/** Scroll state of a page, accounting for pinned layers during an active route transition. */
+export interface PageScrollState {
+  /** `true` while the enclosing `.page` wrapper is pinned as `position: fixed` mid-transition. */
+  isPinned: boolean;
+  /** Effective vertical scroll offset in pixels. */
+  scrollTop: number;
+}
+
+/** Reactive transition direction and `<Transition>` lifecycle hooks returned by `usePageTransition`. */
+export interface UsePageTransitionReturn {
+  direction: ShallowRef<PageDirection>;
+  hooks: TransitionProps;
+}
+
+/** Subset of `window.history.state` managed by Vue Router for each history entry. */
 interface RouterHistoryState {
   position?: number;
-  /** The scroll position of the entry when the person left it with a push. */
+  /** Window scroll coordinates recorded by Vue Router before leaving the entry. */
   scroll?: { left: number; top: number } | null;
 }
 
-const routerState = () => (history.state ?? {}) as RouterHistoryState;
+const readRouterHistoryState = (): RouterHistoryState => (history.state ?? {}) as RouterHistoryState;
 
-/** Makes a page a fixed layer of the size of the screen that shows its content from `top`. */
-function freeze(el: Element, top: number): void {
-  const page = el as HTMLElement;
-  Object.assign(page.style, { inset: "0", overflow: "hidden", position: "fixed" });
-  page.scrollTop = top;
+/** Pins a `.page` wrapper to the viewport and locks its internal scroll offset to `scrollTop`. */
+function pinPageLayer(element: Element, scrollTop: number): void {
+  const pageElement = element as HTMLElement;
+  Object.assign(pageElement.style, { inset: "0", overflow: "hidden", position: "fixed" });
+  pageElement.scrollTop = scrollTop;
 }
 
-/** Puts a page back into the flow. */
-function release(el: Element): void {
-  const page = el as HTMLElement;
-  page.style.removeProperty("inset");
-  page.style.removeProperty("overflow");
-  page.style.removeProperty("position");
+/** Restores a `.page` wrapper back to normal document flow. */
+function unpinPageLayer(element: Element): void {
+  const pageElement = element as HTMLElement;
+  pageElement.style.removeProperty("inset");
+  pageElement.style.removeProperty("overflow");
+  pageElement.style.removeProperty("position");
 }
 
 /**
- * Returns the name of the transition for the current page change and the hooks that keep the scroll positions. Call it
- * once, in `App.vue`.
+ * Reads the effective vertical scroll offset for `element`.
+ * While `usePageTransition` pins the enclosing `.page` wrapper as `position: fixed`, `window.scrollY` is inactive
+ * and the pinned `.page` element holds its own `scrollTop` instead.
  */
-export function usePageTransition(router: Router) {
-  const direction = shallowRef<PageDirection>("forward");
-  let lastPosition = routerState().position ?? 0;
-  /** The place of the new page, read when the change starts. */
-  let enterTop = 0;
+export function getPageScrollState(element: Element | null | undefined): PageScrollState {
+  const pageElement = element?.closest<HTMLElement>(".page");
+  if (pageElement?.style.position === "fixed") {
+    return { isPinned: true, scrollTop: pageElement.scrollTop };
+  }
+  return { isPinned: false, scrollTop: window.scrollY };
+}
 
-  // The position grows with each push and goes down with each back step. A replace keeps it and counts as forward.
+/**
+ * Tracks route navigation direction and provides `<Transition>` hooks that preserve scroll positions across slides.
+ * Call once in `App.vue`.
+ */
+export function usePageTransition(router: Router): UsePageTransitionReturn {
+  const direction = shallowRef<PageDirection>("forward");
+  let previousHistoryPosition = readRouterHistoryState().position ?? 0;
+  let enteringScrollTop = 0;
+
+  // Vue Router increments `position` on `push` and decrements it on `back`; `replace` keeps `position` unchanged and slides forward.
   router.afterEach(() => {
-    const position = routerState().position ?? 0;
-    direction.value = position < lastPosition ? "back" : "forward";
-    lastPosition = position;
+    const currentPosition = readRouterHistoryState().position ?? 0;
+    direction.value = currentPosition < previousHistoryPosition ? "back" : "forward";
+    previousHistoryPosition = currentPosition;
   });
 
   const hooks: TransitionProps = {
-    onAfterEnter: (el) => {
-      release(el);
-      window.scrollTo({ behavior: "instant", top: enterTop });
+    onAfterEnter: (element) => {
+      unpinPageLayer(element);
+      window.scrollTo({ behavior: "instant", top: enteringScrollTop });
     },
-    onBeforeLeave: (el) => {
-      // This hook runs before the new page is in the document, so the window still has the place of the old page.
-      freeze(el, window.scrollY);
+    onBeforeLeave: (element) => {
+      // Runs before the incoming page mounts, while `window.scrollY` still reflects the outgoing page.
+      pinPageLayer(element, window.scrollY);
     },
-    onEnter: (el) => {
-      enterTop = direction.value === "back" ? (routerState().scroll?.top ?? 0) : 0;
-      freeze(el, enterTop);
+    onEnter: (element) => {
+      enteringScrollTop = direction.value === "back" ? (readRouterHistoryState().scroll?.top ?? 0) : 0;
+      pinPageLayer(element, enteringScrollTop);
     },
-    onEnterCancelled: release,
+    onEnterCancelled: unpinPageLayer,
   };
 
   return { direction, hooks };

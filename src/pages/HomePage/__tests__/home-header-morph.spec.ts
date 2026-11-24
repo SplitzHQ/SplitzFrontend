@@ -1,81 +1,96 @@
 import { describe, expect, it } from "vitest";
 
-import { MORPH_CIRCLE_PX, morphFrame, stepSpring, type MorphGeometry, type SpringState } from "../home-header-morph";
+import {
+  COLLAPSED_BUTTON_SIZE_PX,
+  computeHeaderMorphFrame,
+  stepSpring,
+  type HeaderMorphGeometry,
+  type SpringState,
+} from "../home-header-morph";
 
-/** A field of 39.3px under a 130px top row, and an icon at 258, 78. The values come from the prototype. */
-const GEOMETRY: MorphGeometry = {
-  barBase: 130,
+/** Sample geometry: 39.3px search field beneath a 130px top bar, collapsing into a button at `(258, 78)`. */
+const SAMPLE_GEOMETRY: HeaderMorphGeometry = {
   fieldHeight: 39.3,
   fieldLeft: 16,
   fieldTop: 130,
   fieldWidth: 370,
-  filterRight: 36,
-  filterTop: 4,
-  iconLeft: 258,
-  iconTop: 78,
-  magnifierLeft: 10,
-  magnifierTop: 10,
-  rowBottom: 55.3,
-  textLeft: 38,
-  textTop: 10,
+  filterOffsetFromRight: 36,
+  filterOffsetTop: 4,
+  magnifierOffsetLeft: 10,
+  magnifierOffsetTop: 10,
+  placeholderOffsetLeft: 38,
+  placeholderOffsetTop: 10,
+  searchRowBottomOffset: 55.3,
+  targetButtonLeft: 258,
+  targetButtonTop: 78,
+  topBarHeight: 130,
 };
 
-describe("morphFrame", () => {
-  it("starts at the real field, so the copy does not jump when it takes its place", () => {
-    const frame = morphFrame(GEOMETRY, 0, 0);
+describe("computeHeaderMorphFrame", () => {
+  it("matches the resting search field bounds at progress 0 so the overlay swaps in seamlessly", () => {
+    const frame = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 0, 0);
 
-    expect(frame).toMatchObject({ height: 39.3, left: 16, right: 386, text: 1, top: 130 });
-    expect(frame.frame).toBe(1);
+    expect(frame).toMatchObject({ contentOpacity: 1, height: 39.3, left: 16, right: 386, top: 130 });
+    expect(frame.outlineOpacity).toBe(1);
   });
 
-  it("ends at the search icon, with no outline and the brand color", () => {
-    const frame = morphFrame(GEOMETRY, 1, 56);
+  it("lands on the collapsed search icon button at progress 1 with outline hidden and brand tint visible", () => {
+    const frame = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 1, 56);
 
-    expect(frame).toMatchObject({ height: MORPH_CIRCLE_PX, left: 258, right: 298, text: 0, tint: 1, top: 78 });
-    expect(frame.frame).toBe(0);
-    expect(frame.barExtend).toBe(0);
+    expect(frame).toMatchObject({
+      brandIconOpacity: 1,
+      contentOpacity: 0,
+      height: COLLAPSED_BUTTON_SIZE_PX,
+      left: 258,
+      right: 298,
+      top: 78,
+    });
+    expect(frame.outlineOpacity).toBe(0);
+    expect(frame.barExtensionPx).toBe(0);
   });
 
-  it("moves both ends on straight lines with the same progress", () => {
-    const start = morphFrame(GEOMETRY, 0, 0);
-    const middle = morphFrame(GEOMETRY, 0.5, 28);
-    const end = morphFrame(GEOMETRY, 1, 56);
+  it("interpolates left, right, and top edges linearly across progress", () => {
+    const start = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 0, 0);
+    const midpoint = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 0.5, 28);
+    const end = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 1, 56);
 
-    expect(middle.left).toBeCloseTo((start.left + end.left) / 2);
-    expect(middle.right).toBeCloseTo((start.right + end.right) / 2);
-    expect(middle.top).toBeCloseTo((start.top + end.top) / 2);
+    expect(midpoint.left).toBeCloseTo((start.left + end.left) / 2);
+    expect(midpoint.right).toBeCloseTo((start.right + end.right) / 2);
+    expect(midpoint.top).toBeCloseTo((start.top + end.top) / 2);
   });
 
-  it("starts the bar at the bottom of the real search row", () => {
-    expect(morphFrame(GEOMETRY, 0.001, 0).barExtend).toBeCloseTo(55.3, 0);
+  it("extends the backdrop down to the bottom of the resting search row as collapse begins", () => {
+    expect(computeHeaderMorphFrame(SAMPLE_GEOMETRY, 0.001, 0).barExtensionPx).toBeCloseTo(55.3, 0);
   });
 
-  it("does not let the bar cover content that a fast scroll has already moved up", () => {
-    // The spring trails at 10%, but the page has scrolled 40px: the row bottom is now 40px higher.
-    const frame = morphFrame(GEOMETRY, 0.1, 40);
+  it("clamps backdrop extension so a trailing spring never covers scrolled list content", () => {
+    // Spring trails at 10% while the page has already scrolled 40px upward.
+    const frame = computeHeaderMorphFrame(SAMPLE_GEOMETRY, 0.1, 40);
 
-    expect(GEOMETRY.barBase + frame.barExtend).toBeCloseTo(GEOMETRY.fieldTop + GEOMETRY.rowBottom - 40);
+    expect(SAMPLE_GEOMETRY.topBarHeight + frame.barExtensionPx).toBeCloseTo(
+      SAMPLE_GEOMETRY.fieldTop + SAMPLE_GEOMETRY.searchRowBottomOffset - 40
+    );
   });
 });
 
 describe("stepSpring", () => {
-  it("reaches the target in about the settle time and does not overshoot", () => {
-    const state: SpringState = { speed: 0, value: 0 };
-    let highest = 0;
-    let time = 0;
-    while (!stepSpring(state, 1, 1 / 60, 0.28) && time < 2) {
-      time += 1 / 60;
-      highest = Math.max(highest, state.value);
+  it("settles onto the target near settleSeconds without overshooting", () => {
+    const state: SpringState = { value: 0, velocity: 0 };
+    let peakValue = 0;
+    let simulatedSeconds = 0;
+    while (!stepSpring(state, 1, 1 / 60, 0.28) && simulatedSeconds < 2) {
+      simulatedSeconds += 1 / 60;
+      peakValue = Math.max(peakValue, state.value);
     }
 
     expect(state.value).toBe(1);
-    expect(highest).toBeLessThanOrEqual(1);
-    expect(time).toBeGreaterThan(0.2);
-    expect(time).toBeLessThan(0.8);
+    expect(peakValue).toBeLessThanOrEqual(1);
+    expect(simulatedSeconds).toBeGreaterThan(0.2);
+    expect(simulatedSeconds).toBeLessThan(0.8);
   });
 
-  it("jumps to the target with no settle time", () => {
-    const state: SpringState = { speed: 0, value: 0 };
+  it("snaps immediately to the target when settleSeconds is zero", () => {
+    const state: SpringState = { value: 0, velocity: 0 };
 
     expect(stepSpring(state, 0.6, 0, 0)).toBe(true);
     expect(state.value).toBe(0.6);

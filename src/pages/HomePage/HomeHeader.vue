@@ -18,312 +18,327 @@ import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { motionSlow, prefersReducedMotion, scrollBehavior } from "@/libs/motion";
+import { getPageScrollState } from "@/libs/page-transition";
 
 import { HOME_FILTER_BUTTON_CLASS } from "./home-filter-button";
 import {
   clamp01,
-  MORPH_CIRCLE_PX,
-  MORPH_SEAM_PX,
-  morphFrame,
+  COLLAPSED_BUTTON_SIZE_PX,
+  computeHeaderMorphFrame,
+  PILL_SEAM_OVERLAP_PX,
   stepSpring,
-  type MorphGeometry,
+  type HeaderMorphGeometry,
   type SpringState,
 } from "./home-header-morph";
 import HomeSearchBar from "./HomeSearchBar.vue";
 
 /**
- * The header of HomePage. The row with the logo, the bell and the avatar stays at the top on a frosted bar. When
- * the page scrolls, the search field turns into a search icon in that row, and the word mark turns into the glyph with
- * the same progress. A tap on the search icon goes back to the top and puts the focus in the field. The user picked
- * this look in the prototype `2026-11-05-home-motion`. The math is in `home-header-morph.ts`.
+ * Collapsing sticky header for `HomePage`.
+ * Keeps the brand mark, notification bell, and profile menu anchored on a frosted top bar while scrolling collapses
+ * the search bar into a search icon button and scrubs `BrandHomeLogo` into the standalone glyph. Tapping the collapsed
+ * search icon scrolls back to the top and focuses the search input. Interpolation and spring physics live in
+ * `home-header-morph.ts`.
  */
 const keyword = defineModel<string>({ default: "" });
 
 const { $t } = useFluent();
 
-/** The time in which the morph reaches 95% of a scroll step. The spring keeps a wheel step or a flick soft. */
-const FOLLOW_SETTLE_S = 0.28;
-/** The opacity of the frosted bar, in percent. */
-const GLASS_ALPHA = 69;
-/** The blur of the frosted bar, in pixels. */
-const GLASS_BLUR_PX = 18;
-/** The strength of the bottom line of the bar, in percent of `--base-border-quaternary`. */
-const GLASS_LINE = 50;
-/** Under the status bar, the length of the fade from the full header color to the frosted color, in pixels. */
-const TOP_FADE_PX = 24;
+/** 95% spring response time (in seconds) smoothing discrete wheel ticks and flicks. */
+const SPRING_SETTLE_SECONDS = 0.28;
+/** Background opacity percentage of the frosted glass bar. */
+const FROSTED_BG_OPACITY_PERCENT = 69;
+/** Backdrop blur radius (in CSS pixels) of the frosted glass bar. */
+const FROSTED_BLUR_PX = 18;
+/** Bottom divider opacity as a percentage of `--base-border-quaternary`. */
+const BOTTOM_BORDER_OPACITY_PERCENT = 50;
+/** Vertical gradient distance (in CSS pixels) blending the opaque status-bar region into the frosted glass tint. */
+const STATUS_BAR_FADE_HEIGHT_PX = 24;
 
-const header = useTemplateRef<HTMLElement>("header");
-const topRow = useTemplateRef<HTMLElement>("topRow");
-const searchRow = useTemplateRef<HTMLElement>("searchRow");
-const morphEl = useTemplateRef<HTMLElement>("morphEl");
-const searchIcon = useTemplateRef<ComponentPublicInstance>("searchIcon");
-const logo = useTemplateRef<InstanceType<typeof BrandHomeLogo>>("logo");
+const headerRoot = useTemplateRef<HTMLElement>("headerRoot");
+const topBarElement = useTemplateRef<HTMLElement>("topBarElement");
+const searchRowElement = useTemplateRef<HTMLElement>("searchRowElement");
+const morphOverlayElement = useTemplateRef<HTMLElement>("morphOverlayElement");
+const collapsedSearchButton = useTemplateRef<ComponentPublicInstance>("collapsedSearchButton");
+const homeLogo = useTemplateRef<InstanceType<typeof BrandHomeLogo>>("homeLogo");
 
-// --- Scroll ---------------------------------------------------------------------------------------------------------
+// --- Scroll tracking ------------------------------------------------------------------------------------------------
 
-/** The scroll position of the page. */
+/** Current vertical scroll offset of the page in pixels. */
 const scrollTop = shallowRef(0);
-/** The height of the search row. The field is gone when the page has scrolled this far. */
+/** Measured height of `searchRowElement`, defining the scroll distance over which the search bar collapses. */
 const searchRowHeight = shallowRef(0);
 
-/**
- * Returns the scroll position of the page. During a page change the page is a fixed layer that scrolls itself (see
- * `src/libs/page-transition.ts`), and the window then has no scroll.
- */
-function pageScroll(): { frozen: boolean; top: number } {
-  const page = header.value?.closest<HTMLElement>(".page");
-  if (page?.style.position === "fixed") return { frozen: true, top: page.scrollTop };
-  return { frozen: false, top: window.scrollY };
-}
+// --- Layout geometry ------------------------------------------------------------------------------------------------
 
-// --- Geometry -------------------------------------------------------------------------------------------------------
-
-const geometry = shallowRef<MorphGeometry>({
-  barBase: 0,
-  fieldHeight: MORPH_CIRCLE_PX,
+const geometry = shallowRef<HeaderMorphGeometry>({
+  fieldHeight: COLLAPSED_BUTTON_SIZE_PX,
   fieldLeft: 16,
   fieldTop: 0,
   fieldWidth: 0,
-  filterRight: 36,
-  filterTop: 4,
-  iconLeft: 0,
-  iconTop: 0,
-  magnifierLeft: 10,
-  magnifierTop: 10,
-  rowBottom: 56,
-  textLeft: 38,
-  textTop: 10,
+  filterOffsetFromRight: 36,
+  filterOffsetTop: 4,
+  magnifierOffsetLeft: 10,
+  magnifierOffsetTop: 10,
+  placeholderOffsetLeft: 38,
+  placeholderOffsetTop: 10,
+  searchRowBottomOffset: 56,
+  targetButtonLeft: 0,
+  targetButtonTop: 0,
+  topBarHeight: 0,
 });
 
-/** Returns the place of `el` relative to `ancestor`. Offsets ignore transforms, so the scale of a hidden icon does not count. */
-function offsetWithin(el: HTMLElement, ancestor: HTMLElement): { left: number; top: number } {
+/** Computes `element`'s layout offset relative to `ancestor` using `offsetLeft`/`offsetTop` (ignoring CSS transforms). */
+function getOffsetWithinAncestor(element: HTMLElement, ancestor: HTMLElement): { left: number; top: number } {
   let left = 0;
   let top = 0;
-  let node: HTMLElement | null = el;
-  while (node && node !== ancestor) {
-    left += node.offsetLeft;
-    top += node.offsetTop;
-    node = node.offsetParent as HTMLElement | null;
+  let current: HTMLElement | null = element;
+  while (current && current !== ancestor) {
+    left += current.offsetLeft;
+    top += current.offsetTop;
+    current = current.offsetParent as HTMLElement | null;
   }
   return { left, top };
 }
 
-/** Reads the sizes of the real field, the search row and the search icon. */
-function measure(): void {
-  const row = topRow.value;
-  const label = searchRow.value?.querySelector("label");
-  const icon = searchIcon.value?.$el as HTMLElement | undefined;
-  if (!row || !label || icon === undefined || !searchRow.value) return;
-  searchRowHeight.value = searchRow.value.offsetHeight;
-  const rowRect = row.getBoundingClientRect();
-  const field = label.getBoundingClientRect();
-  const magnifier = label.querySelector("svg")?.getBoundingClientRect();
-  const input = label.querySelector("input")?.getBoundingClientRect();
-  const filter = label.parentElement?.querySelector("label ~ div button")?.getBoundingClientRect();
-  const iconPlace = offsetWithin(icon, row);
-  const fallback = geometry.value;
+/** Measures the live search bar, search row, and target icon button bounds. */
+function measureLayoutGeometry(): void {
+  const topBar = topBarElement.value;
+  const searchRow = searchRowElement.value;
+  const searchLabel = searchRow?.querySelector("label");
+  const targetButton = collapsedSearchButton.value?.$el as HTMLElement | undefined;
+  if (!topBar || !searchRow || !searchLabel || targetButton === undefined) return;
+  searchRowHeight.value = searchRow.offsetHeight;
+  const topBarRect = topBar.getBoundingClientRect();
+  const fieldRect = searchLabel.getBoundingClientRect();
+  const magnifierRect = searchLabel.querySelector("svg")?.getBoundingClientRect();
+  const inputRect = searchLabel.querySelector("input")?.getBoundingClientRect();
+  const filterButtonRect = searchLabel.parentElement?.querySelector("label ~ div button")?.getBoundingClientRect();
+  const targetButtonOffset = getOffsetWithinAncestor(targetButton, topBar);
+  const previousGeometry = geometry.value;
   geometry.value = {
-    barBase: row.offsetHeight,
-    fieldHeight: field.height,
-    fieldLeft: field.left - rowRect.left,
-    fieldTop: field.top - rowRect.top + pageScroll().top,
-    fieldWidth: field.width,
-    filterRight: filter ? field.right - filter.left : fallback.filterRight,
-    filterTop: filter ? filter.top - field.top : fallback.filterTop,
-    iconLeft: iconPlace.left,
-    iconTop: iconPlace.top,
-    magnifierLeft: magnifier ? magnifier.left - field.left : fallback.magnifierLeft,
-    magnifierTop: magnifier ? magnifier.top - field.top : fallback.magnifierTop,
-    rowBottom: searchRow.value.getBoundingClientRect().bottom - field.top,
-    textLeft: input ? input.left - field.left : fallback.textLeft,
-    textTop: input ? input.top - field.top + (input.height - 20) / 2 : fallback.textTop,
+    fieldHeight: fieldRect.height,
+    fieldLeft: fieldRect.left - topBarRect.left,
+    fieldTop: fieldRect.top - topBarRect.top + getPageScrollState(headerRoot.value).scrollTop,
+    fieldWidth: fieldRect.width,
+    filterOffsetFromRight: filterButtonRect
+      ? fieldRect.right - filterButtonRect.left
+      : previousGeometry.filterOffsetFromRight,
+    filterOffsetTop: filterButtonRect ? filterButtonRect.top - fieldRect.top : previousGeometry.filterOffsetTop,
+    magnifierOffsetLeft: magnifierRect ? magnifierRect.left - fieldRect.left : previousGeometry.magnifierOffsetLeft,
+    magnifierOffsetTop: magnifierRect ? magnifierRect.top - fieldRect.top : previousGeometry.magnifierOffsetTop,
+    placeholderOffsetLeft: inputRect ? inputRect.left - fieldRect.left : previousGeometry.placeholderOffsetLeft,
+    placeholderOffsetTop: inputRect
+      ? inputRect.top - fieldRect.top + (inputRect.height - 20) / 2
+      : previousGeometry.placeholderOffsetTop,
+    searchRowBottomOffset: searchRow.getBoundingClientRect().bottom - fieldRect.top,
+    targetButtonLeft: targetButtonOffset.left,
+    targetButtonTop: targetButtonOffset.top,
+    topBarHeight: topBar.offsetHeight,
   };
 }
 
-// The sizes can change after the first paint, for example when the safe area arrives.
-useResizeObserver([topRow, searchRow], measure);
+// Re-measure whenever safe-area insets or font metrics resize the header rows after first paint.
+useResizeObserver([topBarElement, searchRowElement], measureLayoutGeometry);
 
-// --- Progress -------------------------------------------------------------------------------------------------------
+// --- Collapse progress & spring -------------------------------------------------------------------------------------
 
 /**
- * True while the focus is in the search row. The morph then stays at the field, because the keyboard of a phone can
- * scroll the page, and the field must not turn into the icon while the person types.
+ * Keeps the search field expanded while focus sits inside `searchRowElement` so mobile virtual-keyboard scrolling
+ * cannot collapse the input underneath the user's typing.
  */
-const searchFocused = shallowRef(false);
+const isSearchFocused = shallowRef(false);
 
-/** How far the search row has scrolled away, from 0 to 1. */
-const searchAway = computed(() => {
-  if (searchFocused.value || searchRowHeight.value <= 0) return 0;
+/** Target collapse ratio (`0..1`) derived from scroll position and focus state. */
+const targetCollapseProgress = computed(() => {
+  if (isSearchFocused.value || searchRowHeight.value <= 0) return 0;
   return clamp01(scrollTop.value / searchRowHeight.value);
 });
 
-// The spring also follows a change of the focus, not only a scroll.
-watch(searchFocused, () => onScroll());
+watch(isSearchFocused, () => syncWithScroll());
 
-/** The progress of the morph. It follows `searchAway` through a spring. */
-const progress = shallowRef(0);
-const spring: SpringState = { speed: 0, value: 0 };
-let frame = 0;
-let lastTime = 0;
+/** Smoothed collapse progress (`0..1`) trailing `targetCollapseProgress` via `spring`. */
+const collapseProgress = shallowRef(0);
+const spring: SpringState = { value: 0, velocity: 0 };
+let animationFrameId = 0;
+let lastFrameTimestampMs = 0;
 
-/** Moves the spring one frame toward `searchAway`. */
-function springStep(now: number): void {
-  const settled = stepSpring(spring, searchAway.value, (now - lastTime) / 1000, settleSeconds());
-  lastTime = now;
-  progress.value = clamp01(spring.value);
-  frame = settled ? 0 : requestAnimationFrame(springStep);
+/** Effective spring settle duration in seconds (`0` when reduced motion is active). */
+function getSpringSettleSeconds(): number {
+  return prefersReducedMotion() ? 0 : SPRING_SETTLE_SECONDS * motionSlow();
 }
 
-/** The settle time of the spring. Reduced motion follows the scroll at once. */
-function settleSeconds(): number {
-  return prefersReducedMotion() ? 0 : FOLLOW_SETTLE_S * motionSlow();
+/** Integrates one animation frame of the collapse spring toward `targetCollapseProgress`. */
+function advanceSpringFrame(timestampMs: number): void {
+  const isSettled = stepSpring(
+    spring,
+    targetCollapseProgress.value,
+    (timestampMs - lastFrameTimestampMs) / 1000,
+    getSpringSettleSeconds()
+  );
+  lastFrameTimestampMs = timestampMs;
+  collapseProgress.value = clamp01(spring.value);
+  animationFrameId = isSettled ? 0 : requestAnimationFrame(advanceSpringFrame);
 }
 
-/** Reads the scroll position, and starts the spring. A page that moves in a page change jumps to its place. */
-function onScroll(): void {
-  const { frozen, top } = pageScroll();
-  scrollTop.value = top;
-  if (frozen || settleSeconds() <= 0) {
-    cancelAnimationFrame(frame);
-    frame = 0;
-    stepSpring(spring, searchAway.value, 0, 0);
-    progress.value = spring.value;
+/** Reads scroll position and drives `collapseProgress` (snapping immediately during route transitions or reduced motion). */
+function syncWithScroll(): void {
+  const { isPinned, scrollTop: currentScrollTop } = getPageScrollState(headerRoot.value);
+  scrollTop.value = currentScrollTop;
+  if (isPinned || getSpringSettleSeconds() <= 0) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+    stepSpring(spring, targetCollapseProgress.value, 0, 0);
+    collapseProgress.value = spring.value;
     return;
   }
-  if (frame) return;
-  lastTime = performance.now();
-  frame = requestAnimationFrame(springStep);
+  if (animationFrameId) return;
+  lastFrameTimestampMs = performance.now();
+  animationFrameId = requestAnimationFrame(advanceSpringFrame);
 }
 
 onMounted(() => {
-  measure();
-  onScroll();
-  // The capture phase also gets the scroll of the page layer during a page change. A scroll event does not bubble.
-  window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+  measureLayoutGeometry();
+  syncWithScroll();
+  // Capture phase receives scroll events from pinned `.page` containers during route transitions (`scroll` does not bubble).
+  window.addEventListener("scroll", syncWithScroll, { capture: true, passive: true });
 });
 onBeforeUnmount(() => {
-  window.removeEventListener("scroll", onScroll, { capture: true });
-  cancelAnimationFrame(frame);
+  window.removeEventListener("scroll", syncWithScroll, { capture: true });
+  cancelAnimationFrame(animationFrameId);
 });
 
-// --- Frame ----------------------------------------------------------------------------------------------------------
+// --- Imperative DOM frame updates -----------------------------------------------------------------------------------
 
-/** True after the morph has started. It changes only at the start, so a frame does not render the header again. */
-const started = computed(() => progress.value > 0);
-/** True when the search icon replaces the field. */
-const iconShown = computed(() => progress.value >= 1);
-/** True when content is under the bar, so the bar shows its bottom line. */
-const edge = computed(() => searchRowHeight.value > 0 && scrollTop.value > searchRowHeight.value);
+/** `true` once collapse begins (`collapseProgress > 0`), toggling only at the boundary to avoid per-frame Vue re-renders. */
+const isMorphStarted = computed(() => collapseProgress.value > 0);
+/** `true` once the search bar has fully collapsed into the top-bar search icon button. */
+const isCollapsedIconVisible = computed(() => collapseProgress.value >= 1);
+/** `true` once page content scrolls beneath the collapsed bar, revealing its bottom hairline border. */
+const showBottomDivider = computed(() => searchRowHeight.value > 0 && scrollTop.value > searchRowHeight.value);
 
-/** The progress of the last frame that `applyFrame` wrote. */
-let lastProgress = 0;
+let lastRenderedProgress = 0;
 
 /**
- * Writes the frame to the copy of the field, the bar and the logo. The values go to the elements directly, not through
- * the template, so a frame does not render the page again. Each part moves with a transform, so a frame needs no layout.
+ * Applies per-frame `transform` and `opacity` styles directly to the morph overlay, backdrop, and `BrandHomeLogo`,
+ * bypassing Vue template re-renders and layout recalculations during scroll.
  */
-function applyFrame(): void {
-  const el = morphEl.value;
-  const row = topRow.value;
-  if (!el || !row) return;
-  const t = progress.value;
-  logo.value?.scrub(t);
-  // The sizes are read again when the morph starts, so the copy matches the field at the swap.
-  if (t > 0 && lastProgress <= 0) measure();
-  lastProgress = t;
-  const g = geometry.value;
-  const f = morphFrame(g, t, scrollTop.value);
-  const scale = f.height / g.fieldHeight;
-  const cap = f.height / 2;
-  const middle = Math.max(0, f.right - f.left - f.height) + 2 * MORPH_SEAM_PX;
-  const set = (name: string, transform: string, opacity?: number) => {
-    const node = el.querySelector<HTMLElement>(`[data-morph="${name}"]`);
-    if (!node) return;
-    node.style.transform = transform;
-    if (opacity !== undefined) node.style.opacity = String(opacity);
+function renderMorphFrame(): void {
+  const overlay = morphOverlayElement.value;
+  const topBar = topBarElement.value;
+  if (!overlay || !topBar) return;
+  const currentProgress = collapseProgress.value;
+  homeLogo.value?.scrub(currentProgress);
+  // Refresh measurements right as collapse begins so the morph overlay aligns seamlessly with the live field.
+  if (currentProgress > 0 && lastRenderedProgress <= 0) measureLayoutGeometry();
+  lastRenderedProgress = currentProgress;
+
+  const currentGeometry = geometry.value;
+  const frame = computeHeaderMorphFrame(currentGeometry, currentProgress, scrollTop.value);
+  const pillScale = frame.height / currentGeometry.fieldHeight;
+  const endCapWidth = frame.height / 2;
+  const middleSpanWidth = Math.max(0, frame.right - frame.left - frame.height) + 2 * PILL_SEAM_OVERLAP_PX;
+
+  const setPartStyle = (partName: string, transform: string, opacity?: number) => {
+    const partElement = overlay.querySelector<HTMLElement>(`[data-morph="${partName}"]`);
+    if (!partElement) return;
+    partElement.style.transform = transform;
+    if (opacity !== undefined) partElement.style.opacity = String(opacity);
   };
-  set("left", `translate(${f.left}px, ${f.top}px) scale(${scale})`);
-  set("mid", `translate(${f.left + cap - MORPH_SEAM_PX}px, ${f.top}px) scale(${middle}, ${scale})`);
-  set("right", `translate(${f.right - cap}px, ${f.top}px) scale(${scale})`);
-  set("icon", `translate(${f.left + f.iconLeft}px, ${f.top + f.iconTop}px)`);
-  set("text", `translate(${f.left + g.textLeft}px, ${f.top + g.textTop}px)`, f.text);
-  set("filter", `translate(${f.right - g.filterRight}px, ${f.top + g.filterTop}px)`, f.text);
-  const frameNode = el.querySelector<HTMLElement>('[data-morph="frame"]');
-  if (frameNode) frameNode.style.opacity = String(f.frame);
-  const tint = el.querySelector<HTMLElement>('[data-morph="tint"]');
-  if (tint) tint.style.opacity = String(f.tint);
-  row.style.setProperty("--bar-extend", `${f.barExtend}px`);
+  setPartStyle("left", `translate(${frame.left}px, ${frame.top}px) scale(${pillScale})`);
+  setPartStyle(
+    "mid",
+    `translate(${frame.left + endCapWidth - PILL_SEAM_OVERLAP_PX}px, ${frame.top}px) scale(${middleSpanWidth}, ${pillScale})`
+  );
+  setPartStyle("right", `translate(${frame.right - endCapWidth}px, ${frame.top}px) scale(${pillScale})`);
+  setPartStyle(
+    "icon",
+    `translate(${frame.left + frame.magnifierOffsetLeft}px, ${frame.top + frame.magnifierOffsetTop}px)`
+  );
+  setPartStyle(
+    "text",
+    `translate(${frame.left + currentGeometry.placeholderOffsetLeft}px, ${frame.top + currentGeometry.placeholderOffsetTop}px)`,
+    frame.contentOpacity
+  );
+  setPartStyle(
+    "filter",
+    `translate(${frame.right - currentGeometry.filterOffsetFromRight}px, ${frame.top + currentGeometry.filterOffsetTop}px)`,
+    frame.contentOpacity
+  );
+
+  const outlineNode = overlay.querySelector<HTMLElement>('[data-morph="frame"]');
+  if (outlineNode) outlineNode.style.opacity = String(frame.outlineOpacity);
+  const brandTintNode = overlay.querySelector<HTMLElement>('[data-morph="tint"]');
+  if (brandTintNode) brandTintNode.style.opacity = String(frame.brandIconOpacity);
+  topBar.style.setProperty("--bar-extend", `${frame.barExtensionPx}px`);
 }
 
-watch([progress, geometry, scrollTop, morphEl], applyFrame, { flush: "post" });
+watch([collapseProgress, geometry, scrollTop, morphOverlayElement], renderMorphFrame, { flush: "post" });
 
-// --- Look -----------------------------------------------------------------------------------------------------------
+// --- Frosted backdrop styles ----------------------------------------------------------------------------------------
 
-/** The size of one half circle of the outline. It changes only when the field changes size. */
-const capSize = computed(() => ({
+/** Resting dimensions of each semicircular pill end-cap. */
+const pillEndCapSizeStyle = computed(() => ({
   height: `${geometry.value.fieldHeight}px`,
   width: `${geometry.value.fieldHeight / 2}px`,
 }));
 
-/** The room above the screen that lets the bar layer move down by `--bar-extend` with a transform. */
-const extendMax = computed(() =>
-  Math.max(0, geometry.value.fieldTop + geometry.value.rowBottom - geometry.value.barBase)
+/** Headroom above the viewport allowing the frosted backdrop to extend downward via `translateY(--bar-extend)` without resizing. */
+const maxBarExtensionPx = computed(() =>
+  Math.max(0, geometry.value.fieldTop + geometry.value.searchRowBottomOffset - geometry.value.topBarHeight)
 );
 
-/** The frosted color of the header. */
-const glassColor = `color-mix(in oklab, var(--base-bg-secondary_alt) ${GLASS_ALPHA}%, transparent)`;
+const frostedBackgroundColor = `color-mix(in oklab, var(--base-bg-secondary_alt) ${FROSTED_BG_OPACITY_PERCENT}%, transparent)`;
 
 /**
- * The frosted bar. The layer starts `--bar-extend-max` above the top row and moves down by `--bar-extend`, so its size
- * does not change on each frame. The status bar area has the full header color, so no content shows behind the time
- * and the battery, and the color fades to the frosted color under it.
+ * Styles for the fixed-height frosted backdrop layer. Kept opaque across `--safe-area-top` so scrolling content never
+ * bleeds behind OS status-bar icons, then feathered into `frostedBackgroundColor` over `STATUS_BAR_FADE_HEIGHT_PX`.
  */
-const barStyle = computed(() => {
-  const screenTop = "(var(--bar-extend-max) - var(--bar-extend, 0px))";
-  const solid = "var(--base-bg-secondary_alt)";
-  const fadeStart = `calc(${screenTop} + var(--safe-area-top, 0px))`;
-  const fadeEnd = `calc(${screenTop} + var(--safe-area-top, 0px) + ${TOP_FADE_PX}px)`;
+const frostedBarStyle = computed(() => {
+  const viewportTopOffset = "(var(--bar-extend-max) - var(--bar-extend, 0px))";
+  const opaqueSurface = "var(--base-bg-secondary_alt)";
+  const fadeStart = `calc(${viewportTopOffset} + var(--safe-area-top, 0px))`;
+  const fadeEnd = `calc(${viewportTopOffset} + var(--safe-area-top, 0px) + ${STATUS_BAR_FADE_HEIGHT_PX}px)`;
   return {
-    WebkitBackdropFilter: `blur(${GLASS_BLUR_PX}px)`,
-    backdropFilter: `blur(${GLASS_BLUR_PX}px)`,
-    backgroundColor: glassColor,
-    backgroundImage: `linear-gradient(to bottom, ${solid} 0, ${solid} ${fadeStart}, transparent ${fadeEnd})`,
-    borderBottomColor: edge.value
-      ? `color-mix(in oklab, var(--base-border-quaternary) ${GLASS_LINE}%, transparent)`
+    WebkitBackdropFilter: `blur(${FROSTED_BLUR_PX}px)`,
+    backdropFilter: `blur(${FROSTED_BLUR_PX}px)`,
+    backgroundColor: frostedBackgroundColor,
+    backgroundImage: `linear-gradient(to bottom, ${opaqueSurface} 0, ${opaqueSurface} ${fadeStart}, transparent ${fadeEnd})`,
+    borderBottomColor: showBottomDivider.value
+      ? `color-mix(in oklab, var(--base-border-quaternary) ${BOTTOM_BORDER_OPACITY_PERCENT}%, transparent)`
       : "transparent",
     top: "calc(-1 * var(--bar-extend-max))",
     transform: "translateY(var(--bar-extend, 0px))",
   };
 });
 
-/** Goes back to the top of the page and puts the focus in the field. */
-function openSearch(): void {
-  searchRow.value?.querySelector("input")?.focus({ preventScroll: true });
+/** Focuses the search input and scrolls back to the top of the page when the collapsed search button is tapped. */
+function expandAndFocusSearch(): void {
+  searchRowElement.value?.querySelector("input")?.focus({ preventScroll: true });
   window.scrollTo({ behavior: scrollBehavior(), top: 0 });
 }
 </script>
 
 <template>
-  <div ref="header" class="contents">
+  <div ref="headerRoot" class="contents">
     <div
-      ref="topRow"
+      ref="topBarElement"
       class="sticky top-0 isolate z-10 flex items-center justify-between px-4 pt-safe-4 pb-3"
-      :style="{ '--bar-extend-max': `${extendMax}px` }"
+      :style="{ '--bar-extend-max': `${maxBarExtensionPx}px` }"
     >
       <div
         aria-hidden="true"
         class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 border-b transition-[border-color] duration-state ease-standard"
-        :style="barStyle"
+        :style="frostedBarStyle"
       />
 
       <!--
-        A copy of the field that turns into the search icon. The real field hides while it shows. It has the size of the
-        real field, and each part moves and scales with a transform. The outline is two half circles and a middle part
-        that scales on its width. The parts overlap by half a pixel, so no seam shows.
+        Stand-in proxy for the search bar while `0 < collapseProgress < 1` (the real search row hides in parallel).
+        Split into two semicircular end-caps and a 1px center strip scaled horizontally, overlapping by `0.5px` so
+        the pill shrinks cleanly on the compositor without subpixel seams.
       -->
       <div
-        ref="morphEl"
-        v-show="started && !iconShown"
+        ref="morphOverlayElement"
+        v-show="isMorphStarted && !isCollapsedIconVisible"
         class="pointer-events-none absolute top-0 left-0 z-10 h-0 w-0"
         aria-hidden="true"
         inert
@@ -331,21 +346,21 @@ function openSearch(): void {
         <div data-morph="frame">
           <span
             data-morph="left"
-            :style="capSize"
+            :style="pillEndCapSizeStyle"
             class="absolute top-0 left-0 origin-top-left rounded-l-full border border-r-0 border-base-border-muted bg-base-bg-primary_alt"
           />
           <span
             data-morph="mid"
-            :style="{ height: capSize.height }"
+            :style="{ height: pillEndCapSizeStyle.height }"
             class="absolute top-0 left-0 w-px origin-top-left border-y border-base-border-muted bg-base-bg-primary_alt"
           />
           <span
             data-morph="right"
-            :style="capSize"
+            :style="pillEndCapSizeStyle"
             class="absolute top-0 left-0 origin-top-left rounded-r-full border border-l-0 border-base-border-muted bg-base-bg-primary_alt"
           />
         </div>
-        <!-- The brand icon fades in over the gray one, so the color change needs no new paint of a color. -->
+        <!-- Cross-fade a brand-tinted icon over the placeholder icon to avoid repainting stroke colors mid-scroll. -->
         <span data-morph="icon" class="absolute top-0 left-0 size-5">
           <PhMagnifyingGlass class="absolute inset-0 size-5 text-base-fg-placeholder" />
           <PhMagnifyingGlass data-morph="tint" class="absolute inset-0 size-5 text-util-color-brand-700 opacity-0" />
@@ -364,24 +379,24 @@ function openSearch(): void {
       </div>
 
       <BrandOpeningOverlay />
-      <h1><BrandHomeLogo ref="logo" /></h1>
-      <!-- The copy of the field goes under the bell and the avatar. -->
+      <h1><BrandHomeLogo ref="homeLogo" /></h1>
+      <!-- Stack top-bar actions above the morphing search proxy (`z-20` over `z-10`). -->
       <div class="relative z-20 flex items-center gap-1">
         <SIconButton
-          ref="searchIcon"
+          ref="collapsedSearchButton"
           variant="ghost"
           size="md"
           :aria-label="$t('home-search-placeholder')"
-          :aria-hidden="!iconShown"
-          :tabindex="iconShown ? undefined : -1"
-          :class="iconShown ? undefined : 'pointer-events-none opacity-0'"
+          :aria-hidden="!isCollapsedIconVisible"
+          :tabindex="isCollapsedIconVisible ? undefined : -1"
+          :class="isCollapsedIconVisible ? undefined : 'pointer-events-none opacity-0'"
           data-testid="home-search-icon"
-          @click="openSearch"
+          @click="expandAndFocusSearch"
         >
           <PhMagnifyingGlass class="text-util-color-brand-700" />
         </SIconButton>
         <NotificationBell />
-        <!-- The slot has the width of the bell, so the 32px avatar has the same space on each side. -->
+        <!-- Match the 40px width of `NotificationBell` so the 32px avatar has symmetric hit spacing. -->
         <div class="flex size-10 items-center justify-center">
           <AvatarMenu />
         </div>
@@ -389,11 +404,11 @@ function openSearch(): void {
     </div>
 
     <div
-      ref="searchRow"
+      ref="searchRowElement"
       class="px-4 pb-4"
-      :style="{ backgroundColor: glassColor, opacity: started ? 0 : undefined }"
-      @focusin="searchFocused = true"
-      @focusout="searchFocused = false"
+      :style="{ backgroundColor: frostedBackgroundColor, opacity: isMorphStarted ? 0 : undefined }"
+      @focusin="isSearchFocused = true"
+      @focusout="isSearchFocused = false"
     >
       <HomeSearchBar v-model="keyword">
         <template #action>

@@ -41,7 +41,7 @@ vi.mock("@/libs/status-bar-color", () => ({
   useStatusBarTopColor: vi.fn(),
 }));
 
-/** Makes one group that has the fields the home page reads. */
+/** Builds a minimal `GroupDto` fixture for `HomePage` tests. */
 function makeGroup(name: string, hoursAgo = 0): GroupDto {
   return {
     balances: [],
@@ -55,7 +55,7 @@ function makeGroup(name: string, hoursAgo = 0): GroupDto {
   };
 }
 
-/** Makes a balance row of the user "me". */
+/** Builds a `GroupBalanceDto` entry belonging to user `"me"`. */
 const myBalance = (groupId: string, balance: string, currency: string): GroupBalanceDto => ({
   balance,
   currency,
@@ -63,7 +63,7 @@ const myBalance = (groupId: string, balance: string, currency: string): GroupBal
   user: { id: "me", userName: "Me" },
 });
 
-/** Returns the names of the group rows, in the order of the page. */
+/** Extracts rendered group names in list order. */
 function rowNames(wrapper: ReturnType<typeof mountPage>, names: string[]) {
   return wrapper
     .findAll("li")
@@ -71,7 +71,7 @@ function rowNames(wrapper: ReturnType<typeof mountPage>, names: string[]) {
     .filter(Boolean);
 }
 
-/** Mounts the page without the header parts, which need the backend. Each slot of Layout renders. */
+/** Mounts `HomePage` with header network widgets stubbed out. */
 function mountPage(pinia = createPinia()) {
   return mount(HomePage, {
     global: {

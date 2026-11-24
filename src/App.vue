@@ -29,7 +29,7 @@ const toastMobileOffset = {
 
 useStatusBarColor();
 
-const { direction: pageDirection, hooks: pageHooks } = usePageTransition(useRouter());
+const { direction: pageTransitionDirection, hooks: pageTransitionHooks } = usePageTransition(useRouter());
 
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
@@ -47,11 +47,12 @@ watch(
 
 <template>
   <!--
-    The page change of the app. See `src/libs/page-transition.ts`. The box gives Transition one element, also for a page
-    with more than one root. A change of the query only keeps the page, because the key is the path.
+    Wrap each route in a single `.page` container so `<Transition>` works even when a page component has multiple root
+    nodes (see `src/libs/page-transition.ts`). Keying on `route.path` avoids re-running page transitions when only
+    query parameters change.
   -->
   <RouterView v-slot="{ Component, route }">
-    <Transition :name="`page-${pageDirection}`" v-bind="pageHooks">
+    <Transition :name="`page-${pageTransitionDirection}`" v-bind="pageTransitionHooks">
       <div :key="route.path" class="page">
         <component :is="Component" />
       </div>
@@ -63,7 +64,7 @@ watch(
 </template>
 
 <style scoped>
-/* The new page moves the full width and the page under it moves 30%, with the time and the curve of a sheet. */
+/* Slide the top page across 100% of the viewport while shifting the underlying page by 30%, using sheet motion tokens. */
 .page-forward-enter-active,
 .page-forward-leave-active,
 .page-back-enter-active,
@@ -71,7 +72,7 @@ watch(
   transition: transform var(--motion-duration-sheet) var(--motion-easing-sheet);
 }
 
-/* The page that moves the full width is on top, with a soft shadow on its left edge. */
+/* Keep the full-travel page stacked on top with a soft shadow along its leading left edge. */
 .page-forward-enter-active,
 .page-back-leave-active {
   z-index: 2;

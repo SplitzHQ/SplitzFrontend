@@ -36,7 +36,7 @@ export const COMPONENT_RULES = {
   BrandAnimatedGlyphParts:
     "Internal helper used by `BrandOpeningOverlay`, `BrandTapWordmark`, and `BrandTapGlyph`. Renders bare `<circle>`, `<path>`, and `<rect>` elements inside an existing glyph `<svg>`. Do not mount directly on a page.",
   BrandHomeLogo:
-    "Use in the `HomePage` header. Call `scrub()` with the header collapse progress to move between the wordmark and the 18px glyph.",
+    "`HomePage` header only. Exposes `scrub(progress)` (`0..1`) so the collapsing header can scrub smoothly between the resting wordmark and the 18px standalone glyph.",
   BrandOpeningOverlay:
     "`HomePage` only. Plays the full-screen brand opening overlay once per cold app start. Mount it on a single page because the first mount consumes the session's only play.",
   BrandTapGlyph:
@@ -51,7 +51,7 @@ export const COMPONENT_RULES = {
 
 /** Behavioral rules for the brand animations defined in `brand-motion.ts`. */
 export const MOTION_RULES = [
-  "`BrandHomeLogo` uses the same paused animation in both directions. The tap animation is unavailable once the header starts to collapse.",
+  "`BrandHomeLogo` scrubs a single paused Web Animations timeline forward and backward as the header collapses or expands, and disables wordmark tap animations while `progress > 0`.",
   "`BrandTapWordmark` and `BrandTapGlyph` animate only when tapped, and ignore extra taps until the active animation finishes.",
   "In `BrandTapGlyph`, the revealed wordmark uses `1em` equal to the glyph height (matching the glyph-to-em ratio in `BrandTapWordmark`) and sits out of flow (`position: absolute`) so the page layout never shifts.",
   'The diamond tittle above the `i` has its own `data-part="tittle"`, so every wordmark animation sequence must explicitly include a step for `tittle`.',

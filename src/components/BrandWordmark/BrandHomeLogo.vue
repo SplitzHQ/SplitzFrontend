@@ -7,131 +7,143 @@ import { BRAND_GLYPH, BRAND_GLYPH_BOX } from "./brand-glyph";
 import BrandTapWordmark from "./BrandTapWordmark.vue";
 
 /**
- * The logo of the HomePage header. It is `BrandTapWordmark`, and it can change to the glyph when the header collapses. The
- * parent calls `scrub()` with the progress of the collapse, from 0 (the word) to 1 (the glyph), so the logo moves with
- * the other parts of the header. The change keeps the diamond: the letters leave one by one, the diamond on the i moves
- * to the place of the diamond in the glyph, and the dot and the bar grow. The way back moves the same steps backward.
- * The rules are in `brand-wordmark.usage.ts`.
+ * Scroll-scrubbed brand logo for the `HomePage` header.
+ * Renders `BrandTapWordmark` at rest and morphs smoothly into the standalone 18px glyph as the header collapses.
+ * `HomeHeader` drives the transition by calling `scrub(progress)` from `0` (wordmark) to `1` (glyph): the letters
+ * fade out with a stagger, the diamond tittle above the `i` translates and scales into the glyph's diamond position,
+ * and the dot and diagonal bar scale in. Reversing `progress` scrubs the same paused Web Animations backward.
+ * See `brand-wordmark.usage.ts` for usage rules.
  *
- * While the glyph shows, a tap on the logo does nothing, because the tap motion needs the letters.
+ * Pointer events on `BrandTapWordmark` are disabled once `progress > 0` because the tap animation requires the full
+ * wordmark at rest.
  */
 
-/** The width of the glyph in the collapsed header. The user picked 18px in the prototype `2026-11-05-home-motion`. */
-const GLYPH_PX = 18;
-/** The time between two letters that leave. */
+/** Rendered width and height (in CSS pixels) of the collapsed header glyph. */
+const COLLAPSED_GLYPH_SIZE_PX = 18;
+/** Stagger delay (in milliseconds) between adjacent letters fading out during collapse. */
 const LETTER_STAGGER_MS = 30;
 
 /**
- * The three parts of the glyph. Each part is its own `<svg>` over the full glyph box. A transform on an `<svg>` box needs
- * no layout, but a transform on a shape inside an `<svg>` does, and the scrub changes it on each frame.
+ * Standalone glyph parts, each rendered in its own full-viewBox `<svg>`.
+ * Animating CSS `transform` on an outer `<svg>` element stays on the compositor without triggering SVG layout on every
+ * scrubbed scroll frame.
  */
 const GLYPH_PARTS = ["dot", "bar", "diamond"] as const;
 
-const word = useTemplateRef<HTMLElement>("word");
-const glyph = useTemplateRef<HTMLElement>("glyph");
+const wordmarkElement = useTemplateRef<HTMLElement>("wordmarkElement");
+const glyphElement = useTemplateRef<HTMLElement>("glyphElement");
 
-let animations: Animation[] = [];
-/** True while the relay is past its start. The classes then show the glyph state. */
-const collapsed = shallowRef(false);
-/** The length of the relay, in milliseconds. */
-let relayLength = 0;
+let scrubAnimations: Animation[] = [];
+/** `true` whenever `progress > 0` and the paused scrub timeline controls part visibility. */
+const isScrubActive = shallowRef(false);
+/** Total end timestamp (in milliseconds) of the paused scrub timeline. */
+let timelineDurationMs = 0;
 
-/** Stops the relay. The classes then show their own state. */
-function stop(): void {
-  animations.forEach((animation) => animation.cancel());
-  animations = [];
+/** Cancels all paused scrub animations so resting CSS rules take over. */
+function cancelScrubTimeline(): void {
+  scrubAnimations.forEach((animation) => animation.cancel());
+  scrubAnimations = [];
 }
 
-/** Returns the center and the width of an element on the screen. */
-function centerOf(el: Element): { width: number; x: number; y: number } {
-  const rect = el.getBoundingClientRect();
+/** Measures an element's viewport center coordinates and rendered width. */
+function getElementCenter(element: Element): { width: number; x: number; y: number } {
+  const rect = element.getBoundingClientRect();
   return { width: rect.width, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-/** Sets the transform origin of each part to the center of its shape, as a share of the glyph box. */
-function setPartOrigins(parts: SVGSVGElement[]): void {
-  parts.forEach((part) => {
-    const shape = part.firstElementChild as SVGGraphicsElement | null;
+/** Sets each part `<svg>`'s `transform-origin` to its inner shape's center, expressed as a percentage of `BRAND_GLYPH_BOX`. */
+function setGlyphPartOrigins(partSvgs: SVGSVGElement[]): void {
+  partSvgs.forEach((partSvg) => {
+    const shape = partSvg.firstElementChild as SVGGraphicsElement | null;
     if (!shape) return;
-    const box = shape.getBBox();
-    const x = ((box.x + box.width / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
-    const y = ((box.y + box.height / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
-    part.style.transformOrigin = `${x}% ${y}%`;
+    const bbox = shape.getBBox();
+    const originXPercent = ((bbox.x + bbox.width / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
+    const originYPercent = ((bbox.y + bbox.height / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
+    partSvg.style.transformOrigin = `${originXPercent}% ${originYPercent}%`;
   });
 }
 
 /**
- * Builds the relay toward the glyph, paused. Each animation holds its first and its last frame, so a time before or
- * after its own part shows the right state.
+ * Builds the paused Web Animations timeline from wordmark (`0`) to collapsed glyph (`timelineDurationMs`).
+ * Every track uses `fill: "both"` so scrubbing to any intermediate timestamp holds initial and final states cleanly.
  */
-function buildRelay(): void {
-  stop();
-  const box = glyph.value;
-  const letters = [...(word.value?.querySelectorAll<SVGElement>('[data-part^="letter-"]') ?? [])];
-  const tittle = word.value?.querySelector<SVGElement>('[data-part="tittle"]');
-  const diamond = box?.querySelector<SVGSVGElement>('[data-glyph="diamond"]');
-  const growing = [...(box?.querySelectorAll<SVGSVGElement>('[data-glyph="dot"], [data-glyph="bar"]') ?? [])];
-  const diamondShape = diamond?.firstElementChild;
-  if (!box || !tittle || !diamond || !diamondShape || typeof box.animate !== "function") return;
-  setPartOrigins([diamond, ...growing]);
+function buildScrubTimeline(): void {
+  cancelScrubTimeline();
+  const glyphContainer = glyphElement.value;
+  const letterElements = [...(wordmarkElement.value?.querySelectorAll<SVGElement>('[data-part^="letter-"]') ?? [])];
+  const tittleElement = wordmarkElement.value?.querySelector<SVGElement>('[data-part="tittle"]');
+  const diamondSvg = glyphContainer?.querySelector<SVGSVGElement>('[data-glyph="diamond"]');
+  const dotAndBarSvgs = [
+    ...(glyphContainer?.querySelectorAll<SVGSVGElement>('[data-glyph="dot"], [data-glyph="bar"]') ?? []),
+  ];
+  const diamondShape = diamondSvg?.firstElementChild;
+  if (!glyphContainer || !tittleElement || !diamondSvg || !diamondShape || typeof glyphContainer.animate !== "function")
+    return;
+  setGlyphPartOrigins([diamondSvg, ...dotAndBarSvgs]);
 
-  // The part boxes are not scaled, so the diamond moves in screen pixels around the center of its shape.
-  const from = centerOf(tittle);
-  const to = centerOf(diamondShape);
-  const onWord = `translate(${from.x - to.x}px, ${from.y - to.y}px) scale(${from.width / to.width})`;
-  const exit = { duration: motionMs("exit"), easing: MOTION_EASING.exit, fill: "both" as const };
-  const move = { duration: motionMs("container"), easing: MOTION_EASING.enter, fill: "both" as const };
-  const enter = { duration: motionMs("state"), easing: MOTION_EASING.enter, fill: "both" as const };
-  const lettersEnd = letters.length * LETTER_STAGGER_MS;
+  // Each part `<svg>` sits unscaled in screen pixels, so translate/scale maps the glyph diamond onto the `i`'s tittle.
+  const tittleCenter = getElementCenter(tittleElement);
+  const diamondCenter = getElementCenter(diamondShape);
+  const initialDiamondTransform = `translate(${tittleCenter.x - diamondCenter.x}px, ${tittleCenter.y - diamondCenter.y}px) scale(${tittleCenter.width / diamondCenter.width})`;
+  const exitTiming = { duration: motionMs("exit"), easing: MOTION_EASING.exit, fill: "both" as const };
+  const moveTiming = { duration: motionMs("container"), easing: MOTION_EASING.enter, fill: "both" as const };
+  const enterTiming = { duration: motionMs("state"), easing: MOTION_EASING.enter, fill: "both" as const };
+  const lettersExitEndMs = letterElements.length * LETTER_STAGGER_MS;
 
-  animations = [
-    ...letters.map((letter, index) =>
-      letter.animate({ opacity: [1, 0] }, { ...exit, delay: index * LETTER_STAGGER_MS })
+  scrubAnimations = [
+    ...letterElements.map((letterElement, index) =>
+      letterElement.animate({ opacity: [1, 0] }, { ...exitTiming, delay: index * LETTER_STAGGER_MS })
     ),
-    diamond.animate({ transform: [onWord, "none"] }, { ...move, delay: lettersEnd / 2 }),
-    ...growing.map((part) =>
-      part.animate(
+    diamondSvg.animate(
+      { transform: [initialDiamondTransform, "none"] },
+      { ...moveTiming, delay: lettersExitEndMs / 2 }
+    ),
+    ...dotAndBarSvgs.map((partSvg) =>
+      partSvg.animate(
         { opacity: [0, 1], transform: ["scale(0)", "none"] },
-        { ...enter, delay: lettersEnd / 2 + move.duration / 2 }
+        { ...enterTiming, delay: lettersExitEndMs / 2 + moveTiming.duration / 2 }
       )
     ),
   ];
-  animations.forEach((animation) => animation.pause());
-  relayLength = Math.max(
+  scrubAnimations.forEach((animation) => animation.pause());
+  timelineDurationMs = Math.max(
     0,
-    ...animations.map((animation) => Number(animation.effect?.getComputedTiming().endTime ?? 0))
+    ...scrubAnimations.map((animation) => Number(animation.effect?.getComputedTiming().endTime ?? 0))
   );
 }
 
-/** Moves the logo to `progress`, from 0 (the word) to 1 (the glyph). */
+/** Scrubs the wordmark-to-glyph timeline to `progress` (`0` = resting wordmark, `1` = collapsed glyph). */
 function scrub(progress: number): void {
   if (progress <= 0) {
-    if (collapsed.value) {
-      stop();
-      collapsed.value = false;
+    if (isScrubActive.value) {
+      cancelScrubTimeline();
+      isScrubActive.value = false;
     }
     return;
   }
-  if (!collapsed.value || animations.length === 0) {
-    buildRelay();
-    collapsed.value = true;
+  if (!isScrubActive.value || scrubAnimations.length === 0) {
+    buildScrubTimeline();
+    isScrubActive.value = true;
   }
-  animations.forEach((animation) => (animation.currentTime = Math.min(1, progress) * relayLength));
+  const targetTimeMs = Math.min(1, progress) * timelineDurationMs;
+  scrubAnimations.forEach((animation) => {
+    animation.currentTime = targetTimeMs;
+  });
 }
 
 defineExpose({ scrub });
-onBeforeUnmount(stop);
+onBeforeUnmount(cancelScrubTimeline);
 </script>
 
 <template>
-  <div :class="['relative flex h-10 items-center', collapsed && 'is-glyph']">
-    <span ref="word" :class="['word block', collapsed && 'pointer-events-none']">
+  <div :class="['relative flex h-10 items-center', isScrubActive && 'is-scrubbing']">
+    <span ref="wordmarkElement" :class="['word block', isScrubActive && 'pointer-events-none']">
       <BrandTapWordmark />
     </span>
     <span
-      ref="glyph"
+      ref="glyphElement"
       aria-hidden="true"
-      :style="{ height: `${GLYPH_PX}px`, width: `${GLYPH_PX}px` }"
+      :style="{ height: `${COLLAPSED_GLYPH_SIZE_PX}px`, width: `${COLLAPSED_GLYPH_SIZE_PX}px` }"
       class="glyph pointer-events-none absolute top-1/2 left-0 block -translate-y-1/2 text-util-color-brand-700"
     >
       <svg
@@ -150,16 +162,16 @@ onBeforeUnmount(stop);
 </template>
 
 <style scoped>
-/* The end states. `scrub()` moves the relay between them. */
+/* Base visibility states overridden frame-by-frame while `scrub()` drives the paused Web Animations. */
 .glyph {
   opacity: 0;
 }
 
-.is-glyph .glyph {
+.is-scrubbing .glyph {
   opacity: 1;
 }
 
-.is-glyph .word :deep([data-part]) {
+.is-scrubbing .word :deep([data-part]) {
   opacity: 0;
 }
 </style>

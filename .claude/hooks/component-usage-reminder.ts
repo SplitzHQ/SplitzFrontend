@@ -1,28 +1,28 @@
 /**
- * A Claude Code hook that runs after Edit and Write. When a change touches a component in `src/components`, it tells the
- * agent to check the usage rules of that component. The hook only adds a reminder, and it never blocks the edit.
+ * Post-edit Claude Code hook that reminds the agent to review a component's `*.usage.ts` rules whenever implementation
+ * files under `src/components/` change. Emits context only and never blocks edits.
  */
 import { readFileSync } from "node:fs";
 
 import { COMPONENT_INDEX } from "../../src/components/component-index";
 
-/** Files that do not change how people use a component. */
-const SKIPPED_FILE = /(\/__tests__\/|\.spec\.ts$|\.stories\.ts$|\.usage\.ts$)/;
+/** Test, story, and usage-rule files that do not alter component behavior on their own. */
+const NON_USAGE_FILE_PATTERN = /(\/__tests__\/|\.spec\.ts$|\.stories\.ts$|\.usage\.ts$)/;
 
-const input = JSON.parse(readFileSync(0, "utf8")) as { tool_input?: { file_path?: string } };
-const path = (input.tool_input?.file_path ?? "").replaceAll("\\", "/");
-const folder = /\/src\/components\/([^/]+)\//.exec(path)?.[1];
+const hookInput = JSON.parse(readFileSync(0, "utf8")) as { tool_input?: { file_path?: string } };
+const normalizedFilePath = (hookInput.tool_input?.file_path ?? "").replaceAll("\\", "/");
+const componentFolder = /\/src\/components\/([^/]+)\//.exec(normalizedFilePath)?.[1];
 
-if (folder && !SKIPPED_FILE.test(path)) {
-  const usage = COMPONENT_INDEX.find((entry) => entry.folder === folder)?.usage;
-  const target = usage
-    ? `Check if this change affects ${usage}. If it does, update that file in the same change.`
-    : `${folder} has no usage file yet. Tell the user in your closing message if this change adds a rule that people must follow.`;
+if (componentFolder && !NON_USAGE_FILE_PATTERN.test(normalizedFilePath)) {
+  const usageFilePath = COMPONENT_INDEX.find((entry) => entry.folder === componentFolder)?.usage;
+  const reminderDetail = usageFilePath
+    ? `Check whether this change affects ${usageFilePath}, and update it in the same change if so.`
+    : `${componentFolder} has no usage file yet. Note in your closing message if this change introduces a usage rule.`;
 
   console.log(
     JSON.stringify({
       hookSpecificOutput: {
-        additionalContext: `You changed the ${folder} component. ${target} See .agents/skills/spz-component-use/SKILL.md.`,
+        additionalContext: `You changed the ${componentFolder} component. ${reminderDetail} See .agents/skills/spz-component-use/SKILL.md.`,
         hookEventName: "PostToolUse",
       },
     })

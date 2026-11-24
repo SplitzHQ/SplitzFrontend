@@ -268,7 +268,7 @@ export const ICON_RULES: UsageRule[] = [
     title: "Header icons",
   },
   {
-    rule: "The filter button in the home search field is a ghost sm button with a brand icon and a translucent brand fill. The fill uses the `comp-search-filter-*` tokens. Use `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, and do not copy the classes. The clear button in the same field stays a plain ghost button. Do not copy this look to another button without a decision of the user.",
+    rule: 'The filter icon button inside `HomeSearchBar` uses `SIconButton` (`variant="ghost"`, `size="sm"`) with `HOME_FILTER_BUTTON_CLASS` from `src/pages/HomePage/home-filter-button.ts`, giving it a brand icon and translucent `comp-search-filter-*` fill. Keep the adjacent clear button as a plain `ghost` button, and do not apply this style elsewhere without user approval.',
     title: "Search filter",
   },
   {

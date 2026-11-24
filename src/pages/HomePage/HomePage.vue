@@ -15,6 +15,7 @@ import Notice from "@/components/Notice/Notice.vue";
 import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
+import { getGroupAvatarImages } from "@/libs/group-avatar";
 import { useStatusBarTopColor } from "@/libs/status-bar-color";
 import { useLoadFeedback } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
@@ -31,10 +32,7 @@ import HomeTotalBalance from "./HomeTotalBalance.vue";
 
 useStatusBarTopColor("--base-bg-secondary_alt");
 
-/**
- * A group row: the shared row with 12px above and below. The row is taller than a transaction row, because a group row
- * is the main item of the page. HomeGroupsSkeleton has the same sizes.
- */
+/** Group list row classes: `TRANSACTION_ROW_CLASS` with taller `py-3` vertical padding matching `HomeGroupsSkeleton`. */
 const GROUP_ROW_CLASS = twMerge(TRANSACTION_ROW_CLASS, "py-3 focus-visible:outline-offset-2");
 
 const { $t } = useFluent();
@@ -52,12 +50,10 @@ const { asyncStatus: groupsAsyncStatus, state: groupsQuery } = useQuery({
   query: () => groupApi.getGroups(),
 });
 
-const groups = computed(() => {
-  return groupsQuery.value.data ?? [];
-});
+const groups = computed(() => groupsQuery.value.data ?? []);
 
-// The total balance comes from the user, not from the groups. A refetch of the groups means that the balances can have
-// changed, so the total reloads too. The first answer does not count, because the store loads the user at its start.
+// Refresh `userStore` balances whenever `getGroups` refetches after its initial response (`userStore` already fetches
+// user info on startup, so skipping the initial `undefined -> data` transition avoids a duplicate request).
 watch(
   () => groupsQuery.value.data,
   (_data, previous) => {
@@ -65,47 +61,46 @@ watch(
   }
 );
 
-const groupWithExtraInfo = computed(() => {
-  return groups.value.map((group) => {
+const groupsWithBalanceSummary = computed(() =>
+  groups.value.map((group) => {
     const myBalances = group.balances
-      .filter((b) => b.user.id === userStore.user?.id)
-      .map((b) => ({
-        ...b,
-        amount: Number.parseFloat(b.balance),
+      .filter((entry) => entry.user.id === userStore.user?.id)
+      .map((entry) => ({
+        ...entry,
+        amount: Number.parseFloat(entry.balance),
       }));
-    const myBalanceNegative = myBalances.filter((b) => b.amount < 0);
-    const myBalancePositive = myBalances.filter((b) => b.amount > 0);
+    const owedByMeBalances = myBalances.filter((entry) => entry.amount < 0);
+    const owedToMeBalances = myBalances.filter((entry) => entry.amount > 0);
     const settled = settledState(group.transactionCount, myBalances, group.balances);
-    return { ...group, myBalanceNegative, myBalancePositive, myBalances, settled };
-  });
-});
+    return { ...group, myBalances, owedByMeBalances, owedToMeBalances, settled };
+  })
+);
 
 const trimmedKeyword = computed(() => searchKeyword.value.trim());
 
-/** The sort that the user picked. This device keeps it. A value that is not a sort, for example an old one, is ignored. */
+/** Persisted sort key in `localStorage`; unknown or retired sort names safely fall back to `"recent"`. */
 const storedSort = useLocalStorage<string>("home-group-sort", "recent");
-/** The sort of the group list. The default puts the most recent group first. */
-const sort = computed<HomeSort>({
+const selectedSort = computed<HomeSort>({
   get: () => HOME_SORTS.find((option) => option === storedSort.value) ?? "recent",
-  set: (next) => (storedSort.value = next),
+  set: (nextSort) => (storedSort.value = nextSort),
 });
-/** The currency that the most groups use. The total balance row and the amount sort use it. */
-const commonCurrency = computed(() => mostUsedCurrency(sortGroups(groupWithExtraInfo.value, "recent")));
+/** Most frequent open-balance currency across groups, shared by `HomeTotalBalance` and `"amount"` sorting. */
+const primaryCurrency = computed(() => mostUsedCurrency(sortGroups(groupsWithBalanceSummary.value, "recent")));
 
 const visibleGroups = computed(() => {
   const keyword = trimmedKeyword.value.toLowerCase();
-  const filtered = keyword
-    ? groupWithExtraInfo.value.filter((g) => g.name.toLowerCase().includes(keyword))
-    : groupWithExtraInfo.value;
-  return sortGroups(filtered, sort.value);
+  const matchingGroups = keyword
+    ? groupsWithBalanceSummary.value.filter((group) => group.name.toLowerCase().includes(keyword))
+    : groupsWithBalanceSummary.value;
+  return sortGroups(matchingGroups, selectedSort.value);
 });
 
-// These two read the list before the search filter. A search with no result must not look like a new user.
+// Check `groups` before search filtering so an empty search match renders `HomeNoResults` instead of `HomeEmptyState`.
 const hasGroups = computed(() => groups.value.length > 0);
 const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
-// '& !hasGroups.value' ensures that a failed refresh keeps the old data, so the list stays and the page shows no error.
+// Preserve cached group rows on background refresh failures rather than replacing the list with an error notice.
 const showErrorState = computed(() => groupsQuery.value.status === "error" && !hasGroups.value);
 const isRetrying = computed(() => showErrorState.value && groupsAsyncStatus.value === "loading");
 
@@ -121,28 +116,26 @@ const { announcement, retry } = useLoadFeedback({
 });
 
 const groupList = useTemplateRef<ComponentPublicInstance>("groupList");
-/** The top of each group row just before the list changes, by group id. */
-const rowTops = new Map<string, number>();
+/** Pre-update `offsetTop` per `groupId` so simultaneously leaving rows stay pinned instead of collapsing to `top: 0`. */
+const rowOffsetTopByGroupId = new Map<string, number>();
 
-// A leaving row has `position: absolute`. Without a `top`, the rows that leave together stack at one place, because
-// each one takes the others out of the flow. So the positions come from before the change.
 watch(
   visibleGroups,
   () => {
-    rowTops.clear();
-    const rows = (groupList.value?.$el as HTMLElement | undefined)?.children ?? [];
-    for (const row of rows) {
+    rowOffsetTopByGroupId.clear();
+    const rowElements = (groupList.value?.$el as HTMLElement | undefined)?.children ?? [];
+    for (const row of rowElements) {
       const { groupId } = (row as HTMLElement).dataset;
-      if (groupId) rowTops.set(groupId, (row as HTMLElement).offsetTop);
+      if (groupId) rowOffsetTopByGroupId.set(groupId, (row as HTMLElement).offsetTop);
     }
   },
   { flush: "pre" }
 );
 
-/** Keeps a leaving group row where it was. */
+/** Pins a leaving `<li>` (`position: absolute`) to its pre-removal vertical offset during fade-out. */
 const pinLeavingRow = (row: Element) => {
   const element = row as HTMLElement;
-  element.style.top = `${rowTops.get(element.dataset.groupId ?? "") ?? element.offsetTop}px`;
+  element.style.top = `${rowOffsetTopByGroupId.get(element.dataset.groupId ?? "") ?? element.offsetTop}px`;
 };
 
 const addExpense = () => {
@@ -155,20 +148,20 @@ const createGroup = () => {
   void router.push({ name: "createGroup" });
 };
 
-const userBalances = computed(() => {
-  const balances = new Map<string, { amount: number; currency: string }>();
+const currencyTotals = computed(() => {
+  const totalsByCurrency = new Map<string, { amount: number; currency: string }>();
   for (const userBalance of userStore.user?.balances ?? []) {
-    const existing = balances.get(userBalance.currency);
+    const existing = totalsByCurrency.get(userBalance.currency);
     if (existing) {
       existing.amount += Number.parseFloat(userBalance.balance);
     } else {
-      balances.set(userBalance.currency, {
+      totalsByCurrency.set(userBalance.currency, {
         amount: Number.parseFloat(userBalance.balance),
         currency: userBalance.currency,
       });
     }
   }
-  return [...balances.values()];
+  return [...totalsByCurrency.values()];
 });
 </script>
 
@@ -196,7 +189,7 @@ const userBalances = computed(() => {
         </p>
         <p role="status" class="sr-only">{{ announcement }}</p>
 
-        <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
+        <!-- Focus fallback target when a successful retry unmounts the focused retry button. -->
         <div ref="content" tabindex="-1" class="outline-none">
           <Transition
             enter-active-class="transition-opacity duration-state ease-enter"
@@ -204,8 +197,8 @@ const userBalances = computed(() => {
             enter-to-class="opacity-100"
           >
             <!--
-              The bottom space keeps the last row above the plus button. 16px above the total and 12px under it: the
-              title row is 32px high with its text in the middle, so the eye sees about the same space on each side.
+              `pb-28` clears the floating `+` button; `pt-4` above and `pb-3` below `HomeTotalBalance` optically center
+              spacing against the 32px-tall `HomeSortButton` row.
             -->
             <div v-if="hasGroups" class="flex flex-col pb-28" :class="showNoResults ? 'gap-1 pt-3' : 'pt-4'">
               <Transition
@@ -215,35 +208,22 @@ const userBalances = computed(() => {
                 <HomeNoResults v-if="showNoResults" :keyword="trimmedKeyword" @clear="searchKeyword = ''" />
               </Transition>
 
-              <!-- The total balance and the list title. The sort button is the title. -->
               <template v-if="!showNoResults">
                 <div class="pb-3">
-                  <HomeTotalBalance :totals="userBalances" :common-currency="commonCurrency" />
+                  <HomeTotalBalance :totals="currencyTotals" :common-currency="primaryCurrency" />
                 </div>
                 <div class="flex min-h-8 items-center">
-                  <HomeSortButton v-model="sort" />
+                  <HomeSortButton v-model="selectedSort" />
                 </div>
               </template>
 
-              <!-- Group List -->
               <TransitionGroup ref="groupList" tag="ul" name="group-row" class="relative" @before-leave="pinLeavingRow">
                 <li v-for="group in visibleGroups" :key="group.groupId" :data-group-id="group.groupId">
                   <RouterLink
                     :to="{ name: 'groupDetail', params: { groupId: group.groupId } }"
                     :class="GROUP_ROW_CLASS"
                   >
-                    <Avatar
-                      v-if="group.photo"
-                      size="sm"
-                      :images="[{ src: group.photo, alt: group.name }]"
-                      aria-hidden="true"
-                    />
-                    <Avatar
-                      v-else
-                      size="sm"
-                      :images="group.members.slice(0, 4).map((m) => ({ src: m.photo ?? null, alt: m.userName }))"
-                      aria-hidden="true"
-                    />
+                    <Avatar size="sm" :images="getGroupAvatarImages(group)" aria-hidden="true" />
 
                     <div class="min-w-0 flex-1">
                       <p class="truncate text-base font-semibold text-base-text-primary">
@@ -251,26 +231,24 @@ const userBalances = computed(() => {
                       </p>
 
                       <!--
-                        The labels and the settled text share one neutral color. A tinted fill behind each amount keeps the
-                        dark green and red apart from the black name.
-                        Each direction has its own line, also when both fit on one line. The amounts of one
-                        direction wrap after the label, and a label or an amount never breaks.
+                        Place owed-to-you and owed-by-you balances on separate lines with subtle status pills so green
+                        and red amounts stay visually distinct from the primary group name without breaking mid-token.
                       -->
                       <div class="mt-0.5 flex flex-col gap-0.5 text-sm font-medium">
-                        <p v-if="group.myBalancePositive.length > 0" class="flex flex-wrap items-center gap-1">
+                        <p v-if="group.owedToMeBalances.length > 0" class="flex flex-wrap items-center gap-1">
                           <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-lent") }}</span>
                           <span
-                            v-for="balance in group.myBalancePositive"
+                            v-for="balance in group.owedToMeBalances"
                             :key="balance.currency"
                             class="rounded-md bg-base-bg-success-subtle px-1 whitespace-nowrap text-base-text-success"
                           >
                             <HomeAmount :amount="balance.amount" :currency="balance.currency" />
                           </span>
                         </p>
-                        <p v-if="group.myBalanceNegative.length > 0" class="flex flex-wrap items-center gap-1">
+                        <p v-if="group.owedByMeBalances.length > 0" class="flex flex-wrap items-center gap-1">
                           <span class="whitespace-nowrap text-base-text-quaternary">{{ $t("home-you-owe") }}</span>
                           <span
-                            v-for="balance in group.myBalanceNegative"
+                            v-for="balance in group.owedByMeBalances"
                             :key="balance.currency"
                             class="rounded-md bg-base-bg-error px-1 whitespace-nowrap text-base-text-error"
                           >
@@ -291,10 +269,7 @@ const userBalances = computed(() => {
                   </RouterLink>
                 </li>
 
-                <!--
-                  Create Group row. Keeps group creation reachable when the user already has groups. It has no hint
-                  under the name: a person who already has groups does not need it.
-                -->
+                <!-- Trailing Create group row keeps group creation accessible once `HomeEmptyState` is no longer shown. -->
                 <li key="create-group">
                   <RouterLink
                     :to="{ name: 'createGroup' }"
@@ -344,7 +319,7 @@ const userBalances = computed(() => {
 </template>
 
 <style scoped>
-/* Each key press can change the list, so a row that leaves only fades. It does not slide away. */
+/* Leaving rows fade out in place without horizontal slide so rapid search typing stays calm. */
 .group-row-move {
   transition: transform var(--motion-duration-container) var(--motion-easing-standard);
 }

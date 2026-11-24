@@ -6,33 +6,35 @@ import { currencyFormatOptions, formatCurrency } from "@/libs/format-currency";
 import { MOTION_EASING, motionMs } from "@/libs/motion";
 
 /**
- * An amount of money on the home page. The digits roll when the value changes, and the first render does not roll.
- * The sign comes from the text next to the amount, so the amount shows as a positive number.
- * NumberFlow gives a screen reader the full value as an image label. A currency code that Intl rejects shows as plain text.
+ * Animated unsigned currency amount for `HomePage` balance summaries and group rows.
+ * Rolls digits smoothly when `amount` updates after mount while staying static on initial render.
+ * Surroundings convey direction (via labels or explicit `+`/`−` prefixes), so `amount` always renders as `Math.abs(amount)`.
+ * `NumberFlow` exposes the full formatted string to screen readers via `role="img"` + `aria-label`; unrecognized
+ * currency codes fall back to plain text via `formatCurrency`.
  */
 export interface HomeAmountProps {
-  /** The amount. The component shows its absolute value. */
+  /** Signed or unsigned amount (rendered as `Math.abs(amount)`). */
   amount: number;
-  /** The ISO 4217 code of the currency. */
+  /** ISO 4217 currency code. */
   currency: string;
 }
 
 const { amount, currency } = defineProps<HomeAmountProps>();
 
-const format = computed(() => currencyFormatOptions(currency));
+const numberFormatOptions = computed(() => currencyFormatOptions(currency));
 
-// The defaults of NumberFlow take 900ms and overshoot. The container token keeps the roll short and with no bounce.
-const timing = { duration: motionMs("container"), easing: MOTION_EASING.enter };
+// Override NumberFlow's 900ms spring default with `container` duration and `enter` easing for a crisp, bounce-free roll.
+const rollTiming = { duration: motionMs("container"), easing: MOTION_EASING.enter };
 </script>
 
 <template>
   <NumberFlow
-    v-if="format"
+    v-if="numberFormatOptions"
     :value="Math.abs(amount)"
-    :format="format"
-    :transform-timing="timing"
-    :spin-timing="timing"
-    :opacity-timing="timing"
+    :format="numberFormatOptions"
+    :transform-timing="rollTiming"
+    :spin-timing="rollTiming"
+    :opacity-timing="rollTiming"
   />
   <template v-else>{{ formatCurrency(amount, currency) }}</template>
 </template>

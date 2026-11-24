@@ -1,144 +1,160 @@
 /**
- * The math of the HomePage header when the page scrolls. The search field turns into the search icon, and the
- * bar holds the field while it does. The user picked this motion in the prototype `2026-11-05-home-motion`. The
- * component `HomeHeader.vue` measures the elements and writes the values of `morphFrame()` on each frame.
+ * Geometry interpolation and spring physics for the scroll-linked `HomePage` header collapse.
+ * As the page scrolls, the full-width search bar morphs into the collapsed search icon button inside the sticky top bar
+ * while the frosted header backdrop retracts in sync. `HomeHeader.vue` measures live DOM coordinates and applies the
+ * per-frame transforms computed by `computeHeaderMorphFrame`.
  */
 
-/** The size of the search icon button and of the circle that the field becomes. */
-export const MORPH_CIRCLE_PX = 40;
-/** The size of the magnifier icon. In the circle it sits in the center. */
-export const MORPH_ICON_PX = 20;
-/** How far the outline parts of the copy overlap, so no seam shows between them. */
-export const MORPH_SEAM_PX = 0.5;
-/** The part of the progress in which the text and the filter button fade. */
-const TEXT_END = 0.3;
-/** The part of the progress after which the outline and the fill fade, and the icon takes the brand color. */
-const FRAME_START = 0.6;
-/** For a critically damped spring, the time to reach 95% of a step is this number divided by the angular frequency. */
+/** Width and height (in CSS pixels) of the collapsed search icon button and target pill circle. */
+export const COLLAPSED_BUTTON_SIZE_PX = 40;
+/** Width and height (in CSS pixels) of the centered magnifying-glass icon. */
+export const MAGNIFIER_ICON_SIZE_PX = 20;
+/** Horizontal overlap (in CSS pixels) between the left cap, center segment, and right cap to hide subpixel seams. */
+export const PILL_SEAM_OVERLAP_PX = 0.5;
+/** Collapse progress (`0..1`) at which placeholder text and the filter icon finish fading out. */
+const CONTENT_FADE_END_PROGRESS = 0.3;
+/** Collapse progress (`0..1`) at which the pill outline/fill begin fading out and the brand icon tint fades in. */
+const OUTLINE_FADE_START_PROGRESS = 0.6;
+/** Critically damped spring constant (`omega * settleSeconds`) reaching ~95% of a step in `settleSeconds`. */
 const SPRING_SETTLE_FACTOR = 4.74;
-/** The longest step of the spring, in seconds. A longer frame, for example after a hidden tab, takes more steps. */
-const SPRING_MAX_STEP_S = 1 / 120;
+/** Maximum integration time step (in seconds) so long frame gaps (such as backgrounded tabs) remain stable. */
+const MAX_SPRING_STEP_SECONDS = 1 / 120;
 
 /**
- * The sizes and places that the copy of the field needs. They come from the real elements, because a browser can draw
- * the field at another height: Safari on iOS can draw the search input taller than 20px. A copy with fixed sizes then
- * jumps in height when it takes the place of the field.
+ * Live DOM layout coordinates consumed by `computeHeaderMorphFrame`.
+ * Measured dynamically from rendered elements because browsers (such as iOS Safari) can size `<input type="search">`
+ * differently, which would cause a hardcoded overlay height to jump when taking over from the real field.
  *
- * The places are relative to the top row, which stays at the top, so the field at scroll position `s` is at
- * `fieldTop - s`. The places inside the field are relative to its top left corner.
+ * Outer coordinates are relative to the sticky top bar (`fieldTop - scrollTop` gives the live viewport position);
+ * inner offsets are relative to the search field's top-left corner.
  */
-export interface MorphGeometry {
-  /** The height of the top row: the bottom of the bar when it does not hold the field. */
-  barBase: number;
+export interface HeaderMorphGeometry {
+  /** Height of the sticky top bar when collapsed. */
+  topBarHeight: number;
   fieldHeight: number;
   fieldLeft: number;
   fieldTop: number;
   fieldWidth: number;
-  /** The distance from the right edge of the field to the left edge of the filter button. */
-  filterRight: number;
-  filterTop: number;
-  iconLeft: number;
-  iconTop: number;
-  magnifierLeft: number;
-  magnifierTop: number;
-  /** The distance from the top of the field to the bottom of the search row. */
-  rowBottom: number;
-  /** The place of the 20px text line in the field. */
-  textLeft: number;
-  textTop: number;
+  /** Distance from the search field's right edge to the filter button's left edge. */
+  filterOffsetFromRight: number;
+  filterOffsetTop: number;
+  /** Offset of the collapsed search icon button relative to the sticky top bar. */
+  targetButtonLeft: number;
+  targetButtonTop: number;
+  /** Offset of the resting magnifying-glass icon relative to the search field's top-left corner. */
+  magnifierOffsetLeft: number;
+  magnifierOffsetTop: number;
+  /** Distance from `fieldTop` to the bottom edge of the search row. */
+  searchRowBottomOffset: number;
+  /** Offset of the 20px-tall placeholder text box relative to the search field's top-left corner. */
+  placeholderOffsetLeft: number;
+  placeholderOffsetTop: number;
 }
 
-/** The values of one frame. Each place is relative to the top row, in pixels. */
-export interface MorphFrame {
-  /** How far the bar reaches below the top row. */
-  barExtend: number;
-  /** The opacity of the outline and the fill of the copy. */
-  frame: number;
-  /** The height of the outline. */
+/** Per-frame layout and opacity values (in pixels relative to the sticky top bar) for the morphing search overlay. */
+export interface HeaderMorphFrame {
+  /** Downward extension (in pixels) of the frosted header backdrop below `topBarHeight`. */
+  barExtensionPx: number;
+  /** Opacity of the brand-colored magnifying-glass overlay (`0` = placeholder gray, `1` = brand shade). */
+  brandIconOpacity: number;
+  /** Opacity of the placeholder text and filter button (`1` at rest, `0` once faded out). */
+  contentOpacity: number;
+  /** Rendered height of the morphing pill outline. */
   height: number;
-  iconLeft: number;
-  iconTop: number;
   left: number;
+  /** Offset of the magnifying-glass icon relative to `(left, top)` of the morphing pill. */
+  magnifierOffsetLeft: number;
+  magnifierOffsetTop: number;
+  /** Opacity of the morphing pill border and background fill. */
+  outlineOpacity: number;
   right: number;
-  /** The opacity of the text and of the filter button. */
-  text: number;
-  /** The opacity of the brand color of the icon. */
-  tint: number;
   top: number;
 }
 
-/** Returns a number between 0 and 1. */
+/** Clamps `value` into the closed `[0, 1]` interval. */
 export function clamp01(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
-/** Returns the value between `from` and `to` at `t`. */
-function lerp(from: number, to: number, t: number): number {
-  return from + (to - from) * t;
+/** Linearly interpolates between `from` and `to` at `progress`. */
+function lerp(from: number, to: number, progress: number): number {
+  return from + (to - from) * progress;
 }
 
-/** Returns the part of `t` between `from` and `to`, with a curve that starts and ends softly. */
-function smoothRange(t: number, from: number, to: number): number {
-  const x = clamp01((t - from) / (to - from));
-  return x * x * (3 - 2 * x);
+/** Maps `progress` across `[rangeStart, rangeEnd]` onto `[0, 1]` with smoothstep easing (`3x^2 - 2x^3`). */
+function smoothstepRange(progress: number, rangeStart: number, rangeEnd: number): number {
+  const normalized = clamp01((progress - rangeStart) / (rangeEnd - rangeStart));
+  return normalized * normalized * (3 - 2 * normalized);
 }
 
 /**
- * Returns the frame at progress `t`, from 0 (the field) to 1 (the icon).
+ * Computes the morphing header state at `progress` (`0` = resting search field, `1` = collapsed search icon button).
  *
- * Both ends of the field move on straight lines to the two sides of the icon, with the same progress, so they start
- * and arrive together. The field shrinks and rises at the same time, and its height goes from the height of the real
- * field to the size of the icon. The bar grows down to hold the field and folds back as the field rises. The bottom of
- * the bar never goes below the place where the search row is now (`scrollTop`), so it never covers content that has
- * already moved up when the spring trails a fast scroll.
+ * Both horizontal edges of the pill interpolate linearly toward the collapsed button's bounds while its height shrinks
+ * to `COLLAPSED_BUTTON_SIZE_PX`. The frosted backdrop extends downward to cover the morphing pill, clamped to the live
+ * scrolled bottom of the search row (`fieldTop + searchRowBottomOffset - scrollTop`) so a trailing spring never covers
+ * list rows that have already scrolled upward.
  */
-export function morphFrame(g: MorphGeometry, t: number, scrollTop: number): MorphFrame {
-  const fade = smoothRange(t, FRAME_START, 1);
-  const iconInset = (MORPH_CIRCLE_PX - MORPH_ICON_PX) / 2;
-  const left = lerp(g.fieldLeft, g.iconLeft, t);
-  const barBottom = Math.min(lerp(g.fieldTop + g.rowBottom, g.barBase, t), g.fieldTop + g.rowBottom - scrollTop);
+export function computeHeaderMorphFrame(
+  geometry: HeaderMorphGeometry,
+  progress: number,
+  scrollTop: number
+): HeaderMorphFrame {
+  const outlineFade = smoothstepRange(progress, OUTLINE_FADE_START_PROGRESS, 1);
+  const centeredIconInset = (COLLAPSED_BUTTON_SIZE_PX - MAGNIFIER_ICON_SIZE_PX) / 2;
+  const searchRowRestingBottom = geometry.fieldTop + geometry.searchRowBottomOffset;
+  const barBottom = Math.min(
+    lerp(searchRowRestingBottom, geometry.topBarHeight, progress),
+    searchRowRestingBottom - scrollTop
+  );
   return {
-    barExtend: t > 0 ? Math.max(0, barBottom - g.barBase) : 0,
-    frame: 1 - fade,
-    height: lerp(g.fieldHeight, MORPH_CIRCLE_PX, t),
-    iconLeft: lerp(g.magnifierLeft, iconInset, t),
-    iconTop: lerp(g.magnifierTop, iconInset, t),
-    left,
-    right: lerp(g.fieldLeft + g.fieldWidth, g.iconLeft + MORPH_CIRCLE_PX, t),
-    text: 1 - smoothRange(t, 0, TEXT_END),
-    tint: fade,
-    top: lerp(g.fieldTop, g.iconTop, t),
+    barExtensionPx: progress > 0 ? Math.max(0, barBottom - geometry.topBarHeight) : 0,
+    brandIconOpacity: outlineFade,
+    contentOpacity: 1 - smoothstepRange(progress, 0, CONTENT_FADE_END_PROGRESS),
+    height: lerp(geometry.fieldHeight, COLLAPSED_BUTTON_SIZE_PX, progress),
+    left: lerp(geometry.fieldLeft, geometry.targetButtonLeft, progress),
+    magnifierOffsetLeft: lerp(geometry.magnifierOffsetLeft, centeredIconInset, progress),
+    magnifierOffsetTop: lerp(geometry.magnifierOffsetTop, centeredIconInset, progress),
+    outlineOpacity: 1 - outlineFade,
+    right: lerp(
+      geometry.fieldLeft + geometry.fieldWidth,
+      geometry.targetButtonLeft + COLLAPSED_BUTTON_SIZE_PX,
+      progress
+    ),
+    top: lerp(geometry.fieldTop, geometry.targetButtonTop, progress),
   };
 }
 
-/** The state of a spring that follows a target. */
+/** Mutable position and velocity of a 1D critically damped spring. */
 export interface SpringState {
-  speed: number;
   value: number;
+  velocity: number;
 }
 
 /**
- * Moves a critically damped spring toward `target` for `seconds`. It starts with no speed and does not overshoot, so a
- * wheel step or a fast flick plays as a soft motion. `settleSeconds` is the time to reach 95% of a step. Returns true
- * when the spring has reached the target.
+ * Advances a critically damped spring (`state`) toward `target` by `elapsedSeconds` without overshooting, smoothing
+ * discrete mouse-wheel ticks and fast flicks. `settleSeconds` specifies the 95% response time (`<= 0` snaps
+ * immediately). Returns `true` once `state` settles onto `target`.
  */
-export function stepSpring(state: SpringState, target: number, seconds: number, settleSeconds: number): boolean {
+export function stepSpring(state: SpringState, target: number, elapsedSeconds: number, settleSeconds: number): boolean {
   if (settleSeconds <= 0) {
     state.value = target;
-    state.speed = 0;
+    state.velocity = 0;
     return true;
   }
-  const omega = SPRING_SETTLE_FACTOR / settleSeconds;
-  let left = Math.min(seconds, 0.1);
-  while (left > 0) {
-    const dt = Math.min(left, SPRING_MAX_STEP_S);
-    state.speed += (omega * omega * (target - state.value) - 2 * omega * state.speed) * dt;
-    state.value += state.speed * dt;
-    left -= dt;
+  const angularFrequency = SPRING_SETTLE_FACTOR / settleSeconds;
+  let remainingSeconds = Math.min(elapsedSeconds, 0.1);
+  while (remainingSeconds > 0) {
+    const dt = Math.min(remainingSeconds, MAX_SPRING_STEP_SECONDS);
+    const acceleration =
+      angularFrequency * angularFrequency * (target - state.value) - 2 * angularFrequency * state.velocity;
+    state.velocity += acceleration * dt;
+    state.value += state.velocity * dt;
+    remainingSeconds -= dt;
   }
-  if (Math.abs(target - state.value) < 0.001 && Math.abs(state.speed) < 0.01) {
+  if (Math.abs(target - state.value) < 0.001 && Math.abs(state.velocity) < 0.01) {
     state.value = target;
-    state.speed = 0;
+    state.velocity = 0;
     return true;
   }
   return false;

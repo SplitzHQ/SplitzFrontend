@@ -55,11 +55,11 @@ export const SIZE_GUIDE: Record<AvatarSize, AvatarSizeRule> = {
   },
   lg: {
     callers: "FrequentSelectionList, the ProfilePage identity card, JoinGroupPage",
-    rule: "A chooser with the name under the avatar, or the main picture of a page.",
+    rule: "A chooser with the name below the avatar, or the hero avatar of a page.",
   },
   sm: {
     callers: "HomePage group rows, MarkPaidSheet, PaidByButton, UserItem, RequestCard on ProfilePage",
-    rule: "A group row on the home screen, with the same size as a transaction tile. A person in a split or a payment, where the row has space or the name is under the avatar.",
+    rule: "Group rows on `HomePage` (matching the dimensions of a transaction tile), or a person in a split or payment row with extra vertical space or a stacked label.",
   },
   xs: {
     callers:
@@ -79,19 +79,19 @@ export const GROUP_RULES: UsageRule[] = [
     title: "Four pictures",
   },
   {
-    rule: "The app shows a grid at `xs`, `sm` and `lg`. HomePage uses `sm` for its group rows. At `xxs` each picture in a grid is too small to see. No caller uses `xxs` with a grid.",
+    rule: "Multi-member grids are supported at `xs`, `sm` (`HomePage` group rows), and `lg`. Never render a grid at `xxs`, where individual tiles are too small to read.",
     title: "Sizes",
   },
   {
-    rule: "One person in the list shows at full size, with no grid.",
+    rule: "A single-item `images` array renders at full frame size without a grid.",
     title: "One person",
   },
   {
-    rule: "Two people go on a diagonal: the first at the top left and the second at the bottom right. The tiles keep the size of a grid tile. Each tile moves to the center, so the gap between the rounded corners on the diagonal stays small. `Avatar.vue` holds the shift of each size. In one row they would leave an empty band above and below the tiles. Three people show two tiles in the first row and one in the center of the second row.",
+    rule: "Two members sit on the grid diagonal (top-left and bottom-right) instead of a single row that would leave empty horizontal bands. Both tiles keep standard grid-tile dimensions and shift slightly toward the center (`--pair-shift` in `Avatar.vue`) so the diagonal gap between rounded corners stays tight. Three members render two tiles on the top row and one centered tile below.",
     title: "Two people",
   },
   {
-    rule: "The corner of the frame is the corner of a tile plus the padding. The frame of a grid therefore has a smaller corner than one person at the same size.",
+    rule: "A grid frame's corner radius equals the tile radius plus frame padding, giving a multi-member grid a tighter outer radius than a single avatar at the same size.",
     title: "Corners",
   },
 ];

@@ -5,91 +5,91 @@ import { computed, ref } from "vue";
 
 import Sheet from "@/components/Sheet/Sheet.vue";
 
-import { leadTotal, type HomeBalance } from "./home-balances";
+import { selectPrimaryTotal, type HomeBalance } from "./home-balances";
 import HomeAmount from "./HomeAmount.vue";
 
 /**
- * The total balance of the user above the group list. It is one row with a surface, so it reads as one control
- * and not as a second title above the list. The row shows one total with a + or a − sign, so the direction does not
- * depend on the color. When the user has more than one total, a tap on the row opens a sheet with all totals, one group
- * for each direction.
+ * Summary card displaying the user's net balance above the group list on `HomePage`.
+ * Rendered as a single filled row so it reads as a summary control rather than a second section heading, with an
+ * explicit `+` or `−` prefix so direction never relies on color alone. When the user carries non-zero totals across
+ * multiple currencies, tapping opens a breakdown sheet grouped into owed-to-you and owed-by-you sections.
  *
- * The app has no exchange rates, so the row and the sheet show no converted total.
+ * Because Splitz does not convert between currencies, neither the card nor the sheet displays a converted sum.
  */
 const { commonCurrency, totals } = defineProps<{
-  /** The currency that the most groups use. The row shows the total in this currency. */
+  /** Most frequent non-zero currency across the user's groups, preferred as the headline total. */
   commonCurrency?: string;
-  /** The totals of the user, one for each currency. A zero total does not show. */
+  /** Per-currency net balances for the current user (zero-valued entries are omitted from display). */
   totals: readonly HomeBalance[];
 }>();
 
 const { $t } = useFluent();
 
-const open = ref(false);
+const isSheetOpen = ref(false);
 
-const openTotals = computed(() => totals.filter(({ amount }) => amount !== 0));
-const lead = computed(() => leadTotal(openTotals.value, commonCurrency));
-/** The row opens the sheet only when the sheet shows more than the row. */
-const hasDetails = computed(() => openTotals.value.length > 1);
+const nonZeroTotals = computed(() => totals.filter(({ amount }) => amount !== 0));
+const primaryTotal = computed(() => selectPrimaryTotal(nonZeroTotals.value, commonCurrency));
+/** Interactive sheet trigger only when additional currencies exist beyond `primaryTotal`. */
+const hasMultipleCurrencies = computed(() => nonZeroTotals.value.length > 1);
 
-/** The groups of the sheet: one for each direction that has a total, the owed totals first. */
-const detailParts = computed(() =>
+/** Breakdown sections inside the sheet, showing owed-to-you currencies ahead of owed-by-you currencies. */
+const directionSections = computed(() =>
   [
     {
       key: "owed",
       label: "home-you-lent",
       tone: "text-base-text-success",
-      totals: openTotals.value.filter(({ amount }) => amount > 0),
+      totals: nonZeroTotals.value.filter(({ amount }) => amount > 0),
     },
     {
       key: "owes",
       label: "home-you-owe",
       tone: "text-base-text-error",
-      totals: openTotals.value.filter(({ amount }) => amount < 0),
+      totals: nonZeroTotals.value.filter(({ amount }) => amount < 0),
     },
-  ].filter((part) => part.totals.length > 0)
+  ].filter((section) => section.totals.length > 0)
 );
 </script>
 
 <template>
   <component
-    :is="hasDetails ? 'button' : 'div'"
-    :type="hasDetails ? 'button' : undefined"
+    :is="hasMultipleCurrencies ? 'button' : 'div'"
+    :type="hasMultipleCurrencies ? 'button' : undefined"
     class="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-base-bg-secondary px-4 text-left text-base whitespace-nowrap"
     :class="
-      hasDetails &&
+      hasMultipleCurrencies &&
       'touch-manipulation transition-colors duration-hover-in ease-standard hover:bg-base-bg-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-border-brand-solid active:bg-base-bg-secondary_hover'
     "
     data-testid="home-total-balance"
-    @click="hasDetails && (open = true)"
+    @click="hasMultipleCurrencies && (isSheetOpen = true)"
   >
     <span class="text-sm font-medium text-base-text-quaternary">{{ $t("home-total-balance") }}</span>
     <span class="flex items-center gap-1.5">
-      <!-- One element for each sign, so the digits roll and the color fades when the sign changes. -->
+      <!-- Keep a single mounted `HomeAmount` across sign flips so digits roll and color cross-fades smoothly. -->
       <span
-        v-if="lead"
+        v-if="primaryTotal"
         class="font-semibold tabular-nums"
-        :class="lead.amount < 0 ? 'text-base-text-error' : 'text-base-text-success'"
+        :class="primaryTotal.amount < 0 ? 'text-base-text-error' : 'text-base-text-success'"
       >
-        {{ lead.amount < 0 ? "−" : "+" }}<HomeAmount :amount="lead.amount" :currency="lead.currency" />
+        {{ primaryTotal.amount < 0 ? "−" : "+"
+        }}<HomeAmount :amount="primaryTotal.amount" :currency="primaryTotal.currency" />
       </span>
       <span v-else class="text-sm font-medium text-base-text-quaternary">{{ $t("home-you-are-settled-up") }}</span>
-      <PhCaretRight v-if="hasDetails" class="icon-4 text-base-text-quinary" aria-hidden="true" />
+      <PhCaretRight v-if="hasMultipleCurrencies" class="icon-4 text-base-text-quinary" aria-hidden="true" />
     </span>
   </component>
 
-  <Sheet v-model="open" :title="$t('home-total-balance')" detent="medium" show-close-button>
-    <!-- One group for each direction. A line names the currency on the left and the amount on the right. -->
+  <Sheet v-model="isSheetOpen" :title="$t('home-total-balance')" detent="medium" show-close-button>
     <div class="flex flex-col gap-5 text-base">
-      <section v-for="part in detailParts" :key="part.key" class="flex flex-col gap-1">
-        <h3 class="text-sm font-semibold text-base-text-quaternary">{{ $t(part.label) }}</h3>
+      <section v-for="section in directionSections" :key="section.key" class="flex flex-col gap-1">
+        <h3 class="text-sm font-semibold text-base-text-quaternary">{{ $t(section.label) }}</h3>
         <p
-          v-for="total in part.totals"
+          v-for="total in section.totals"
           :key="total.currency"
           class="flex min-h-10 items-center justify-between gap-3 whitespace-nowrap"
         >
           <span class="text-base-text-secondary">{{ total.currency }}</span>
-          <span class="font-medium tabular-nums" :class="part.tone">
+          <span class="font-medium tabular-nums" :class="section.tone">
             <HomeAmount :amount="total.amount" :currency="total.currency" />
           </span>
         </p>

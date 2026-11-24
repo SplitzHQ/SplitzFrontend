@@ -9,12 +9,12 @@ Follow these steps before you change UI code. The rules exist because a guess fr
 
 ## Before a UI change
 
-1. Read `src/components/component-index.ts`. Use the `use` field to choose the component.
-2. Read the file in the `usage` field of that entry. Do this before you write code.
-3. Find the facts that the rules depend on. For example, find the real background under a button. Do not infer the surface from a word such as "card".
-4. Follow the rules. After a visible change, look at the result in the browser, at phone width and at desktop width.
+1. Read `src/components/component-index.ts` and check each entry's `use` field to choose the right component.
+2. Read the usage file listed in that entry's `usage` field before writing code.
+3. Verify the concrete UI context required by the rules (for example, inspect the actual background token under a button instead of assuming from the word "card").
+4. Follow the rules, then inspect visible changes in the browser at both mobile and desktop widths.
 
-For the logo, an app icon or a brand color, also follow `.agents/skills/spz-brand-use/SKILL.md`.
+When touching the logo, app icons, or brand colors, also follow `.agents/skills/spz-brand-use/SKILL.md`.
 
 ## When the rules do not decide
 

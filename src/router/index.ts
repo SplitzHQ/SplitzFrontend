@@ -133,9 +133,9 @@ const router = createRouter({
     },
   ],
   /*
-   * The page change of App.vue restores the scroll position when its motion ends (see `src/libs/page-transition.ts`).
-   * This option returns false, so the router does not scroll by itself. It still turns on the manual scroll restoration
-   * of the router, and the router then saves the scroll position of each history entry.
+   * Return `false` so Vue Router enables manual scroll restoration and records each history entry's scroll coordinates
+   * in `history.state.scroll`, while deferring actual window scrolling to `usePageTransition` in `App.vue` until the
+   * slide transition finishes.
    */
   scrollBehavior: () => false,
 });

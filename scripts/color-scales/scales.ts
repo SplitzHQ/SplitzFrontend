@@ -1,20 +1,17 @@
-import type { SemanticToken } from "@/assets/color.usage";
-
 import { colorAtContrast, hexToOklch, oklchToHex } from "./color-math";
 
 /**
- * The color scales of the app. Each scale has 12 steps for each theme, and each step has one job in both themes.
- * Each value stays on the curve of the `core-color-*` family, so a family keeps its hue. The position on the curve comes
- * from a target contrast on the page. The design decisions are in the prototype "Color token review".
+ * Theme color scales for the app. Each scale defines 12 contrast-targeted steps per theme so every step plays the same
+ * visual role in light and dark modes. Values stay on the `core-color-*` curve of each family to preserve hue.
  */
 
 export const THEMES = ["light", "dark"] as const;
 export type Theme = (typeof THEMES)[number];
 
-/** The steps of a `core-color-*` family, from light to dark. */
+/** Steps of a `core-color-*` family, ordered from light to dark. */
 export const CORE_STEPS = ["25", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"] as const;
 
-/** The scales in `color.css`. The names of the families are the names of the `core-color-*` families. */
+/** Scale names in `color.css` mapped to their `core-color-*` source families. */
 export const SCALE_FAMILIES = {
   brand: "brand",
   error: "error",
@@ -25,50 +22,50 @@ export const SCALE_FAMILIES = {
 export type ScaleName = keyof typeof SCALE_FAMILIES;
 
 /**
- * The target contrast of each neutral step on the page.
- * Step 8 holds the placeholder and the disabled text. Step 9 holds text-muted, step 10 holds text-secondary and step 12
- * holds text-primary. Step 9 is below the 4.5:1 of WCAG AA. This is a design decision.
+ * Target contrast ratios against the page surface for each neutral step.
+ * Step 8 serves placeholder and disabled text, step 9 serves `text-muted`, step 10 serves `text-secondary`, and step 12
+ * serves `text-primary`. Step 9 intentionally sits below the 4.5:1 WCAG AA threshold for secondary metadata.
  */
 const NEUTRAL_TARGETS: Record<Theme, readonly number[]> = {
   dark: [1, 1.16, 1.28, 1.4, 1.55, 1.7, 1.9, 3.3, 4.7, 8.4, 10.5, 16.6],
   light: [1, 1.06, 1.12, 1.19, 1.27, 1.38, 1.7, 3.1, 4.2, 7.6, 10, 15.4],
 };
 
-/** The target contrast of a color scale on the page. Steps 9 and 10 use the solid targets, so their value here is 0. */
+/** Target contrast ratios against the page surface for chromatic scales (steps 9 and 10 use solid contrast targets instead). */
 const COLOR_TARGETS: Record<Theme, readonly number[]> = {
   dark: [1.03, 1.08, 1.2, 1.35, 1.5, 1.75, 2.2, 3, 0, 0, 8, 11],
   light: [1.03, 1.07, 1.15, 1.24, 1.36, 1.52, 1.85, 2.5, 0, 0, 6.2, 10.5],
 };
 
-/** White text on step 9 has this contrast. Step 10 has more in the light theme and less in the dark theme. */
+/** Target contrast of white text on solid step 9; step 10 increases contrast in light mode and lowers it in dark mode. */
 const SOLID_ON_WHITE = 4.6;
 const SOLID_PRESSED_ON_WHITE: Record<Theme, number> = { dark: 3.9, light: 5.8 };
-/** The brand keeps the color of the primary button, so its solid step has more contrast. */
+/** Higher solid contrast targets for the brand scale so the primary button retains its deeper shade. */
 const BRAND_SOLID_ON_WHITE = 6.4;
 const BRAND_SOLID_PRESSED_ON_WHITE = 8.2;
 
 /**
- * The contrast of step 9 and step 10 of the danger scale with `base-text-inverse`. This token is the label of the
- * destructive button. It is near white in the light theme and near black in the dark theme.
+ * Target contrast of danger steps 9 and 10 (zero-based indices 8 and 9) against `base-text-inverse`, the label color
+ * of the destructive button (near-white in light mode, near-black in dark mode).
  */
 const DANGER_ON_INVERSE: Record<number, number> = { 8: 4.6, 9: 5.8 };
 
-/** The colors that the scales start from. They come from the `core-color-*` tokens, which the generator does not change. */
+/** Base color inputs read from the static `core-color-*` palette tokens. */
 export interface ScaleSource {
-  /** Returns the 12 colors of a family, from light to dark. */
+  /** Returns the 12 hex colors of `family` from light to dark. */
   ramp: (family: string) => readonly string[];
-  /** The page color of each theme. */
+  /** Page background hex color for each theme. */
   page: Record<Theme, string>;
 }
 
-/** Returns the color of the page and of each curve in a theme. A curve starts at the page and moves away from it. */
+/** Builds a color curve starting at the theme's page surface and progressing away from it in lightness. */
 function curveOf(family: string, theme: Theme, source: ScaleSource): { curve: string[]; page: string } {
   const page = source.page[theme];
   const ramp = source.ramp(family);
   return { curve: theme === "light" ? [page, ...ramp] : [page, ...[...ramp].reverse()], page };
 }
 
-/** Gives a neutral color the hue of the brand. The lightness does not change. The tint is strongest in the middle. */
+/** Tints a neutral hex color with the brand hue while preserving lightness, peaking in chroma near mid-tones. */
 function sageTinted(hex: string, source: ScaleSource): string {
   const { l } = hexToOklch(hex);
   const brandSolid = source.ramp("brand")[CORE_STEPS.indexOf("600")] as string;
@@ -76,7 +73,7 @@ function sageTinted(hex: string, source: ScaleSource): string {
   return oklchToHex({ c: Math.max(0.003, chroma), h: hexToOklch(brandSolid).h, l });
 }
 
-/** Returns the 12 neutral colors of a theme. */
+/** Computes the 12 sage-tinted neutral scale colors for `theme`. */
 export function neutralScale(theme: Theme, source: ScaleSource): string[] {
   const { curve, page } = curveOf(SCALE_FAMILIES.neutral, theme, source);
   return NEUTRAL_TARGETS[theme].map((target, index) =>
@@ -84,18 +81,18 @@ export function neutralScale(theme: Theme, source: ScaleSource): string[] {
   );
 }
 
-/** Returns the 12 colors of a color family in a theme. */
+/** Computes the 12 chromatic scale colors for `family` in `theme`. */
 export function colorScale(family: string, theme: Theme, source: ScaleSource): string[] {
   const { curve, page } = curveOf(family, theme, source);
   const solidCurve = ["#ffffff", ...source.ramp(family)];
   const isBrand = family === "brand";
-  // The inverse text is step 1 of the neutral scale.
+  // `base-text-inverse` matches step 1 of the neutral scale.
   const inverse = sageTinted(page, source);
   const inverseCurve = [inverse, ...curve.slice(1)];
   return COLOR_TARGETS[theme].map((target, index) => {
     const dangerTarget = family === "error" ? DANGER_ON_INVERSE[index] : undefined;
     if (dangerTarget !== undefined) return colorAtContrast(inverseCurve, inverse, dangerTarget);
-    // The primary button in the dark theme keeps its color.
+    // Preserve the exact dark-mode primary button fill (`brand-300`).
     if (isBrand && theme === "dark" && index === 11) return source.ramp(family)[CORE_STEPS.indexOf("300")] as string;
     if (index === 8) return colorAtContrast(solidCurve, "#ffffff", isBrand ? BRAND_SOLID_ON_WHITE : SOLID_ON_WHITE);
     if (index === 9) {
@@ -106,42 +103,40 @@ export function colorScale(family: string, theme: Theme, source: ScaleSource): s
   });
 }
 
-/** Returns the 12 colors of a scale in a theme. */
+/** Computes the 12 scale colors for `name` in `theme`. */
 export function scaleColors(name: ScaleName, theme: Theme, source: ScaleSource): string[] {
   return name === "neutral" ? neutralScale(theme, source) : colorScale(SCALE_FAMILIES[name], theme, source);
 }
 
-/** A step of a scale. `N` is neutral. `B`, `E`, `S` and `W` are brand, error, success and warning. */
+/** Compact shorthand for a scale step (`N` = neutral, `B` = brand, `E` = error, `S` = success, `W` = warning). */
 type StepRef = `${"N" | "B" | "E" | "S" | "W"}${number}`;
-/** The value of a token: a step of a scale, or the name of another token. */
+/** Reference to either a scale step shorthand or an existing CSS token name. */
 export type TokenRef = StepRef | `${"base" | "core" | "util"}-${string}`;
-/** One value for both themes, or one value for each theme. */
+/** Token reference shared across both themes or specified per theme. */
 export type ThemedRef = TokenRef | Record<Theme, TokenRef>;
 
 const REF_NAMES: Record<string, ScaleName> = { B: "brand", E: "error", N: "neutral", S: "success", W: "warning" };
 
-/** Returns the name of a scale token from a step, for example `core-scale-neutral-9` from `N9`. */
+/** Expands a step shorthand such as `N9` into its CSS variable name (`core-scale-neutral-9`). */
 export function scaleToken(ref: StepRef): string {
   return `core-scale-${REF_NAMES[ref[0] as string] as ScaleName}-${ref.slice(1)}`;
 }
 
-/** Returns the name of the token that a value points at. */
+/** Resolves a `TokenRef` into a full CSS custom property name (without `--`). */
 export function tokenName(ref: TokenRef): string {
   return /^[BENSW]\d+$/.test(ref) ? scaleToken(ref as StepRef) : ref;
 }
 
-/** The translucent neutral at one opacity. The base color is black in the light theme and white in the dark theme. */
+/** Builds a translucent neutral token pair using black alpha in light mode and white alpha in dark mode. */
 function neutralAlpha(opacity: number): Record<Theme, TokenRef> {
   return { dark: `core-alpha-white-${opacity}`, light: `core-alpha-black-${opacity}` };
 }
 
 /**
- * The value of each old `base-*` token. These values keep the look of the app until the components move to the new
- * semantic tokens. The app has three levels of reading text, so two old names of one level use one
- * step: secondary and tertiary use step 10, and quaternary and quinary use step 9.
+ * Scale-step mappings for legacy `base-*` tokens while components migrate to `SEMANTIC_TOKENS`.
+ * Reading text uses three hierarchy levels, so `secondary`/`tertiary` share step 10 and `quaternary`/`quinary` share step 9.
  *
- * The `util-color-*` tokens do not move here. The category colors and the avatar colors use their steps 50, 100, 500 and
- * 600, and those values must not change.
+ * `util-color-*` tokens are excluded so category and avatar palette steps (50, 100, 500, 600) remain unchanged.
  */
 export const BASE_STEPS: Record<string, ThemedRef> = {
   "base-bg-brand": "B3",
@@ -217,18 +212,17 @@ export const BASE_STEPS: Record<string, ThemedRef> = {
   "base-text-tertiary": "N10",
 };
 
-/** A semantic token: its value and the old names that it replaces. */
+/** Semantic token definition pairing its target value with the legacy `base-*` names it replaces. */
 export interface SemanticDefinition {
   value: ThemedRef;
   replaces: readonly string[];
 }
 
 /**
- * The semantic tokens, from the list "three" in section 7 of the prototype "Color token review". The rules for
- * each token are in `src/assets/color.usage.ts`. The hover fill and the active fill use the opacities of the outline
- * button, and the subtle fill keeps the value of `util-alpha-black-5`.
+ * Semantic color tokens. Usage rules for each token live in `src/assets/color.usage.ts`.
+ * Neutral hover and active fills share the outline button's alpha steps, and `base-bg-subtle` matches `util-alpha-black-5`.
  */
-export const SEMANTIC_TOKENS: Record<SemanticToken, SemanticDefinition> = {
+export const SEMANTIC_TOKENS: Record<string, SemanticDefinition> = {
   "base-bg-active": { replaces: ["base-bg-neutral_pressed"], value: neutralAlpha(10) },
   "base-bg-brand-solid": {
     replaces: ["base-bg-brand-reverse", "base-bg-brand-reverse_hover", "base-bg-brand-reverse_pressed"],
@@ -288,10 +282,10 @@ export const SEMANTIC_TOKENS: Record<SemanticToken, SemanticDefinition> = {
   "base-text-warning": { replaces: [], value: "W11" },
 };
 
-/** The old names whose value is not a step of a scale. Each one has the color of its semantic token in both themes. */
-export const ALPHA_ALIASES: Record<string, SemanticToken> = { "base-bg-overlay": "base-bg-scrim" };
+/** Legacy tokens whose values come from alpha tokens instead of scale steps, aliased directly in both themes. */
+export const ALPHA_ALIASES: Record<string, string> = { "base-bg-overlay": "base-bg-scrim" };
 
-/** The color families of the main categories. Each family has a fill at step 50 and an icon at step 600. */
+/** Main category color families, each providing a fill at step 50 and an icon color at step 600. */
 const PALETTE_FAMILIES = [
   "brand",
   "clearblue",
@@ -307,9 +301,9 @@ const PALETTE_FAMILIES = [
   "waterblue",
   "yellow",
 ] as const;
-/** The color families of the action tiles on the review page. These families also have a hover, a press and a label. */
+/** Color families for the review-page action tiles, which also define hover, pressed, and label steps. */
 const ACTION_FAMILIES = ["clearblue", "leaf", "purple", "rosered"] as const;
-/** The text step of each avatar family. See `avatar-initial.ts` for why the steps are different. */
+/** Foreground text step per avatar color family (see `avatar-initial.ts` for contrast details). */
 const AVATAR_TEXT_STEPS = {
   brand: 500,
   leaf: 600,
@@ -320,7 +314,7 @@ const AVATAR_TEXT_STEPS = {
   yellow: 600,
 };
 
-/** Returns the four parts of the status badge in one tone. */
+/** Builds the four `comp-status-badge-<tone>-*` token entries for a single badge tone. */
 function statusBadgeTone(
   tone: string,
   parts: { core: TokenRef; halo: TokenRef; icon: TokenRef; ring: TokenRef }
@@ -331,8 +325,8 @@ function statusBadgeTone(
 }
 
 /**
- * The component tokens from section 9 of the prototype. Each value is the color that the component uses today, so a
- * migration card can change the name and keep the look. The rules for each group are in `src/assets/color.usage.ts`.
+ * Component-scoped color tokens (`comp-*`). Values match current component colors so token migrations preserve visuals.
+ * Group rules live in `src/assets/color.usage.ts`.
  */
 export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-button-outline-bg-hover": neutralAlpha(5),
@@ -343,8 +337,8 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   "comp-button-secondary-bg": "core-alpha-brand-20",
   "comp-button-secondary-bg-hover": "core-alpha-brand-30",
   "comp-button-secondary-bg-pressed": "core-alpha-brand-40",
-  // The hover and pressed fill of a shared row. The dark theme needs a step between the page and N2: N2 is too
-  // bright on the dark page, so the 3% white sits about half way.
+  // Dark mode needs an intermediate step between the page surface and `N2` because `N2` looks too bright on a row hover;
+  // 3% white lands roughly halfway.
   "comp-row-bg-hover": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
   "comp-row-bg-pressed": { dark: "core-alpha-white-3", light: "base-bg-secondary" },
   "comp-search-filter-bg": "core-alpha-brand-10",
@@ -403,36 +397,35 @@ export const COMPONENT_TOKENS: Record<string, ThemedRef> = {
   ),
 };
 
-/** Returns the value of a themed value in one theme. */
+/** Resolves `value` for a single `theme`. */
 export function themedRef(value: ThemedRef, theme: Theme): TokenRef {
   return typeof value === "string" ? value : value[theme];
 }
 
-/** Returns the value of an old `base-*` token in a theme. */
+/** Resolves the scale-step reference for a legacy `base-*` token in `theme`. */
 export function baseStep(token: string, theme: Theme): TokenRef {
   return themedRef(BASE_STEPS[token] as ThemedRef, theme);
 }
 
 /**
- * Returns the value that a semantic token has in `color.css`. When one name is both an old token and a semantic token,
- * the old value stays. The app must not change color until the last old use of that name moves.
+ * Resolves the `color.css` reference for a semantic token. When a token name exists in both `BASE_STEPS` and
+ * `SEMANTIC_TOKENS`, the legacy step wins until all legacy call sites migrate.
  */
-export function semanticRef(token: SemanticToken, theme: Theme): TokenRef {
+export function semanticRef(token: string, theme: Theme): TokenRef {
   return token in BASE_STEPS ? baseStep(token, theme) : themedRef(SEMANTIC_TOKENS[token].value, theme);
 }
 
-/** Returns the semantic tokens whose name is new. The generator adds these lines, and the other names already exist. */
-export function newSemanticTokens(): SemanticToken[] {
-  return (Object.keys(SEMANTIC_TOKENS) as SemanticToken[]).filter((token) => !(token in BASE_STEPS));
+/** Returns semantic token names that do not collide with existing `BASE_STEPS` entries. */
+export function newSemanticTokens(): string[] {
+  return Object.keys(SEMANTIC_TOKENS).filter((token) => !(token in BASE_STEPS));
 }
 
 /**
- * Returns the semantic token that an old name can point at. An old name is an alias only when the color is the same in
- * both themes. Other old names keep their own value, and a later change deletes them after the components move.
+ * Finds the semantic token that `oldToken` can alias directly when both themes resolve to the exact same color.
+ * Legacy tokens whose light or dark step differs keep their own value until components migrate.
  */
-export function aliasOf(oldToken: string): SemanticToken | undefined {
-  const tokens = Object.keys(SEMANTIC_TOKENS) as SemanticToken[];
-  return tokens.find(
+export function aliasOf(oldToken: string): string | undefined {
+  return Object.keys(SEMANTIC_TOKENS).find(
     (token) =>
       SEMANTIC_TOKENS[token].replaces.includes(oldToken) &&
       THEMES.every((theme) => baseStep(oldToken, theme) === semanticRef(token, theme))

@@ -44,11 +44,11 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Focus ring",
   },
   {
-    rule: "`TRANSACTION_ROW_CLASS` has `-mx-2 px-2`. The hover and pressed fill (`comp-row-bg-hover` and `comp-row-bg-pressed`, one step lighter than `base-bg-hover`) extends 8px past the content on each side, and the content stays in its place. A press also makes the row 2% smaller with the timing of the SSegmentControl press, except under reduced motion. The user picked this look in the prototype `2026-11-05-home-motion`. The parent must have 8px of free space on each side. Do not add `w-full`, because the row then does not extend on the right. Put the row in a flex column or a block element, which stretches it. A scroll area cuts the fill, so give the scroll area `-mx-2 px-2`.",
+    rule: "`TRANSACTION_ROW_CLASS` uses `-mx-2 px-2` so its hover and pressed fill (`comp-row-bg-hover` / `comp-row-bg-pressed`, one step lighter than `base-bg-hover`) extends 8px past the content on each side without shifting alignment, and scales to 98% on press unless reduced motion is active. Parent containers must leave 8px of horizontal room (add `-mx-2 px-2` on clipping scroll containers), and rows must sit in a block or flex-column parent without `w-full` so both negative margins take effect.",
     title: "Hover and pressed fill",
   },
   {
-    rule: "A group row and the Create group row on HomePage use `TRANSACTION_ROW_CLASS` with their own content, so all rows react in the same way.",
+    rule: "Group rows and the Create group row on `HomePage` also apply `TRANSACTION_ROW_CLASS` so interactive rows share uniform hover and press feedback.",
     title: "Other rows",
   },
   {
@@ -96,7 +96,7 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
     title: "Focus ring",
   },
   {
-    text: "The hover fill uses the Tailwind `hover:` variant, which applies only on a device that can hover, so a tap on a phone cannot leave a stuck color. Do not write the hover fill in another way. The fill uses the motion tokens and changes at once when the system asks for reduced motion.",
+    text: "Hover background uses Tailwind's `hover:` variant (`@media (hover: hover)`), preventing stuck hover fills after touch taps on mobile. Background transitions follow motion tokens and become instant when reduced motion is enabled.",
     title: "Hover, press and reduced motion",
   },
   {

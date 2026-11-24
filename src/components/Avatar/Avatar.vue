@@ -93,16 +93,15 @@ const failedSources = shallowReactive(new Set<string>());
 const isGroup = computed(() => images.length > 1);
 
 /**
- * Two people go on a diagonal of the grid: the first at the top left and the second at the bottom right. In one row they
- * would leave an empty band above and below. The tiles keep the size of a grid tile and move a little to the center. See
- * `avatar.usage.ts`.
+ * Places a two-member group on the grid diagonal (top-left and bottom-right) instead of a single centered row,
+ * avoiding empty horizontal bands while nudging both tiles slightly inward. See `avatar.usage.ts`.
  */
-const isPair = computed(() => images.length === 2);
+const isDiagonalPair = computed(() => images.length === 2);
 const sizeClasses = computed(() => SIZE_CLASSES[size]);
 const tileClass = computed(() => (isGroup.value ? sizeClasses.value.multiple : sizeClasses.value.single));
 
-/** The pictures to show. A missing picture and a picture that failed to load have a null source and show a tile. */
-const shownImages = computed(() =>
+/** Normalized avatar items (capped at `MAX_GRID_IMAGES`), falling back to `null` `src` when missing or errored. */
+const displayedImages = computed(() =>
   images.slice(0, MAX_GRID_IMAGES).map(({ alt, src }) => {
     const resolved = resolveAssetUrl(src);
     return {
@@ -114,17 +113,17 @@ const shownImages = computed(() =>
   })
 );
 
-/** A grid is one picture for a screen reader, with one name. A single picture uses its own `alt`. */
+/** Combined accessible label for multi-member grids; single avatars expose their own `alt` directly. */
 const gridLabel = computed(() =>
   isGroup.value
-    ? shownImages.value
+    ? displayedImages.value
         .map(({ alt }) => alt)
         .filter(Boolean)
         .join(", ") || undefined
     : undefined
 );
 
-/** Replaces a picture that failed to load with the tile. */
+/** Marks a failed image URL so its tile falls back to an initial. */
 function onImageError(src: string) {
   failedSources.add(src);
 }
@@ -140,16 +139,16 @@ function onImageError(src: string) {
     :aria-label="gridLabel"
   >
     <div
-      :class="[isPair ? 'grid grid-cols-2' : 'flex flex-wrap justify-center', 'gap-0.5']"
-      :data-pair="isPair || undefined"
+      :class="[isDiagonalPair ? 'grid grid-cols-2' : 'flex flex-wrap justify-center', 'gap-0.5']"
+      :data-pair="isDiagonalPair || undefined"
     >
-      <!-- The position is the key, because two people with no picture have the same source. -->
-      <template v-for="(image, index) in shownImages" :key="index">
+      <!-- Key by index because multiple members without photos share `src: null`. -->
+      <template v-for="(image, index) in displayedImages" :key="index">
         <img
           v-if="image.src"
           :class="[
             tileClass,
-            isPair && index === 1 && 'col-start-2 row-start-2',
+            isDiagonalPair && index === 1 && 'col-start-2 row-start-2',
             PICTURE_LINE_CLASS,
             'block object-cover',
           ]"
@@ -161,7 +160,7 @@ function onImageError(src: string) {
           v-else
           :class="[
             tileClass,
-            isPair && index === 1 && 'col-start-2 row-start-2',
+            isDiagonalPair && index === 1 && 'col-start-2 row-start-2',
             'flex items-center justify-center leading-none font-semibold select-none',
           ]"
           :style="AVATAR_TONE_STYLES[image.tone]"
