@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhPlus, PhUsers } from "@phosphor-icons/vue";
-import { useQuery } from "@pinia/colada";
+import { useQuery, useQueryCache } from "@pinia/colada";
 import { useLocalStorage } from "@vueuse/core";
 import { useFluent } from "fluent-vue";
 import { twMerge } from "tailwind-merge";
@@ -16,7 +16,7 @@ import SButton from "@/components/SButton/SButton.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
 import { TRANSACTION_ROW_CLASS } from "@/components/TransactionItem/transaction-row";
 import { useStatusBarTopColor } from "@/libs/status-bar-color";
-import { CONTENT_FADE_IN, useLoadFeedback, type LoadPhase } from "@/libs/use-load-feedback";
+import { useLoadFeedback } from "@/libs/use-load-feedback";
 import { useRouterHistoryStore } from "@/stores/routing-history";
 import { useUserStore } from "@/stores/user";
 
@@ -46,11 +46,11 @@ const userStore = useUserStore();
 const searchKeyword = ref("");
 
 const groupApi = new GroupApi(config);
-const {
-  asyncStatus: groupsAsyncStatus,
-  refetch: refetchGroups,
-  state: groupsQuery,
-} = useQuery({ key: ["getGroups"], query: () => groupApi.getGroups() });
+const queryCache = useQueryCache();
+const { asyncStatus: groupsAsyncStatus, state: groupsQuery } = useQuery({
+  key: ["getGroups"],
+  query: () => groupApi.getGroups(),
+});
 
 const groups = computed(() => {
   return groupsQuery.value.data ?? [];
@@ -105,14 +105,9 @@ const hasGroups = computed(() => groups.value.length > 0);
 const showNoResults = computed(() => hasGroups.value && visibleGroups.value.length === 0);
 const showEmptyState = computed(() => groupsQuery.value.status === "success" && !hasGroups.value);
 const showLoadingState = computed(() => groupsQuery.value.status === "pending");
-// A failed refresh keeps the old data, so the list stays and the page shows no error.
+// '& !hasGroups.value' ensures that a failed refresh keeps the old data, so the list stays and the page shows no error.
 const showErrorState = computed(() => groupsQuery.value.status === "error" && !hasGroups.value);
 const isRetrying = computed(() => showErrorState.value && groupsAsyncStatus.value === "loading");
-
-const loadPhase = computed<LoadPhase>(() => {
-  if (showLoadingState.value || isRetrying.value) return "loading";
-  return showErrorState.value ? "failed" : "ready";
-});
 
 const content = useTemplateRef<HTMLElement>("content");
 const { announcement, retry } = useLoadFeedback({
@@ -122,7 +117,7 @@ const { announcement, retry } = useLoadFeedback({
     loaded: () => $t("home-status-loaded"),
     loading: () => $t("home-status-loading"),
   },
-  phase: loadPhase,
+  phase: () => (showLoadingState.value || isRetrying.value ? "loading" : showErrorState.value ? "failed" : "ready"),
 });
 
 const groupList = useTemplateRef<ComponentPublicInstance>("groupList");
@@ -196,7 +191,6 @@ const userBalances = computed(() => {
           <PhPlus />
         </SIconButton>
 
-        <!-- This element stays in the page, so a screen reader reads the result when the text changes. -->
         <p role="status" class="sr-only">
           {{ showNoResults ? $t("home-no-results-title", { keyword: trimmedKeyword }) : "" }}
         </p>
@@ -204,7 +198,11 @@ const userBalances = computed(() => {
 
         <!-- A successful retry removes the button that had the focus, so the focus moves to this block. -->
         <div ref="content" tabindex="-1" class="outline-none">
-          <Transition v-bind="CONTENT_FADE_IN">
+          <Transition
+            enter-active-class="transition-opacity duration-state ease-enter"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+          >
             <!--
               The bottom space keeps the last row above the plus button. 16px above the total and 12px under it: the
               title row is 32px high with its text in the middle, so the eye sees about the same space on each side.
@@ -317,7 +315,6 @@ const userBalances = computed(() => {
               </TransitionGroup>
             </div>
 
-            <!-- Transition needs one root element, and HomeEmptyState has two. -->
             <div v-else-if="showEmptyState">
               <HomeEmptyState @add-expense="addExpense" @create-group="createGroup" />
             </div>
@@ -328,7 +325,12 @@ const userBalances = computed(() => {
               <Notice tone="error" announce data-testid="home-load-error">
                 <p>{{ $t("home-error-loading-groups") }}</p>
                 <template #action>
-                  <SButton variant="outline" size="sm" :loading="isRetrying" @click="retry(refetchGroups)">
+                  <SButton
+                    variant="outline"
+                    size="sm"
+                    :loading="isRetrying"
+                    @click="retry(() => queryCache.invalidateQueries({ exact: true, key: ['getGroups'] }))"
+                  >
                     {{ $t("home-error-retry") }}
                   </SButton>
                 </template>

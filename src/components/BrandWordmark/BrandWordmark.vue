@@ -11,31 +11,37 @@ import {
 } from "./brand-wordmark";
 
 /**
- * The Splitz logo: the word as outlines, with the diamond of the glyph on the i. The rules are in
- * `brand-wordmark.usage.ts`.
+ * Static SVG `"Splitz"` wordmark rendered from vector letter outlines, with the brand diamond replacing the dot on
+ * the `i`. See `brand-wordmark.usage.ts` for usage rules.
  *
- * The default slot draws in the same SVG, under the word. `BrandTapLogo` puts the mark there. Each letter and the diamond
- * have a `data-part`, so the steps in `brand-motion.ts` can move them.
+ * Slots:
+ * - `default`: Optional SVG elements rendered behind the wordmark inside the same coordinate space (used by
+ *   `BrandTapWordmark` to layer the animated glyph and morphing tittle `<rect>`).
+ *
+ * Each letter (`data-part="letter-0"`..`"letter-5"`) and the `i`'s diamond (`data-part="tittle"`) expose `data-part`
+ * selectors so `brand-motion.ts` can animate them individually.
  */
-const { size } = defineProps<{
-  /** The surface that shows the logo. */
+export interface BrandWordmarkProps {
+  /** Named size preset matching the UI surface where the wordmark appears. */
   size: WordmarkSize;
-}>();
+}
 
-const { box, emUnits } = WORDMARK_LAYOUT;
+const { size } = defineProps<BrandWordmarkProps>();
 
-const viewBox = `0 ${box.y} ${box.width} ${box.height}`;
+const { box: wordmarkBox, emUnits } = WORDMARK_LAYOUT;
 
-/** The rendered size in CSS pixels. The SVG scales from the font size of the logo size. */
-const scale = computed(() => WORDMARK_FONT_SIZE[size] / emUnits);
+const viewBox = `0 ${wordmarkBox.y} ${wordmarkBox.width} ${wordmarkBox.height}`;
+
+/** Ratio converting SVG user units (`100` per em) into CSS pixels for the selected `size` preset. */
+const pixelScale = computed(() => WORDMARK_FONT_SIZE[size] / emUnits);
 </script>
 
 <template>
-  <!-- `overflow-visible` keeps the tip of the diamond, which goes above the box. -->
+  <!-- Keep `overflow-visible` because the top tip of the `i`'s diamond extends above `wordmarkBox.y`. -->
   <svg
     :viewBox="viewBox"
-    :width="box.width * scale"
-    :height="box.height * scale"
+    :width="wordmarkBox.width * pixelScale"
+    :height="wordmarkBox.height * pixelScale"
     fill="currentColor"
     class="block shrink-0 overflow-visible text-util-color-brand-700 select-none"
     xmlns="http://www.w3.org/2000/svg"
@@ -43,13 +49,18 @@ const scale = computed(() => WORDMARK_FONT_SIZE[size] / emUnits);
     :aria-label="WORDMARK_WORD"
   >
     <slot />
-    <path v-for="(letter, index) in WORDMARK_LETTERS" :key="index" :data-part="`letter-${index}`" :d="letter" />
+    <path
+      v-for="(letterPath, letterIndex) in WORDMARK_LETTERS"
+      :key="letterIndex"
+      :data-part="`letter-${letterIndex}`"
+      :d="letterPath"
+    />
     <path data-part="tittle" :d="WORDMARK_TITTLE" />
   </svg>
 </template>
 
 <style scoped>
-/* Each part scales and moves around its own center. */
+/* Scale and translate each letter path and the tittle around its own bounding-box center. */
 [data-part] {
   transform-box: fill-box;
   transform-origin: center;

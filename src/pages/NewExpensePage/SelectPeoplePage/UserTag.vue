@@ -9,7 +9,7 @@ import Avatar from "@/components/Avatar/Avatar.vue";
  */
 const { photo, name } = defineProps<{ photo: string | null | undefined; name: string }>();
 
-defineEmits<{ remove: [event: MouseEvent] }>();
+defineEmits<{ remove: [] }>();
 
 const { $t } = useFluent();
 </script>
@@ -19,7 +19,7 @@ const { $t } = useFluent();
     type="button"
     :aria-label="$t('new-expense-select-people-remove', { name })"
     class="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-comp-user-tag-border bg-base-bg-brand-subtle py-0.5 pr-2 pl-0.5 transition-opacity duration-feedback ease-standard after:absolute after:top-1/2 after:left-1/2 after:h-11 after:w-[max(100%,--spacing(11))] after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-base-focus-ring active:opacity-70 motion-reduce:transition-none"
-    @click="$emit('remove', $event)"
+    @click="$emit('remove')"
   >
     <Avatar aria-hidden="true" :images="[{ src: photo, alt: name }]" size="xxs" />
     <span class="max-w-28 truncate text-sm leading-5 font-normal text-base-text-primary">{{ name }}</span>

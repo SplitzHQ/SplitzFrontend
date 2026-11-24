@@ -70,7 +70,7 @@ export const SETUP_RULES: UsageRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The panel has the dialog role. The `label` prop is required, and the panel gets its name from it. The trigger gets `aria-expanded` and `aria-haspopup`.",
+    text: "The panel has the dialog role. Set `aria-label`, and the panel gets its name from it. The trigger gets `aria-expanded` and `aria-haspopup`.",
     title: "Role and name",
   },
   {

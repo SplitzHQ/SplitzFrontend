@@ -13,7 +13,7 @@ import {
 } from "vue";
 
 import BrandHomeLogo from "@/components/BrandWordmark/BrandHomeLogo.vue";
-import BrandOpening from "@/components/BrandWordmark/BrandOpening.vue";
+import BrandOpeningOverlay from "@/components/BrandWordmark/BrandOpeningOverlay.vue";
 import AvatarMenu from "@/components/Notification/AvatarMenu.vue";
 import NotificationBell from "@/components/Notification/NotificationBell.vue";
 import SIconButton from "@/components/SButton/SIconButton.vue";
@@ -113,7 +113,7 @@ function measure(): void {
   const row = topRow.value;
   const label = searchRow.value?.querySelector("label");
   const icon = searchIcon.value?.$el as HTMLElement | undefined;
-  if (!row || !label || !icon || !searchRow.value) return;
+  if (!row || !label || icon! || !searchRow.value) return;
   searchRowHeight.value = searchRow.value.offsetHeight;
   const rowRect = row.getBoundingClientRect();
   const field = label.getBoundingClientRect();
@@ -363,7 +363,7 @@ function openSearch(): void {
         </span>
       </div>
 
-      <BrandOpening />
+      <BrandOpeningOverlay />
       <h1><BrandHomeLogo ref="logo" /></h1>
       <!-- The copy of the field goes under the bell and the avatar. -->
       <div class="relative z-20 flex items-center gap-1">

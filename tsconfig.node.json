@@ -7,11 +7,13 @@
     "nightwatch.conf.*",
     "playwright.config.*",
     ".claude/hooks/*.ts",
+    "oxlint-plugins/**/*.ts",
     "src/components/component-index.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 
     "module": "ESNext",

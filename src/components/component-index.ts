@@ -36,7 +36,7 @@ export const COMPONENT_INDEX: ComponentEntry[] = [
     use: "A progressive blur over content that scrolls under a fixed area. Sheet and BottomAction add it, so a page does not use it directly.",
   },
   {
-    components: ["BrandWordmark", "BrandHomeLogo", "BrandTapLogo", "BrandTapMark", "BrandOpening"],
+    components: ["BrandWordmark", "BrandHomeLogo", "BrandTapWordmark", "BrandTapGlyph", "BrandOpeningOverlay"],
     folder: "BrandWordmark",
     usage: "src/components/BrandWordmark/brand-wordmark.usage.ts",
     use: "The Splitz logo: the word with the diamond on the i, the word mark of HomePage with its tap motion and its change to the glyph, and the full-screen opening. The brand rules for every logo and app icon are in `src/components/BrandWordmark/brand.usage.ts`.",

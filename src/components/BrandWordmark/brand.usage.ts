@@ -121,7 +121,7 @@ export const COLOR_RULES: BrandRule[] = [
     title: "Logo color",
   },
   {
-    rule: "If a brand value changes, change these files together: the token in `src/assets`, `brand-glyph.ts`, `PLATE_COLOR_TOKEN` in `BrandOpening.vue`, `pwa-assets.config.ts`, `public/favicon.svg` and the `mask-icon` color in `index.html`. Then run `bun run generate-pwa-assets`.",
+    rule: "If a brand value changes, change these files together: the token in `src/assets`, `brand-glyph.ts`, `OPENING_STATUS_BAR_TOKEN` in `BrandOpeningOverlay.vue`, `pwa-assets.config.ts`, `public/favicon.svg` and the `mask-icon` color in `index.html`. Then run `bun run generate-pwa-assets`.",
     title: "Change a value",
   },
 ];

@@ -25,15 +25,27 @@ export const RULE_SCOPE: RuleScope = {
 
 /** When to use a text input. */
 export const WHEN_TO_USE: UsageRule[] = [
-  { rule: "The user types one line of text, for example a name, an email address or a code.", title: "One line" },
+  {
+    rule: "The user types one line of text, for example a name, an email address or a code.",
+    title: "One line",
+  },
   { rule: "The user searches a list on the same screen.", title: "Search" },
 ];
 
 /** The cases with another component. */
 export const NOT_A_TEXT_INPUT: UseInsteadRule[] = [
-  { use: "Keyboard", when: "The user enters an amount of money on the new expense screen." },
-  { use: "SSegmentControl", when: "The user chooses one item from a short list, and the items are all visible." },
-  { use: "HomeSearchBar", when: "The field is the search field in the header of the home page." },
+  {
+    use: "Keyboard",
+    when: "The user enters an amount of money on the new expense screen.",
+  },
+  {
+    use: "SSegmentControl",
+    when: "The user chooses one item from a short list, and the items are all visible.",
+  },
+  {
+    use: "HomeSearchBar",
+    when: "The field is the search field in the header of the home page.",
+  },
 ];
 
 /** What each variant is for. */
@@ -43,7 +55,7 @@ export const VARIANT_GUIDE: Record<TextInputVariant, UsageRule> = {
     title: "outlined",
   },
   plain: {
-    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-base` and scaled to look like `text-sm`, so it fits a row of `text-sm` text. It sets its own width, so do not add a width class, and put it in a block element that has the width. A flex parent would shrink it. It clips its extra width, so the page does not scroll sideways, and a long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
+    rule: "The bare input, for an inline layout that has its own container. It shows no label, no hint and no icon. Its text is `text-sm`, so it fits a row of `text-sm` text. The input is the root element and fills the width of its parent. A class on the component goes to the input. A long placeholder ends with an ellipsis. `SelectPeoplePage/SearchBar.vue` is the only use. See the open questions.",
     title: "plain",
   },
 };
@@ -133,10 +145,6 @@ export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
     text: '`label` names the input. In the `plain` variant it is the `aria-label`. `hint`, `error` and `described-by` set `aria-describedby`. `error` and `invalid` set `aria-invalid`. The `error` text has `role="alert"`, so a screen reader reads it when it appears.',
     title: "Screen reader",
-  },
-  {
-    text: "Each input that a person can type in has a computed text size of at least 16px, because a focused input under 16px makes iOS zoom the page. This includes HomeSearchBar and a raw `<input>` or `<textarea>`. A placeholder has the same size as the text. The `outlined` text is `text-base`. The `plain` text is `text-base` and scaled to look like `text-sm`. A real iPhone did not zoom for HomeSearchBar or for this scaled input (2026-11-04). Do not use `maximum-scale` in the viewport, because it can stop pinch zoom.",
-    title: "Zoom on iOS",
   },
   {
     text: "The empty border, the placeholder and the dark hint are below the WCAG minimum in the contrast tables. See the open questions.",

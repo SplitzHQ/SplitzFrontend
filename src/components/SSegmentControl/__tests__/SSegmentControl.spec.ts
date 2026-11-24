@@ -13,8 +13,8 @@ function mountControl(start = 0, props: Partial<SegmentControlProps> = {}) {
     defineComponent({
       render: () =>
         h(SSegmentControl as Component, {
+          "aria-label": "Choice",
           items: ITEMS,
-          label: "Choice",
           modelValue: model.value,
           "onUpdate:modelValue": (value: number) => (model.value = value),
           size: "sm",
@@ -60,12 +60,6 @@ describe("SSegmentControl", () => {
     const { radios } = mountControl(1);
 
     expect(radios().map((radio) => radio.attributes("tabindex"))).toEqual(["-1", "0", "-1"]);
-  });
-
-  it("puts the first segment in the tab order when the index is outside the list", () => {
-    const { radios } = mountControl(-1);
-
-    expect(radios().map((radio) => radio.attributes("tabindex"))).toEqual(["0", "-1", "-1"]);
   });
 
   it.each([

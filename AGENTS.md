@@ -25,11 +25,19 @@
 
 - Do not put a table in a card. This rule applies in `src/` and in `devtools/`, prototypes too. A table must not have a rounded frame with a border, a tinted header row, or a band of color behind the header. These parts give the generic AI look. Put the table on the page: a line under the header, a line between rows, and no outer padding on the first and the last column. In `devtools/`, use `DocTable` and the `ds-table` rule. Do not make a table frame by hand.
 
-- Add animations where appropriate. Check `ui-animation` skill.
+- Add animations where appropriate. Check `ui-animation` skill. Prefer `motion-v` when it simplifies the code.
 
 - Run format and test after code changes.
 
 - When adding or editing locale files (`src/locales/**/*.ftl`), follow the rules and glossary in `src/locales/README.md`.
+
+## Testing rules
+
+- Do not add test that check on a specific implementation detail. Focus on testing the behavior and output of the code instead.
+
+- Do not rely on implementation details that may change frequently, such as private methods or internal state.
+
+- Do not check a css class or style in tests.
 
 ## Devtools rules
 

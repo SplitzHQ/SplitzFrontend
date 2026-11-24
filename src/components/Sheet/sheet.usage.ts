@@ -111,7 +111,7 @@ export const LAYOUT_RULES: UsageRule[] = [
     title: "Status bar",
   },
   {
-    rule: "Set `title`, and Sheet draws the title: an h2 with size display-xs and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
+    rule: "Set `title`, and Sheet draws the title: an h2 with size display-xs and weight semibold. Do not write a title in the content. Only a panel that puts its own controls in the title row has no `title`, and it sets `aria-label`. NotificationSheet is that case. Such a title row sets `data-sheet-handle` and `touch-none`, so a press on it also drags the handle.",
     title: "Title",
   },
   {
@@ -179,7 +179,7 @@ export const COPY_RULES: CopyRule[] = [
 /** Accessibility rules that the component follows, written for the people who use it. */
 export const ACCESSIBILITY_NOTES: AccessibilityNote[] = [
   {
-    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `label`, and the panel gets its name from that prop. `description` gives the panel its `aria-describedby`.",
+    text: "The panel has the dialog role and `aria-modal`. The type check requires `title` or `aria-label`. A visible title names the panel through `aria-labelledby`; otherwise `aria-label` names it directly. `description` gives the panel its `aria-describedby`.",
     title: "Role and name",
   },
   {
@@ -220,5 +220,5 @@ export const OPEN_QUESTIONS = [
   "Is the blur correct on a real iPhone? No device test exists. A drag sets the opacity of the panel near the point of dismissal, and one closed report from iOS 18 shows a black area when a blur changes its opacity. iOS 17 also needs a check, because Safari 17.6 on a Mac had a bug with a mask and a blur together. The compositor cost of the blur in Chromium is in the prototype `2026-11-04-sheet-action-divider`.",
   "Can a sheet close while its action runs? A tap on the backdrop closes DeleteConfirmSheet, MarkPaidSheet, EditNicknameSheet and the 2FA confirm step while the request runs. No caller blocks this now, and the old `dismissOnBackdrop` prop had no caller, so this work removed it.",
   "Must a mouse drag start only on the handle? A mouse drag now starts on each free part of the panel, so a person with a mouse cannot select the text in a sheet. A finger is not affected.",
-  "Must a sheet move above the on-screen keyboard? `dvh` does not change when the keyboard opens, and `index.html` does not set `interactive-widget`. The browser scrolls to the focused field, but a Save button under the field can stay under the keyboard. Test this on a device before you decide.",
+  "Must a sheet move above the on-screen keyboard? `index.html` sets `interactive-widget=resizes-content`, so `dvh` follows the keyboard on supported browsers. Other browsers still need a fallback. The browser scrolls to the focused field, but a Save button under the field can stay under the keyboard. Test this on a device before you decide.",
 ];

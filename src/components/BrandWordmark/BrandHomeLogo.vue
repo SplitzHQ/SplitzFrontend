@@ -3,11 +3,11 @@ import { onBeforeUnmount, shallowRef, useTemplateRef } from "vue";
 
 import { MOTION_EASING, motionMs } from "@/libs/motion";
 
-import { BRAND_GLYPH } from "./brand-glyph";
-import BrandTapLogo from "./BrandTapLogo.vue";
+import { BRAND_GLYPH, BRAND_GLYPH_BOX } from "./brand-glyph";
+import BrandTapWordmark from "./BrandTapWordmark.vue";
 
 /**
- * The logo of the HomePage header. It is `BrandTapLogo`, and it can change to the glyph when the header collapses. The
+ * The logo of the HomePage header. It is `BrandTapWordmark`, and it can change to the glyph when the header collapses. The
  * parent calls `scrub()` with the progress of the collapse, from 0 (the word) to 1 (the glyph), so the logo moves with
  * the other parts of the header. The change keeps the diamond: the letters leave one by one, the diamond on the i moves
  * to the place of the diamond in the glyph, and the dot and the bar grow. The way back moves the same steps backward.
@@ -18,9 +18,6 @@ import BrandTapLogo from "./BrandTapLogo.vue";
 
 /** The width of the glyph in the collapsed header. The user picked 18px in the prototype `2026-11-05-home-motion`. */
 const GLYPH_PX = 18;
-/** The box of the glyph in the units of `brand-glyph.ts`: it starts at 150 and is 300 wide. */
-const GLYPH_ORIGIN = 150;
-const GLYPH_UNITS = 300;
 /** The time between two letters that leave. */
 const LETTER_STAGGER_MS = 30;
 
@@ -57,8 +54,8 @@ function setPartOrigins(parts: SVGSVGElement[]): void {
     const shape = part.firstElementChild as SVGGraphicsElement | null;
     if (!shape) return;
     const box = shape.getBBox();
-    const x = ((box.x + box.width / 2 - GLYPH_ORIGIN) / GLYPH_UNITS) * 100;
-    const y = ((box.y + box.height / 2 - GLYPH_ORIGIN) / GLYPH_UNITS) * 100;
+    const x = ((box.x + box.width / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
+    const y = ((box.y + box.height / 2 - BRAND_GLYPH_BOX.min) / BRAND_GLYPH_BOX.size) * 100;
     part.style.transformOrigin = `${x}% ${y}%`;
   });
 }
@@ -129,7 +126,7 @@ onBeforeUnmount(stop);
 <template>
   <div :class="['relative flex h-10 items-center', collapsed && 'is-glyph']">
     <span ref="word" :class="['word block', collapsed && 'pointer-events-none']">
-      <BrandTapLogo />
+      <BrandTapWordmark />
     </span>
     <span
       ref="glyph"
@@ -141,7 +138,7 @@ onBeforeUnmount(stop);
         v-for="part in GLYPH_PARTS"
         :key="part"
         :data-glyph="part"
-        viewBox="150 150 300 300"
+        :viewBox="BRAND_GLYPH_BOX.viewBox"
         fill="currentColor"
         class="absolute inset-0 size-full overflow-visible"
       >

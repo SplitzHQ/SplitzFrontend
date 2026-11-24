@@ -4,6 +4,7 @@
     "typeAware": true
   },
   "plugins": ["typescript", "import", "unicorn", "node", "jsdoc", "vue"],
+  "jsPlugins": ["./oxlint-plugins/splitz/index.ts"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -128,6 +129,14 @@
       }
     ]
   },
+  "overrides": [
+    {
+      "files": ["src/**/*.ts", "src/**/*.vue"],
+      "rules": {
+        "splitz/tailwind-canonical-classes": "error"
+      }
+    }
+  ],
   "globals": {
     "AudioWorkletGlobalScope": "readonly",
     "AudioWorkletProcessor": "readonly",

@@ -1,10 +1,11 @@
-import { mount } from "@vue/test-utils";
+import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref, shallowRef } from "vue";
 
 import GroupDetailPage from "../GroupDetailPage.vue";
 
+/** The query state exposed to the page during a load or refresh. */
 interface QueryState {
   data: unknown;
   status: string;
@@ -21,13 +22,17 @@ const PENDING: QueryState = { data: undefined, status: "pending" };
 
 /** Makes the parts of a query result that the page reads. */
 function makeRequest() {
-  return { asyncStatus: shallowRef("idle"), refetch: vi.fn(() => Promise.resolve()), state: ref(PENDING) };
+  return { asyncStatus: shallowRef("idle"), state: ref(PENDING) };
 }
 
 const requests: Record<string, ReturnType<typeof makeRequest>> = vi.hoisted(() => ({}));
+const invalidateQueries = vi.hoisted(() => vi.fn<() => Promise<void>>());
+
+enableAutoUnmount(afterEach);
 
 vi.mock("@pinia/colada", () => ({
   useQuery: ({ key }: { key: () => string[] }) => requests[key()[0] ?? ""],
+  useQueryCache: () => ({ invalidateQueries }),
 }));
 
 vi.mock("fluent-vue", () => ({
@@ -48,8 +53,9 @@ function setStates(group: QueryState, transactions: QueryState, invoices: QueryS
 }
 
 /** Mounts the page without the parts that need the backend. Each slot of Layout renders. */
-function mountPage() {
+function mountPage(attachTo?: HTMLElement) {
   return mount(GroupDetailPage, {
+    attachTo,
     global: {
       mocks: { $t: (key: string) => key },
       stubs: {
@@ -69,6 +75,7 @@ function mountPage() {
 describe("GroupDetailPage load states", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    invalidateQueries.mockReset().mockResolvedValue(undefined);
     requests.getGroup = makeRequest();
     requests.getGroupTransactions = makeRequest();
     requests.getGroupInvoices = makeRequest();
@@ -110,26 +117,66 @@ describe("GroupDetailPage load states", () => {
     expect(wrapper.find("balance-card-stub").exists()).toBe(true);
   });
 
-  it("requests again only what failed", async () => {
-    setStates(SUCCESS_GROUP, FAILED, SUCCESS_LIST);
+  it("retries only the current group's failed queries that have no cached data", async () => {
+    setStates(FAILED, FAILED, { data: SUCCESS_LIST.data, status: "error" });
     const wrapper = mountPage();
 
     await wrapper.get(`${LOAD_ERROR} button`).trigger("click");
 
-    expect(requests.getGroupTransactions.refetch).toHaveBeenCalledOnce();
-    expect(requests.getGroup.refetch).not.toHaveBeenCalled();
-    expect(requests.getGroupInvoices.refetch).not.toHaveBeenCalled();
+    expect(invalidateQueries).toHaveBeenCalledTimes(2);
+    expect(invalidateQueries).toHaveBeenCalledWith({ exact: true, key: ["getGroup", "group-1"] });
+    expect(invalidateQueries).toHaveBeenCalledWith({ exact: true, key: ["getGroupTransactions", "group-1"] });
   });
 
-  it("keeps the notice and shows the loading button during a retry", async () => {
-    setStates(FAILED, SUCCESS_LIST, SUCCESS_LIST);
+  it("announces another failure and makes Retry available again", async () => {
+    setStates(SUCCESS_GROUP, SUCCESS_LIST, FAILED);
     const wrapper = mountPage();
+    const status = wrapper.get('[role="status"]');
+    const retryButton = wrapper.get(`${LOAD_ERROR} button`);
+    const request = requests.getGroupInvoices;
+    let finishRetry!: () => void;
+    const retry = new Promise<void>((resolve) => {
+      finishRetry = resolve;
+    });
+    invalidateQueries.mockImplementationOnce(() => {
+      request.asyncStatus.value = "loading";
+      return retry;
+    });
 
-    requests.getGroup.asyncStatus.value = "loading";
-    await nextTick();
+    expect(status.text()).toBe("");
+    await retryButton.trigger("click");
 
-    expect(wrapper.get(`${LOAD_ERROR} button`).attributes("aria-busy")).toBe("true");
-    expect(wrapper.get('[role="status"]').text()).toBe("group-detail-status-loading");
+    expect(retryButton.attributes("aria-busy")).toBe("true");
+    expect(status.text()).toBe("group-detail-status-loading");
+
+    request.asyncStatus.value = "idle";
+    finishRetry();
+    await flushPromises();
+
+    expect(wrapper.get(LOAD_ERROR).text()).toContain("group-detail-error-invoices");
+    expect(retryButton.attributes("aria-busy")).toBeUndefined();
+    expect(status.text()).toBe("group-detail-error-invoices");
+  });
+
+  it("restores focus to the recovered content after a successful retry", async () => {
+    setStates(FAILED, SUCCESS_LIST, SUCCESS_LIST);
+    const wrapper = mountPage(document.body);
+    const retryButton = wrapper.get<HTMLButtonElement>(`${LOAD_ERROR} button`);
+    invalidateQueries.mockImplementationOnce(() => {
+      requests.getGroup.state.value = SUCCESS_GROUP;
+      return Promise.resolve();
+    });
+
+    retryButton.element.focus();
+    expect(document.activeElement).toBe(retryButton.element);
+    await retryButton.trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find(LOAD_ERROR).exists()).toBe(false);
+    expect(wrapper.get('[role="status"]').text()).toBe("group-detail-status-loaded");
+    const focused = document.activeElement;
+    expect(focused).not.toBe(document.body);
+    expect(focused?.contains(wrapper.get('[data-test="transactions"]').element)).toBe(true);
   });
 
   it("keeps the old data and shows no notice when a refresh fails", () => {

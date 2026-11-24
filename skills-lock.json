@@ -1,57 +1,63 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "e2e-testing-patterns": {
       "source": "wshobson/agents",
       "sourceType": "github",
-      "computedHash": "3425e335940b8f1f4881452603252385f9119159632dc211bc8c8a375f4619cd"
+      "computedHash": ""
     },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
-      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+      "computedHash": ""
     },
     "humanizer": {
       "source": "blader/humanizer",
       "sourceType": "github",
       "skillPath": "SKILL.md",
-      "computedHash": "f17e3360d6ad1a9f93774fbe89347376968c4060137ac04872baa49b3a4a4175"
+      "computedHash": ""
     },
     "javascript-testing-patterns": {
       "source": "wshobson/agents",
       "sourceType": "github",
-      "computedHash": "325957f63862a4ef54726b34d3cfad105a918fcdcf6d08e11dc8d803dbd2a7a0"
+      "computedHash": ""
+    },
+    "modern-web-guidance": {
+      "source": "GoogleChrome/modern-web-guidance",
+      "sourceType": "github",
+      "skillPath": "skills/modern-web-guidance/SKILL.md",
+      "computedHash": "9e69ce00dc314b64f6664031b70295ea46c7de93ac682c624808df6e48e08b66"
     },
     "playwright-generate-test": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
-      "computedHash": "8f963da3e25f705ff39755b8b990f20da0c0320cb86ac83fcc4d2d4eca91f6e4"
+      "computedHash": ""
     },
     "vue": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "f72b54618560c53d65740515ded5bb833750c4574dbe961fd21f022bd2b31a74"
+      "computedHash": ""
     },
     "vue-router-best-practices": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "405d377ebeef773b240f31902dfb204095d4bcc945e8a4c2f4b560062c032fbb"
+      "computedHash": ""
     },
     "vue-testing-best-practices": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "c568e4abe743cd36a0eb15730f72de54b8d84c9bfbaa4395bc448428b9c71c12"
+      "computedHash": ""
     },
     "vueuse-functions": {
       "source": "antfu/skills",
       "sourceType": "github",
-      "computedHash": "5189e448e981e42e2153c1b5e8d19e51b01e642c2357ab0f2892c4d8b50ba2b5"
+      "computedHash": ""
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
       "ref": "main",
       "sourceType": "github",
-      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+      "computedHash": ""
     }
   }
 }
