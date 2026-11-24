@@ -113,7 +113,7 @@ function measure(): void {
   const row = topRow.value;
   const label = searchRow.value?.querySelector("label");
   const icon = searchIcon.value?.$el as HTMLElement | undefined;
-  if (!row || !label || icon! || !searchRow.value) return;
+  if (!row || !label || icon === undefined || !searchRow.value) return;
   searchRowHeight.value = searchRow.value.offsetHeight;
   const rowRect = row.getBoundingClientRect();
   const field = label.getBoundingClientRect();
